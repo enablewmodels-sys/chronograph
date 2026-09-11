@@ -27,6 +27,7 @@ with tempfile.TemporaryDirectory(prefix='chronograph-source-') as temp:
                 raise RuntimeError('Credential-shaped bytes in source archive')
         archive.extractall(temp, filter='data')
     root, = pathlib.Path(temp).iterdir()
+    root = root.resolve()
     manifest = (root / 'FILES.sha256').read_text().splitlines()
     for line in manifest:
         expected, rel = line.split('  ', 1)
@@ -46,7 +47,9 @@ with tempfile.TemporaryDirectory(prefix='chronograph-source-') as temp:
             assert included.is_relative_to(root) and included.is_file(), (source, relative)
     for package in metadata['packages']:
         assert package['version'] == __import__('tomllib').loads((root / 'Cargo.toml').read_text())['workspace']['package']['version']
-        assert pathlib.Path(package['license_file']).read_bytes() == (root / 'LICENSE').read_bytes()
+        license_path = (pathlib.Path(package['manifest_path']).parent / package['license_file']).resolve()
+        assert license_path.is_relative_to(root)
+        assert license_path.read_bytes() == (root / 'LICENSE').read_bytes()
         for target in package['targets']:
             assert pathlib.Path(target['src_path']).is_file()
     subprocess.run(['python3', 'scripts/release/check-docs.py'], cwd=root, check=True, capture_output=True)
