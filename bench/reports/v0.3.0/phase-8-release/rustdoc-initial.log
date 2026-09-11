@@ -1,0 +1,26 @@
+    Checking arrow-string v59.3.0
+    Checking arrow v59.3.0
+    Checking chronograph-db v0.3.0 (<workspace>/crates/chronograph-core)
+    Checking chronograph-connector-common v0.3.0 (<workspace>/crates/chronograph-connector-common)
+ Documenting chronograph-connector-common v0.3.0 (<workspace>/crates/chronograph-connector-common)
+ Documenting chronograph-db v0.3.0 (<workspace>/crates/chronograph-core)
+    Checking chronograph-server v0.3.0 (<workspace>/crates/chronograph-server)
+    Checking chronograph-bench v0.3.0 (<workspace>/crates/chronograph-bench)
+ Documenting chronograph-server v0.3.0 (<workspace>/crates/chronograph-server)
+ Documenting chronograph-bench v0.3.0 (<workspace>/crates/chronograph-bench)
+ Documenting chronograph-conn-robotics v0.3.0 (<workspace>/crates/chronograph-conn-robotics)
+ Documenting chronograph-conn-bci v0.3.0 (<workspace>/crates/chronograph-conn-bci)
+ Documenting chronograph-conn-quantum v0.3.0 (<workspace>/crates/chronograph-conn-quantum)
+ Documenting chronograph-conn-worldmodel v0.3.0 (<workspace>/crates/chronograph-conn-worldmodel)
+error: unresolved link to `0,1`
+   --> crates/chronograph-conn-quantum/src/lib.rs:218:60
+    |
+218 |     /// Directed two-qubit operation error probability in [0,1].
+    |                                                            ^^^ no item named `0,1` in scope
+    |
+    = help: to escape `[` and `]` characters, add '\' before them like `\[` or `\]`
+    = note: `-D rustdoc::broken-intra-doc-links` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(rustdoc::broken_intra_doc_links)]`
+
+error: could not document `chronograph-conn-quantum`
+warning: build failed, waiting for other jobs to finish...

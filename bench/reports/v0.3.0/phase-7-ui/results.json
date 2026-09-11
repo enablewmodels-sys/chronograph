@@ -1,0 +1,56 @@
+{
+  "phase": "phase-7-ui",
+  "started_at": "2026-09-09T14:16:17.687173+00:00",
+  "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
+  "checks": [
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--workspace"
+      ],
+      "exit_code": 0,
+      "seconds": 0.682043,
+      "output": "build.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--workspace"
+      ],
+      "exit_code": 0,
+      "seconds": 18.740462,
+      "output": "test.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 0.772502,
+      "output": "clippy.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.366622,
+      "output": "fmt.log"
+    }
+  ]
+}

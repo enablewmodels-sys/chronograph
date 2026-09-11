@@ -1,0 +1,5 @@
+$ target/release/measure --single --shuffled --ingest-only
+dataset=10000000, nodes=100000, seed=4848215499434033153, mode=single-shuffled, rayon_threads=10
+Generated in 0.293s
+Ingest: 1305054 edges/s buffered, 1303809 edges/s including sync; 7.663s / 7.670s
+Reopen: 5.036s, 10000000 versions, 962598544 bytes

@@ -1,0 +1,623 @@
+$ target/release/examples/fork_demo <workspace>/.work/phase-5-fork-demo
+{
+  "create_ms": 0.165833,
+  "discarded": 99,
+  "fork_time_us": "2000",
+  "forks": 100,
+  "merge_and_sync_ms": 4.052084,
+  "outcomes": [
+    {
+      "fork": "1",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "2",
+      "reward": 0.7599999999999999,
+      "steps": 25,
+      "terminated": true
+    },
+    {
+      "fork": "3",
+      "reward": 0.73,
+      "steps": 28,
+      "terminated": true
+    },
+    {
+      "fork": "4",
+      "reward": 0.84,
+      "steps": 17,
+      "terminated": true
+    },
+    {
+      "fork": "5",
+      "reward": 0.6099999999999999,
+      "steps": 40,
+      "terminated": true
+    },
+    {
+      "fork": "6",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "7",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "8",
+      "reward": 0.72,
+      "steps": 29,
+      "terminated": true
+    },
+    {
+      "fork": "9",
+      "reward": 0.5399999999999998,
+      "steps": 47,
+      "terminated": true
+    },
+    {
+      "fork": "10",
+      "reward": 0.48999999999999977,
+      "steps": 52,
+      "terminated": true
+    },
+    {
+      "fork": "11",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "12",
+      "reward": 0.84,
+      "steps": 17,
+      "terminated": true
+    },
+    {
+      "fork": "13",
+      "reward": 0.5299999999999998,
+      "steps": 48,
+      "terminated": true
+    },
+    {
+      "fork": "14",
+      "reward": 0.75,
+      "steps": 26,
+      "terminated": true
+    },
+    {
+      "fork": "15",
+      "reward": -0.6200000000000003,
+      "steps": 62,
+      "terminated": false
+    },
+    {
+      "fork": "16",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "17",
+      "reward": 0.75,
+      "steps": 26,
+      "terminated": true
+    },
+    {
+      "fork": "18",
+      "reward": 0.71,
+      "steps": 30,
+      "terminated": true
+    },
+    {
+      "fork": "19",
+      "reward": 0.5799999999999998,
+      "steps": 43,
+      "terminated": true
+    },
+    {
+      "fork": "20",
+      "reward": 0.5199999999999998,
+      "steps": 49,
+      "terminated": true
+    },
+    {
+      "fork": "21",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "22",
+      "reward": 0.72,
+      "steps": 29,
+      "terminated": true
+    },
+    {
+      "fork": "23",
+      "reward": 0.73,
+      "steps": 28,
+      "terminated": true
+    },
+    {
+      "fork": "24",
+      "reward": 0.7,
+      "steps": 31,
+      "terminated": true
+    },
+    {
+      "fork": "25",
+      "reward": -0.6200000000000003,
+      "steps": 62,
+      "terminated": false
+    },
+    {
+      "fork": "26",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "27",
+      "reward": 0.84,
+      "steps": 17,
+      "terminated": true
+    },
+    {
+      "fork": "28",
+      "reward": 0.7599999999999999,
+      "steps": 25,
+      "terminated": true
+    },
+    {
+      "fork": "29",
+      "reward": 0.6399999999999999,
+      "steps": 37,
+      "terminated": true
+    },
+    {
+      "fork": "30",
+      "reward": 0.5799999999999998,
+      "steps": 43,
+      "terminated": true
+    },
+    {
+      "fork": "31",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "32",
+      "reward": 0.75,
+      "steps": 26,
+      "terminated": true
+    },
+    {
+      "fork": "33",
+      "reward": 0.5099999999999998,
+      "steps": 50,
+      "terminated": true
+    },
+    {
+      "fork": "34",
+      "reward": 0.5899999999999999,
+      "steps": 42,
+      "terminated": true
+    },
+    {
+      "fork": "35",
+      "reward": -0.6200000000000003,
+      "steps": 62,
+      "terminated": false
+    },
+    {
+      "fork": "36",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "37",
+      "reward": 0.84,
+      "steps": 17,
+      "terminated": true
+    },
+    {
+      "fork": "38",
+      "reward": 0.75,
+      "steps": 26,
+      "terminated": true
+    },
+    {
+      "fork": "39",
+      "reward": 0.6099999999999999,
+      "steps": 40,
+      "terminated": true
+    },
+    {
+      "fork": "40",
+      "reward": -0.6200000000000003,
+      "steps": 62,
+      "terminated": false
+    },
+    {
+      "fork": "41",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "42",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "43",
+      "reward": 0.7599999999999999,
+      "steps": 25,
+      "terminated": true
+    },
+    {
+      "fork": "44",
+      "reward": 0.5399999999999998,
+      "steps": 47,
+      "terminated": true
+    },
+    {
+      "fork": "45",
+      "reward": 0.4999999999999998,
+      "steps": 51,
+      "terminated": true
+    },
+    {
+      "fork": "46",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "47",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "48",
+      "reward": 0.74,
+      "steps": 27,
+      "terminated": true
+    },
+    {
+      "fork": "49",
+      "reward": 0.6399999999999999,
+      "steps": 37,
+      "terminated": true
+    },
+    {
+      "fork": "50",
+      "reward": 0.5299999999999998,
+      "steps": 48,
+      "terminated": true
+    },
+    {
+      "fork": "51",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "52",
+      "reward": 0.7699999999999999,
+      "steps": 24,
+      "terminated": true
+    },
+    {
+      "fork": "53",
+      "reward": 0.7999999999999999,
+      "steps": 21,
+      "terminated": true
+    },
+    {
+      "fork": "54",
+      "reward": 0.73,
+      "steps": 28,
+      "terminated": true
+    },
+    {
+      "fork": "55",
+      "reward": 0.5399999999999998,
+      "steps": 47,
+      "terminated": true
+    },
+    {
+      "fork": "56",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "57",
+      "reward": 0.8099999999999999,
+      "steps": 20,
+      "terminated": true
+    },
+    {
+      "fork": "58",
+      "reward": 0.7699999999999999,
+      "steps": 24,
+      "terminated": true
+    },
+    {
+      "fork": "59",
+      "reward": 0.4399999999999997,
+      "steps": 57,
+      "terminated": true
+    },
+    {
+      "fork": "60",
+      "reward": -0.6200000000000003,
+      "steps": 62,
+      "terminated": false
+    },
+    {
+      "fork": "61",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "62",
+      "reward": 0.75,
+      "steps": 26,
+      "terminated": true
+    },
+    {
+      "fork": "63",
+      "reward": 0.8099999999999999,
+      "steps": 20,
+      "terminated": true
+    },
+    {
+      "fork": "64",
+      "reward": 0.5299999999999998,
+      "steps": 48,
+      "terminated": true
+    },
+    {
+      "fork": "65",
+      "reward": 0.5999999999999999,
+      "steps": 41,
+      "terminated": true
+    },
+    {
+      "fork": "66",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "67",
+      "reward": 0.7999999999999999,
+      "steps": 21,
+      "terminated": true
+    },
+    {
+      "fork": "68",
+      "reward": 0.71,
+      "steps": 30,
+      "terminated": true
+    },
+    {
+      "fork": "69",
+      "reward": 0.5699999999999998,
+      "steps": 44,
+      "terminated": true
+    },
+    {
+      "fork": "70",
+      "reward": -0.6200000000000003,
+      "steps": 62,
+      "terminated": false
+    },
+    {
+      "fork": "71",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "72",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "73",
+      "reward": 0.7599999999999999,
+      "steps": 25,
+      "terminated": true
+    },
+    {
+      "fork": "74",
+      "reward": 0.5499999999999998,
+      "steps": 46,
+      "terminated": true
+    },
+    {
+      "fork": "75",
+      "reward": 0.4999999999999998,
+      "steps": 51,
+      "terminated": true
+    },
+    {
+      "fork": "76",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "77",
+      "reward": 0.84,
+      "steps": 17,
+      "terminated": true
+    },
+    {
+      "fork": "78",
+      "reward": 0.7,
+      "steps": 31,
+      "terminated": true
+    },
+    {
+      "fork": "79",
+      "reward": 0.75,
+      "steps": 26,
+      "terminated": true
+    },
+    {
+      "fork": "80",
+      "reward": -0.6200000000000003,
+      "steps": 62,
+      "terminated": false
+    },
+    {
+      "fork": "81",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "82",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "83",
+      "reward": 0.7999999999999999,
+      "steps": 21,
+      "terminated": true
+    },
+    {
+      "fork": "84",
+      "reward": 0.5199999999999998,
+      "steps": 49,
+      "terminated": true
+    },
+    {
+      "fork": "85",
+      "reward": -0.6200000000000003,
+      "steps": 62,
+      "terminated": false
+    },
+    {
+      "fork": "86",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "87",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "88",
+      "reward": 0.75,
+      "steps": 26,
+      "terminated": true
+    },
+    {
+      "fork": "89",
+      "reward": -0.6200000000000003,
+      "steps": 62,
+      "terminated": false
+    },
+    {
+      "fork": "90",
+      "reward": 0.4999999999999998,
+      "steps": 51,
+      "terminated": true
+    },
+    {
+      "fork": "91",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "92",
+      "reward": 0.84,
+      "steps": 17,
+      "terminated": true
+    },
+    {
+      "fork": "93",
+      "reward": 0.71,
+      "steps": 30,
+      "terminated": true
+    },
+    {
+      "fork": "94",
+      "reward": -0.6200000000000003,
+      "steps": 62,
+      "terminated": false
+    },
+    {
+      "fork": "95",
+      "reward": 0.72,
+      "steps": 29,
+      "terminated": true
+    },
+    {
+      "fork": "96",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "97",
+      "reward": 0.85,
+      "steps": 16,
+      "terminated": true
+    },
+    {
+      "fork": "98",
+      "reward": 0.8099999999999999,
+      "steps": 20,
+      "terminated": true
+    },
+    {
+      "fork": "99",
+      "reward": 0.5499999999999998,
+      "steps": 46,
+      "terminated": true
+    },
+    {
+      "fork": "100",
+      "reward": 0.5399999999999998,
+      "steps": 47,
+      "terminated": true
+    }
+  ],
+  "parallel_compute_ms": 0.312125,
+  "parent_versions_after_merge": 19,
+  "rayon_workers": 10,
+  "restored_branch_records": 3158,
+  "seed": 42,
+  "selected_fork": "1",
+  "selected_reward": 0.85,
+  "serialized_persist_and_sync_ms": 824.964583,
+  "status": "passed",
+  "terminated": 90,
+  "truncated": 10,
+  "verification": "All branch states compared after reopening; selected parent episode compared after merge, discard and reopening. Arrow export contains the completed selected episode.",
+  "version": "0.3.0"
+}

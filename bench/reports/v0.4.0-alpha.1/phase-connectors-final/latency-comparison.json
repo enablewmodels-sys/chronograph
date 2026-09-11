@@ -1,0 +1,74 @@
+[
+  {
+    "workload": "HTTP stats",
+    "before_p50_ms": 0.18745899999998983,
+    "after_p50_ms": 0.18999999999999773,
+    "change_percent": 1.3554964018841709
+  },
+  {
+    "workload": "HTTP as-of first page (1000 rows)",
+    "before_p50_ms": 2.2652499999999236,
+    "after_p50_ms": 2.22458400000005,
+    "change_percent": -1.7952102416896598
+  },
+  {
+    "workload": "HTTP uniform sample (16 edges)",
+    "before_p50_ms": 0.19299999999998363,
+    "after_p50_ms": 0.1689169999999649,
+    "change_percent": -12.478238341979676
+  },
+  {
+    "workload": "MCP as-of first page (1000 rows)",
+    "before_p50_ms": 3.0101660000000265,
+    "after_p50_ms": 2.8730000000000473,
+    "change_percent": -4.556758663807181
+  },
+  {
+    "workload": "HTTP as-of first page, 8 clients",
+    "before_p50_ms": 5.585999999999785,
+    "after_p50_ms": 5.360125000000153,
+    "change_percent": -4.043591120652367
+  },
+  {
+    "workload": "MCP as-of first page, 8 concurrent requests",
+    "before_p50_ms": 6.818625000000338,
+    "after_p50_ms": 6.200834000000214,
+    "change_percent": -9.060345744194676
+  },
+  {
+    "workload": "HTTP durable single insert",
+    "before_p50_ms": 4.078082999999879,
+    "after_p50_ms": 3.9510409999998046,
+    "change_percent": -3.115238213642979
+  },
+  {
+    "workload": "HTTP schema catalog (1 relation, 1 migration)",
+    "before_p50_ms": 0.13445899999987887,
+    "after_p50_ms": 0.12874999999985448,
+    "change_percent": -4.245903955874675
+  },
+  {
+    "workload": "HTTP schema preview (metadata-only)",
+    "before_p50_ms": 0.13145799999983865,
+    "after_p50_ms": 0.12029200000006313,
+    "change_percent": -8.493967654908207
+  },
+  {
+    "workload": "HTTP typed as-of first page (1000 rows)",
+    "before_p50_ms": 2.6482919999998558,
+    "after_p50_ms": 2.6527500000001965,
+    "change_percent": 0.16833491172201231
+  },
+  {
+    "workload": "MCP typed as-of first page (1000 rows)",
+    "before_p50_ms": 3.473457999999482,
+    "after_p50_ms": 3.537250000000313,
+    "change_percent": 1.8365559624109462
+  },
+  {
+    "workload": "HTTP typed durable single insert",
+    "before_p50_ms": 4.0118750000001455,
+    "after_p50_ms": 3.785124999999425,
+    "change_percent": -5.651970711966648
+  }
+]

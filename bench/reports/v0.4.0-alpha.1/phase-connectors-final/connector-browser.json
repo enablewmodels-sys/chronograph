@@ -1,0 +1,30 @@
+[
+  {
+    "device": "desktop",
+    "repeat": 0,
+    "status": "passed",
+    "url": "http://127.0.0.1:18089/app/connectors",
+    "title": "Chronograph · A memory for worlds in motion"
+  },
+  {
+    "device": "desktop",
+    "repeat": 1,
+    "status": "passed",
+    "url": "http://127.0.0.1:18089/app/connectors",
+    "title": "Chronograph · A memory for worlds in motion"
+  },
+  {
+    "device": "mobile",
+    "repeat": 0,
+    "status": "passed",
+    "url": "http://127.0.0.1:18089/app/connectors",
+    "title": "Chronograph · A memory for worlds in motion"
+  },
+  {
+    "device": "mobile",
+    "repeat": 1,
+    "status": "passed",
+    "url": "http://127.0.0.1:18089/app/connectors",
+    "title": "Chronograph · A memory for worlds in motion"
+  }
+]

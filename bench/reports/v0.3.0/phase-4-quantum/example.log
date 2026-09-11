@@ -1,0 +1,4 @@
+$ cargo run --locked -p chronograph-conn-quantum --example quantum_connector
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.29s
+     Running `target/debug/examples/quantum_connector`
+EXPLORATORY quantum: 3 qubits, 5 gates, 20 DAG edges, 3 exact calibration windows; gap at t=250 and reopen/Arrow comparisons passed

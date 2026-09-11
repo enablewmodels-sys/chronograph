@@ -1,0 +1,60 @@
+name: Verify
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      PROPTEST_RNG_SEED: '4848215499434033153'
+      CHRONOGRAPH_REPORT_PHASE: phase-ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.93.0
+        with:
+          components: rustfmt, clippy
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y cmake
+      - run: python3 scripts/check-phase.py phase-ci
+      - run: cargo test --locked --workspace --all-features -- --test-threads=2
+      - run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+      - run: npm --prefix ui ci
+      - run: npm --prefix ui run format:check
+      - run: npm --prefix ui audit --audit-level=high
+      - run: cargo install cargo-audit --locked --version 0.22.2
+      - run: cargo audit
+      - run: cargo install mdbook --locked --version 0.5.3
+      - run: mdbook build
+      - run: python3 scripts/release/check-docs.py
+      - run: RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --no-deps
+      - run: node scripts/build-site.mjs
+      - run: npm --prefix ui run build
+      - run: cargo build --locked --release -p chronograph-server --bins
+      - run: node scripts/protocol-test.mjs
+      - run: node scripts/schema-test.mjs
+      - run: node scripts/connector-platform-test.mjs
+      - run: npx playwright install --with-deps chromium
+        working-directory: ui
+      - run: xvfb-run npm --prefix ui run test:e2e -- --headed
+      - run: node scripts/service-latency.mjs
+      - run: docker build -t chronograph:ci .
+      - run: python3 scripts/container-smoke.py --image chronograph:ci
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: verification-evidence
+          # Never upload browser traces, temporary configs or raw credentials.
+          path: |
+            bench/reports/v0.4.0-alpha.2/phase-ci/
+            /tmp/chronograph-schema-*.png
+            /tmp/chronograph-landing-*.png
+            /tmp/chronograph-branches-*.png
+            /tmp/chronograph-branch-explorer-*.png

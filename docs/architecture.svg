@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="850" viewBox="0 0 1120 850" role="img" aria-labelledby="title desc">
+  <title id="title">Chronograph Community architecture</title>
+  <desc id="desc">Browser and MCP clients use the scoped HTTP service. Embedded Rust applications and connectors use the engine directly. One owner commits parent and branch mutations to a locked journal; private credentials remain outside the graph volume.</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#61786a"/></marker></defs>
+  <rect width="1120" height="850" rx="12" fill="#f6f7f0"/>
+  <g font-family="Arial, sans-serif" fill="#18271f">
+    <text x="40" y="48" font-size="28" font-weight="700">Chronograph Community</text>
+    <text x="40" y="75" font-size="15" fill="#53685c">One workspace. An embedded engine, with optional HTTP, console and MCP.</text>
+    <g fill="#e6eddf" stroke="#a8b9aa">
+      <rect x="40" y="105" width="290" height="88" rx="6"/>
+      <rect x="360" y="105" width="320" height="88" rx="6"/>
+      <rect x="730" y="105" width="350" height="88" rx="6"/>
+      <rect x="40" y="245" width="640" height="110" rx="6"/>
+      <rect x="730" y="245" width="350" height="110" rx="6"/>
+    </g>
+    <g font-size="18" font-weight="700">
+      <text x="62" y="138">Browser console / HTTP</text><text x="382" y="138">Codex / Cursor / Claude</text>
+      <text x="752" y="138">Embedded applications</text>
+      <text x="62" y="276">Authenticated service · Axum + MCP</text><text x="752" y="276">Private credential store</text>
+    </g>
+    <g font-size="14" fill="#53685c">
+      <text x="62" y="169">Token stays in browser memory</text><text x="382" y="163">Streamable HTTP or native stdio bridge</text>
+      <text x="752" y="163">BCI · robotics · world model · quantum</text><text x="752" y="183">Use the public Rust API directly</text>
+      <text x="62" y="303">Exact Host / Origin · scopes · body and rate limits</text><text x="62" y="330">8 workers + 32 waiting requests · read/write lock</text>
+      <text x="752" y="303">Argon2id · expiry · revocation</text><text x="752" y="330">Separate directory and exclusive lock</text>
+    </g>
+    <rect x="40" y="402" width="1040" height="230" rx="8" fill="#16271e"/>
+    <text x="64" y="435" font-size="20" font-weight="700" fill="#e7f1df">Embedded Rust engine · one journal owner</text>
+    <g fill="#263e2d" stroke="#5b7760"><rect x="64" y="454" width="430" height="72" rx="4"/><rect x="520" y="454" width="536" height="72" rx="4"/><rect x="64" y="562" width="992" height="45" rx="4"/></g>
+    <g fill="#e7f1df" font-size="16"><text x="82" y="482">Parent edge arena + ordered temporal indexes</text><text x="82" y="509" font-size="13">As-of · between · neighbors · sampling · Arrow</text><text x="538" y="482">Durable branches: shared frozen base + isolated deltas</text><text x="538" y="509" font-size="13">Preview · conflict-checked atomic merge · retained ID mappings</text><text x="82" y="590">Validate → append one checked record → apply · buffered or explicit fsync</text></g>
+    <g fill="#e6eddf" stroke="#a8b9aa"><rect x="40" y="687" width="310" height="104" rx="6"/><rect x="380" y="687" width="330" height="104" rx="6"/><rect x="740" y="687" width="340" height="104" rx="6"/></g>
+    <g font-size="18" font-weight="700"><text x="62" y="719">Locked journal · format 2</text><text x="402" y="719">Immutable Arrow sidecars</text><text x="762" y="719">Checksummed backups</text></g>
+    <g font-size="14" fill="#53685c"><text x="62" y="749">Checked replay · CRC · torn-tail recovery</text><text x="62" y="774">Source of truth for parent and forks</text><text x="402" y="749">Content address + row references</text><text x="402" y="774">Synced before adapter graph commits</text><text x="762" y="749">Journal + index + sidecars; no credentials</text><text x="762" y="774">Restore into a separate destination</text></g>
+    <text x="40" y="828" font-size="13" fill="#53685c">Community has no managed control plane, billing, multiwriter replication or shared-engine tenancy.</text>
+  </g>
+  <g fill="none" stroke="#61786a" stroke-width="2" marker-end="url(#arrow)"><path d="M185 193V245"/><path d="M520 193V245"/><path d="M905 193H1100V385H1000V402"/><path d="M730 300H680"/><path d="M360 355V402"/><path d="M275 526V562"/><path d="M788 526V562"/><path d="M195 632V687"/><path d="M545 632V687"/><path d="M910 632V687"/></g>
+</svg>

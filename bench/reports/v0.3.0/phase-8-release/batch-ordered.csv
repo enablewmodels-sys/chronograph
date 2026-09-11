@@ -1,0 +1,12 @@
+metric,value,unit
+ingest_buffered,1106938.9301245422,edges/s
+ingest_with_sync,1104832.5828719898,edges/s
+log_size,698050224,bytes
+reopen,10.644845083,seconds
+as_of_p50,19.053292,ms
+as_of_p99,19.804542,ms
+between_p50,22.811875,ms
+between_p99,23.782334,ms
+sample_LatestFirst,27686054.56574111,edges/s
+sample_Uniform,24740807.604989976,edges/s
+arrow_export,31.187333000000002,ms

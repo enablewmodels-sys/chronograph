@@ -1,0 +1,94 @@
+[
+  {
+    "file": "upstream/anes-0.1.6/LICENSE-MIT",
+    "url": "https://raw.githubusercontent.com/zrzka/anes-rs/378ac7461ecac29fde9e10df7b08359d1315a9ad/LICENSE-MIT",
+    "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "file": "upstream/anes-0.1.6/LICENSE-APACHE",
+    "url": "https://raw.githubusercontent.com/zrzka/anes-rs/378ac7461ecac29fde9e10df7b08359d1315a9ad/LICENSE-APACHE",
+    "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "file": "upstream/binrw-0.15.2/LICENSE",
+    "url": "https://raw.githubusercontent.com/jam1garner/binrw/db9ef7bece9525057001edd260439fa2748287df/LICENSE",
+    "sha256": "08159509fe99d146416fe110053a7360ddfccbba5f0c8f955bdbda025d4d2a20"
+  },
+  {
+    "file": "upstream/binrw_derive-0.15.2/LICENSE",
+    "url": "https://raw.githubusercontent.com/jam1garner/binrw/db9ef7bece9525057001edd260439fa2748287df/LICENSE",
+    "sha256": "08159509fe99d146416fe110053a7360ddfccbba5f0c8f955bdbda025d4d2a20"
+  },
+  {
+    "file": "upstream/flatbuffers-25.12.19/LICENSE",
+    "url": "https://raw.githubusercontent.com/google/flatbuffers/7e163021e59cca4f8e1e35a7c828b5c6b7915953/LICENSE",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "file": "upstream/mcap-0.25.0/LICENSE",
+    "url": "https://raw.githubusercontent.com/foxglove/mcap/0e1528a3dad6942384dae40b64827567413a18cf/LICENSE",
+    "sha256": "da11235665c17d4c1634072dae92b8ba1b38d6fdde2ccf19a6bbede33253f58d"
+  },
+  {
+    "file": "upstream/rmcp-3.2.0/LICENSE",
+    "url": "https://raw.githubusercontent.com/modelcontextprotocol/rust-sdk/51ccb42993d6eb5075399672ce7a0c21a0e55eea/LICENSE",
+    "sha256": "0382b0057770ca05e9c350a50aa3b1c1fea84da0bc81d723bf00b9aa841be58a"
+  },
+  {
+    "file": "upstream/rmcp-macros-3.2.0/LICENSE",
+    "url": "https://raw.githubusercontent.com/modelcontextprotocol/rust-sdk/51ccb42993d6eb5075399672ce7a0c21a0e55eea/LICENSE",
+    "sha256": "0382b0057770ca05e9c350a50aa3b1c1fea84da0bc81d723bf00b9aa841be58a"
+  },
+  {
+    "file": "upstream/xshell-macros-0.2.7/LICENSE-MIT",
+    "url": "https://raw.githubusercontent.com/matklad/xshell/9a405946ecbbfe50fe4a7229bd764194154e4ce6/LICENSE-MIT",
+    "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "file": "upstream/xshell-macros-0.2.7/LICENSE-APACHE",
+    "url": "https://raw.githubusercontent.com/matklad/xshell/9a405946ecbbfe50fe4a7229bd764194154e4ce6/LICENSE-APACHE",
+    "sha256": "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5"
+  },
+  {
+    "file": "upstream/ra_ap_limit-0.0.188/LICENSE-MIT",
+    "url": "https://raw.githubusercontent.com/rust-lang/rust-analyzer/2023-12-04/LICENSE-MIT",
+    "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+    "verified": "tag source crates/limit/src/lib.rs byte-equal to crate 0.0.188"
+  },
+  {
+    "file": "upstream/ra_ap_limit-0.0.188/LICENSE-APACHE",
+    "url": "https://raw.githubusercontent.com/rust-lang/rust-analyzer/2023-12-04/LICENSE-APACHE",
+    "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+    "verified": "tag source crates/limit/src/lib.rs byte-equal to crate 0.0.188"
+  },
+  {
+    "file": "upstream/oq3_lexer-0.7.0/LICENSE.txt",
+    "url": "https://raw.githubusercontent.com/Qiskit/openqasm3_parser/e168656ac5379843f89c62b72a9d7775f30eb40f/LICENSE.txt",
+    "sha256": "3f524e2c16f22761ccffe28c4f70caa5d3190d7242a1875e9641dbcd3f05236c"
+  },
+  {
+    "file": "upstream/oq3_parser-0.7.0/LICENSE.txt",
+    "url": "https://raw.githubusercontent.com/Qiskit/openqasm3_parser/e168656ac5379843f89c62b72a9d7775f30eb40f/LICENSE.txt",
+    "sha256": "3f524e2c16f22761ccffe28c4f70caa5d3190d7242a1875e9641dbcd3f05236c"
+  },
+  {
+    "file": "upstream/oq3_syntax-0.7.0/LICENSE.txt",
+    "url": "https://raw.githubusercontent.com/Qiskit/openqasm3_parser/e168656ac5379843f89c62b72a9d7775f30eb40f/LICENSE.txt",
+    "sha256": "3f524e2c16f22761ccffe28c4f70caa5d3190d7242a1875e9641dbcd3f05236c"
+  },
+  {
+    "file": "upstream/oq3_lexer-0.7.0/NOTICE.txt",
+    "url": "https://raw.githubusercontent.com/Qiskit/openqasm3_parser/e168656ac5379843f89c62b72a9d7775f30eb40f/NOTICE.txt",
+    "sha256": "2fc22464c27bf2351054da3df21950ac3b322ca70217cb502b56bef3068046e9"
+  },
+  {
+    "file": "upstream/oq3_parser-0.7.0/NOTICE.txt",
+    "url": "https://raw.githubusercontent.com/Qiskit/openqasm3_parser/e168656ac5379843f89c62b72a9d7775f30eb40f/NOTICE.txt",
+    "sha256": "2fc22464c27bf2351054da3df21950ac3b322ca70217cb502b56bef3068046e9"
+  },
+  {
+    "file": "upstream/oq3_syntax-0.7.0/NOTICE.txt",
+    "url": "https://raw.githubusercontent.com/Qiskit/openqasm3_parser/e168656ac5379843f89c62b72a9d7775f30eb40f/NOTICE.txt",
+    "sha256": "2fc22464c27bf2351054da3df21950ac3b322ca70217cb502b56bef3068046e9"
+  }
+]

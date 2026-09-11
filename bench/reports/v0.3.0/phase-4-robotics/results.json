@@ -1,0 +1,56 @@
+{
+  "phase": "phase-4-robotics",
+  "started_at": "2026-09-09T12:19:54.584515+00:00",
+  "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
+  "checks": [
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--workspace"
+      ],
+      "exit_code": 0,
+      "seconds": 27.825027,
+      "output": "build.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--workspace"
+      ],
+      "exit_code": 0,
+      "seconds": 19.786834,
+      "output": "test.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 12.334293,
+      "output": "clippy.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.230643,
+      "output": "fmt.log"
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+$ cargo test --locked --workspace
+   Compiling chronograph-server v0.3.0 (<workspace>/crates/chronograph-server)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.52s
+     Running unittests src/lib.rs (target/debug/deps/chronograph_bench-9eb64e14bd3d75e8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/measure.rs (target/debug/deps/measure-5cfe1f13785a8f8c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_db-f3f21817bf25007f)
+
+running 18 tests
+test tests::crash_child ... ignored, subprocess-only crash writer
+test tests::arrow_export_and_parallel_reads ... ok
+test tests::failed_sync_disables_writer_and_requires_reopen ... ok
+test tests::interval_math_and_late_replacement ... ok
+test tests::application_revision_and_drop_durability ... ok
+test tests::corrupted_length_cannot_hide_later_records_as_a_torn_tail ... ok
+test tests::late_event_fills_gap_without_changing_successor ... ok
+test tests::independently_encoded_v1_fixture_is_compatible ... ok
+test tests::lock_and_sync_mode ... ok
+test tests::corruption_and_format_errors_do_not_rewrite_files ... ok
+test tests::codec_rejects_unbounded_counts_and_invalid_options ... ok
+test tests::kill_mid_append_recovers_whole_operations ... ok
+test tests::migration_rejects_existing_locked_and_incomplete_files ... ok
+test tests::batches_match_sequential_and_reject_invalid_input_atomically ... ok
+test tests::sampling_and_temporal_filtering ... ok
+test tests::partial_header_and_trailing_checksum_recovery ... ok
+test tests::arbitrary_history_matches_naive_model ... ok
+test tests::partial_append_every_byte_preserves_atomic_replacement ... ok
+
+test result: ok. 17 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.26s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_server-cf17ad69f900c422)
+
+running 8 tests
+test auth::tests::rate_limits_invalid_credentials_before_expensive_hashing ... ok
+test backup::tests::invalid_and_incomplete_archives_leave_no_destination ... ok
+test backup::tests::backup_restore_sidecars_and_source_preservation ... ok
+test auth::tests::malformed_credentials_and_commit_failure_fail_closed ... ok
+test auth::tests::salted_tokens_cache_revocation_expiry_and_lock ... ok
+test service_tests::worker_queue_is_bounded_and_cancellation_releases_waiters ... ok
+test service_tests::invalid_requests_cannot_mutate_and_cookie_routes_are_retired ... ok
+test service_tests::scopes_exact_ids_durability_pagination_and_revocation ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.69s
+
+     Running unittests src/bin/chronograph-mcp.rs (target/debug/deps/chronograph_mcp-1064d9802f53d4f3)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/chronograph_server-fc470a2ef41ce28b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_bench
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_db
+
+running 1 test
+test crates/chronograph-core/src/lib.rs - (line 3) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 1 test
+test crates/chronograph-core/src/graph.rs - graph::Graph (line 24) - compile fail ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+all doctests ran in 0.81s; merged doctests compilation took 0.38s
+   Doc-tests chronograph_server
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

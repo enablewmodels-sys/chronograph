@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "checks": [
+    "token bootstrap, private permissions and hash-only external credential store",
+    "scope enforcement, exact u64 IDs, explicit durability and atomic validation",
+    "temporal semantics, revision-bound pagination, batch sampling and Arrow stream",
+    "origin boundary, retired cookies, JSON errors and body limit",
+    "official JS client: HTTP MCP and native Rust stdio bridge tool discovery/read/write",
+    "revocation invalidates cached HTTP and existing MCP credentials immediately",
+    "downloaded bundle restores to an independent service; sidecars retained, secrets excluded, overwrite rejected",
+    "fsync-acknowledged history survives process kill and restart"
+  ],
+  "seconds": 1.188552459,
+  "date": "2026-09-09T11:46:40.928Z",
+  "runtime": "v20.20.2",
+  "mcp_client": "@modelcontextprotocol/sdk",
+  "server": "0.3.0"
+}

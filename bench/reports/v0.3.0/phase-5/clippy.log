@@ -1,0 +1,9 @@
+$ cargo clippy --locked --workspace --all-targets -- -D warnings
+    Checking chronograph-db v0.3.0 (<workspace>/crates/chronograph-core)
+    Checking chronograph-server v0.3.0 (<workspace>/crates/chronograph-server)
+    Checking chronograph-conn-bci v0.3.0 (<workspace>/crates/chronograph-conn-bci)
+    Checking chronograph-conn-worldmodel v0.3.0 (<workspace>/crates/chronograph-conn-worldmodel)
+    Checking chronograph-bench v0.3.0 (<workspace>/crates/chronograph-bench)
+    Checking chronograph-conn-quantum v0.3.0 (<workspace>/crates/chronograph-conn-quantum)
+    Checking chronograph-conn-robotics v0.3.0 (<workspace>/crates/chronograph-conn-robotics)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.01s

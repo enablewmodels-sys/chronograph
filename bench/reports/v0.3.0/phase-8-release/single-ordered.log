@@ -1,0 +1,23 @@
+$ target/release/measure --single --ingest-only
+dataset=10000000, nodes=100000, seed=4848215499434033153, mode=single-ordered, rayon_threads=10
+Generated in 1.317s
+Ingest: 547763 edges/s buffered, 547251 edges/s including sync; 18.256s / 18.273s
+Reopen: 13.762s, 10000000 versions, 978022224 bytes
+       34.99 real        30.39 user         1.69 sys
+          4037935104  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              283872  page reclaims
+               59707  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                 478  voluntary context switches
+               19908  involuntary context switches
+         65291496907  instructions retired
+         71151924205  cycles elapsed
+          2536377728  peak memory footprint

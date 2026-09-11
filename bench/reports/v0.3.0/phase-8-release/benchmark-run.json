@@ -1,0 +1,94 @@
+{
+  "started_at": "2026-09-09T14:28:47.718817+00:00",
+  "host": "macOS-26.5-arm64-arm-64bit-Mach-O",
+  "threads": 10,
+  "dataset": 10000000,
+  "cache": "warm OS cache; developer host, no isolation",
+  "commands": [
+    {
+      "name": "batch-ordered",
+      "command": [
+        "target/release/measure"
+      ],
+      "environment": {
+        "CHRONOGRAPH_BENCH_DB": "<workspace>/bench/data/v0.3.0/final/batch-ordered.cgraph"
+      },
+      "exit_code": 0,
+      "seconds": 32.232387
+    },
+    {
+      "name": "single-ordered",
+      "command": [
+        "target/release/measure",
+        "--single",
+        "--ingest-only"
+      ],
+      "environment": {
+        "CHRONOGRAPH_BENCH_DB": "<workspace>/bench/data/v0.3.0/final/single-ordered.cgraph"
+      },
+      "exit_code": 0,
+      "seconds": 34.997494
+    },
+    {
+      "name": "batch-shuffled",
+      "command": [
+        "target/release/measure",
+        "--shuffled",
+        "--ingest-only"
+      ],
+      "environment": {
+        "CHRONOGRAPH_BENCH_DB": "<workspace>/bench/data/v0.3.0/final/batch-shuffled.cgraph"
+      },
+      "exit_code": 0,
+      "seconds": 25.793602
+    },
+    {
+      "name": "single-shuffled",
+      "command": [
+        "target/release/measure",
+        "--single",
+        "--shuffled",
+        "--ingest-only"
+      ],
+      "environment": {
+        "CHRONOGRAPH_BENCH_DB": "<workspace>/bench/data/v0.3.0/final/single-shuffled.cgraph"
+      },
+      "exit_code": 0,
+      "seconds": 34.565579
+    },
+    {
+      "name": "criterion",
+      "command": [
+        "cargo",
+        "bench",
+        "--locked",
+        "--workspace",
+        "--bench",
+        "engine"
+      ],
+      "environment": {
+        "CHRONOGRAPH_BENCH_DB": "<workspace>/bench/data/v0.3.0/final/batch-ordered.cgraph"
+      },
+      "exit_code": 0,
+      "seconds": 111.224516
+    },
+    {
+      "name": "world-model-example",
+      "command": [
+        "target/release/examples/world_model"
+      ],
+      "environment": {},
+      "exit_code": 0,
+      "seconds": 0.429373
+    },
+    {
+      "name": "bci-example",
+      "command": [
+        "target/release/examples/bci_stream"
+      ],
+      "environment": {},
+      "exit_code": 0,
+      "seconds": 1.20335
+    }
+  ]
+}

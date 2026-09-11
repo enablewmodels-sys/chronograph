@@ -1,0 +1,92 @@
+{
+  "versions": {
+    "lerobot": "0.6.1",
+    "numpy": "2.2.6",
+    "pyarrow": "25.0.1",
+    "torch": "2.11.0",
+    "rosbags": "0.11.0",
+    "mcap": "1.3.1"
+  },
+  "checks": [
+    {
+      "repeat": 1,
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "-p",
+        "chronograph-conn-robotics",
+        "--example",
+        "robotics_connector",
+        "--",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph",
+        "<workspace>/examples/datasets/robotics/references.mcap"
+      ],
+      "exit_code": 0
+    },
+    {
+      "repeat": 1,
+      "command": [
+        "<workspace>/.work/connector-python/bin/python",
+        "<workspace>/scripts/connectors/export-lerobot.py",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph/lerobot.arrow",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph/lerobot",
+        "--dtype",
+        "float64"
+      ],
+      "exit_code": 0
+    },
+    {
+      "repeat": 1,
+      "command": [
+        "<workspace>/.work/connector-python/bin/python",
+        "<workspace>/scripts/connectors/export-lerobot.py",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph/lerobot.arrow",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph/lerobot-f32",
+        "--dtype",
+        "float32"
+      ],
+      "exit_code": 0
+    },
+    {
+      "repeat": 2,
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "-p",
+        "chronograph-conn-robotics",
+        "--example",
+        "robotics_connector",
+        "--",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph",
+        "<workspace>/examples/datasets/robotics/references.mcap"
+      ],
+      "exit_code": 0
+    },
+    {
+      "repeat": 2,
+      "command": [
+        "<workspace>/.work/connector-python/bin/python",
+        "<workspace>/scripts/connectors/export-lerobot.py",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph/lerobot.arrow",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph/lerobot",
+        "--dtype",
+        "float64"
+      ],
+      "exit_code": 0
+    },
+    {
+      "repeat": 2,
+      "command": [
+        "<workspace>/.work/connector-python/bin/python",
+        "<workspace>/scripts/connectors/export-lerobot.py",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph/lerobot.arrow",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph/lerobot-f32",
+        "--dtype",
+        "float32"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "docker": {
+    "status": "PENDING",
+    "command": [
+      "docker",
+      "info",
+      "--format",
+      "{{json .ServerVersion}}"
+    ],
+    "observed": "Timed out after 8 seconds on 2026-09-09; no image/container/Neo4j/TLS execution claimed"
+  },
+  "native_linux": {
+    "status": "PENDING",
+    "observed": "No Linux runtime/container daemon available locally; architecture-specific GitHub jobs prepared but not run"
+  },
+  "publication": {
+    "status": "DEFERRED",
+    "observed": "GitHub owner/repository and AWS provisioning explicitly deferred"
+  },
+  "managed": {
+    "status": "REVIEW GATE",
+    "observed": "Accepted contract requires review before Phase 6 control-plane and billing code"
+  }
+}

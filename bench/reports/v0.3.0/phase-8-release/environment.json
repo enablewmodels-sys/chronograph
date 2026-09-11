@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-09-09T14:32:58.400030+00:00",
+  "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
+  "chip": "Apple M5",
+  "logical_cpus": 10,
+  "ram_bytes": 17179869184,
+  "rust": "rustc 1.93.0 (254b59607 2026-01-19)",
+  "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=22544483)\t80%; AC attached; not charging present: true",
+  "power_settings": "Battery Power:\n Sleep On Power Button 1\n lowpowermode         0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         2\n womp                 0\n networkoversleep     0\n sleep                1\n lessbright           1\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n lowpowermode         1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n disksleep            10",
+  "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+  "swap": "vm.swapusage: total = 6144.00M  used = 5133.81M  free = 1010.19M  (encrypted)",
+  "note": "No power settings changed; developer host is not isolated. Phase-2 power state was not collected."
+}

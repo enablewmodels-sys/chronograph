@@ -1,0 +1,43 @@
+{
+  "version": "0.4.0-alpha.1",
+  "transport": "loopback HTTP, no TLS",
+  "durability": "fsync",
+  "fixture": "synthetic model outputs; 256 KiB little-endian f32 tensor",
+  "summary": [
+    {
+      "name": "JEPA single record, 256 KiB tensor validation, Arrow publish + journal fsync",
+      "samples": 100,
+      "p50_ms": 12.382791999999995,
+      "p95_ms": 14.498749999999973,
+      "p99_ms": 17.085708000000068
+    },
+    {
+      "name": "Identical latest-batch retry",
+      "samples": 200,
+      "p50_ms": 0.22433300000011513,
+      "p95_ms": 0.5271669999999631,
+      "p99_ms": 0.9382080000000315
+    },
+    {
+      "name": "Read checkpoint",
+      "samples": 200,
+      "p50_ms": 0.18083299999989322,
+      "p95_ms": 0.3714580000000751,
+      "p99_ms": 0.8767910000001393
+    },
+    {
+      "name": "Verified source record export",
+      "samples": 200,
+      "p50_ms": 0.20637499999975262,
+      "p95_ms": 0.3975829999999405,
+      "p99_ms": 0.5216249999998581
+    },
+    {
+      "name": "500 JEPA records sharing a 256 KiB tensor, fsync",
+      "samples": 50,
+      "p50_ms": 13.802374999999756,
+      "p95_ms": 15.945624999999836,
+      "p99_ms": 16.074542000000292
+    }
+  ]
+}

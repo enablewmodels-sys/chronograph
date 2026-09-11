@@ -1,0 +1,22 @@
+Inventory: 423 dependencies, 423 with upstream license texts
+{
+  "version": "0.3.0",
+  "edition": "community",
+  "status": "unsigned local candidate",
+  "target": "aarch64-apple-darwin",
+  "publication": "deferred",
+  "artifacts": [
+    {
+      "file": "chronograph-community-0.3.0-source.tar.gz",
+      "bytes": 2343536,
+      "sha256": "8d8f8add613c926ad2ba34e1bfff2520ca806b13c771d5aa80691ea95efb6aee"
+    },
+    {
+      "file": "chronograph-community-0.3.0-aarch64-apple-darwin.tar.gz",
+      "bytes": 9558290,
+      "sha256": "ed7e5df3c533d77d1608524476b1edb5ec471ce2cf491df458c238b20e0d01d0"
+    }
+  ],
+  "sbom": "SBOM.spdx.json inside each bundle; workspace dependency inventory, not a binary reachability proof",
+  "source_files": 1003
+}

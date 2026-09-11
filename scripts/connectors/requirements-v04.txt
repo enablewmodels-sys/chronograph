@@ -1,0 +1,5 @@
+# Optional local conversion runtimes, pinned to the compatibility run.
+mne==1.13.0
+qiskit==2.5.2
+cirq-core==1.6.1
+# Existing world/robot environment: requirements.txt plus torch 2.11.0.

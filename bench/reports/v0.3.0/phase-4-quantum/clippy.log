@@ -1,0 +1,33 @@
+$ cargo clippy --locked --workspace --all-targets -- -D warnings
+    Checking either v1.18.0
+    Checking chronograph-connector-common v0.3.0 (<workspace>/crates/chronograph-connector-common)
+    Checking unicode-xid v0.2.6
+    Checking unicode-properties v0.1.4
+    Checking memoffset v0.9.1
+    Checking drop_bomb v0.1.5
+    Checking countme v3.0.1
+    Checking text-size v1.1.1
+    Checking hashbrown v0.14.5
+    Checking rustc-hash v1.1.0
+    Checking ra_ap_limit v0.0.188
+    Checking xshell v0.2.7
+    Checking rayon v1.12.0
+    Checking itertools v0.13.0
+    Checking oq3_lexer v0.7.0
+    Checking itertools v0.10.5
+    Checking triomphe v0.1.11
+    Checking cov-mark v2.2.0
+    Checking smol_str v0.2.2
+    Checking oq3_parser v0.7.0
+    Checking rowan v0.15.15
+    Checking oq3_syntax v0.7.0
+    Checking criterion-plot v0.8.2
+    Checking criterion v0.8.2
+    Checking chronograph-db v0.3.0 (<workspace>/crates/chronograph-core)
+    Checking chronograph-server v0.3.0 (<workspace>/crates/chronograph-server)
+    Checking chronograph-conn-bci v0.3.0 (<workspace>/crates/chronograph-conn-bci)
+    Checking chronograph-bench v0.3.0 (<workspace>/crates/chronograph-bench)
+    Checking chronograph-conn-quantum v0.3.0 (<workspace>/crates/chronograph-conn-quantum)
+    Checking chronograph-conn-worldmodel v0.3.0 (<workspace>/crates/chronograph-conn-worldmodel)
+    Checking chronograph-conn-robotics v0.3.0 (<workspace>/crates/chronograph-conn-robotics)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.76s

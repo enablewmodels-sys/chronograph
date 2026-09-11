@@ -1,0 +1,3 @@
+$ cargo build --locked --workspace
+   Compiling chronograph-conn-worldmodel v0.3.0 (<workspace>/crates/chronograph-conn-worldmodel)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.14s

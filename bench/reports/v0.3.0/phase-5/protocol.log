@@ -1,0 +1,10 @@
+$ CHRONOGRAPH_REPORT_PHASE=phase-5 node scripts/protocol-test.mjs
+PASS token bootstrap, private permissions and hash-only external credential store
+PASS scope enforcement, exact u64 IDs, explicit durability and atomic validation
+PASS temporal semantics, revision-bound pagination, batch sampling and Arrow stream
+PASS origin boundary, retired cookies, JSON errors and body limit
+PASS official JS client: HTTP MCP and native Rust stdio bridge tool discovery/read/write
+PASS HTTP and native MCP branches: scoped IDs, bounded intervals, cursor isolation, preview, merge remapping, retries and conflicts
+PASS revocation invalidates cached HTTP and existing MCP credentials immediately
+PASS downloaded bundle restores to an independent service; sidecars retained, secrets excluded, overwrite rejected
+PASS fsync-acknowledged parent and branch history, discard and merge results survive backup restoration and process kill/restart

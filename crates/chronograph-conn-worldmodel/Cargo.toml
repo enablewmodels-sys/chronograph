@@ -1,0 +1,33 @@
+[package]
+name = "chronograph-conn-worldmodel"
+description = "Restorable environment steps and Minari/Arrow export for Chronograph"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+repository.workspace = true
+
+[dependencies]
+chronograph-db.workspace = true
+chronograph-connector-common = { path = "../chronograph-connector-common" }
+arrow = { workspace = true, features = ["ipc"] }
+serde.workspace = true
+thiserror.workspace = true
+# Explicit state/mapping schemas with lossless numerical JSON and human-readable config.
+serde_json = { version = "1", features = ["float_roundtrip"] }
+toml = "1.1"
+
+[dev-dependencies]
+# Existing workspace runtimes for parallel rollout computation and deterministic action policies.
+rayon.workspace = true
+rand.workspace = true
+tempfile = "3"
+proptest.workspace = true
+
+[[example]]
+name = "worldmodel_connector"
+path = "../../examples/worldmodel_connector.rs"
+
+[[example]]
+name = "fork_demo"
+path = "../../examples/fork_demo.rs"

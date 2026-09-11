@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "schema": "https://raw.githubusercontent.com/spdx/spdx-spec/v2.3/schemas/spdx-schema.json",
+  "schema_sha256": "239208b7ac287b3cf5d9a9af23f9d69863971102a5e1587a27a398b43490b89b",
+  "format": "SPDX-2.3",
+  "packages": 423,
+  "upstream_license_text_coverage": 423,
+  "scope": "target-filtered workspace, including optional/development; superset of linked binary"
+}

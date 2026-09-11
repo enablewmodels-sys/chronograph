@@ -1,0 +1,5 @@
+$ cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+   Compiling lamquant-lsl-sys v0.1.2
+    Checking lamquant-lsl v0.1.2
+    Checking chronograph-conn-bci v0.3.0 (<workspace>/crates/chronograph-conn-bci)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.41s

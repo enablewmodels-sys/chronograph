@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "archive": "chronograph-community-0.3.0-aarch64-apple-darwin.tar.gz",
+  "checks": [
+    "all file checksums",
+    "unique SPDX dependency identifiers",
+    "offline manual",
+    "relocated launcher",
+    "private token bootstrap",
+    "UI and nested docs",
+    "unauthenticated request rejected",
+    "durable fork across restart",
+    "state external to bundle",
+    "graceful shutdown"
+  ]
+}

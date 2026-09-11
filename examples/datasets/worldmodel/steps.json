@@ -1,0 +1,652 @@
+[
+  {
+    "episode": 0,
+    "index": 0,
+    "timestamp_us": 0,
+    "observation": [
+      0.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": null,
+    "reward": 0.0,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 42,
+      "steps": 0,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 0,
+    "index": 1,
+    "timestamp_us": 50000,
+    "observation": [
+      1.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": 0,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 1,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 45454805674,
+      "steps": 1,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 0,
+    "index": 2,
+    "timestamp_us": 100000,
+    "observation": [
+      2.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": 0,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 2,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 11532217803599905471,
+      "steps": 2,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 0,
+    "index": 3,
+    "timestamp_us": 150000,
+    "observation": [
+      3.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": 0,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 3,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 10021416941527320954,
+      "steps": 3,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 0,
+    "index": 4,
+    "timestamp_us": 200000,
+    "observation": [
+      2.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": 1,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 2,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 2899061411254629736,
+      "steps": 4,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 0,
+    "index": 5,
+    "timestamp_us": 250000,
+    "observation": [
+      3.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": 0,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 3,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 5661411637479084162,
+      "steps": 5,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 0,
+    "index": 6,
+    "timestamp_us": 300000,
+    "observation": [
+      3.0,
+      1.0,
+      3.0,
+      3.0
+    ],
+    "action": 1,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 3,
+      "y": 1,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 10094803945545275427,
+      "steps": 6,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 0,
+    "index": 7,
+    "timestamp_us": 350000,
+    "observation": [
+      3.0,
+      2.0,
+      3.0,
+      3.0
+    ],
+    "action": 1,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 3,
+      "y": 2,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 11439985393877029075,
+      "steps": 7,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 0,
+    "index": 8,
+    "timestamp_us": 400000,
+    "observation": [
+      3.0,
+      3.0,
+      3.0,
+      3.0
+    ],
+    "action": 1,
+    "reward": 1.0,
+    "terminated": true,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 3,
+      "y": 3,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 10624261412083704114,
+      "steps": 8,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 0,
+    "timestamp_us": 10000000,
+    "observation": [
+      0.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": null,
+    "reward": 0.0,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 137,
+      "steps": 0,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 1,
+    "timestamp_us": 10050000,
+    "observation": [
+      0.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 146121229000,
+      "steps": 1,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 2,
+    "timestamp_us": 10100000,
+    "observation": [
+      0.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 10385946379058524877,
+      "steps": 2,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 3,
+    "timestamp_us": 10150000,
+    "observation": [
+      0.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 4936578318584820456,
+      "steps": 3,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 4,
+    "timestamp_us": 10200000,
+    "observation": [
+      0.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 5386565745703731597,
+      "steps": 4,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 5,
+    "timestamp_us": 10250000,
+    "observation": [
+      0.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 7446697560599128142,
+      "steps": 5,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 6,
+    "timestamp_us": 10300000,
+    "observation": [
+      0.0,
+      0.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 0,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 4918560817611945246,
+      "steps": 6,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 7,
+    "timestamp_us": 10350000,
+    "observation": [
+      0.0,
+      1.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 1,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 12783646489690466036,
+      "steps": 7,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 8,
+    "timestamp_us": 10400000,
+    "observation": [
+      0.0,
+      1.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 1,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 4558733557974830393,
+      "steps": 8,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 9,
+    "timestamp_us": 10450000,
+    "observation": [
+      0.0,
+      1.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 1,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 12476414035308650339,
+      "steps": 9,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 10,
+    "timestamp_us": 10500000,
+    "observation": [
+      0.0,
+      1.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 1,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 8299900480184528285,
+      "steps": 10,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 11,
+    "timestamp_us": 10550000,
+    "observation": [
+      0.0,
+      1.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 1,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 8740483932629898886,
+      "steps": 11,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 12,
+    "timestamp_us": 10600000,
+    "observation": [
+      0.0,
+      1.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 1,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 787498961558283051,
+      "steps": 12,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 13,
+    "timestamp_us": 10650000,
+    "observation": [
+      0.0,
+      1.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 1,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 1704284923668291245,
+      "steps": 13,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 14,
+    "timestamp_us": 10700000,
+    "observation": [
+      1.0,
+      1.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 1,
+      "y": 1,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 1845503683221114704,
+      "steps": 14,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 15,
+    "timestamp_us": 10750000,
+    "observation": [
+      0.0,
+      1.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": false,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 1,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 11443617189786564814,
+      "steps": 15,
+      "horizon": 16
+    }
+  },
+  {
+    "episode": 1,
+    "index": 16,
+    "timestamp_us": 10800000,
+    "observation": [
+      0.0,
+      1.0,
+      3.0,
+      3.0
+    ],
+    "action": 2,
+    "reward": -0.01,
+    "terminated": false,
+    "truncated": true,
+    "state": {
+      "size": 4,
+      "x": 0,
+      "y": 1,
+      "goal_x": 3,
+      "goal_y": 3,
+      "rng_state": 927742083424082751,
+      "steps": 16,
+      "horizon": 16
+    }
+  }
+]

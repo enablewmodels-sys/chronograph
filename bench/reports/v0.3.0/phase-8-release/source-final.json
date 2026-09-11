@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "archive": "chronograph-community-0.3.0-source.tar.gz",
+  "checks": [
+    "regular relative files only",
+    "no runtime directories or credential patterns",
+    "all source file checksums",
+    "offline locked Cargo metadata",
+    "all 8 workspace members and target files",
+    "20 chapters and internal links"
+  ],
+  "files_checked": 1019
+}

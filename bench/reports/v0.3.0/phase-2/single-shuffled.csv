@@ -1,0 +1,5 @@
+metric,value,unit
+ingest_buffered,1305053.6970620966,edges/s
+ingest_with_sync,1303808.5878612162,edges/s
+log_size,962598544,bytes
+reopen,5.036016042,seconds

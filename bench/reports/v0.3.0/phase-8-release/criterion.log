@@ -1,0 +1,148 @@
+$ cargo bench --locked --workspace --bench engine
+   Compiling proc-macro2 v1.0.107
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling once_cell v1.21.4
+   Compiling semver v1.0.28
+   Compiling libc v0.2.189
+   Compiling either v1.18.0
+   Compiling serde_json v1.0.151
+   Compiling rayon v1.12.0
+   Compiling itertools v0.13.0
+   Compiling rustc_version v0.4.1
+   Compiling flatbuffers v25.12.19
+   Compiling jobserver v0.1.35
+   Compiling cc v1.4.5
+   Compiling quote v1.0.47
+   Compiling criterion-plot v0.8.2
+   Compiling syn v2.0.119
+   Compiling syn v3.0.5
+   Compiling alloca v0.4.0
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.20
+   Compiling zerocopy-derive v0.8.57
+   Compiling thiserror v2.0.20
+   Compiling zerocopy v0.8.57
+   Compiling chrono v0.4.45
+   Compiling tinytemplate v1.2.1
+   Compiling half v2.7.1
+   Compiling ahash v0.8.12
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_chacha v0.9.0
+   Compiling arrow-buffer v59.3.0
+   Compiling ciborium-ll v0.2.2
+   Compiling rand v0.9.5
+   Compiling ciborium v0.2.2
+   Compiling criterion v0.8.2
+   Compiling arrow-data v59.3.0
+   Compiling arrow-array v59.3.0
+   Compiling arrow-select v59.3.0
+   Compiling arrow-arith v59.3.0
+   Compiling arrow-row v59.3.0
+   Compiling arrow-ord v59.3.0
+   Compiling arrow-ipc v59.3.0
+   Compiling arrow-string v59.3.0
+   Compiling arrow-cast v59.3.0
+   Compiling arrow v59.3.0
+   Compiling chronograph-db v0.3.0 (<workspace>/crates/chronograph-core)
+   Compiling chronograph-bench v0.3.0 (<workspace>/crates/chronograph-bench)
+    Finished `bench` profile [optimized + debuginfo] target(s) in 1m 02s
+     Running benches/engine.rs (target/release/deps/engine-ae52bea838a67595)
+Benchmarking temporal_10000000_versions/as_of_full_traversal
+Benchmarking temporal_10000000_versions/as_of_full_traversal: Warming up for 1.0000 s
+
+Warning: Unable to complete 20 samples in 3.0s. You may wish to increase target time to 4.0s, enable flat sampling, or reduce sample count to 10.
+Benchmarking temporal_10000000_versions/as_of_full_traversal: Collecting 20 samples in estimated 4.0214 s (210 iterations)
+Benchmarking temporal_10000000_versions/as_of_full_traversal: Analyzing
+temporal_10000000_versions/as_of_full_traversal
+                        time:   [11.543 ms 11.749 ms 12.105 ms]
+                        change: [+33.394% +50.033% +66.584%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Benchmarking temporal_10000000_versions/between_full_traversal
+Benchmarking temporal_10000000_versions/between_full_traversal: Warming up for 1.0000 s
+
+Warning: Unable to complete 20 samples in 3.0s. You may wish to increase target time to 4.6s, enable flat sampling, or reduce sample count to 10.
+Benchmarking temporal_10000000_versions/between_full_traversal: Collecting 20 samples in estimated 4.5843 s (210 iterations)
+Benchmarking temporal_10000000_versions/between_full_traversal: Analyzing
+temporal_10000000_versions/between_full_traversal
+                        time:   [21.037 ms 21.791 ms 22.599 ms]
+                        change: [+71.777% +85.880% +99.424%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Found 3 outliers among 20 measurements (15.00%)
+  3 (15.00%) low severe
+
+Benchmarking sample_10k_k10/LatestFirst
+Benchmarking sample_10k_k10/LatestFirst: Warming up for 1.0000 s
+
+Warning: Unable to complete 100 samples in 3.0s. You may wish to increase target time to 3.3s, enable flat sampling, or reduce sample count to 60.
+Benchmarking sample_10k_k10/LatestFirst: Collecting 100 samples in estimated 3.2503 s (5050 iterations)
+Benchmarking sample_10k_k10/LatestFirst: Analyzing
+sample_10k_k10/LatestFirst
+                        time:   [614.66 µs 617.74 µs 621.79 µs]
+                        thrpt:  [59.791 Melem/s 60.182 Melem/s 60.484 Melem/s]
+                 change:
+                        time:   [+4.8007% +9.0971% +13.603%] (p = 0.00 < 0.05)
+                        thrpt:  [−11.974% −8.3385% −4.5808%]
+                        Performance has regressed.
+Found 4 outliers among 100 measurements (4.00%)
+  3 (3.00%) high mild
+  1 (1.00%) high severe
+Benchmarking sample_10k_k10/Uniform
+Benchmarking sample_10k_k10/Uniform: Warming up for 1.0000 s
+Benchmarking sample_10k_k10/Uniform: Collecting 100 samples in estimated 5.3564 s (10k iterations)
+Benchmarking sample_10k_k10/Uniform: Analyzing
+sample_10k_k10/Uniform  time:   [525.22 µs 527.07 µs 529.37 µs]
+                        thrpt:  [70.228 Melem/s 70.535 Melem/s 70.784 Melem/s]
+                 change:
+                        time:   [+7.8662% +12.833% +17.820%] (p = 0.00 < 0.05)
+                        thrpt:  [−15.124% −11.374% −7.2925%]
+                        Performance has regressed.
+Found 12 outliers among 100 measurements (12.00%)
+  1 (1.00%) low mild
+  3 (3.00%) high mild
+  8 (8.00%) high severe
+
+Benchmarking ingest_100000_versions/single_with_sync
+Benchmarking ingest_100000_versions/single_with_sync: Warming up for 1.0000 s
+Benchmarking ingest_100000_versions/single_with_sync: Collecting 10 samples in estimated 5.2494 s (110 iterations)
+Benchmarking ingest_100000_versions/single_with_sync: Analyzing
+ingest_100000_versions/single_with_sync
+                        time:   [38.296 ms 38.627 ms 38.882 ms]
+                        thrpt:  [2.5719 Melem/s 2.5889 Melem/s 2.6113 Melem/s]
+                 change:
+                        time:   [−0.9170% +9.4726% +21.028%] (p = 0.10 > 0.05)
+                        thrpt:  [−17.375% −8.6529% +0.9255%]
+                        No change in performance detected.
+Benchmarking ingest_100000_versions/batch_10k_with_sync
+Benchmarking ingest_100000_versions/batch_10k_with_sync: Warming up for 1.0000 s
+Benchmarking ingest_100000_versions/batch_10k_with_sync: Collecting 10 samples in estimated 4.3535 s (110 iterations)
+Benchmarking ingest_100000_versions/batch_10k_with_sync: Analyzing
+ingest_100000_versions/batch_10k_with_sync
+                        time:   [32.749 ms 32.792 ms 32.836 ms]
+                        thrpt:  [3.0454 Melem/s 3.0495 Melem/s 3.0535 Melem/s]
+                 change:
+                        time:   [+4.1218% +10.790% +18.336%] (p = 0.01 < 0.05)
+                        thrpt:  [−15.495% −9.7390% −3.9587%]
+                        Performance has regressed.
+Found 2 outliers among 10 measurements (20.00%)
+  1 (10.00%) low severe
+  1 (10.00%) high mild
+
+      111.21 real       353.61 user        23.37 sys
+          2469658624  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             1817819  page reclaims
+               59153  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                  47  messages sent
+                2565  messages received
+                  58  signals received
+                9842  voluntary context switches
+              926460  involuntary context switches
+          2920333253  instructions retired
+          1055588769  cycles elapsed
+            84509272  peak memory footprint

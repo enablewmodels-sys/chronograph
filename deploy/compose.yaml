@@ -1,0 +1,61 @@
+name: chronograph
+services:
+  chronograph:
+    image: chronograph:${CHRONOGRAPH_TAG:-local}
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      CHRONOGRAPH_ORIGIN: https://${DOMAIN:?Set DOMAIN in deploy/.env}
+      CHRONOGRAPH_BIND: 0.0.0.0:8080
+      CHRONOGRAPH_DATA: /data
+      CHRONOGRAPH_AUTH: /config/auth.json
+    volumes:
+      - graph-data:/data
+      - graph-config:/config
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 128
+    mem_limit: ${CHRONOGRAPH_MEMORY:-2g}
+    stop_grace_period: 60s
+    networks:
+      - backend
+
+  proxy:
+    image: caddy:2.10-alpine
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in deploy/.env}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in deploy/.env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      chronograph:
+        condition: service_healthy
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - backend
+      - ingress
+
+volumes:
+  graph-data:
+  graph-config:
+  caddy-data:
+  caddy-config:
+networks:
+  backend:
+    internal: true
+  ingress:

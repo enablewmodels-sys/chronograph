@@ -1,0 +1,9 @@
+$ cargo build --locked --workspace
+   Compiling chronograph-db v0.3.0 (<workspace>/crates/chronograph-core)
+   Compiling chronograph-server v0.3.0 (<workspace>/crates/chronograph-server)
+   Compiling chronograph-bench v0.3.0 (<workspace>/crates/chronograph-bench)
+   Compiling chronograph-conn-worldmodel v0.3.0 (<workspace>/crates/chronograph-conn-worldmodel)
+   Compiling chronograph-conn-bci v0.3.0 (<workspace>/crates/chronograph-conn-bci)
+   Compiling chronograph-conn-robotics v0.3.0 (<workspace>/crates/chronograph-conn-robotics)
+   Compiling chronograph-conn-quantum v0.3.0 (<workspace>/crates/chronograph-conn-quantum)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.45s

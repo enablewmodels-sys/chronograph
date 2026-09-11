@@ -1,0 +1,10 @@
+$ target/release/examples/world_model
+Gridworld replay: agent -> object relative x position
+t=0.00s  x=0.0  version=0  interval=[0, 1000000)
+t=1.00s  x=1.0  version=1  interval=[1000000, 2000000)
+t=2.00s  x=2.0  version=2  interval=[2000000, 2500000)
+t=2.75s  x=2.5  version=8  interval=[2500000, 3000000)
+t=3.00s  x=3.0  version=3  interval=[3000000, 4000000)
+t=7.00s  x=7.0  version=7  interval=[7000000, 9223372036854775807)
+Arrow snapshot: 1 row(s), 6 columns
+Reopened: 3 nodes, 9 historical versions

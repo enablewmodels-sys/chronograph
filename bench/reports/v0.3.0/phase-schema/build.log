@@ -1,0 +1,3 @@
+$ cargo build --locked --workspace
+   Compiling chronograph-server v0.3.0 (<workspace>/crates/chronograph-server)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.37s

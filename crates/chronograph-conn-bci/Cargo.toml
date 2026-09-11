@@ -1,0 +1,32 @@
+[package]
+name = "chronograph-conn-bci"
+description = "LSL and synthetic neural-stream adapters for Chronograph"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+lsl = ["dep:lsl"]
+
+[dependencies]
+chronograph-db.workspace = true
+arrow = { workspace = true, features = ["ipc"] }
+serde.workspace = true
+thiserror.workspace = true
+# Human-readable, validated connector mapping files.
+toml = "1.1"
+# Preserve mapping/clock provenance in Arrow metadata and read source fixtures.
+serde_json = "1"
+# Maintained binding fork bundles liblsl 1.16.2; the original 0.1.1 fails Apple Clang.
+# Optional: embedded/default builds need no C++ toolchain or liblsl.
+lsl = { package = "lamquant-lsl", version = "=0.1.2", optional = true }
+
+[dev-dependencies]
+tempfile = "3"
+
+[[example]]
+name = "bci_connector"
+path = "../../examples/bci_connector.rs"

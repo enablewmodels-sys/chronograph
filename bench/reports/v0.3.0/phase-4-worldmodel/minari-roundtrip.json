@@ -1,0 +1,113 @@
+{
+  "versions": {
+    "minari": "0.5.3",
+    "gymnasium": "1.3.0",
+    "numpy": "2.2.6",
+    "pyarrow": "25.0.1",
+    "h5py": "3.16.0"
+  },
+  "checks": [
+    {
+      "repeat": 1,
+      "command": [
+        "<workspace>/.work/connector-python/bin/python",
+        "<workspace>/scripts/connectors/make-worldmodel-fixture.py",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/source.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "repeat": 1,
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "-p",
+        "chronograph-conn-worldmodel",
+        "--example",
+        "worldmodel_connector",
+        "--",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/graph",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/source.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "repeat": 1,
+      "command": [
+        "<workspace>/.work/connector-python/bin/python",
+        "<workspace>/scripts/connectors/export-minari.py",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/graph/worldmodel.arrow",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/minari"
+      ],
+      "exit_code": 0
+    },
+    {
+      "repeat": 1,
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "-p",
+        "chronograph-conn-worldmodel",
+        "--example",
+        "worldmodel_connector",
+        "--",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/restored",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/minari/roundtrip-steps.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "repeat": 2,
+      "command": [
+        "<workspace>/.work/connector-python/bin/python",
+        "<workspace>/scripts/connectors/make-worldmodel-fixture.py",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/source.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "repeat": 2,
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "-p",
+        "chronograph-conn-worldmodel",
+        "--example",
+        "worldmodel_connector",
+        "--",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/graph",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/source.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "repeat": 2,
+      "command": [
+        "<workspace>/.work/connector-python/bin/python",
+        "<workspace>/scripts/connectors/export-minari.py",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/graph/worldmodel.arrow",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/minari"
+      ],
+      "exit_code": 0
+    },
+    {
+      "repeat": 2,
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "-p",
+        "chronograph-conn-worldmodel",
+        "--example",
+        "worldmodel_connector",
+        "--",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/restored",
+        "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/minari/roundtrip-steps.json"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

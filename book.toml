@@ -1,0 +1,17 @@
+[book]
+title = "Chronograph Community 0.4 alpha"
+description = "Temporal graph storage, durable branches, domain adapters and operations"
+language = "en"
+src = "docs"
+
+[build]
+build-dir = "target/book"
+create-missing = false
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+smart-punctuation = true
+
+[output.html.playground]
+runnable = false

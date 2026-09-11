@@ -1,0 +1,39 @@
+# Community release status
+
+Community **0.4.0-alpha.2** is the first public source-available alpha prepared for
+[this repository](https://github.com/enablewmodels-sys/chronograph). The
+[release page](https://github.com/enablewmodels-sys/chronograph/releases/tag/v0.4.0-alpha.2)
+is the source of truth for published binaries and checksums. It is an alpha with
+documented limitations, not a managed-service launch or a production SLA.
+
+| Area | Delivered | Limit or remaining work |
+| --- | --- | --- |
+| Temporal engine | Directed typed relationships, valid-time history, late observations, ordered neighborhood indexes | History/indexes reside in RAM; no compaction or replication |
+| Durable branching | Fork, conflict-checked merge, discard, replay and backup | One journal owner; application payload references remain opaque |
+| Community service | Scoped expiring tokens, bounded API, HTTP MCP, native stdio bridge, local backups | One workspace per process; deployed TLS and interactive agent-app checks remain separate |
+| Schema and connectors | Visual designer, checksum migrations, 28 presets, 12 connector descriptors, typed assets, durable ingestion/checkpoint transactions | See connector-specific limits; descriptors do not imply every native format is decoded |
+| Python SDK and agent | Durable SQLite spool, retry/checkpoint recovery, byte-exact arrays and selected dataset adapters | Optional model/hardware dependencies are installed separately |
+| Browser console | Temporal queries, branches, schemas, connectors, access and operations; desktop/mobile tests | Public static demo is synthetic and read only |
+| Packaging | Source, Apple Silicon native bundle, Python wheel, checksums, license and third-party inventory | Unsigned/not notarized; inspect CI before assuming Linux/container support |
+| Public website | Static landing, full docs and synthetic demo; Vercel configuration | Owner imports and deploys repository in Vercel |
+| Managed | Edition boundary and deployment recipes documented | Hosted accounts, teams, billing, off-host recovery and cloud operations not delivered |
+
+## Evidence and compatibility
+
+The 0.4 connector checks cover Rust tests, browser flows, real optional SDK
+adapters, killed-process recovery, backup/restore and separately measured local
+ingestion latency. The 10M-version engine benchmark remains the earlier workload;
+its batch-insert and as-of targets were missed under recorded Low Power Mode.
+See [testing](TESTING.md), [benchmarks](BENCHMARKS.md), [connector scope](CONNECTOR_PLATFORM.md)
+and [known limits](LIMITATIONS.md). A passing build does not establish hardware
+connectivity, public TLS safety or production throughput.
+
+Storage format 3 requires an [explicit upgrade](UPGRADE_0_4.md) of format-2 data
+into a separate destination. Preserve the source, auth configuration and previous
+binary for rollback. No release step modifies an existing workspace.
+
+The public tree contains Community code and sanitized evidence. Runtime graph
+files, tokens, authentication stores, private planning material and Managed source
+are excluded. [Licensing](LICENSING.md) describes the modification and competition
+terms. [Website deployment](WEBSITE.md) separates static publication from hosting
+a real database service.

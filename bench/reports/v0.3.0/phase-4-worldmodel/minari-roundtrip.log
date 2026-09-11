@@ -1,0 +1,98 @@
+$ <workspace>/.work/connector-python/bin/python <workspace>/scripts/connectors/make-worldmodel-fixture.py /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/source.json
+Created 26 Gymnasium reset/step records across two complete episodes at /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/source.json
+
+$ cargo run --locked -p chronograph-conn-worldmodel --example worldmodel_connector -- /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/graph /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/source.json
+   Compiling chronograph-conn-worldmodel v0.3.0 (<workspace>/crates/chronograph-conn-worldmodel)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.31s
+     Running `target/debug/examples/worldmodel_connector /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/graph /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/source.json`
+World model: 26 source/reset records, two complete episodes; 24 exact next-step/RNG restores and Arrow source comparisons passed
+Dataset retained at /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/graph
+
+$ <workspace>/.work/connector-python/bin/python <workspace>/scripts/connectors/export-minari.py /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/graph/worldmodel.arrow /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/minari
+<workspace>/.work/connector-python/lib/python3.12/site-packages/minari/utils.py:235: UserWarning: `code_permalink` is set to None. For reproducibility purposes it is highly recommended to link your dataset to versioned code.
+  warnings.warn(
+<workspace>/.work/connector-python/lib/python3.12/site-packages/minari/utils.py:243: UserWarning: `author` is set to None. For longevity purposes it is highly recommended to provide an author name.
+  warnings.warn(
+<workspace>/.work/connector-python/lib/python3.12/site-packages/minari/utils.py:251: UserWarning: `author_email` is set to None. For longevity purposes it is highly recommended to provide an author email, or some other obvious contact information.
+  warnings.warn(
+<workspace>/.work/connector-python/lib/python3.12/site-packages/minari/utils.py:284: UserWarning: `eval_env` is set to None. If another environment is intended to be used for evaluation please specify corresponding Gymnasium environment (gym.Env | gym.envs.registration.EnvSpec). If None the environment used to collect the data (`env=EnvSpec(id='ChronographGridWorld-v1', entry_point='gridworld_env:GridWorld', reward_threshold=None, nondeterministic=False, max_episode_steps=None, order_enforce=True, disable_env_checker=False, kwargs={'size': 4, 'horizon': 16}, namespace=None, name='ChronographGridWorld', version=1, additional_wrappers=(), vector_entry_point=None)`) will be used for this purpose.
+  warnings.warn(
+{
+  "dataset_id": "chronograph-gridworld-v0",
+  "mapping": {
+    "environment_id": "ChronographGridWorld-v1",
+    "environment_node": 30000,
+    "episode_base": 31000,
+    "max_episodes": 1000,
+    "state_kind": 300,
+    "state_codec": "chronograph-gridworld-xorshift64-v1",
+    "observation_dim": 4,
+    "action_count": 4,
+    "clock_domain": "simulation_us"
+  },
+  "original_episode_ids": [
+    0,
+    1
+  ],
+  "episodes": 2,
+  "reset_and_step_records": 26,
+  "transitions": 24,
+  "resumed_transitions": 24,
+  "reader_roundtrip": "passed",
+  "minari_version": "0.5.3"
+}
+
+$ cargo run --locked -p chronograph-conn-worldmodel --example worldmodel_connector -- /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/restored /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/minari/roundtrip-steps.json
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running `target/debug/examples/worldmodel_connector /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/restored /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/minari/roundtrip-steps.json`
+World model: 26 source/reset records, two complete episodes; 24 exact next-step/RNG restores and Arrow source comparisons passed
+Dataset retained at /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-l19fdq6o/restored
+
+$ <workspace>/.work/connector-python/bin/python <workspace>/scripts/connectors/make-worldmodel-fixture.py /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/source.json
+Created 26 Gymnasium reset/step records across two complete episodes at /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/source.json
+
+$ cargo run --locked -p chronograph-conn-worldmodel --example worldmodel_connector -- /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/graph /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/source.json
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running `target/debug/examples/worldmodel_connector /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/graph /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/source.json`
+World model: 26 source/reset records, two complete episodes; 24 exact next-step/RNG restores and Arrow source comparisons passed
+Dataset retained at /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/graph
+
+$ <workspace>/.work/connector-python/bin/python <workspace>/scripts/connectors/export-minari.py /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/graph/worldmodel.arrow /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/minari
+<workspace>/.work/connector-python/lib/python3.12/site-packages/minari/utils.py:235: UserWarning: `code_permalink` is set to None. For reproducibility purposes it is highly recommended to link your dataset to versioned code.
+  warnings.warn(
+<workspace>/.work/connector-python/lib/python3.12/site-packages/minari/utils.py:243: UserWarning: `author` is set to None. For longevity purposes it is highly recommended to provide an author name.
+  warnings.warn(
+<workspace>/.work/connector-python/lib/python3.12/site-packages/minari/utils.py:251: UserWarning: `author_email` is set to None. For longevity purposes it is highly recommended to provide an author email, or some other obvious contact information.
+  warnings.warn(
+<workspace>/.work/connector-python/lib/python3.12/site-packages/minari/utils.py:284: UserWarning: `eval_env` is set to None. If another environment is intended to be used for evaluation please specify corresponding Gymnasium environment (gym.Env | gym.envs.registration.EnvSpec). If None the environment used to collect the data (`env=EnvSpec(id='ChronographGridWorld-v1', entry_point='gridworld_env:GridWorld', reward_threshold=None, nondeterministic=False, max_episode_steps=None, order_enforce=True, disable_env_checker=False, kwargs={'size': 4, 'horizon': 16}, namespace=None, name='ChronographGridWorld', version=1, additional_wrappers=(), vector_entry_point=None)`) will be used for this purpose.
+  warnings.warn(
+{
+  "dataset_id": "chronograph-gridworld-v0",
+  "mapping": {
+    "environment_id": "ChronographGridWorld-v1",
+    "environment_node": 30000,
+    "episode_base": 31000,
+    "max_episodes": 1000,
+    "state_kind": 300,
+    "state_codec": "chronograph-gridworld-xorshift64-v1",
+    "observation_dim": 4,
+    "action_count": 4,
+    "clock_domain": "simulation_us"
+  },
+  "original_episode_ids": [
+    0,
+    1
+  ],
+  "episodes": 2,
+  "reset_and_step_records": 26,
+  "transitions": 24,
+  "resumed_transitions": 24,
+  "reader_roundtrip": "passed",
+  "minari_version": "0.5.3"
+}
+
+$ cargo run --locked -p chronograph-conn-worldmodel --example worldmodel_connector -- /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/restored /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/minari/roundtrip-steps.json
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running `target/debug/examples/worldmodel_connector /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/restored /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/minari/roundtrip-steps.json`
+World model: 26 source/reset records, two complete episodes; 24 exact next-step/RNG restores and Arrow source comparisons passed
+Dataset retained at /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-worldmodel-e2e-hs0jbqh3/restored

@@ -1,0 +1,23 @@
+   Compiling lamquant-lsl-sys v0.1.2
+   Compiling lamquant-lsl v0.1.2
+   Compiling chronograph-conn-bci v0.3.0 (<workspace>/crates/chronograph-conn-bci)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.14s
+     Running unittests src/lib.rs (target/debug/deps/chronograph_conn_bci-a60de00bc13df6e5)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/roundtrip.rs (target/debug/deps/roundtrip-32ed6124808bb3be)
+
+running 2 tests
+test invalid_frames_are_atomic_and_simulator_is_deterministic ... ok
+test source_graph_arrow_roundtrip_and_late_arrival ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+   Doc-tests chronograph_conn_bci
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

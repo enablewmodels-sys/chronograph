@@ -1,0 +1,3501 @@
+workload,sample,latency_ms
+"HTTP stats",0,1.320167
+"HTTP stats",1,0.289833
+"HTTP stats",2,0.288292
+"HTTP stats",3,0.224834
+"HTTP stats",4,0.206958
+"HTTP stats",5,0.211375
+"HTTP stats",6,0.292584
+"HTTP stats",7,0.280459
+"HTTP stats",8,0.224708
+"HTTP stats",9,0.231375
+"HTTP stats",10,0.256875
+"HTTP stats",11,0.232584
+"HTTP stats",12,0.212417
+"HTTP stats",13,0.216583
+"HTTP stats",14,0.214000
+"HTTP stats",15,0.201666
+"HTTP stats",16,0.219500
+"HTTP stats",17,0.295167
+"HTTP stats",18,0.206750
+"HTTP stats",19,0.200750
+"HTTP stats",20,0.231417
+"HTTP stats",21,0.277292
+"HTTP stats",22,0.212000
+"HTTP stats",23,0.213500
+"HTTP stats",24,0.235375
+"HTTP stats",25,0.225458
+"HTTP stats",26,0.217709
+"HTTP stats",27,0.209125
+"HTTP stats",28,0.203625
+"HTTP stats",29,0.232042
+"HTTP stats",30,0.200208
+"HTTP stats",31,0.212709
+"HTTP stats",32,0.204833
+"HTTP stats",33,0.206375
+"HTTP stats",34,0.194209
+"HTTP stats",35,0.202666
+"HTTP stats",36,0.204583
+"HTTP stats",37,0.206875
+"HTTP stats",38,0.208125
+"HTTP stats",39,0.218917
+"HTTP stats",40,0.216208
+"HTTP stats",41,0.207583
+"HTTP stats",42,0.216500
+"HTTP stats",43,0.224500
+"HTTP stats",44,0.218542
+"HTTP stats",45,0.247209
+"HTTP stats",46,0.264041
+"HTTP stats",47,0.219833
+"HTTP stats",48,0.201416
+"HTTP stats",49,0.219458
+"HTTP stats",50,0.200209
+"HTTP stats",51,0.215167
+"HTTP stats",52,0.275291
+"HTTP stats",53,0.210708
+"HTTP stats",54,0.208584
+"HTTP stats",55,0.204667
+"HTTP stats",56,0.211667
+"HTTP stats",57,0.198292
+"HTTP stats",58,0.215709
+"HTTP stats",59,0.203166
+"HTTP stats",60,0.195417
+"HTTP stats",61,0.203417
+"HTTP stats",62,0.198000
+"HTTP stats",63,0.202791
+"HTTP stats",64,0.213125
+"HTTP stats",65,0.200708
+"HTTP stats",66,0.198125
+"HTTP stats",67,0.193209
+"HTTP stats",68,0.202416
+"HTTP stats",69,0.221917
+"HTTP stats",70,0.251750
+"HTTP stats",71,0.207541
+"HTTP stats",72,0.201541
+"HTTP stats",73,0.209542
+"HTTP stats",74,0.205250
+"HTTP stats",75,0.196250
+"HTTP stats",76,0.194584
+"HTTP stats",77,0.190917
+"HTTP stats",78,0.183125
+"HTTP stats",79,0.219625
+"HTTP stats",80,0.197709
+"HTTP stats",81,0.195792
+"HTTP stats",82,0.199917
+"HTTP stats",83,0.389375
+"HTTP stats",84,0.222583
+"HTTP stats",85,0.219500
+"HTTP stats",86,0.205084
+"HTTP stats",87,0.212000
+"HTTP stats",88,0.230084
+"HTTP stats",89,0.216083
+"HTTP stats",90,0.204834
+"HTTP stats",91,0.222834
+"HTTP stats",92,0.194250
+"HTTP stats",93,0.198750
+"HTTP stats",94,0.191542
+"HTTP stats",95,0.191875
+"HTTP stats",96,0.194125
+"HTTP stats",97,0.195334
+"HTTP stats",98,0.205584
+"HTTP stats",99,0.197708
+"HTTP stats",100,0.188500
+"HTTP stats",101,0.192584
+"HTTP stats",102,0.207000
+"HTTP stats",103,0.191458
+"HTTP stats",104,0.194959
+"HTTP stats",105,0.204500
+"HTTP stats",106,0.207542
+"HTTP stats",107,0.184709
+"HTTP stats",108,0.172208
+"HTTP stats",109,0.174750
+"HTTP stats",110,0.172041
+"HTTP stats",111,0.189625
+"HTTP stats",112,0.191542
+"HTTP stats",113,0.212042
+"HTTP stats",114,0.200708
+"HTTP stats",115,0.198417
+"HTTP stats",116,0.195500
+"HTTP stats",117,0.200084
+"HTTP stats",118,0.212375
+"HTTP stats",119,0.184208
+"HTTP stats",120,0.192667
+"HTTP stats",121,0.182042
+"HTTP stats",122,0.190250
+"HTTP stats",123,0.194458
+"HTTP stats",124,0.205958
+"HTTP stats",125,0.297750
+"HTTP stats",126,0.195583
+"HTTP stats",127,0.217167
+"HTTP stats",128,0.190875
+"HTTP stats",129,0.232333
+"HTTP stats",130,0.200041
+"HTTP stats",131,0.192333
+"HTTP stats",132,0.194000
+"HTTP stats",133,0.183209
+"HTTP stats",134,0.220583
+"HTTP stats",135,0.197750
+"HTTP stats",136,0.202750
+"HTTP stats",137,0.187459
+"HTTP stats",138,0.184084
+"HTTP stats",139,0.208500
+"HTTP stats",140,0.221375
+"HTTP stats",141,0.199250
+"HTTP stats",142,0.190833
+"HTTP stats",143,0.195708
+"HTTP stats",144,0.204083
+"HTTP stats",145,0.201333
+"HTTP stats",146,0.196042
+"HTTP stats",147,0.207708
+"HTTP stats",148,0.201500
+"HTTP stats",149,0.196125
+"HTTP stats",150,0.182583
+"HTTP stats",151,0.225333
+"HTTP stats",152,0.198333
+"HTTP stats",153,0.171333
+"HTTP stats",154,0.182709
+"HTTP stats",155,0.188959
+"HTTP stats",156,0.193875
+"HTTP stats",157,0.174292
+"HTTP stats",158,0.176042
+"HTTP stats",159,0.191042
+"HTTP stats",160,0.180417
+"HTTP stats",161,0.179709
+"HTTP stats",162,0.185209
+"HTTP stats",163,0.199000
+"HTTP stats",164,0.199584
+"HTTP stats",165,0.194375
+"HTTP stats",166,0.242708
+"HTTP stats",167,0.253000
+"HTTP stats",168,0.211125
+"HTTP stats",169,1.178375
+"HTTP stats",170,0.199791
+"HTTP stats",171,0.187083
+"HTTP stats",172,0.180208
+"HTTP stats",173,0.195500
+"HTTP stats",174,0.198792
+"HTTP stats",175,0.183292
+"HTTP stats",176,0.174084
+"HTTP stats",177,0.191334
+"HTTP stats",178,0.173709
+"HTTP stats",179,0.175250
+"HTTP stats",180,0.180250
+"HTTP stats",181,0.174958
+"HTTP stats",182,0.189875
+"HTTP stats",183,0.182417
+"HTTP stats",184,0.175125
+"HTTP stats",185,0.169292
+"HTTP stats",186,0.170000
+"HTTP stats",187,0.187875
+"HTTP stats",188,0.186750
+"HTTP stats",189,0.176458
+"HTTP stats",190,0.178583
+"HTTP stats",191,0.184000
+"HTTP stats",192,0.166375
+"HTTP stats",193,0.164833
+"HTTP stats",194,0.168625
+"HTTP stats",195,0.195500
+"HTTP stats",196,0.188750
+"HTTP stats",197,0.185250
+"HTTP stats",198,0.169208
+"HTTP stats",199,0.164875
+"HTTP stats",200,0.169042
+"HTTP stats",201,0.167250
+"HTTP stats",202,0.174750
+"HTTP stats",203,0.163000
+"HTTP stats",204,0.181250
+"HTTP stats",205,0.163791
+"HTTP stats",206,0.191750
+"HTTP stats",207,0.205625
+"HTTP stats",208,0.177834
+"HTTP stats",209,0.173250
+"HTTP stats",210,0.175333
+"HTTP stats",211,0.166833
+"HTTP stats",212,0.350166
+"HTTP stats",213,0.189208
+"HTTP stats",214,0.202958
+"HTTP stats",215,0.354459
+"HTTP stats",216,0.179625
+"HTTP stats",217,0.171625
+"HTTP stats",218,0.217750
+"HTTP stats",219,0.177375
+"HTTP stats",220,0.168708
+"HTTP stats",221,0.195000
+"HTTP stats",222,0.193916
+"HTTP stats",223,0.204292
+"HTTP stats",224,0.184292
+"HTTP stats",225,0.183708
+"HTTP stats",226,0.180833
+"HTTP stats",227,0.187375
+"HTTP stats",228,0.178291
+"HTTP stats",229,0.175625
+"HTTP stats",230,0.208875
+"HTTP stats",231,0.181667
+"HTTP stats",232,0.180417
+"HTTP stats",233,0.200250
+"HTTP stats",234,0.193083
+"HTTP stats",235,0.201750
+"HTTP stats",236,0.186166
+"HTTP stats",237,0.199167
+"HTTP stats",238,0.182541
+"HTTP stats",239,0.171917
+"HTTP stats",240,0.174708
+"HTTP stats",241,0.185583
+"HTTP stats",242,0.179000
+"HTTP stats",243,0.181334
+"HTTP stats",244,0.192292
+"HTTP stats",245,0.182334
+"HTTP stats",246,0.191708
+"HTTP stats",247,0.172000
+"HTTP stats",248,0.171042
+"HTTP stats",249,0.373500
+"HTTP stats",250,0.542000
+"HTTP stats",251,0.186209
+"HTTP stats",252,0.211917
+"HTTP stats",253,0.185833
+"HTTP stats",254,0.206292
+"HTTP stats",255,0.239084
+"HTTP stats",256,0.197542
+"HTTP stats",257,0.189250
+"HTTP stats",258,0.185208
+"HTTP stats",259,0.186625
+"HTTP stats",260,0.188667
+"HTTP stats",261,0.165750
+"HTTP stats",262,0.177208
+"HTTP stats",263,0.167834
+"HTTP stats",264,0.529708
+"HTTP stats",265,0.636917
+"HTTP stats",266,0.616125
+"HTTP stats",267,0.543917
+"HTTP stats",268,0.266792
+"HTTP stats",269,0.196416
+"HTTP stats",270,0.202917
+"HTTP stats",271,0.199291
+"HTTP stats",272,0.191250
+"HTTP stats",273,0.194959
+"HTTP stats",274,0.243041
+"HTTP stats",275,0.181292
+"HTTP stats",276,0.274375
+"HTTP stats",277,0.231834
+"HTTP stats",278,0.192333
+"HTTP stats",279,0.201250
+"HTTP stats",280,0.464292
+"HTTP stats",281,0.344208
+"HTTP stats",282,0.260458
+"HTTP stats",283,0.198958
+"HTTP stats",284,0.214125
+"HTTP stats",285,0.190166
+"HTTP stats",286,0.187167
+"HTTP stats",287,0.186959
+"HTTP stats",288,0.175958
+"HTTP stats",289,0.178792
+"HTTP stats",290,0.182917
+"HTTP stats",291,1.274709
+"HTTP stats",292,0.215167
+"HTTP stats",293,0.190750
+"HTTP stats",294,0.194375
+"HTTP stats",295,0.199459
+"HTTP stats",296,0.175458
+"HTTP stats",297,0.187541
+"HTTP stats",298,0.204917
+"HTTP stats",299,0.200125
+"HTTP stats",300,0.163042
+"HTTP stats",301,0.173958
+"HTTP stats",302,0.189083
+"HTTP stats",303,0.185166
+"HTTP stats",304,0.201042
+"HTTP stats",305,0.214208
+"HTTP stats",306,0.168167
+"HTTP stats",307,0.166000
+"HTTP stats",308,0.167292
+"HTTP stats",309,0.171125
+"HTTP stats",310,0.181125
+"HTTP stats",311,0.212416
+"HTTP stats",312,0.176666
+"HTTP stats",313,0.189708
+"HTTP stats",314,0.154875
+"HTTP stats",315,0.141709
+"HTTP stats",316,0.143542
+"HTTP stats",317,0.425666
+"HTTP stats",318,0.253583
+"HTTP stats",319,0.184625
+"HTTP stats",320,0.186083
+"HTTP stats",321,0.226250
+"HTTP stats",322,0.143625
+"HTTP stats",323,0.155125
+"HTTP stats",324,0.165000
+"HTTP stats",325,0.137833
+"HTTP stats",326,0.152958
+"HTTP stats",327,0.162000
+"HTTP stats",328,0.165417
+"HTTP stats",329,0.135125
+"HTTP stats",330,0.132959
+"HTTP stats",331,0.129292
+"HTTP stats",332,0.130708
+"HTTP stats",333,0.137083
+"HTTP stats",334,0.142833
+"HTTP stats",335,0.141250
+"HTTP stats",336,0.147625
+"HTTP stats",337,0.153542
+"HTTP stats",338,0.169333
+"HTTP stats",339,0.164583
+"HTTP stats",340,0.172667
+"HTTP stats",341,0.170459
+"HTTP stats",342,0.167708
+"HTTP stats",343,0.152708
+"HTTP stats",344,0.152500
+"HTTP stats",345,0.164750
+"HTTP stats",346,0.150833
+"HTTP stats",347,0.154083
+"HTTP stats",348,0.152416
+"HTTP stats",349,0.153125
+"HTTP stats",350,0.156417
+"HTTP stats",351,0.172583
+"HTTP stats",352,0.166917
+"HTTP stats",353,0.194291
+"HTTP stats",354,0.168875
+"HTTP stats",355,0.171750
+"HTTP stats",356,0.181375
+"HTTP stats",357,0.195333
+"HTTP stats",358,0.175292
+"HTTP stats",359,0.177209
+"HTTP stats",360,0.158916
+"HTTP stats",361,0.160000
+"HTTP stats",362,0.175333
+"HTTP stats",363,0.169125
+"HTTP stats",364,0.142833
+"HTTP stats",365,0.151750
+"HTTP stats",366,0.148833
+"HTTP stats",367,0.287333
+"HTTP stats",368,0.169584
+"HTTP stats",369,0.196167
+"HTTP stats",370,0.154958
+"HTTP stats",371,0.160208
+"HTTP stats",372,0.152875
+"HTTP stats",373,0.151459
+"HTTP stats",374,0.142125
+"HTTP stats",375,0.141083
+"HTTP stats",376,0.141000
+"HTTP stats",377,0.141875
+"HTTP stats",378,0.145792
+"HTTP stats",379,0.131375
+"HTTP stats",380,0.133375
+"HTTP stats",381,0.140875
+"HTTP stats",382,0.132792
+"HTTP stats",383,0.143625
+"HTTP stats",384,0.140292
+"HTTP stats",385,0.161250
+"HTTP stats",386,0.151459
+"HTTP stats",387,0.158250
+"HTTP stats",388,0.131834
+"HTTP stats",389,0.158666
+"HTTP stats",390,0.161375
+"HTTP stats",391,0.164959
+"HTTP stats",392,0.141792
+"HTTP stats",393,0.140917
+"HTTP stats",394,0.149000
+"HTTP stats",395,0.145792
+"HTTP stats",396,0.138417
+"HTTP stats",397,0.132417
+"HTTP stats",398,0.168083
+"HTTP stats",399,0.169375
+"HTTP stats",400,0.159208
+"HTTP stats",401,0.146666
+"HTTP stats",402,0.137500
+"HTTP stats",403,0.139875
+"HTTP stats",404,0.136292
+"HTTP stats",405,0.129667
+"HTTP stats",406,0.124000
+"HTTP stats",407,0.138375
+"HTTP stats",408,0.159875
+"HTTP stats",409,0.189416
+"HTTP stats",410,0.137792
+"HTTP stats",411,0.146041
+"HTTP stats",412,0.149125
+"HTTP stats",413,0.139250
+"HTTP stats",414,0.135917
+"HTTP stats",415,0.131333
+"HTTP stats",416,0.143334
+"HTTP stats",417,0.149541
+"HTTP stats",418,0.147292
+"HTTP stats",419,0.176792
+"HTTP stats",420,0.140667
+"HTTP stats",421,0.288375
+"HTTP stats",422,0.301459
+"HTTP stats",423,0.215916
+"HTTP stats",424,0.555458
+"HTTP stats",425,0.419250
+"HTTP stats",426,0.246542
+"HTTP stats",427,0.171958
+"HTTP stats",428,0.196584
+"HTTP stats",429,0.172167
+"HTTP stats",430,0.153125
+"HTTP stats",431,0.146000
+"HTTP stats",432,0.143500
+"HTTP stats",433,0.141333
+"HTTP stats",434,0.128708
+"HTTP stats",435,0.137833
+"HTTP stats",436,0.152042
+"HTTP stats",437,0.149000
+"HTTP stats",438,0.171792
+"HTTP stats",439,0.166791
+"HTTP stats",440,0.147666
+"HTTP stats",441,0.165125
+"HTTP stats",442,0.147583
+"HTTP stats",443,0.149083
+"HTTP stats",444,0.132333
+"HTTP stats",445,0.134542
+"HTTP stats",446,1.044792
+"HTTP stats",447,0.272458
+"HTTP stats",448,0.244291
+"HTTP stats",449,0.267250
+"HTTP stats",450,0.290209
+"HTTP stats",451,0.282125
+"HTTP stats",452,0.331959
+"HTTP stats",453,0.282458
+"HTTP stats",454,0.270042
+"HTTP stats",455,2.223292
+"HTTP stats",456,0.563709
+"HTTP stats",457,0.252708
+"HTTP stats",458,0.236083
+"HTTP stats",459,0.139958
+"HTTP stats",460,0.123875
+"HTTP stats",461,0.123583
+"HTTP stats",462,0.113541
+"HTTP stats",463,0.110500
+"HTTP stats",464,0.196292
+"HTTP stats",465,0.171792
+"HTTP stats",466,0.129458
+"HTTP stats",467,0.166125
+"HTTP stats",468,0.191042
+"HTTP stats",469,0.166792
+"HTTP stats",470,0.146625
+"HTTP stats",471,0.133042
+"HTTP stats",472,0.123708
+"HTTP stats",473,0.125792
+"HTTP stats",474,0.134375
+"HTTP stats",475,0.118958
+"HTTP stats",476,0.124125
+"HTTP stats",477,0.129917
+"HTTP stats",478,0.123333
+"HTTP stats",479,0.118792
+"HTTP stats",480,0.117417
+"HTTP stats",481,0.120375
+"HTTP stats",482,0.188416
+"HTTP stats",483,0.187334
+"HTTP stats",484,0.146208
+"HTTP stats",485,0.130666
+"HTTP stats",486,0.120584
+"HTTP stats",487,0.122584
+"HTTP stats",488,0.143792
+"HTTP stats",489,0.145000
+"HTTP stats",490,0.139583
+"HTTP stats",491,0.116167
+"HTTP stats",492,0.137167
+"HTTP stats",493,0.139750
+"HTTP stats",494,0.130416
+"HTTP stats",495,0.133250
+"HTTP stats",496,0.138166
+"HTTP stats",497,0.140584
+"HTTP stats",498,0.121792
+"HTTP stats",499,0.123625
+"HTTP as-of first page (1000 rows)",0,2.187791
+"HTTP as-of first page (1000 rows)",1,2.330292
+"HTTP as-of first page (1000 rows)",2,2.245792
+"HTTP as-of first page (1000 rows)",3,2.300208
+"HTTP as-of first page (1000 rows)",4,2.302042
+"HTTP as-of first page (1000 rows)",5,2.330000
+"HTTP as-of first page (1000 rows)",6,2.303167
+"HTTP as-of first page (1000 rows)",7,2.186792
+"HTTP as-of first page (1000 rows)",8,2.341167
+"HTTP as-of first page (1000 rows)",9,2.286125
+"HTTP as-of first page (1000 rows)",10,2.114958
+"HTTP as-of first page (1000 rows)",11,2.256458
+"HTTP as-of first page (1000 rows)",12,2.248125
+"HTTP as-of first page (1000 rows)",13,2.287875
+"HTTP as-of first page (1000 rows)",14,2.217542
+"HTTP as-of first page (1000 rows)",15,2.166875
+"HTTP as-of first page (1000 rows)",16,2.338542
+"HTTP as-of first page (1000 rows)",17,2.260333
+"HTTP as-of first page (1000 rows)",18,2.178666
+"HTTP as-of first page (1000 rows)",19,2.338792
+"HTTP as-of first page (1000 rows)",20,2.433750
+"HTTP as-of first page (1000 rows)",21,2.148625
+"HTTP as-of first page (1000 rows)",22,2.146125
+"HTTP as-of first page (1000 rows)",23,2.328041
+"HTTP as-of first page (1000 rows)",24,2.210667
+"HTTP as-of first page (1000 rows)",25,2.167458
+"HTTP as-of first page (1000 rows)",26,2.132375
+"HTTP as-of first page (1000 rows)",27,2.354208
+"HTTP as-of first page (1000 rows)",28,2.187458
+"HTTP as-of first page (1000 rows)",29,2.152167
+"HTTP as-of first page (1000 rows)",30,2.183708
+"HTTP as-of first page (1000 rows)",31,2.179666
+"HTTP as-of first page (1000 rows)",32,2.332041
+"HTTP as-of first page (1000 rows)",33,2.213542
+"HTTP as-of first page (1000 rows)",34,2.668125
+"HTTP as-of first page (1000 rows)",35,2.233042
+"HTTP as-of first page (1000 rows)",36,2.220292
+"HTTP as-of first page (1000 rows)",37,2.344166
+"HTTP as-of first page (1000 rows)",38,2.379375
+"HTTP as-of first page (1000 rows)",39,2.175166
+"HTTP as-of first page (1000 rows)",40,2.105083
+"HTTP as-of first page (1000 rows)",41,2.470833
+"HTTP as-of first page (1000 rows)",42,2.165333
+"HTTP as-of first page (1000 rows)",43,2.143542
+"HTTP as-of first page (1000 rows)",44,2.156333
+"HTTP as-of first page (1000 rows)",45,2.299250
+"HTTP as-of first page (1000 rows)",46,2.170709
+"HTTP as-of first page (1000 rows)",47,2.187042
+"HTTP as-of first page (1000 rows)",48,2.150875
+"HTTP as-of first page (1000 rows)",49,2.371917
+"HTTP as-of first page (1000 rows)",50,2.146458
+"HTTP as-of first page (1000 rows)",51,2.089417
+"HTTP as-of first page (1000 rows)",52,2.151541
+"HTTP as-of first page (1000 rows)",53,2.324208
+"HTTP as-of first page (1000 rows)",54,2.122584
+"HTTP as-of first page (1000 rows)",55,2.111042
+"HTTP as-of first page (1000 rows)",56,2.213500
+"HTTP as-of first page (1000 rows)",57,2.347208
+"HTTP as-of first page (1000 rows)",58,2.088542
+"HTTP as-of first page (1000 rows)",59,2.117583
+"HTTP as-of first page (1000 rows)",60,2.374500
+"HTTP as-of first page (1000 rows)",61,2.138417
+"HTTP as-of first page (1000 rows)",62,2.113875
+"HTTP as-of first page (1000 rows)",63,2.151125
+"HTTP as-of first page (1000 rows)",64,2.245334
+"HTTP as-of first page (1000 rows)",65,2.178375
+"HTTP as-of first page (1000 rows)",66,2.209708
+"HTTP as-of first page (1000 rows)",67,2.132000
+"HTTP as-of first page (1000 rows)",68,2.365334
+"HTTP as-of first page (1000 rows)",69,2.261375
+"HTTP as-of first page (1000 rows)",70,2.171041
+"HTTP as-of first page (1000 rows)",71,2.178959
+"HTTP as-of first page (1000 rows)",72,2.312167
+"HTTP as-of first page (1000 rows)",73,2.127958
+"HTTP as-of first page (1000 rows)",74,2.204125
+"HTTP as-of first page (1000 rows)",75,2.347542
+"HTTP as-of first page (1000 rows)",76,2.130250
+"HTTP as-of first page (1000 rows)",77,2.123708
+"HTTP as-of first page (1000 rows)",78,2.142958
+"HTTP as-of first page (1000 rows)",79,2.214209
+"HTTP as-of first page (1000 rows)",80,2.137250
+"HTTP as-of first page (1000 rows)",81,2.122208
+"HTTP as-of first page (1000 rows)",82,2.118042
+"HTTP as-of first page (1000 rows)",83,2.263333
+"HTTP as-of first page (1000 rows)",84,2.137666
+"HTTP as-of first page (1000 rows)",85,2.114708
+"HTTP as-of first page (1000 rows)",86,2.421875
+"HTTP as-of first page (1000 rows)",87,2.296958
+"HTTP as-of first page (1000 rows)",88,2.137625
+"HTTP as-of first page (1000 rows)",89,2.107750
+"HTTP as-of first page (1000 rows)",90,2.203583
+"HTTP as-of first page (1000 rows)",91,2.308875
+"HTTP as-of first page (1000 rows)",92,2.255875
+"HTTP as-of first page (1000 rows)",93,2.069292
+"HTTP as-of first page (1000 rows)",94,2.086250
+"HTTP as-of first page (1000 rows)",95,2.358000
+"HTTP as-of first page (1000 rows)",96,2.174708
+"HTTP as-of first page (1000 rows)",97,2.115667
+"HTTP as-of first page (1000 rows)",98,2.238500
+"HTTP as-of first page (1000 rows)",99,2.168416
+"HTTP as-of first page (1000 rows)",100,2.116292
+"HTTP as-of first page (1000 rows)",101,2.148625
+"HTTP as-of first page (1000 rows)",102,2.276583
+"HTTP as-of first page (1000 rows)",103,2.287375
+"HTTP as-of first page (1000 rows)",104,2.106958
+"HTTP as-of first page (1000 rows)",105,2.126250
+"HTTP as-of first page (1000 rows)",106,2.355625
+"HTTP as-of first page (1000 rows)",107,2.166250
+"HTTP as-of first page (1000 rows)",108,2.046500
+"HTTP as-of first page (1000 rows)",109,2.133041
+"HTTP as-of first page (1000 rows)",110,2.242875
+"HTTP as-of first page (1000 rows)",111,2.126167
+"HTTP as-of first page (1000 rows)",112,2.093041
+"HTTP as-of first page (1000 rows)",113,2.142625
+"HTTP as-of first page (1000 rows)",114,2.273250
+"HTTP as-of first page (1000 rows)",115,2.115417
+"HTTP as-of first page (1000 rows)",116,2.600292
+"HTTP as-of first page (1000 rows)",117,12.415875
+"HTTP as-of first page (1000 rows)",118,9.117500
+"HTTP as-of first page (1000 rows)",119,4.480708
+"HTTP as-of first page (1000 rows)",120,4.408375
+"HTTP as-of first page (1000 rows)",121,2.812375
+"HTTP as-of first page (1000 rows)",122,3.034792
+"HTTP as-of first page (1000 rows)",123,2.762291
+"HTTP as-of first page (1000 rows)",124,2.533542
+"HTTP as-of first page (1000 rows)",125,2.986792
+"HTTP as-of first page (1000 rows)",126,2.339250
+"HTTP as-of first page (1000 rows)",127,2.208375
+"HTTP as-of first page (1000 rows)",128,2.243459
+"HTTP as-of first page (1000 rows)",129,2.949000
+"HTTP as-of first page (1000 rows)",130,2.292791
+"HTTP as-of first page (1000 rows)",131,2.286042
+"HTTP as-of first page (1000 rows)",132,4.069167
+"HTTP as-of first page (1000 rows)",133,2.666584
+"HTTP as-of first page (1000 rows)",134,2.302666
+"HTTP as-of first page (1000 rows)",135,3.305500
+"HTTP as-of first page (1000 rows)",136,2.287333
+"HTTP as-of first page (1000 rows)",137,2.478667
+"HTTP as-of first page (1000 rows)",138,2.710250
+"HTTP as-of first page (1000 rows)",139,2.651375
+"HTTP as-of first page (1000 rows)",140,2.792666
+"HTTP as-of first page (1000 rows)",141,2.962291
+"HTTP as-of first page (1000 rows)",142,2.844083
+"HTTP as-of first page (1000 rows)",143,2.677500
+"HTTP as-of first page (1000 rows)",144,2.650375
+"HTTP as-of first page (1000 rows)",145,3.887209
+"HTTP as-of first page (1000 rows)",146,5.189000
+"HTTP as-of first page (1000 rows)",147,2.512875
+"HTTP as-of first page (1000 rows)",148,2.307791
+"HTTP as-of first page (1000 rows)",149,3.155917
+"HTTP as-of first page (1000 rows)",150,2.558916
+"HTTP as-of first page (1000 rows)",151,2.524625
+"HTTP as-of first page (1000 rows)",152,2.874167
+"HTTP as-of first page (1000 rows)",153,2.269000
+"HTTP as-of first page (1000 rows)",154,2.441084
+"HTTP as-of first page (1000 rows)",155,2.979958
+"HTTP as-of first page (1000 rows)",156,2.352000
+"HTTP as-of first page (1000 rows)",157,2.253417
+"HTTP as-of first page (1000 rows)",158,2.903583
+"HTTP as-of first page (1000 rows)",159,2.313458
+"HTTP as-of first page (1000 rows)",160,2.294334
+"HTTP as-of first page (1000 rows)",161,2.433958
+"HTTP as-of first page (1000 rows)",162,2.695416
+"HTTP as-of first page (1000 rows)",163,2.345250
+"HTTP as-of first page (1000 rows)",164,2.527333
+"HTTP as-of first page (1000 rows)",165,2.746916
+"HTTP as-of first page (1000 rows)",166,2.502875
+"HTTP as-of first page (1000 rows)",167,2.328291
+"HTTP as-of first page (1000 rows)",168,2.899833
+"HTTP as-of first page (1000 rows)",169,2.434958
+"HTTP as-of first page (1000 rows)",170,2.429291
+"HTTP as-of first page (1000 rows)",171,2.313833
+"HTTP as-of first page (1000 rows)",172,2.660250
+"HTTP as-of first page (1000 rows)",173,2.233125
+"HTTP as-of first page (1000 rows)",174,2.481167
+"HTTP as-of first page (1000 rows)",175,3.181458
+"HTTP as-of first page (1000 rows)",176,2.577000
+"HTTP as-of first page (1000 rows)",177,2.325708
+"HTTP as-of first page (1000 rows)",178,2.891500
+"HTTP as-of first page (1000 rows)",179,2.486083
+"HTTP as-of first page (1000 rows)",180,2.328833
+"HTTP as-of first page (1000 rows)",181,2.974875
+"HTTP as-of first page (1000 rows)",182,2.544917
+"HTTP as-of first page (1000 rows)",183,2.269750
+"HTTP as-of first page (1000 rows)",184,4.228000
+"HTTP as-of first page (1000 rows)",185,3.250458
+"HTTP as-of first page (1000 rows)",186,2.377417
+"HTTP as-of first page (1000 rows)",187,3.135125
+"HTTP as-of first page (1000 rows)",188,2.507917
+"HTTP as-of first page (1000 rows)",189,2.352750
+"HTTP as-of first page (1000 rows)",190,2.837083
+"HTTP as-of first page (1000 rows)",191,2.393750
+"HTTP as-of first page (1000 rows)",192,2.229875
+"HTTP as-of first page (1000 rows)",193,2.149708
+"HTTP as-of first page (1000 rows)",194,2.603750
+"HTTP as-of first page (1000 rows)",195,2.233083
+"HTTP as-of first page (1000 rows)",196,2.184417
+"HTTP as-of first page (1000 rows)",197,2.712167
+"HTTP as-of first page (1000 rows)",198,2.433958
+"HTTP as-of first page (1000 rows)",199,2.201833
+"HTTP as-of first page (1000 rows)",200,2.089666
+"HTTP as-of first page (1000 rows)",201,2.835625
+"HTTP as-of first page (1000 rows)",202,2.206375
+"HTTP as-of first page (1000 rows)",203,2.227791
+"HTTP as-of first page (1000 rows)",204,2.385958
+"HTTP as-of first page (1000 rows)",205,2.433875
+"HTTP as-of first page (1000 rows)",206,2.128375
+"HTTP as-of first page (1000 rows)",207,2.179500
+"HTTP as-of first page (1000 rows)",208,2.462792
+"HTTP as-of first page (1000 rows)",209,2.220000
+"HTTP as-of first page (1000 rows)",210,2.117792
+"HTTP as-of first page (1000 rows)",211,2.096750
+"HTTP as-of first page (1000 rows)",212,2.410625
+"HTTP as-of first page (1000 rows)",213,2.400375
+"HTTP as-of first page (1000 rows)",214,2.389125
+"HTTP as-of first page (1000 rows)",215,2.544584
+"HTTP as-of first page (1000 rows)",216,2.218417
+"HTTP as-of first page (1000 rows)",217,2.047458
+"HTTP as-of first page (1000 rows)",218,2.159250
+"HTTP as-of first page (1000 rows)",219,2.300334
+"HTTP as-of first page (1000 rows)",220,2.218000
+"HTTP as-of first page (1000 rows)",221,2.221000
+"HTTP as-of first page (1000 rows)",222,2.111208
+"HTTP as-of first page (1000 rows)",223,2.257833
+"HTTP as-of first page (1000 rows)",224,2.252750
+"HTTP as-of first page (1000 rows)",225,2.159083
+"HTTP as-of first page (1000 rows)",226,2.276542
+"HTTP as-of first page (1000 rows)",227,2.221459
+"HTTP as-of first page (1000 rows)",228,2.087583
+"HTTP as-of first page (1000 rows)",229,2.139583
+"HTTP as-of first page (1000 rows)",230,2.319208
+"HTTP as-of first page (1000 rows)",231,2.142167
+"HTTP as-of first page (1000 rows)",232,2.141958
+"HTTP as-of first page (1000 rows)",233,2.239667
+"HTTP as-of first page (1000 rows)",234,2.575792
+"HTTP as-of first page (1000 rows)",235,2.588375
+"HTTP as-of first page (1000 rows)",236,2.379041
+"HTTP as-of first page (1000 rows)",237,2.304125
+"HTTP as-of first page (1000 rows)",238,2.377458
+"HTTP as-of first page (1000 rows)",239,2.192291
+"HTTP as-of first page (1000 rows)",240,2.097834
+"HTTP as-of first page (1000 rows)",241,2.584792
+"HTTP as-of first page (1000 rows)",242,2.268917
+"HTTP as-of first page (1000 rows)",243,2.152500
+"HTTP as-of first page (1000 rows)",244,2.136208
+"HTTP as-of first page (1000 rows)",245,2.425709
+"HTTP as-of first page (1000 rows)",246,2.187458
+"HTTP as-of first page (1000 rows)",247,2.068959
+"HTTP as-of first page (1000 rows)",248,2.435958
+"HTTP as-of first page (1000 rows)",249,2.426917
+"HTTP as-of first page (1000 rows)",250,2.190583
+"HTTP as-of first page (1000 rows)",251,2.189708
+"HTTP as-of first page (1000 rows)",252,2.612958
+"HTTP as-of first page (1000 rows)",253,2.279500
+"HTTP as-of first page (1000 rows)",254,2.259083
+"HTTP as-of first page (1000 rows)",255,2.228125
+"HTTP as-of first page (1000 rows)",256,2.526792
+"HTTP as-of first page (1000 rows)",257,2.214916
+"HTTP as-of first page (1000 rows)",258,2.215333
+"HTTP as-of first page (1000 rows)",259,2.521458
+"HTTP as-of first page (1000 rows)",260,2.145375
+"HTTP as-of first page (1000 rows)",261,2.221709
+"HTTP as-of first page (1000 rows)",262,2.219416
+"HTTP as-of first page (1000 rows)",263,2.313833
+"HTTP as-of first page (1000 rows)",264,2.153041
+"HTTP as-of first page (1000 rows)",265,2.119167
+"HTTP as-of first page (1000 rows)",266,2.146833
+"HTTP as-of first page (1000 rows)",267,2.449834
+"HTTP as-of first page (1000 rows)",268,2.645333
+"HTTP as-of first page (1000 rows)",269,2.423833
+"HTTP as-of first page (1000 rows)",270,2.582083
+"HTTP as-of first page (1000 rows)",271,2.346667
+"HTTP as-of first page (1000 rows)",272,2.206917
+"HTTP as-of first page (1000 rows)",273,2.300458
+"HTTP as-of first page (1000 rows)",274,2.785625
+"HTTP as-of first page (1000 rows)",275,2.265250
+"HTTP as-of first page (1000 rows)",276,2.328000
+"HTTP as-of first page (1000 rows)",277,2.471792
+"HTTP as-of first page (1000 rows)",278,2.254042
+"HTTP as-of first page (1000 rows)",279,2.228000
+"HTTP as-of first page (1000 rows)",280,2.221459
+"HTTP as-of first page (1000 rows)",281,2.542667
+"HTTP as-of first page (1000 rows)",282,2.213958
+"HTTP as-of first page (1000 rows)",283,2.182500
+"HTTP as-of first page (1000 rows)",284,2.405208
+"HTTP as-of first page (1000 rows)",285,2.140625
+"HTTP as-of first page (1000 rows)",286,2.123667
+"HTTP as-of first page (1000 rows)",287,2.238625
+"HTTP as-of first page (1000 rows)",288,2.406000
+"HTTP as-of first page (1000 rows)",289,2.210542
+"HTTP as-of first page (1000 rows)",290,2.221375
+"HTTP as-of first page (1000 rows)",291,2.193542
+"HTTP as-of first page (1000 rows)",292,2.487208
+"HTTP as-of first page (1000 rows)",293,2.121333
+"HTTP as-of first page (1000 rows)",294,2.120209
+"HTTP as-of first page (1000 rows)",295,2.291834
+"HTTP as-of first page (1000 rows)",296,2.151500
+"HTTP as-of first page (1000 rows)",297,2.092500
+"HTTP as-of first page (1000 rows)",298,2.113792
+"HTTP as-of first page (1000 rows)",299,2.274458
+"HTTP uniform sample (16 edges)",0,0.198833
+"HTTP uniform sample (16 edges)",1,0.185292
+"HTTP uniform sample (16 edges)",2,0.183000
+"HTTP uniform sample (16 edges)",3,0.182917
+"HTTP uniform sample (16 edges)",4,0.237584
+"HTTP uniform sample (16 edges)",5,0.202375
+"HTTP uniform sample (16 edges)",6,0.211625
+"HTTP uniform sample (16 edges)",7,0.210208
+"HTTP uniform sample (16 edges)",8,0.199292
+"HTTP uniform sample (16 edges)",9,0.176584
+"HTTP uniform sample (16 edges)",10,0.197584
+"HTTP uniform sample (16 edges)",11,0.271500
+"HTTP uniform sample (16 edges)",12,0.477167
+"HTTP uniform sample (16 edges)",13,0.488459
+"HTTP uniform sample (16 edges)",14,0.265125
+"HTTP uniform sample (16 edges)",15,0.297333
+"HTTP uniform sample (16 edges)",16,0.413083
+"HTTP uniform sample (16 edges)",17,0.399500
+"HTTP uniform sample (16 edges)",18,0.463250
+"HTTP uniform sample (16 edges)",19,0.409625
+"HTTP uniform sample (16 edges)",20,0.239167
+"HTTP uniform sample (16 edges)",21,0.177542
+"HTTP uniform sample (16 edges)",22,0.164459
+"HTTP uniform sample (16 edges)",23,0.240875
+"HTTP uniform sample (16 edges)",24,0.187875
+"HTTP uniform sample (16 edges)",25,0.174791
+"HTTP uniform sample (16 edges)",26,0.223750
+"HTTP uniform sample (16 edges)",27,0.211125
+"HTTP uniform sample (16 edges)",28,0.170750
+"HTTP uniform sample (16 edges)",29,0.163958
+"HTTP uniform sample (16 edges)",30,0.721042
+"HTTP uniform sample (16 edges)",31,0.201750
+"HTTP uniform sample (16 edges)",32,0.164417
+"HTTP uniform sample (16 edges)",33,0.202125
+"HTTP uniform sample (16 edges)",34,0.211958
+"HTTP uniform sample (16 edges)",35,0.216667
+"HTTP uniform sample (16 edges)",36,0.210208
+"HTTP uniform sample (16 edges)",37,0.199167
+"HTTP uniform sample (16 edges)",38,0.211583
+"HTTP uniform sample (16 edges)",39,0.195459
+"HTTP uniform sample (16 edges)",40,0.184125
+"HTTP uniform sample (16 edges)",41,0.180625
+"HTTP uniform sample (16 edges)",42,0.174375
+"HTTP uniform sample (16 edges)",43,0.200917
+"HTTP uniform sample (16 edges)",44,0.202250
+"HTTP uniform sample (16 edges)",45,0.174458
+"HTTP uniform sample (16 edges)",46,0.189625
+"HTTP uniform sample (16 edges)",47,0.182083
+"HTTP uniform sample (16 edges)",48,0.242958
+"HTTP uniform sample (16 edges)",49,0.312042
+"HTTP uniform sample (16 edges)",50,0.168416
+"HTTP uniform sample (16 edges)",51,0.164458
+"HTTP uniform sample (16 edges)",52,0.173542
+"HTTP uniform sample (16 edges)",53,0.181083
+"HTTP uniform sample (16 edges)",54,0.207791
+"HTTP uniform sample (16 edges)",55,0.184042
+"HTTP uniform sample (16 edges)",56,0.199750
+"HTTP uniform sample (16 edges)",57,0.199375
+"HTTP uniform sample (16 edges)",58,0.236500
+"HTTP uniform sample (16 edges)",59,0.308000
+"HTTP uniform sample (16 edges)",60,0.389875
+"HTTP uniform sample (16 edges)",61,0.413834
+"HTTP uniform sample (16 edges)",62,0.240292
+"HTTP uniform sample (16 edges)",63,0.217917
+"HTTP uniform sample (16 edges)",64,0.163166
+"HTTP uniform sample (16 edges)",65,0.150042
+"HTTP uniform sample (16 edges)",66,0.156166
+"HTTP uniform sample (16 edges)",67,0.157292
+"HTTP uniform sample (16 edges)",68,0.167000
+"HTTP uniform sample (16 edges)",69,0.158583
+"HTTP uniform sample (16 edges)",70,0.192250
+"HTTP uniform sample (16 edges)",71,0.217333
+"HTTP uniform sample (16 edges)",72,0.184541
+"HTTP uniform sample (16 edges)",73,0.536708
+"HTTP uniform sample (16 edges)",74,0.317917
+"HTTP uniform sample (16 edges)",75,0.182250
+"HTTP uniform sample (16 edges)",76,0.181958
+"HTTP uniform sample (16 edges)",77,0.199458
+"HTTP uniform sample (16 edges)",78,0.247250
+"HTTP uniform sample (16 edges)",79,0.190583
+"HTTP uniform sample (16 edges)",80,0.182458
+"HTTP uniform sample (16 edges)",81,0.170291
+"HTTP uniform sample (16 edges)",82,0.173250
+"HTTP uniform sample (16 edges)",83,0.231792
+"HTTP uniform sample (16 edges)",84,0.400417
+"HTTP uniform sample (16 edges)",85,0.247208
+"HTTP uniform sample (16 edges)",86,0.172833
+"HTTP uniform sample (16 edges)",87,0.169291
+"HTTP uniform sample (16 edges)",88,0.162125
+"HTTP uniform sample (16 edges)",89,0.207167
+"HTTP uniform sample (16 edges)",90,0.221291
+"HTTP uniform sample (16 edges)",91,0.190875
+"HTTP uniform sample (16 edges)",92,0.211541
+"HTTP uniform sample (16 edges)",93,0.207208
+"HTTP uniform sample (16 edges)",94,0.226917
+"HTTP uniform sample (16 edges)",95,0.288375
+"HTTP uniform sample (16 edges)",96,0.180917
+"HTTP uniform sample (16 edges)",97,0.203333
+"HTTP uniform sample (16 edges)",98,0.203083
+"HTTP uniform sample (16 edges)",99,0.176958
+"HTTP uniform sample (16 edges)",100,0.254833
+"HTTP uniform sample (16 edges)",101,0.259708
+"HTTP uniform sample (16 edges)",102,0.249834
+"HTTP uniform sample (16 edges)",103,0.322000
+"HTTP uniform sample (16 edges)",104,0.169792
+"HTTP uniform sample (16 edges)",105,0.228125
+"HTTP uniform sample (16 edges)",106,0.226583
+"HTTP uniform sample (16 edges)",107,0.228875
+"HTTP uniform sample (16 edges)",108,0.190583
+"HTTP uniform sample (16 edges)",109,0.171916
+"HTTP uniform sample (16 edges)",110,0.261542
+"HTTP uniform sample (16 edges)",111,0.298125
+"HTTP uniform sample (16 edges)",112,0.240541
+"HTTP uniform sample (16 edges)",113,0.185375
+"HTTP uniform sample (16 edges)",114,0.173166
+"HTTP uniform sample (16 edges)",115,0.186375
+"HTTP uniform sample (16 edges)",116,0.207084
+"HTTP uniform sample (16 edges)",117,0.159375
+"HTTP uniform sample (16 edges)",118,0.175125
+"HTTP uniform sample (16 edges)",119,0.172917
+"HTTP uniform sample (16 edges)",120,0.324125
+"HTTP uniform sample (16 edges)",121,0.295083
+"HTTP uniform sample (16 edges)",122,0.258250
+"HTTP uniform sample (16 edges)",123,0.189459
+"HTTP uniform sample (16 edges)",124,0.179583
+"HTTP uniform sample (16 edges)",125,0.200500
+"HTTP uniform sample (16 edges)",126,0.349958
+"HTTP uniform sample (16 edges)",127,0.229625
+"HTTP uniform sample (16 edges)",128,0.395375
+"HTTP uniform sample (16 edges)",129,0.457959
+"HTTP uniform sample (16 edges)",130,0.476542
+"HTTP uniform sample (16 edges)",131,0.364708
+"HTTP uniform sample (16 edges)",132,0.195625
+"HTTP uniform sample (16 edges)",133,0.166666
+"HTTP uniform sample (16 edges)",134,0.214125
+"HTTP uniform sample (16 edges)",135,0.223417
+"HTTP uniform sample (16 edges)",136,0.236542
+"HTTP uniform sample (16 edges)",137,0.200292
+"HTTP uniform sample (16 edges)",138,0.179042
+"HTTP uniform sample (16 edges)",139,0.178417
+"HTTP uniform sample (16 edges)",140,0.287250
+"HTTP uniform sample (16 edges)",141,0.309292
+"HTTP uniform sample (16 edges)",142,0.182292
+"HTTP uniform sample (16 edges)",143,0.154459
+"HTTP uniform sample (16 edges)",144,0.216792
+"HTTP uniform sample (16 edges)",145,0.211875
+"HTTP uniform sample (16 edges)",146,0.176166
+"HTTP uniform sample (16 edges)",147,0.169959
+"HTTP uniform sample (16 edges)",148,0.180208
+"HTTP uniform sample (16 edges)",149,0.177833
+"HTTP uniform sample (16 edges)",150,0.280792
+"HTTP uniform sample (16 edges)",151,0.179708
+"HTTP uniform sample (16 edges)",152,0.185792
+"HTTP uniform sample (16 edges)",153,0.241833
+"HTTP uniform sample (16 edges)",154,0.271083
+"HTTP uniform sample (16 edges)",155,0.209416
+"HTTP uniform sample (16 edges)",156,0.176458
+"HTTP uniform sample (16 edges)",157,0.165167
+"HTTP uniform sample (16 edges)",158,0.536750
+"HTTP uniform sample (16 edges)",159,0.237250
+"HTTP uniform sample (16 edges)",160,0.182708
+"HTTP uniform sample (16 edges)",161,0.470125
+"HTTP uniform sample (16 edges)",162,0.479958
+"HTTP uniform sample (16 edges)",163,0.571750
+"HTTP uniform sample (16 edges)",164,0.202833
+"HTTP uniform sample (16 edges)",165,0.161583
+"HTTP uniform sample (16 edges)",166,0.164166
+"HTTP uniform sample (16 edges)",167,0.157042
+"HTTP uniform sample (16 edges)",168,0.235834
+"HTTP uniform sample (16 edges)",169,0.176083
+"HTTP uniform sample (16 edges)",170,0.178916
+"HTTP uniform sample (16 edges)",171,0.164541
+"HTTP uniform sample (16 edges)",172,0.283500
+"HTTP uniform sample (16 edges)",173,0.216333
+"HTTP uniform sample (16 edges)",174,0.536208
+"HTTP uniform sample (16 edges)",175,0.220084
+"HTTP uniform sample (16 edges)",176,0.190209
+"HTTP uniform sample (16 edges)",177,0.171542
+"HTTP uniform sample (16 edges)",178,0.187833
+"HTTP uniform sample (16 edges)",179,0.156083
+"HTTP uniform sample (16 edges)",180,0.188916
+"HTTP uniform sample (16 edges)",181,0.193792
+"HTTP uniform sample (16 edges)",182,0.161500
+"HTTP uniform sample (16 edges)",183,0.189667
+"HTTP uniform sample (16 edges)",184,0.178167
+"HTTP uniform sample (16 edges)",185,0.165250
+"HTTP uniform sample (16 edges)",186,0.184583
+"HTTP uniform sample (16 edges)",187,0.192541
+"HTTP uniform sample (16 edges)",188,0.186625
+"HTTP uniform sample (16 edges)",189,0.179250
+"HTTP uniform sample (16 edges)",190,0.161917
+"HTTP uniform sample (16 edges)",191,1.629875
+"HTTP uniform sample (16 edges)",192,0.229584
+"HTTP uniform sample (16 edges)",193,0.480250
+"HTTP uniform sample (16 edges)",194,0.270250
+"HTTP uniform sample (16 edges)",195,0.430208
+"HTTP uniform sample (16 edges)",196,0.243041
+"HTTP uniform sample (16 edges)",197,0.275542
+"HTTP uniform sample (16 edges)",198,0.221375
+"HTTP uniform sample (16 edges)",199,0.204125
+"HTTP uniform sample (16 edges)",200,0.193791
+"HTTP uniform sample (16 edges)",201,0.168709
+"HTTP uniform sample (16 edges)",202,0.177292
+"HTTP uniform sample (16 edges)",203,0.201125
+"HTTP uniform sample (16 edges)",204,0.354167
+"HTTP uniform sample (16 edges)",205,0.223333
+"HTTP uniform sample (16 edges)",206,0.383083
+"HTTP uniform sample (16 edges)",207,0.356208
+"HTTP uniform sample (16 edges)",208,0.277500
+"HTTP uniform sample (16 edges)",209,0.220666
+"HTTP uniform sample (16 edges)",210,0.209292
+"HTTP uniform sample (16 edges)",211,0.304791
+"HTTP uniform sample (16 edges)",212,0.278708
+"HTTP uniform sample (16 edges)",213,0.232125
+"HTTP uniform sample (16 edges)",214,0.181583
+"HTTP uniform sample (16 edges)",215,0.169291
+"HTTP uniform sample (16 edges)",216,0.191667
+"HTTP uniform sample (16 edges)",217,0.170792
+"HTTP uniform sample (16 edges)",218,0.174583
+"HTTP uniform sample (16 edges)",219,0.173167
+"HTTP uniform sample (16 edges)",220,0.316417
+"HTTP uniform sample (16 edges)",221,0.238917
+"HTTP uniform sample (16 edges)",222,0.179708
+"HTTP uniform sample (16 edges)",223,0.188208
+"HTTP uniform sample (16 edges)",224,0.176833
+"HTTP uniform sample (16 edges)",225,0.164291
+"HTTP uniform sample (16 edges)",226,0.184083
+"HTTP uniform sample (16 edges)",227,0.194000
+"HTTP uniform sample (16 edges)",228,0.182917
+"HTTP uniform sample (16 edges)",229,0.175792
+"HTTP uniform sample (16 edges)",230,0.168375
+"HTTP uniform sample (16 edges)",231,0.161834
+"HTTP uniform sample (16 edges)",232,0.317875
+"HTTP uniform sample (16 edges)",233,0.337458
+"HTTP uniform sample (16 edges)",234,0.171083
+"HTTP uniform sample (16 edges)",235,0.175750
+"HTTP uniform sample (16 edges)",236,0.205375
+"HTTP uniform sample (16 edges)",237,0.207375
+"HTTP uniform sample (16 edges)",238,0.184166
+"HTTP uniform sample (16 edges)",239,0.193875
+"HTTP uniform sample (16 edges)",240,0.209541
+"HTTP uniform sample (16 edges)",241,0.179667
+"HTTP uniform sample (16 edges)",242,0.166875
+"HTTP uniform sample (16 edges)",243,0.172083
+"HTTP uniform sample (16 edges)",244,0.170333
+"HTTP uniform sample (16 edges)",245,0.162083
+"HTTP uniform sample (16 edges)",246,0.157875
+"HTTP uniform sample (16 edges)",247,0.155375
+"HTTP uniform sample (16 edges)",248,0.151042
+"HTTP uniform sample (16 edges)",249,0.151166
+"HTTP uniform sample (16 edges)",250,0.150792
+"HTTP uniform sample (16 edges)",251,0.155208
+"HTTP uniform sample (16 edges)",252,0.180209
+"HTTP uniform sample (16 edges)",253,0.174750
+"HTTP uniform sample (16 edges)",254,0.160875
+"HTTP uniform sample (16 edges)",255,0.163375
+"HTTP uniform sample (16 edges)",256,0.169792
+"HTTP uniform sample (16 edges)",257,0.195333
+"HTTP uniform sample (16 edges)",258,0.178875
+"HTTP uniform sample (16 edges)",259,0.162208
+"HTTP uniform sample (16 edges)",260,0.326167
+"HTTP uniform sample (16 edges)",261,0.301209
+"HTTP uniform sample (16 edges)",262,0.224041
+"HTTP uniform sample (16 edges)",263,0.185959
+"HTTP uniform sample (16 edges)",264,0.402667
+"HTTP uniform sample (16 edges)",265,0.421000
+"HTTP uniform sample (16 edges)",266,0.211083
+"HTTP uniform sample (16 edges)",267,0.192875
+"HTTP uniform sample (16 edges)",268,0.162000
+"HTTP uniform sample (16 edges)",269,0.250750
+"HTTP uniform sample (16 edges)",270,0.395708
+"HTTP uniform sample (16 edges)",271,0.223458
+"HTTP uniform sample (16 edges)",272,0.224500
+"HTTP uniform sample (16 edges)",273,0.182292
+"HTTP uniform sample (16 edges)",274,0.203333
+"HTTP uniform sample (16 edges)",275,0.227542
+"HTTP uniform sample (16 edges)",276,0.193000
+"HTTP uniform sample (16 edges)",277,0.195959
+"HTTP uniform sample (16 edges)",278,0.193000
+"HTTP uniform sample (16 edges)",279,0.247167
+"HTTP uniform sample (16 edges)",280,0.173583
+"HTTP uniform sample (16 edges)",281,0.159041
+"HTTP uniform sample (16 edges)",282,0.154833
+"HTTP uniform sample (16 edges)",283,0.152708
+"HTTP uniform sample (16 edges)",284,0.185875
+"HTTP uniform sample (16 edges)",285,0.153875
+"HTTP uniform sample (16 edges)",286,0.150584
+"HTTP uniform sample (16 edges)",287,0.166875
+"HTTP uniform sample (16 edges)",288,0.192209
+"HTTP uniform sample (16 edges)",289,0.181250
+"HTTP uniform sample (16 edges)",290,0.169375
+"HTTP uniform sample (16 edges)",291,0.177375
+"HTTP uniform sample (16 edges)",292,0.190041
+"HTTP uniform sample (16 edges)",293,0.159084
+"HTTP uniform sample (16 edges)",294,0.141750
+"HTTP uniform sample (16 edges)",295,0.138375
+"HTTP uniform sample (16 edges)",296,0.142125
+"HTTP uniform sample (16 edges)",297,0.143917
+"HTTP uniform sample (16 edges)",298,0.155375
+"HTTP uniform sample (16 edges)",299,0.148500
+"MCP as-of first page (1000 rows)",0,3.113167
+"MCP as-of first page (1000 rows)",1,2.886333
+"MCP as-of first page (1000 rows)",2,4.011792
+"MCP as-of first page (1000 rows)",3,2.874125
+"MCP as-of first page (1000 rows)",4,2.904166
+"MCP as-of first page (1000 rows)",5,3.798667
+"MCP as-of first page (1000 rows)",6,2.934625
+"MCP as-of first page (1000 rows)",7,3.702625
+"MCP as-of first page (1000 rows)",8,2.849458
+"MCP as-of first page (1000 rows)",9,2.736750
+"MCP as-of first page (1000 rows)",10,3.430708
+"MCP as-of first page (1000 rows)",11,9.213166
+"MCP as-of first page (1000 rows)",12,3.674708
+"MCP as-of first page (1000 rows)",13,3.698333
+"MCP as-of first page (1000 rows)",14,2.902166
+"MCP as-of first page (1000 rows)",15,3.451875
+"MCP as-of first page (1000 rows)",16,3.095792
+"MCP as-of first page (1000 rows)",17,2.761458
+"MCP as-of first page (1000 rows)",18,3.248125
+"MCP as-of first page (1000 rows)",19,2.950792
+"MCP as-of first page (1000 rows)",20,3.015375
+"MCP as-of first page (1000 rows)",21,3.253791
+"MCP as-of first page (1000 rows)",22,4.278083
+"MCP as-of first page (1000 rows)",23,3.452958
+"MCP as-of first page (1000 rows)",24,3.221333
+"MCP as-of first page (1000 rows)",25,6.952125
+"MCP as-of first page (1000 rows)",26,2.975334
+"MCP as-of first page (1000 rows)",27,3.106125
+"MCP as-of first page (1000 rows)",28,2.842209
+"MCP as-of first page (1000 rows)",29,2.788958
+"MCP as-of first page (1000 rows)",30,3.218166
+"MCP as-of first page (1000 rows)",31,2.943542
+"MCP as-of first page (1000 rows)",32,3.250834
+"MCP as-of first page (1000 rows)",33,3.502875
+"MCP as-of first page (1000 rows)",34,2.823750
+"MCP as-of first page (1000 rows)",35,3.097000
+"MCP as-of first page (1000 rows)",36,2.904542
+"MCP as-of first page (1000 rows)",37,2.745875
+"MCP as-of first page (1000 rows)",38,2.961459
+"MCP as-of first page (1000 rows)",39,2.724875
+"MCP as-of first page (1000 rows)",40,3.482708
+"MCP as-of first page (1000 rows)",41,3.075625
+"MCP as-of first page (1000 rows)",42,2.903792
+"MCP as-of first page (1000 rows)",43,2.733750
+"MCP as-of first page (1000 rows)",44,3.000750
+"MCP as-of first page (1000 rows)",45,2.754125
+"MCP as-of first page (1000 rows)",46,2.701000
+"MCP as-of first page (1000 rows)",47,2.855208
+"MCP as-of first page (1000 rows)",48,2.608666
+"MCP as-of first page (1000 rows)",49,2.807458
+"MCP as-of first page (1000 rows)",50,3.112459
+"MCP as-of first page (1000 rows)",51,3.237917
+"MCP as-of first page (1000 rows)",52,3.032458
+"MCP as-of first page (1000 rows)",53,2.791666
+"MCP as-of first page (1000 rows)",54,2.712584
+"MCP as-of first page (1000 rows)",55,2.926791
+"MCP as-of first page (1000 rows)",56,2.861750
+"MCP as-of first page (1000 rows)",57,2.884458
+"MCP as-of first page (1000 rows)",58,3.412041
+"MCP as-of first page (1000 rows)",59,2.932792
+"MCP as-of first page (1000 rows)",60,2.740542
+"MCP as-of first page (1000 rows)",61,3.031875
+"MCP as-of first page (1000 rows)",62,2.844333
+"MCP as-of first page (1000 rows)",63,3.009083
+"MCP as-of first page (1000 rows)",64,3.297458
+"MCP as-of first page (1000 rows)",65,2.870334
+"MCP as-of first page (1000 rows)",66,2.840416
+"MCP as-of first page (1000 rows)",67,3.135500
+"MCP as-of first page (1000 rows)",68,2.837500
+"MCP as-of first page (1000 rows)",69,3.009209
+"MCP as-of first page (1000 rows)",70,3.190084
+"MCP as-of first page (1000 rows)",71,3.250458
+"MCP as-of first page (1000 rows)",72,3.441917
+"MCP as-of first page (1000 rows)",73,2.921708
+"MCP as-of first page (1000 rows)",74,2.846458
+"MCP as-of first page (1000 rows)",75,3.081833
+"MCP as-of first page (1000 rows)",76,2.924209
+"MCP as-of first page (1000 rows)",77,2.909542
+"MCP as-of first page (1000 rows)",78,2.761875
+"MCP as-of first page (1000 rows)",79,2.739750
+"MCP as-of first page (1000 rows)",80,3.169416
+"MCP as-of first page (1000 rows)",81,3.219458
+"MCP as-of first page (1000 rows)",82,4.110708
+"MCP as-of first page (1000 rows)",83,4.071292
+"MCP as-of first page (1000 rows)",84,2.996208
+"MCP as-of first page (1000 rows)",85,3.460791
+"MCP as-of first page (1000 rows)",86,3.891792
+"MCP as-of first page (1000 rows)",87,4.239375
+"MCP as-of first page (1000 rows)",88,5.646541
+"MCP as-of first page (1000 rows)",89,3.397542
+"MCP as-of first page (1000 rows)",90,3.031375
+"MCP as-of first page (1000 rows)",91,2.956333
+"MCP as-of first page (1000 rows)",92,3.223291
+"MCP as-of first page (1000 rows)",93,2.796292
+"MCP as-of first page (1000 rows)",94,3.144375
+"MCP as-of first page (1000 rows)",95,2.959209
+"MCP as-of first page (1000 rows)",96,2.854708
+"MCP as-of first page (1000 rows)",97,3.369334
+"MCP as-of first page (1000 rows)",98,2.845625
+"MCP as-of first page (1000 rows)",99,4.728250
+"MCP as-of first page (1000 rows)",100,3.495708
+"MCP as-of first page (1000 rows)",101,2.783000
+"MCP as-of first page (1000 rows)",102,3.036667
+"MCP as-of first page (1000 rows)",103,2.797000
+"MCP as-of first page (1000 rows)",104,2.718375
+"MCP as-of first page (1000 rows)",105,3.124292
+"MCP as-of first page (1000 rows)",106,2.741375
+"MCP as-of first page (1000 rows)",107,2.776417
+"MCP as-of first page (1000 rows)",108,3.148834
+"MCP as-of first page (1000 rows)",109,2.819125
+"MCP as-of first page (1000 rows)",110,3.092083
+"MCP as-of first page (1000 rows)",111,3.300625
+"MCP as-of first page (1000 rows)",112,2.657042
+"MCP as-of first page (1000 rows)",113,3.150792
+"MCP as-of first page (1000 rows)",114,2.830709
+"MCP as-of first page (1000 rows)",115,2.845917
+"MCP as-of first page (1000 rows)",116,2.962041
+"MCP as-of first page (1000 rows)",117,2.720125
+"MCP as-of first page (1000 rows)",118,2.699416
+"MCP as-of first page (1000 rows)",119,3.041834
+"MCP as-of first page (1000 rows)",120,2.815958
+"MCP as-of first page (1000 rows)",121,2.861083
+"MCP as-of first page (1000 rows)",122,3.054291
+"MCP as-of first page (1000 rows)",123,2.728833
+"MCP as-of first page (1000 rows)",124,2.653375
+"MCP as-of first page (1000 rows)",125,2.821959
+"MCP as-of first page (1000 rows)",126,2.690459
+"MCP as-of first page (1000 rows)",127,2.628250
+"MCP as-of first page (1000 rows)",128,2.915166
+"MCP as-of first page (1000 rows)",129,2.937917
+"MCP as-of first page (1000 rows)",130,3.198500
+"MCP as-of first page (1000 rows)",131,3.449750
+"MCP as-of first page (1000 rows)",132,2.955167
+"MCP as-of first page (1000 rows)",133,2.854083
+"MCP as-of first page (1000 rows)",134,3.365458
+"MCP as-of first page (1000 rows)",135,3.617250
+"MCP as-of first page (1000 rows)",136,3.891125
+"MCP as-of first page (1000 rows)",137,3.362834
+"MCP as-of first page (1000 rows)",138,3.471209
+"MCP as-of first page (1000 rows)",139,3.623541
+"MCP as-of first page (1000 rows)",140,3.192125
+"MCP as-of first page (1000 rows)",141,3.296542
+"MCP as-of first page (1000 rows)",142,2.845417
+"MCP as-of first page (1000 rows)",143,3.431917
+"MCP as-of first page (1000 rows)",144,3.419959
+"MCP as-of first page (1000 rows)",145,3.466083
+"MCP as-of first page (1000 rows)",146,3.876416
+"MCP as-of first page (1000 rows)",147,3.490542
+"MCP as-of first page (1000 rows)",148,3.633416
+"MCP as-of first page (1000 rows)",149,3.670458
+"MCP as-of first page (1000 rows)",150,5.047250
+"MCP as-of first page (1000 rows)",151,3.596292
+"MCP as-of first page (1000 rows)",152,6.412125
+"MCP as-of first page (1000 rows)",153,4.097083
+"MCP as-of first page (1000 rows)",154,3.368959
+"MCP as-of first page (1000 rows)",155,3.356375
+"MCP as-of first page (1000 rows)",156,4.211000
+"MCP as-of first page (1000 rows)",157,5.230625
+"MCP as-of first page (1000 rows)",158,3.272959
+"MCP as-of first page (1000 rows)",159,3.338708
+"MCP as-of first page (1000 rows)",160,6.501958
+"MCP as-of first page (1000 rows)",161,3.691125
+"MCP as-of first page (1000 rows)",162,4.726333
+"MCP as-of first page (1000 rows)",163,4.060625
+"MCP as-of first page (1000 rows)",164,3.552208
+"MCP as-of first page (1000 rows)",165,3.600541
+"MCP as-of first page (1000 rows)",166,3.788709
+"MCP as-of first page (1000 rows)",167,2.880375
+"MCP as-of first page (1000 rows)",168,2.721542
+"MCP as-of first page (1000 rows)",169,3.871750
+"MCP as-of first page (1000 rows)",170,3.128000
+"MCP as-of first page (1000 rows)",171,3.813750
+"MCP as-of first page (1000 rows)",172,2.886333
+"MCP as-of first page (1000 rows)",173,2.697792
+"MCP as-of first page (1000 rows)",174,3.539667
+"MCP as-of first page (1000 rows)",175,2.795042
+"MCP as-of first page (1000 rows)",176,3.262416
+"MCP as-of first page (1000 rows)",177,2.986625
+"MCP as-of first page (1000 rows)",178,2.678292
+"MCP as-of first page (1000 rows)",179,3.458041
+"MCP as-of first page (1000 rows)",180,3.058209
+"MCP as-of first page (1000 rows)",181,3.570458
+"MCP as-of first page (1000 rows)",182,3.234125
+"MCP as-of first page (1000 rows)",183,2.857125
+"MCP as-of first page (1000 rows)",184,3.259584
+"MCP as-of first page (1000 rows)",185,2.882875
+"MCP as-of first page (1000 rows)",186,2.724709
+"MCP as-of first page (1000 rows)",187,3.602375
+"MCP as-of first page (1000 rows)",188,2.747708
+"MCP as-of first page (1000 rows)",189,2.825584
+"MCP as-of first page (1000 rows)",190,3.162875
+"MCP as-of first page (1000 rows)",191,2.824208
+"MCP as-of first page (1000 rows)",192,3.159666
+"MCP as-of first page (1000 rows)",193,2.918208
+"MCP as-of first page (1000 rows)",194,2.712209
+"MCP as-of first page (1000 rows)",195,2.801917
+"MCP as-of first page (1000 rows)",196,3.172709
+"MCP as-of first page (1000 rows)",197,2.843000
+"MCP as-of first page (1000 rows)",198,3.097417
+"MCP as-of first page (1000 rows)",199,2.814542
+"MCP as-of first page (1000 rows)",200,2.712500
+"MCP as-of first page (1000 rows)",201,3.180459
+"MCP as-of first page (1000 rows)",202,2.815750
+"MCP as-of first page (1000 rows)",203,2.706625
+"MCP as-of first page (1000 rows)",204,3.095458
+"MCP as-of first page (1000 rows)",205,2.710583
+"MCP as-of first page (1000 rows)",206,3.023375
+"MCP as-of first page (1000 rows)",207,3.394917
+"MCP as-of first page (1000 rows)",208,2.868584
+"MCP as-of first page (1000 rows)",209,3.157625
+"MCP as-of first page (1000 rows)",210,3.083125
+"MCP as-of first page (1000 rows)",211,2.877459
+"MCP as-of first page (1000 rows)",212,3.224083
+"MCP as-of first page (1000 rows)",213,2.917208
+"MCP as-of first page (1000 rows)",214,2.737042
+"MCP as-of first page (1000 rows)",215,3.127291
+"MCP as-of first page (1000 rows)",216,3.316666
+"MCP as-of first page (1000 rows)",217,2.854625
+"MCP as-of first page (1000 rows)",218,3.286458
+"MCP as-of first page (1000 rows)",219,4.196667
+"MCP as-of first page (1000 rows)",220,3.816208
+"MCP as-of first page (1000 rows)",221,2.940625
+"MCP as-of first page (1000 rows)",222,2.960750
+"MCP as-of first page (1000 rows)",223,3.308042
+"MCP as-of first page (1000 rows)",224,2.894209
+"MCP as-of first page (1000 rows)",225,3.213917
+"MCP as-of first page (1000 rows)",226,2.832584
+"MCP as-of first page (1000 rows)",227,2.789917
+"MCP as-of first page (1000 rows)",228,3.214083
+"MCP as-of first page (1000 rows)",229,2.732792
+"MCP as-of first page (1000 rows)",230,3.093333
+"MCP as-of first page (1000 rows)",231,3.247417
+"MCP as-of first page (1000 rows)",232,2.764958
+"MCP as-of first page (1000 rows)",233,2.806375
+"MCP as-of first page (1000 rows)",234,2.924917
+"MCP as-of first page (1000 rows)",235,2.714584
+"MCP as-of first page (1000 rows)",236,2.788291
+"MCP as-of first page (1000 rows)",237,2.951333
+"MCP as-of first page (1000 rows)",238,2.821375
+"MCP as-of first page (1000 rows)",239,2.696417
+"MCP as-of first page (1000 rows)",240,2.847709
+"MCP as-of first page (1000 rows)",241,2.658917
+"MCP as-of first page (1000 rows)",242,2.659375
+"MCP as-of first page (1000 rows)",243,3.239792
+"MCP as-of first page (1000 rows)",244,2.896750
+"MCP as-of first page (1000 rows)",245,3.010166
+"MCP as-of first page (1000 rows)",246,2.730625
+"MCP as-of first page (1000 rows)",247,2.648208
+"MCP as-of first page (1000 rows)",248,3.141083
+"MCP as-of first page (1000 rows)",249,2.745042
+"MCP as-of first page (1000 rows)",250,2.706500
+"MCP as-of first page (1000 rows)",251,2.866375
+"MCP as-of first page (1000 rows)",252,2.708416
+"MCP as-of first page (1000 rows)",253,2.940833
+"MCP as-of first page (1000 rows)",254,3.256333
+"MCP as-of first page (1000 rows)",255,3.990667
+"MCP as-of first page (1000 rows)",256,2.844875
+"MCP as-of first page (1000 rows)",257,2.822334
+"MCP as-of first page (1000 rows)",258,2.736792
+"MCP as-of first page (1000 rows)",259,3.466250
+"MCP as-of first page (1000 rows)",260,3.238417
+"MCP as-of first page (1000 rows)",261,3.084875
+"MCP as-of first page (1000 rows)",262,3.401417
+"MCP as-of first page (1000 rows)",263,2.917917
+"MCP as-of first page (1000 rows)",264,2.992709
+"MCP as-of first page (1000 rows)",265,4.757042
+"MCP as-of first page (1000 rows)",266,3.154208
+"MCP as-of first page (1000 rows)",267,3.508625
+"MCP as-of first page (1000 rows)",268,3.518709
+"MCP as-of first page (1000 rows)",269,3.741250
+"MCP as-of first page (1000 rows)",270,3.949083
+"MCP as-of first page (1000 rows)",271,3.189750
+"MCP as-of first page (1000 rows)",272,3.248417
+"MCP as-of first page (1000 rows)",273,2.873958
+"MCP as-of first page (1000 rows)",274,3.094791
+"MCP as-of first page (1000 rows)",275,4.029250
+"MCP as-of first page (1000 rows)",276,2.948334
+"MCP as-of first page (1000 rows)",277,3.095083
+"MCP as-of first page (1000 rows)",278,3.340917
+"MCP as-of first page (1000 rows)",279,3.252542
+"MCP as-of first page (1000 rows)",280,2.968542
+"MCP as-of first page (1000 rows)",281,2.671542
+"MCP as-of first page (1000 rows)",282,2.925209
+"MCP as-of first page (1000 rows)",283,2.753417
+"MCP as-of first page (1000 rows)",284,2.676875
+"MCP as-of first page (1000 rows)",285,3.019916
+"MCP as-of first page (1000 rows)",286,2.888708
+"MCP as-of first page (1000 rows)",287,2.969292
+"MCP as-of first page (1000 rows)",288,2.929083
+"MCP as-of first page (1000 rows)",289,2.756708
+"MCP as-of first page (1000 rows)",290,2.905583
+"MCP as-of first page (1000 rows)",291,3.067709
+"MCP as-of first page (1000 rows)",292,2.707416
+"MCP as-of first page (1000 rows)",293,2.669375
+"MCP as-of first page (1000 rows)",294,2.924834
+"MCP as-of first page (1000 rows)",295,3.359875
+"MCP as-of first page (1000 rows)",296,4.434583
+"MCP as-of first page (1000 rows)",297,2.960209
+"MCP as-of first page (1000 rows)",298,2.794667
+"MCP as-of first page (1000 rows)",299,3.402542
+"HTTP as-of first page, 8 clients",0,7.507083
+"HTTP as-of first page, 8 clients",4,7.731583
+"HTTP as-of first page, 8 clients",2,8.665750
+"HTTP as-of first page, 8 clients",1,9.100625
+"HTTP as-of first page, 8 clients",5,9.109250
+"HTTP as-of first page, 8 clients",3,9.609209
+"HTTP as-of first page, 8 clients",7,9.987334
+"HTTP as-of first page, 8 clients",6,10.749583
+"HTTP as-of first page, 8 clients",8,4.275125
+"HTTP as-of first page, 8 clients",10,3.593125
+"HTTP as-of first page, 8 clients",11,3.588500
+"HTTP as-of first page, 8 clients",15,4.715042
+"HTTP as-of first page, 8 clients",9,8.256500
+"HTTP as-of first page, 8 clients",16,5.069875
+"HTTP as-of first page, 8 clients",12,7.730250
+"HTTP as-of first page, 8 clients",13,7.681000
+"HTTP as-of first page, 8 clients",18,5.812667
+"HTTP as-of first page, 8 clients",14,9.019000
+"HTTP as-of first page, 8 clients",17,7.671666
+"HTTP as-of first page, 8 clients",19,4.525417
+"HTTP as-of first page, 8 clients",20,4.508417
+"HTTP as-of first page, 8 clients",21,4.435833
+"HTTP as-of first page, 8 clients",22,4.426084
+"HTTP as-of first page, 8 clients",24,3.560833
+"HTTP as-of first page, 8 clients",26,3.704125
+"HTTP as-of first page, 8 clients",23,7.418125
+"HTTP as-of first page, 8 clients",25,6.740291
+"HTTP as-of first page, 8 clients",27,7.435250
+"HTTP as-of first page, 8 clients",31,6.256458
+"HTTP as-of first page, 8 clients",28,7.870958
+"HTTP as-of first page, 8 clients",29,7.867083
+"HTTP as-of first page, 8 clients",30,7.840292
+"HTTP as-of first page, 8 clients",32,6.284375
+"HTTP as-of first page, 8 clients",33,5.536958
+"HTTP as-of first page, 8 clients",34,5.203958
+"HTTP as-of first page, 8 clients",35,4.467584
+"HTTP as-of first page, 8 clients",36,4.558459
+"HTTP as-of first page, 8 clients",39,3.999458
+"HTTP as-of first page, 8 clients",37,5.263041
+"HTTP as-of first page, 8 clients",38,5.333042
+"HTTP as-of first page, 8 clients",41,4.290375
+"HTTP as-of first page, 8 clients",42,3.909583
+"HTTP as-of first page, 8 clients",43,3.928334
+"HTTP as-of first page, 8 clients",44,3.824250
+"HTTP as-of first page, 8 clients",45,5.224459
+"HTTP as-of first page, 8 clients",40,9.225875
+"HTTP as-of first page, 8 clients",46,5.570792
+"HTTP as-of first page, 8 clients",48,5.085833
+"HTTP as-of first page, 8 clients",49,5.027583
+"HTTP as-of first page, 8 clients",47,7.592125
+"HTTP as-of first page, 8 clients",50,7.715167
+"HTTP as-of first page, 8 clients",51,7.944042
+"HTTP as-of first page, 8 clients",53,7.581750
+"HTTP as-of first page, 8 clients",52,8.998292
+"HTTP as-of first page, 8 clients",56,8.091167
+"HTTP as-of first page, 8 clients",54,9.424125
+"HTTP as-of first page, 8 clients",55,9.461625
+"HTTP as-of first page, 8 clients",57,8.523875
+"HTTP as-of first page, 8 clients",58,7.717250
+"HTTP as-of first page, 8 clients",59,7.781750
+"HTTP as-of first page, 8 clients",60,6.199041
+"HTTP as-of first page, 8 clients",61,5.657791
+"HTTP as-of first page, 8 clients",62,5.358334
+"HTTP as-of first page, 8 clients",64,4.756208
+"HTTP as-of first page, 8 clients",63,5.567750
+"HTTP as-of first page, 8 clients",67,2.925667
+"HTTP as-of first page, 8 clients",66,4.087583
+"HTTP as-of first page, 8 clients",65,5.367042
+"HTTP as-of first page, 8 clients",69,4.229292
+"HTTP as-of first page, 8 clients",72,3.486750
+"HTTP as-of first page, 8 clients",68,5.489583
+"HTTP as-of first page, 8 clients",70,5.041000
+"HTTP as-of first page, 8 clients",73,4.200500
+"HTTP as-of first page, 8 clients",71,6.672417
+"HTTP as-of first page, 8 clients",74,5.608041
+"HTTP as-of first page, 8 clients",75,5.627042
+"HTTP as-of first page, 8 clients",76,4.585000
+"HTTP as-of first page, 8 clients",77,4.539125
+"HTTP as-of first page, 8 clients",78,5.303458
+"HTTP as-of first page, 8 clients",80,4.628542
+"HTTP as-of first page, 8 clients",79,5.743666
+"HTTP as-of first page, 8 clients",82,3.587208
+"HTTP as-of first page, 8 clients",81,4.513542
+"HTTP as-of first page, 8 clients",83,3.930458
+"HTTP as-of first page, 8 clients",86,4.024500
+"HTTP as-of first page, 8 clients",85,5.654709
+"HTTP as-of first page, 8 clients",88,4.218375
+"HTTP as-of first page, 8 clients",84,7.214584
+"HTTP as-of first page, 8 clients",87,5.634792
+"HTTP as-of first page, 8 clients",89,5.241292
+"HTTP as-of first page, 8 clients",90,5.232208
+"HTTP as-of first page, 8 clients",91,5.236292
+"HTTP as-of first page, 8 clients",93,4.229750
+"HTTP as-of first page, 8 clients",94,5.269750
+"HTTP as-of first page, 8 clients",92,7.462958
+"HTTP as-of first page, 8 clients",95,6.547291
+"HTTP as-of first page, 8 clients",96,7.167209
+"HTTP as-of first page, 8 clients",99,6.617208
+"HTTP as-of first page, 8 clients",98,7.492292
+"HTTP as-of first page, 8 clients",97,8.383750
+"HTTP as-of first page, 8 clients",100,6.711542
+"HTTP as-of first page, 8 clients",101,7.978334
+"HTTP as-of first page, 8 clients",102,7.298167
+"HTTP as-of first page, 8 clients",103,7.243083
+"HTTP as-of first page, 8 clients",104,6.759000
+"HTTP as-of first page, 8 clients",105,6.580292
+"HTTP as-of first page, 8 clients",106,6.486209
+"HTTP as-of first page, 8 clients",107,6.670834
+"HTTP as-of first page, 8 clients",108,7.217750
+"HTTP as-of first page, 8 clients",109,5.216500
+"HTTP as-of first page, 8 clients",110,5.218375
+"HTTP as-of first page, 8 clients",111,4.967792
+"HTTP as-of first page, 8 clients",112,4.827833
+"HTTP as-of first page, 8 clients",113,4.826875
+"HTTP as-of first page, 8 clients",116,2.975541
+"HTTP as-of first page, 8 clients",115,4.742625
+"HTTP as-of first page, 8 clients",114,5.831167
+"HTTP as-of first page, 8 clients",117,4.178709
+"HTTP as-of first page, 8 clients",120,3.498125
+"HTTP as-of first page, 8 clients",122,3.257417
+"HTTP as-of first page, 8 clients",121,4.028875
+"HTTP as-of first page, 8 clients",119,5.237791
+"HTTP as-of first page, 8 clients",118,6.510750
+"HTTP as-of first page, 8 clients",123,5.212208
+"HTTP as-of first page, 8 clients",124,5.887083
+"HTTP as-of first page, 8 clients",127,4.111875
+"HTTP as-of first page, 8 clients",126,5.067125
+"HTTP as-of first page, 8 clients",125,6.103792
+"HTTP as-of first page, 8 clients",129,5.595292
+"HTTP as-of first page, 8 clients",128,7.809709
+"HTTP as-of first page, 8 clients",131,7.090791
+"HTTP as-of first page, 8 clients",132,6.880417
+"HTTP as-of first page, 8 clients",130,9.795500
+"HTTP as-of first page, 8 clients",133,8.408292
+"HTTP as-of first page, 8 clients",135,8.307041
+"HTTP as-of first page, 8 clients",134,10.736834
+"HTTP as-of first page, 8 clients",136,9.523417
+"HTTP as-of first page, 8 clients",137,8.208208
+"HTTP as-of first page, 8 clients",138,7.148708
+"HTTP as-of first page, 8 clients",139,6.700583
+"HTTP as-of first page, 8 clients",140,6.648417
+"HTTP as-of first page, 8 clients",141,5.994375
+"HTTP as-of first page, 8 clients",142,5.683083
+"HTTP as-of first page, 8 clients",143,4.061292
+"HTTP as-of first page, 8 clients",145,3.296042
+"HTTP as-of first page, 8 clients",147,3.554875
+"HTTP as-of first page, 8 clients",144,5.306042
+"HTTP as-of first page, 8 clients",148,3.518459
+"HTTP as-of first page, 8 clients",150,3.072667
+"HTTP as-of first page, 8 clients",146,6.085417
+"HTTP as-of first page, 8 clients",151,3.992917
+"HTTP as-of first page, 8 clients",152,4.044625
+"HTTP as-of first page, 8 clients",149,5.623084
+"HTTP as-of first page, 8 clients",154,3.310208
+"HTTP as-of first page, 8 clients",153,4.101333
+"HTTP as-of first page, 8 clients",156,3.289584
+"HTTP as-of first page, 8 clients",155,4.052875
+"HTTP as-of first page, 8 clients",158,5.067583
+"HTTP as-of first page, 8 clients",160,4.714500
+"HTTP as-of first page, 8 clients",157,6.340250
+"HTTP as-of first page, 8 clients",161,5.124208
+"HTTP as-of first page, 8 clients",159,6.272750
+"HTTP as-of first page, 8 clients",163,5.139625
+"HTTP as-of first page, 8 clients",164,5.143417
+"HTTP as-of first page, 8 clients",162,6.273167
+"HTTP as-of first page, 8 clients",165,3.174625
+"HTTP as-of first page, 8 clients",166,3.282334
+"HTTP as-of first page, 8 clients",167,3.894125
+"HTTP as-of first page, 8 clients",169,3.611750
+"HTTP as-of first page, 8 clients",170,3.643584
+"HTTP as-of first page, 8 clients",172,3.545083
+"HTTP as-of first page, 8 clients",168,6.296208
+"HTTP as-of first page, 8 clients",173,5.353417
+"HTTP as-of first page, 8 clients",171,6.971334
+"HTTP as-of first page, 8 clients",174,6.100916
+"HTTP as-of first page, 8 clients",176,4.997458
+"HTTP as-of first page, 8 clients",175,5.862458
+"HTTP as-of first page, 8 clients",177,5.346583
+"HTTP as-of first page, 8 clients",178,5.059583
+"HTTP as-of first page, 8 clients",179,4.207750
+"HTTP as-of first page, 8 clients",180,3.639833
+"HTTP as-of first page, 8 clients",181,3.171750
+"HTTP as-of first page, 8 clients",182,3.158292
+"HTTP as-of first page, 8 clients",183,3.164583
+"HTTP as-of first page, 8 clients",186,4.695292
+"HTTP as-of first page, 8 clients",185,6.291750
+"HTTP as-of first page, 8 clients",184,7.184208
+"HTTP as-of first page, 8 clients",187,6.698000
+"HTTP as-of first page, 8 clients",188,7.312042
+"HTTP as-of first page, 8 clients",189,7.616167
+"HTTP as-of first page, 8 clients",191,7.297292
+"HTTP as-of first page, 8 clients",190,8.449833
+"HTTP as-of first page, 8 clients",192,6.042167
+"HTTP as-of first page, 8 clients",193,7.456500
+"HTTP as-of first page, 8 clients",195,7.700167
+"HTTP as-of first page, 8 clients",194,10.002416
+"HTTP as-of first page, 8 clients",197,10.225541
+"HTTP as-of first page, 8 clients",196,12.059417
+"HTTP as-of first page, 8 clients",198,11.606333
+"HTTP as-of first page, 8 clients",199,11.313458
+"HTTP as-of first page, 8 clients",200,11.092167
+"HTTP as-of first page, 8 clients",201,8.876583
+"HTTP as-of first page, 8 clients",202,7.910875
+"HTTP as-of first page, 8 clients",203,6.635333
+"HTTP as-of first page, 8 clients",204,4.425667
+"HTTP as-of first page, 8 clients",205,3.674917
+"HTTP as-of first page, 8 clients",206,3.254833
+"HTTP as-of first page, 8 clients",207,3.162125
+"HTTP as-of first page, 8 clients",208,3.082625
+"HTTP as-of first page, 8 clients",210,4.113167
+"HTTP as-of first page, 8 clients",213,3.803583
+"HTTP as-of first page, 8 clients",209,6.299792
+"HTTP as-of first page, 8 clients",214,4.878417
+"HTTP as-of first page, 8 clients",212,6.259625
+"HTTP as-of first page, 8 clients",216,5.274833
+"HTTP as-of first page, 8 clients",211,7.538417
+"HTTP as-of first page, 8 clients",215,6.428500
+"HTTP as-of first page, 8 clients",217,4.557083
+"HTTP as-of first page, 8 clients",218,4.152000
+"HTTP as-of first page, 8 clients",219,3.672000
+"HTTP as-of first page, 8 clients",220,3.853625
+"HTTP as-of first page, 8 clients",221,3.633709
+"HTTP as-of first page, 8 clients",222,3.560667
+"HTTP as-of first page, 8 clients",223,4.740667
+"HTTP as-of first page, 8 clients",227,4.270500
+"HTTP as-of first page, 8 clients",224,6.022500
+"HTTP as-of first page, 8 clients",226,5.636416
+"HTTP as-of first page, 8 clients",228,4.898792
+"HTTP as-of first page, 8 clients",225,6.850208
+"HTTP as-of first page, 8 clients",230,4.831667
+"HTTP as-of first page, 8 clients",229,5.633375
+"HTTP as-of first page, 8 clients",231,4.019250
+"HTTP as-of first page, 8 clients",232,3.240541
+"HTTP as-of first page, 8 clients",233,3.118208
+"HTTP as-of first page, 8 clients",235,3.684208
+"HTTP as-of first page, 8 clients",239,3.693000
+"HTTP as-of first page, 8 clients",234,6.443833
+"HTTP as-of first page, 8 clients",236,6.111750
+"HTTP as-of first page, 8 clients",238,6.033375
+"HTTP as-of first page, 8 clients",237,7.235375
+"HTTP as-of first page, 8 clients",240,6.514709
+"HTTP as-of first page, 8 clients",242,5.162542
+"HTTP as-of first page, 8 clients",241,6.919166
+"HTTP as-of first page, 8 clients",243,4.370125
+"HTTP as-of first page, 8 clients",244,3.941875
+"HTTP as-of first page, 8 clients",245,3.848542
+"HTTP as-of first page, 8 clients",246,5.042000
+"HTTP as-of first page, 8 clients",247,4.992667
+"HTTP as-of first page, 8 clients",248,5.328041
+"HTTP as-of first page, 8 clients",249,5.360000
+"HTTP as-of first page, 8 clients",251,5.044209
+"HTTP as-of first page, 8 clients",250,6.060959
+"HTTP as-of first page, 8 clients",253,5.952708
+"HTTP as-of first page, 8 clients",252,7.524417
+"HTTP as-of first page, 8 clients",254,6.384125
+"HTTP as-of first page, 8 clients",255,6.685000
+"HTTP as-of first page, 8 clients",258,5.951417
+"HTTP as-of first page, 8 clients",256,7.641417
+"HTTP as-of first page, 8 clients",259,6.620083
+"HTTP as-of first page, 8 clients",257,9.246459
+"HTTP as-of first page, 8 clients",260,8.362667
+"HTTP as-of first page, 8 clients",262,8.835875
+"HTTP as-of first page, 8 clients",261,10.964750
+"HTTP as-of first page, 8 clients",263,9.461542
+"HTTP as-of first page, 8 clients",265,8.342334
+"HTTP as-of first page, 8 clients",264,9.588875
+"HTTP as-of first page, 8 clients",266,8.746791
+"HTTP as-of first page, 8 clients",267,7.589833
+"HTTP as-of first page, 8 clients",268,6.793208
+"HTTP as-of first page, 8 clients",269,5.162167
+"HTTP as-of first page, 8 clients",270,5.335667
+"HTTP as-of first page, 8 clients",271,5.365791
+"HTTP as-of first page, 8 clients",272,5.646875
+"HTTP as-of first page, 8 clients",273,5.763125
+"HTTP as-of first page, 8 clients",275,5.371583
+"HTTP as-of first page, 8 clients",276,5.407333
+"HTTP as-of first page, 8 clients",277,4.650833
+"HTTP as-of first page, 8 clients",274,6.983917
+"HTTP as-of first page, 8 clients",278,4.221042
+"HTTP as-of first page, 8 clients",279,3.892583
+"HTTP as-of first page, 8 clients",280,3.380000
+"HTTP as-of first page, 8 clients",281,4.191000
+"HTTP as-of first page, 8 clients",283,4.684208
+"HTTP as-of first page, 8 clients",286,4.650375
+"HTTP as-of first page, 8 clients",285,5.581125
+"HTTP as-of first page, 8 clients",282,7.228750
+"HTTP as-of first page, 8 clients",284,6.788292
+"HTTP as-of first page, 8 clients",287,6.037542
+"HTTP as-of first page, 8 clients",288,6.038458
+"HTTP as-of first page, 8 clients",289,5.434375
+"HTTP as-of first page, 8 clients",290,4.962917
+"HTTP as-of first page, 8 clients",291,5.008375
+"HTTP as-of first page, 8 clients",293,4.552417
+"HTTP as-of first page, 8 clients",292,5.625375
+"HTTP as-of first page, 8 clients",294,5.462708
+"HTTP as-of first page, 8 clients",296,5.221375
+"HTTP as-of first page, 8 clients",295,6.014000
+"HTTP as-of first page, 8 clients",297,5.706500
+"HTTP as-of first page, 8 clients",298,5.265125
+"HTTP as-of first page, 8 clients",300,5.320416
+"HTTP as-of first page, 8 clients",299,6.316958
+"HTTP as-of first page, 8 clients",304,3.957042
+"HTTP as-of first page, 8 clients",303,4.775417
+"HTTP as-of first page, 8 clients",301,6.358000
+"HTTP as-of first page, 8 clients",302,6.080709
+"HTTP as-of first page, 8 clients",305,4.677334
+"HTTP as-of first page, 8 clients",306,4.553791
+"HTTP as-of first page, 8 clients",307,3.562250
+"HTTP as-of first page, 8 clients",309,3.952416
+"HTTP as-of first page, 8 clients",308,5.179375
+"HTTP as-of first page, 8 clients",313,5.080542
+"HTTP as-of first page, 8 clients",310,6.735750
+"HTTP as-of first page, 8 clients",311,6.773166
+"HTTP as-of first page, 8 clients",315,5.280958
+"HTTP as-of first page, 8 clients",312,7.151125
+"HTTP as-of first page, 8 clients",314,6.780917
+"HTTP as-of first page, 8 clients",316,5.135583
+"HTTP as-of first page, 8 clients",317,4.707459
+"HTTP as-of first page, 8 clients",318,3.426583
+"HTTP as-of first page, 8 clients",319,4.139708
+"HTTP as-of first page, 8 clients",320,5.015791
+"HTTP as-of first page, 8 clients",322,5.051917
+"HTTP as-of first page, 8 clients",321,5.890708
+"HTTP as-of first page, 8 clients",323,5.523500
+"HTTP as-of first page, 8 clients",326,4.555875
+"HTTP as-of first page, 8 clients",324,5.898750
+"HTTP as-of first page, 8 clients",325,5.874875
+"HTTP as-of first page, 8 clients",327,4.447250
+"HTTP as-of first page, 8 clients",329,2.707750
+"HTTP as-of first page, 8 clients",328,3.874875
+"HTTP as-of first page, 8 clients",330,4.663500
+"HTTP as-of first page, 8 clients",332,4.454875
+"HTTP as-of first page, 8 clients",334,4.596916
+"HTTP as-of first page, 8 clients",331,6.177667
+"HTTP as-of first page, 8 clients",333,5.873916
+"HTTP as-of first page, 8 clients",337,5.141000
+"HTTP as-of first page, 8 clients",336,6.505250
+"HTTP as-of first page, 8 clients",335,7.281791
+"HTTP as-of first page, 8 clients",338,5.214292
+"HTTP as-of first page, 8 clients",340,4.722791
+"HTTP as-of first page, 8 clients",341,5.273500
+"HTTP as-of first page, 8 clients",339,7.762625
+"HTTP as-of first page, 8 clients",342,6.667167
+"HTTP as-of first page, 8 clients",343,6.716042
+"HTTP as-of first page, 8 clients",344,6.142000
+"HTTP as-of first page, 8 clients",345,6.131583
+"HTTP as-of first page, 8 clients",346,5.948417
+"HTTP as-of first page, 8 clients",348,4.572583
+"HTTP as-of first page, 8 clients",347,6.634208
+"HTTP as-of first page, 8 clients",349,5.066583
+"HTTP as-of first page, 8 clients",350,5.634167
+"HTTP as-of first page, 8 clients",353,4.949583
+"HTTP as-of first page, 8 clients",351,6.824458
+"HTTP as-of first page, 8 clients",354,7.050583
+"HTTP as-of first page, 8 clients",352,9.269250
+"HTTP as-of first page, 8 clients",356,7.776333
+"HTTP as-of first page, 8 clients",357,8.120500
+"HTTP as-of first page, 8 clients",355,10.361625
+"HTTP as-of first page, 8 clients",358,7.981834
+"HTTP as-of first page, 8 clients",359,7.494917
+"HTTP as-of first page, 8 clients",360,6.852041
+"HTTP as-of first page, 8 clients",361,5.724959
+"HTTP as-of first page, 8 clients",362,4.854334
+"HTTP as-of first page, 8 clients",363,5.019167
+"HTTP as-of first page, 8 clients",364,5.458916
+"HTTP as-of first page, 8 clients",366,4.816875
+"HTTP as-of first page, 8 clients",365,5.755875
+"HTTP as-of first page, 8 clients",367,5.217959
+"HTTP as-of first page, 8 clients",368,8.236875
+"HTTP as-of first page, 8 clients",370,8.606250
+"HTTP as-of first page, 8 clients",369,10.852000
+"HTTP as-of first page, 8 clients",371,11.409709
+"HTTP as-of first page, 8 clients",372,10.749000
+"HTTP as-of first page, 8 clients",374,10.316125
+"HTTP as-of first page, 8 clients",373,11.119917
+"HTTP as-of first page, 8 clients",375,10.714250
+"HTTP as-of first page, 8 clients",376,8.282166
+"HTTP as-of first page, 8 clients",377,7.696792
+"HTTP as-of first page, 8 clients",378,6.914084
+"HTTP as-of first page, 8 clients",379,6.038250
+"HTTP as-of first page, 8 clients",381,5.518333
+"HTTP as-of first page, 8 clients",380,7.069041
+"HTTP as-of first page, 8 clients",382,6.874417
+"HTTP as-of first page, 8 clients",383,6.923083
+"HTTP as-of first page, 8 clients",385,5.663625
+"HTTP as-of first page, 8 clients",384,6.700708
+"HTTP as-of first page, 8 clients",386,5.382125
+"HTTP as-of first page, 8 clients",387,4.432125
+"HTTP as-of first page, 8 clients",389,3.950791
+"HTTP as-of first page, 8 clients",388,5.586000
+"HTTP as-of first page, 8 clients",390,4.427708
+"HTTP as-of first page, 8 clients",392,5.195333
+"HTTP as-of first page, 8 clients",395,4.512083
+"HTTP as-of first page, 8 clients",391,6.578333
+"HTTP as-of first page, 8 clients",394,5.933666
+"HTTP as-of first page, 8 clients",397,4.071541
+"HTTP as-of first page, 8 clients",393,7.081666
+"HTTP as-of first page, 8 clients",396,5.434625
+"HTTP as-of first page, 8 clients",398,4.650166
+"HTTP as-of first page, 8 clients",399,3.438666
+"MCP as-of first page, 8 concurrent requests",7,5.933292
+"MCP as-of first page, 8 concurrent requests",1,6.792792
+"MCP as-of first page, 8 concurrent requests",3,7.469334
+"MCP as-of first page, 8 concurrent requests",0,8.166375
+"MCP as-of first page, 8 concurrent requests",4,10.533416
+"MCP as-of first page, 8 concurrent requests",2,11.648500
+"MCP as-of first page, 8 concurrent requests",6,13.283875
+"MCP as-of first page, 8 concurrent requests",5,14.447667
+"MCP as-of first page, 8 concurrent requests",8,9.257500
+"MCP as-of first page, 8 concurrent requests",11,8.069208
+"MCP as-of first page, 8 concurrent requests",9,10.668750
+"MCP as-of first page, 8 concurrent requests",10,11.208834
+"MCP as-of first page, 8 concurrent requests",13,9.130917
+"MCP as-of first page, 8 concurrent requests",12,11.979541
+"MCP as-of first page, 8 concurrent requests",14,10.335625
+"MCP as-of first page, 8 concurrent requests",15,9.886375
+"MCP as-of first page, 8 concurrent requests",16,9.782959
+"MCP as-of first page, 8 concurrent requests",17,9.410250
+"MCP as-of first page, 8 concurrent requests",18,8.806417
+"MCP as-of first page, 8 concurrent requests",19,8.798458
+"MCP as-of first page, 8 concurrent requests",20,7.517209
+"MCP as-of first page, 8 concurrent requests",21,6.826625
+"MCP as-of first page, 8 concurrent requests",22,6.497750
+"MCP as-of first page, 8 concurrent requests",23,6.515958
+"MCP as-of first page, 8 concurrent requests",25,5.892834
+"MCP as-of first page, 8 concurrent requests",24,7.149917
+"MCP as-of first page, 8 concurrent requests",26,7.036458
+"MCP as-of first page, 8 concurrent requests",28,6.125708
+"MCP as-of first page, 8 concurrent requests",27,7.574125
+"MCP as-of first page, 8 concurrent requests",30,5.542542
+"MCP as-of first page, 8 concurrent requests",31,5.395542
+"MCP as-of first page, 8 concurrent requests",32,5.346500
+"MCP as-of first page, 8 concurrent requests",29,8.560000
+"MCP as-of first page, 8 concurrent requests",33,6.921500
+"MCP as-of first page, 8 concurrent requests",34,6.546209
+"MCP as-of first page, 8 concurrent requests",35,6.096208
+"MCP as-of first page, 8 concurrent requests",36,6.089042
+"MCP as-of first page, 8 concurrent requests",38,5.564250
+"MCP as-of first page, 8 concurrent requests",37,6.710333
+"MCP as-of first page, 8 concurrent requests",39,6.293959
+"MCP as-of first page, 8 concurrent requests",40,8.507375
+"MCP as-of first page, 8 concurrent requests",41,8.152791
+"MCP as-of first page, 8 concurrent requests",42,8.089417
+"MCP as-of first page, 8 concurrent requests",43,8.096792
+"MCP as-of first page, 8 concurrent requests",44,8.095917
+"MCP as-of first page, 8 concurrent requests",45,8.073875
+"MCP as-of first page, 8 concurrent requests",46,8.106334
+"MCP as-of first page, 8 concurrent requests",47,7.945666
+"MCP as-of first page, 8 concurrent requests",48,5.266458
+"MCP as-of first page, 8 concurrent requests",49,5.166041
+"MCP as-of first page, 8 concurrent requests",51,4.387917
+"MCP as-of first page, 8 concurrent requests",50,5.692542
+"MCP as-of first page, 8 concurrent requests",53,5.053875
+"MCP as-of first page, 8 concurrent requests",52,6.519625
+"MCP as-of first page, 8 concurrent requests",55,5.456917
+"MCP as-of first page, 8 concurrent requests",56,5.495833
+"MCP as-of first page, 8 concurrent requests",54,7.293333
+"MCP as-of first page, 8 concurrent requests",59,4.765500
+"MCP as-of first page, 8 concurrent requests",57,6.606708
+"MCP as-of first page, 8 concurrent requests",60,4.608959
+"MCP as-of first page, 8 concurrent requests",58,7.191708
+"MCP as-of first page, 8 concurrent requests",61,5.049208
+"MCP as-of first page, 8 concurrent requests",62,4.815625
+"MCP as-of first page, 8 concurrent requests",63,5.494291
+"MCP as-of first page, 8 concurrent requests",66,4.528625
+"MCP as-of first page, 8 concurrent requests",64,6.424000
+"MCP as-of first page, 8 concurrent requests",67,5.268083
+"MCP as-of first page, 8 concurrent requests",68,5.232625
+"MCP as-of first page, 8 concurrent requests",65,7.672292
+"MCP as-of first page, 8 concurrent requests",70,5.275209
+"MCP as-of first page, 8 concurrent requests",69,6.438917
+"MCP as-of first page, 8 concurrent requests",72,4.277541
+"MCP as-of first page, 8 concurrent requests",73,5.579875
+"MCP as-of first page, 8 concurrent requests",74,5.898500
+"MCP as-of first page, 8 concurrent requests",71,8.933416
+"MCP as-of first page, 8 concurrent requests",75,6.835084
+"MCP as-of first page, 8 concurrent requests",77,6.300125
+"MCP as-of first page, 8 concurrent requests",76,9.807667
+"MCP as-of first page, 8 concurrent requests",79,8.817125
+"MCP as-of first page, 8 concurrent requests",78,10.010666
+"MCP as-of first page, 8 concurrent requests",80,8.045833
+"MCP as-of first page, 8 concurrent requests",81,7.738792
+"MCP as-of first page, 8 concurrent requests",82,8.206833
+"MCP as-of first page, 8 concurrent requests",83,8.249792
+"MCP as-of first page, 8 concurrent requests",84,8.185625
+"MCP as-of first page, 8 concurrent requests",85,5.863458
+"MCP as-of first page, 8 concurrent requests",86,5.876500
+"MCP as-of first page, 8 concurrent requests",88,5.321500
+"MCP as-of first page, 8 concurrent requests",87,6.511708
+"MCP as-of first page, 8 concurrent requests",89,5.887292
+"MCP as-of first page, 8 concurrent requests",90,5.109708
+"MCP as-of first page, 8 concurrent requests",91,5.014333
+"MCP as-of first page, 8 concurrent requests",92,4.998000
+"MCP as-of first page, 8 concurrent requests",93,4.989542
+"MCP as-of first page, 8 concurrent requests",95,4.834250
+"MCP as-of first page, 8 concurrent requests",96,5.850500
+"MCP as-of first page, 8 concurrent requests",98,5.576125
+"MCP as-of first page, 8 concurrent requests",94,8.719667
+"MCP as-of first page, 8 concurrent requests",99,6.306625
+"MCP as-of first page, 8 concurrent requests",97,8.062917
+"MCP as-of first page, 8 concurrent requests",100,6.951459
+"MCP as-of first page, 8 concurrent requests",101,6.996708
+"MCP as-of first page, 8 concurrent requests",102,6.341959
+"MCP as-of first page, 8 concurrent requests",105,3.761917
+"MCP as-of first page, 8 concurrent requests",104,5.913125
+"MCP as-of first page, 8 concurrent requests",103,8.421667
+"MCP as-of first page, 8 concurrent requests",107,6.429542
+"MCP as-of first page, 8 concurrent requests",106,7.627250
+"MCP as-of first page, 8 concurrent requests",108,6.950500
+"MCP as-of first page, 8 concurrent requests",109,6.912709
+"MCP as-of first page, 8 concurrent requests",110,6.884083
+"MCP as-of first page, 8 concurrent requests",111,6.894500
+"MCP as-of first page, 8 concurrent requests",112,6.385917
+"MCP as-of first page, 8 concurrent requests",114,6.769958
+"MCP as-of first page, 8 concurrent requests",113,8.248375
+"MCP as-of first page, 8 concurrent requests",115,7.525667
+"MCP as-of first page, 8 concurrent requests",116,7.579917
+"MCP as-of first page, 8 concurrent requests",117,7.568375
+"MCP as-of first page, 8 concurrent requests",119,6.928708
+"MCP as-of first page, 8 concurrent requests",118,8.155166
+"MCP as-of first page, 8 concurrent requests",120,7.214000
+"MCP as-of first page, 8 concurrent requests",121,4.982625
+"MCP as-of first page, 8 concurrent requests",122,4.894000
+"MCP as-of first page, 8 concurrent requests",123,4.764333
+"MCP as-of first page, 8 concurrent requests",125,4.860459
+"MCP as-of first page, 8 concurrent requests",126,5.104292
+"MCP as-of first page, 8 concurrent requests",127,5.148625
+"MCP as-of first page, 8 concurrent requests",124,7.517041
+"MCP as-of first page, 8 concurrent requests",128,5.702375
+"MCP as-of first page, 8 concurrent requests",129,5.727083
+"MCP as-of first page, 8 concurrent requests",130,5.725209
+"MCP as-of first page, 8 concurrent requests",132,4.417250
+"MCP as-of first page, 8 concurrent requests",134,3.519041
+"MCP as-of first page, 8 concurrent requests",131,6.879584
+"MCP as-of first page, 8 concurrent requests",133,5.299709
+"MCP as-of first page, 8 concurrent requests",135,4.656708
+"MCP as-of first page, 8 concurrent requests",137,4.763500
+"MCP as-of first page, 8 concurrent requests",136,6.373542
+"MCP as-of first page, 8 concurrent requests",139,5.512833
+"MCP as-of first page, 8 concurrent requests",142,4.517042
+"MCP as-of first page, 8 concurrent requests",138,7.478083
+"MCP as-of first page, 8 concurrent requests",140,6.921708
+"MCP as-of first page, 8 concurrent requests",141,7.274792
+"MCP as-of first page, 8 concurrent requests",143,6.716833
+"MCP as-of first page, 8 concurrent requests",144,6.047917
+"MCP as-of first page, 8 concurrent requests",146,4.771000
+"MCP as-of first page, 8 concurrent requests",145,6.248708
+"MCP as-of first page, 8 concurrent requests",147,5.688250
+"MCP as-of first page, 8 concurrent requests",149,7.161292
+"MCP as-of first page, 8 concurrent requests",148,8.415333
+"MCP as-of first page, 8 concurrent requests",151,6.899792
+"MCP as-of first page, 8 concurrent requests",150,8.307750
+"MCP as-of first page, 8 concurrent requests",153,7.177083
+"MCP as-of first page, 8 concurrent requests",152,8.624708
+"MCP as-of first page, 8 concurrent requests",154,8.562000
+"MCP as-of first page, 8 concurrent requests",155,8.885917
+"MCP as-of first page, 8 concurrent requests",156,6.992291
+"MCP as-of first page, 8 concurrent requests",158,6.383334
+"MCP as-of first page, 8 concurrent requests",159,6.386750
+"MCP as-of first page, 8 concurrent requests",157,9.215625
+"MCP as-of first page, 8 concurrent requests",160,7.817583
+"MCP as-of first page, 8 concurrent requests",161,7.590125
+"MCP as-of first page, 8 concurrent requests",163,5.702333
+"MCP as-of first page, 8 concurrent requests",162,7.662250
+"MCP as-of first page, 8 concurrent requests",164,6.018791
+"MCP as-of first page, 8 concurrent requests",165,6.369833
+"MCP as-of first page, 8 concurrent requests",166,6.353084
+"MCP as-of first page, 8 concurrent requests",167,5.623917
+"MCP as-of first page, 8 concurrent requests",168,5.509041
+"MCP as-of first page, 8 concurrent requests",169,5.551875
+"MCP as-of first page, 8 concurrent requests",170,7.398125
+"MCP as-of first page, 8 concurrent requests",171,8.392084
+"MCP as-of first page, 8 concurrent requests",172,10.295291
+"MCP as-of first page, 8 concurrent requests",174,9.209958
+"MCP as-of first page, 8 concurrent requests",173,10.595208
+"MCP as-of first page, 8 concurrent requests",175,9.686833
+"MCP as-of first page, 8 concurrent requests",176,9.626208
+"MCP as-of first page, 8 concurrent requests",177,9.550208
+"MCP as-of first page, 8 concurrent requests",178,7.978167
+"MCP as-of first page, 8 concurrent requests",179,6.993667
+"MCP as-of first page, 8 concurrent requests",180,5.276834
+"MCP as-of first page, 8 concurrent requests",181,5.166292
+"MCP as-of first page, 8 concurrent requests",182,5.211583
+"MCP as-of first page, 8 concurrent requests",183,5.731208
+"MCP as-of first page, 8 concurrent requests",184,5.904416
+"MCP as-of first page, 8 concurrent requests",185,5.857875
+"MCP as-of first page, 8 concurrent requests",187,4.971625
+"MCP as-of first page, 8 concurrent requests",186,6.158042
+"MCP as-of first page, 8 concurrent requests",189,5.345958
+"MCP as-of first page, 8 concurrent requests",188,7.329458
+"MCP as-of first page, 8 concurrent requests",190,7.189041
+"MCP as-of first page, 8 concurrent requests",191,7.086958
+"MCP as-of first page, 8 concurrent requests",193,7.498083
+"MCP as-of first page, 8 concurrent requests",194,7.835083
+"MCP as-of first page, 8 concurrent requests",192,9.592791
+"MCP as-of first page, 8 concurrent requests",195,8.466417
+"MCP as-of first page, 8 concurrent requests",196,7.904167
+"MCP as-of first page, 8 concurrent requests",198,5.999625
+"MCP as-of first page, 8 concurrent requests",197,7.720875
+"MCP as-of first page, 8 concurrent requests",199,6.279000
+"MCP as-of first page, 8 concurrent requests",200,5.187750
+"MCP as-of first page, 8 concurrent requests",201,4.832250
+"MCP as-of first page, 8 concurrent requests",202,4.796584
+"MCP as-of first page, 8 concurrent requests",203,5.019542
+"MCP as-of first page, 8 concurrent requests",205,5.380750
+"MCP as-of first page, 8 concurrent requests",204,7.589541
+"MCP as-of first page, 8 concurrent requests",206,7.721042
+"MCP as-of first page, 8 concurrent requests",209,6.676417
+"MCP as-of first page, 8 concurrent requests",207,8.494292
+"MCP as-of first page, 8 concurrent requests",210,8.590166
+"MCP as-of first page, 8 concurrent requests",208,10.733458
+"MCP as-of first page, 8 concurrent requests",211,10.151084
+"MCP as-of first page, 8 concurrent requests",212,9.612000
+"MCP as-of first page, 8 concurrent requests",213,8.794541
+"MCP as-of first page, 8 concurrent requests",214,8.125750
+"MCP as-of first page, 8 concurrent requests",215,8.006417
+"MCP as-of first page, 8 concurrent requests",216,8.043833
+"MCP as-of first page, 8 concurrent requests",217,6.818625
+"MCP as-of first page, 8 concurrent requests",218,6.431166
+"MCP as-of first page, 8 concurrent requests",219,5.639250
+"MCP as-of first page, 8 concurrent requests",220,5.933875
+"MCP as-of first page, 8 concurrent requests",221,6.639834
+"MCP as-of first page, 8 concurrent requests",222,6.692708
+"MCP as-of first page, 8 concurrent requests",224,5.937750
+"MCP as-of first page, 8 concurrent requests",223,7.191333
+"MCP as-of first page, 8 concurrent requests",225,6.455500
+"MCP as-of first page, 8 concurrent requests",226,6.441333
+"MCP as-of first page, 8 concurrent requests",228,5.604542
+"MCP as-of first page, 8 concurrent requests",227,7.958084
+"MCP as-of first page, 8 concurrent requests",229,6.510583
+"MCP as-of first page, 8 concurrent requests",230,8.098708
+"MCP as-of first page, 8 concurrent requests",231,9.389417
+"MCP as-of first page, 8 concurrent requests",232,10.081917
+"MCP as-of first page, 8 concurrent requests",233,10.989250
+"MCP as-of first page, 8 concurrent requests",234,12.495209
+"MCP as-of first page, 8 concurrent requests",235,12.227500
+"MCP as-of first page, 8 concurrent requests",236,11.776625
+"MCP as-of first page, 8 concurrent requests",238,8.746958
+"MCP as-of first page, 8 concurrent requests",237,11.614583
+"MCP as-of first page, 8 concurrent requests",239,8.038292
+"MCP as-of first page, 8 concurrent requests",240,7.377125
+"MCP as-of first page, 8 concurrent requests",241,6.501458
+"MCP as-of first page, 8 concurrent requests",242,7.863583
+"MCP as-of first page, 8 concurrent requests",243,7.853666
+"MCP as-of first page, 8 concurrent requests",244,7.931083
+"MCP as-of first page, 8 concurrent requests",246,7.449708
+"MCP as-of first page, 8 concurrent requests",245,8.752708
+"MCP as-of first page, 8 concurrent requests",248,7.594250
+"MCP as-of first page, 8 concurrent requests",247,8.798709
+"MCP as-of first page, 8 concurrent requests",249,8.194417
+"MCP as-of first page, 8 concurrent requests",250,5.392916
+"MCP as-of first page, 8 concurrent requests",251,5.514750
+"MCP as-of first page, 8 concurrent requests",252,5.870834
+"MCP as-of first page, 8 concurrent requests",253,6.430167
+"MCP as-of first page, 8 concurrent requests",255,6.589917
+"MCP as-of first page, 8 concurrent requests",254,8.457375
+"MCP as-of first page, 8 concurrent requests",256,7.968167
+"MCP as-of first page, 8 concurrent requests",257,8.012875
+"MCP as-of first page, 8 concurrent requests",259,7.171750
+"MCP as-of first page, 8 concurrent requests",258,8.775416
+"MCP as-of first page, 8 concurrent requests",260,7.706500
+"MCP as-of first page, 8 concurrent requests",261,7.949292
+"MCP as-of first page, 8 concurrent requests",262,7.641542
+"MCP as-of first page, 8 concurrent requests",263,7.099958
+"MCP as-of first page, 8 concurrent requests",264,6.968958
+"MCP as-of first page, 8 concurrent requests",265,6.959042
+"MCP as-of first page, 8 concurrent requests",266,7.303375
+"MCP as-of first page, 8 concurrent requests",267,7.231833
+"MCP as-of first page, 8 concurrent requests",268,6.937458
+"MCP as-of first page, 8 concurrent requests",269,6.116084
+"MCP as-of first page, 8 concurrent requests",270,5.547250
+"MCP as-of first page, 8 concurrent requests",271,5.450375
+"MCP as-of first page, 8 concurrent requests",272,6.711750
+"MCP as-of first page, 8 concurrent requests",273,7.257250
+"MCP as-of first page, 8 concurrent requests",274,6.906708
+"MCP as-of first page, 8 concurrent requests",275,6.907000
+"MCP as-of first page, 8 concurrent requests",276,6.919375
+"MCP as-of first page, 8 concurrent requests",278,6.235250
+"MCP as-of first page, 8 concurrent requests",277,7.532666
+"MCP as-of first page, 8 concurrent requests",279,9.297917
+"MCP as-of first page, 8 concurrent requests",280,8.721875
+"MCP as-of first page, 8 concurrent requests",281,8.515209
+"MCP as-of first page, 8 concurrent requests",282,8.635875
+"MCP as-of first page, 8 concurrent requests",283,8.890834
+"MCP as-of first page, 8 concurrent requests",284,10.910250
+"MCP as-of first page, 8 concurrent requests",285,11.082125
+"MCP as-of first page, 8 concurrent requests",286,11.319666
+"MCP as-of first page, 8 concurrent requests",287,8.955375
+"MCP as-of first page, 8 concurrent requests",288,8.279542
+"MCP as-of first page, 8 concurrent requests",289,8.328083
+"MCP as-of first page, 8 concurrent requests",290,8.155625
+"MCP as-of first page, 8 concurrent requests",291,8.426958
+"MCP as-of first page, 8 concurrent requests",292,6.931875
+"MCP as-of first page, 8 concurrent requests",293,7.217750
+"MCP as-of first page, 8 concurrent requests",294,7.220667
+"MCP as-of first page, 8 concurrent requests",296,7.231791
+"MCP as-of first page, 8 concurrent requests",295,9.375708
+"MCP as-of first page, 8 concurrent requests",297,9.077584
+"MCP as-of first page, 8 concurrent requests",298,9.261458
+"MCP as-of first page, 8 concurrent requests",299,9.319417
+"MCP as-of first page, 8 concurrent requests",300,8.863500
+"MCP as-of first page, 8 concurrent requests",301,8.410708
+"MCP as-of first page, 8 concurrent requests",302,8.105291
+"MCP as-of first page, 8 concurrent requests",303,7.474917
+"MCP as-of first page, 8 concurrent requests",304,6.776875
+"MCP as-of first page, 8 concurrent requests",305,6.084417
+"MCP as-of first page, 8 concurrent requests",306,5.835250
+"MCP as-of first page, 8 concurrent requests",307,5.226958
+"MCP as-of first page, 8 concurrent requests",308,5.135459
+"MCP as-of first page, 8 concurrent requests",310,4.475875
+"MCP as-of first page, 8 concurrent requests",309,6.569708
+"MCP as-of first page, 8 concurrent requests",311,6.020541
+"MCP as-of first page, 8 concurrent requests",313,5.170625
+"MCP as-of first page, 8 concurrent requests",314,5.211208
+"MCP as-of first page, 8 concurrent requests",312,7.024000
+"MCP as-of first page, 8 concurrent requests",316,5.150708
+"MCP as-of first page, 8 concurrent requests",315,7.137083
+"MCP as-of first page, 8 concurrent requests",317,6.964167
+"MCP as-of first page, 8 concurrent requests",318,6.116042
+"MCP as-of first page, 8 concurrent requests",319,6.026167
+"MCP as-of first page, 8 concurrent requests",320,5.974167
+"MCP as-of first page, 8 concurrent requests",321,6.753084
+"MCP as-of first page, 8 concurrent requests",323,6.338333
+"MCP as-of first page, 8 concurrent requests",322,7.485541
+"MCP as-of first page, 8 concurrent requests",324,6.102791
+"MCP as-of first page, 8 concurrent requests",325,5.664167
+"MCP as-of first page, 8 concurrent requests",326,5.822791
+"MCP as-of first page, 8 concurrent requests",327,5.854750
+"MCP as-of first page, 8 concurrent requests",328,5.868708
+"MCP as-of first page, 8 concurrent requests",329,5.051250
+"MCP as-of first page, 8 concurrent requests",330,4.890584
+"MCP as-of first page, 8 concurrent requests",332,4.447875
+"MCP as-of first page, 8 concurrent requests",331,5.653167
+"MCP as-of first page, 8 concurrent requests",334,4.381125
+"MCP as-of first page, 8 concurrent requests",333,5.765209
+"MCP as-of first page, 8 concurrent requests",335,5.666042
+"MCP as-of first page, 8 concurrent requests",338,4.570834
+"MCP as-of first page, 8 concurrent requests",336,6.323208
+"MCP as-of first page, 8 concurrent requests",337,6.904250
+"MCP as-of first page, 8 concurrent requests",339,6.886792
+"MCP as-of first page, 8 concurrent requests",341,6.266000
+"MCP as-of first page, 8 concurrent requests",342,6.288791
+"MCP as-of first page, 8 concurrent requests",340,8.138125
+"MCP as-of first page, 8 concurrent requests",343,6.154792
+"MCP as-of first page, 8 concurrent requests",344,6.053917
+"MCP as-of first page, 8 concurrent requests",345,6.087917
+"MCP as-of first page, 8 concurrent requests",346,5.506000
+"MCP as-of first page, 8 concurrent requests",347,4.842584
+"MCP as-of first page, 8 concurrent requests",348,4.731625
+"MCP as-of first page, 8 concurrent requests",349,4.688917
+"MCP as-of first page, 8 concurrent requests",350,5.069042
+"MCP as-of first page, 8 concurrent requests",351,5.701375
+"MCP as-of first page, 8 concurrent requests",353,5.171917
+"MCP as-of first page, 8 concurrent requests",354,5.174333
+"MCP as-of first page, 8 concurrent requests",352,6.983375
+"MCP as-of first page, 8 concurrent requests",355,5.744167
+"MCP as-of first page, 8 concurrent requests",356,7.362875
+"MCP as-of first page, 8 concurrent requests",357,7.744917
+"MCP as-of first page, 8 concurrent requests",358,7.367417
+"MCP as-of first page, 8 concurrent requests",359,6.968250
+"MCP as-of first page, 8 concurrent requests",361,6.336375
+"MCP as-of first page, 8 concurrent requests",360,7.495208
+"MCP as-of first page, 8 concurrent requests",362,6.878125
+"MCP as-of first page, 8 concurrent requests",363,6.868833
+"MCP as-of first page, 8 concurrent requests",364,5.302750
+"MCP as-of first page, 8 concurrent requests",365,4.912250
+"MCP as-of first page, 8 concurrent requests",366,4.853625
+"MCP as-of first page, 8 concurrent requests",369,3.775667
+"MCP as-of first page, 8 concurrent requests",367,5.545042
+"MCP as-of first page, 8 concurrent requests",370,4.383833
+"MCP as-of first page, 8 concurrent requests",368,6.085042
+"MCP as-of first page, 8 concurrent requests",372,4.896500
+"MCP as-of first page, 8 concurrent requests",374,5.197541
+"MCP as-of first page, 8 concurrent requests",371,7.917208
+"MCP as-of first page, 8 concurrent requests",373,7.493042
+"MCP as-of first page, 8 concurrent requests",376,6.052167
+"MCP as-of first page, 8 concurrent requests",375,7.346542
+"MCP as-of first page, 8 concurrent requests",377,6.767667
+"MCP as-of first page, 8 concurrent requests",378,6.783625
+"MCP as-of first page, 8 concurrent requests",379,6.318667
+"MCP as-of first page, 8 concurrent requests",380,5.489542
+"MCP as-of first page, 8 concurrent requests",381,5.057500
+"MCP as-of first page, 8 concurrent requests",382,4.883792
+"MCP as-of first page, 8 concurrent requests",383,5.378333
+"MCP as-of first page, 8 concurrent requests",385,4.723416
+"MCP as-of first page, 8 concurrent requests",384,5.972750
+"MCP as-of first page, 8 concurrent requests",386,5.370375
+"MCP as-of first page, 8 concurrent requests",387,5.706833
+"MCP as-of first page, 8 concurrent requests",390,4.592375
+"MCP as-of first page, 8 concurrent requests",388,6.310958
+"MCP as-of first page, 8 concurrent requests",389,7.865375
+"MCP as-of first page, 8 concurrent requests",392,6.396041
+"MCP as-of first page, 8 concurrent requests",391,7.710208
+"MCP as-of first page, 8 concurrent requests",393,7.104958
+"MCP as-of first page, 8 concurrent requests",394,7.092500
+"MCP as-of first page, 8 concurrent requests",397,5.477708
+"MCP as-of first page, 8 concurrent requests",395,7.171917
+"MCP as-of first page, 8 concurrent requests",396,7.098875
+"MCP as-of first page, 8 concurrent requests",398,4.927167
+"MCP as-of first page, 8 concurrent requests",399,4.608625
+"HTTP durable single insert",0,4.298750
+"HTTP durable single insert",1,2.920834
+"HTTP durable single insert",2,3.168750
+"HTTP durable single insert",3,4.937458
+"HTTP durable single insert",4,3.909500
+"HTTP durable single insert",5,3.902208
+"HTTP durable single insert",6,3.872833
+"HTTP durable single insert",7,3.954959
+"HTTP durable single insert",8,3.363291
+"HTTP durable single insert",9,3.653125
+"HTTP durable single insert",10,3.568125
+"HTTP durable single insert",11,3.459791
+"HTTP durable single insert",12,4.456666
+"HTTP durable single insert",13,3.650667
+"HTTP durable single insert",14,3.916167
+"HTTP durable single insert",15,4.066791
+"HTTP durable single insert",16,2.905292
+"HTTP durable single insert",17,4.006666
+"HTTP durable single insert",18,4.315000
+"HTTP durable single insert",19,3.624000
+"HTTP durable single insert",20,3.944291
+"HTTP durable single insert",21,4.024750
+"HTTP durable single insert",22,3.984334
+"HTTP durable single insert",23,4.032834
+"HTTP durable single insert",24,3.965041
+"HTTP durable single insert",25,4.085208
+"HTTP durable single insert",26,3.924875
+"HTTP durable single insert",27,4.038500
+"HTTP durable single insert",28,3.945625
+"HTTP durable single insert",29,3.991167
+"HTTP durable single insert",30,3.996167
+"HTTP durable single insert",31,4.030792
+"HTTP durable single insert",32,4.085334
+"HTTP durable single insert",33,3.965000
+"HTTP durable single insert",34,4.085542
+"HTTP durable single insert",35,3.005709
+"HTTP durable single insert",36,3.899209
+"HTTP durable single insert",37,4.012166
+"HTTP durable single insert",38,4.305042
+"HTTP durable single insert",39,3.775166
+"HTTP durable single insert",40,4.145625
+"HTTP durable single insert",41,4.021417
+"HTTP durable single insert",42,4.221166
+"HTTP durable single insert",43,3.832791
+"HTTP durable single insert",44,3.939458
+"HTTP durable single insert",45,2.971458
+"HTTP durable single insert",46,4.402500
+"HTTP durable single insert",47,4.620208
+"HTTP durable single insert",48,4.109250
+"HTTP durable single insert",49,4.065709
+"HTTP durable single insert",50,4.831584
+"HTTP durable single insert",51,3.985250
+"HTTP durable single insert",52,3.883125
+"HTTP durable single insert",53,4.043583
+"HTTP durable single insert",54,3.521958
+"HTTP durable single insert",55,4.843292
+"HTTP durable single insert",56,4.704416
+"HTTP durable single insert",57,3.927459
+"HTTP durable single insert",58,3.191667
+"HTTP durable single insert",59,3.851542
+"HTTP durable single insert",60,4.275542
+"HTTP durable single insert",61,4.922292
+"HTTP durable single insert",62,5.255167
+"HTTP durable single insert",63,4.583667
+"HTTP durable single insert",64,3.939458
+"HTTP durable single insert",65,6.186916
+"HTTP durable single insert",66,3.730291
+"HTTP durable single insert",67,4.219500
+"HTTP durable single insert",68,3.684458
+"HTTP durable single insert",69,3.154417
+"HTTP durable single insert",70,4.079417
+"HTTP durable single insert",71,4.049708
+"HTTP durable single insert",72,3.873375
+"HTTP durable single insert",73,4.089916
+"HTTP durable single insert",74,4.073125
+"HTTP durable single insert",75,3.907250
+"HTTP durable single insert",76,4.153375
+"HTTP durable single insert",77,3.822833
+"HTTP durable single insert",78,4.049542
+"HTTP durable single insert",79,4.069584
+"HTTP durable single insert",80,3.934416
+"HTTP durable single insert",81,3.931750
+"HTTP durable single insert",82,4.016709
+"HTTP durable single insert",83,4.164292
+"HTTP durable single insert",84,4.000666
+"HTTP durable single insert",85,4.062416
+"HTTP durable single insert",86,4.792333
+"HTTP durable single insert",87,4.029542
+"HTTP durable single insert",88,4.048458
+"HTTP durable single insert",89,4.078083
+"HTTP durable single insert",90,3.750542
+"HTTP durable single insert",91,4.261709
+"HTTP durable single insert",92,3.880709
+"HTTP durable single insert",93,4.979458
+"HTTP durable single insert",94,4.105791
+"HTTP durable single insert",95,4.877042
+"HTTP durable single insert",96,6.151583
+"HTTP durable single insert",97,5.008708
+"HTTP durable single insert",98,5.347541
+"HTTP durable single insert",99,4.775833
+"HTTP durable single insert",100,4.908292
+"HTTP durable single insert",101,5.070917
+"HTTP durable single insert",102,4.829000
+"HTTP durable single insert",103,5.224750
+"HTTP durable single insert",104,5.053083
+"HTTP durable single insert",105,4.612542
+"HTTP durable single insert",106,4.598042
+"HTTP durable single insert",107,4.376084
+"HTTP durable single insert",108,4.517500
+"HTTP durable single insert",109,4.407958
+"HTTP durable single insert",110,4.077917
+"HTTP durable single insert",111,3.940417
+"HTTP durable single insert",112,11.284292
+"HTTP durable single insert",113,3.832750
+"HTTP durable single insert",114,4.231292
+"HTTP durable single insert",115,4.653125
+"HTTP durable single insert",116,4.356916
+"HTTP durable single insert",117,3.714792
+"HTTP durable single insert",118,5.365542
+"HTTP durable single insert",119,4.706250
+"HTTP durable single insert",120,5.325333
+"HTTP durable single insert",121,5.249500
+"HTTP durable single insert",122,5.428125
+"HTTP durable single insert",123,5.240959
+"HTTP durable single insert",124,4.999833
+"HTTP durable single insert",125,4.804833
+"HTTP durable single insert",126,5.026292
+"HTTP durable single insert",127,4.721292
+"HTTP durable single insert",128,3.405792
+"HTTP durable single insert",129,3.835500
+"HTTP durable single insert",130,4.913042
+"HTTP durable single insert",131,3.832792
+"HTTP durable single insert",132,4.893625
+"HTTP durable single insert",133,5.513250
+"HTTP durable single insert",134,5.769292
+"HTTP durable single insert",135,5.327875
+"HTTP durable single insert",136,3.489334
+"HTTP durable single insert",137,4.256083
+"HTTP durable single insert",138,2.878416
+"HTTP durable single insert",139,4.043750
+"HTTP durable single insert",140,5.046125
+"HTTP durable single insert",141,5.547750
+"HTTP durable single insert",142,5.486042
+"HTTP durable single insert",143,3.870834
+"HTTP durable single insert",144,3.931125
+"HTTP durable single insert",145,3.936417
+"HTTP durable single insert",146,2.925083
+"HTTP durable single insert",147,4.119292
+"HTTP durable single insert",148,3.923792
+"HTTP durable single insert",149,4.157875
+"HTTP durable single insert",150,3.836958
+"HTTP durable single insert",151,4.213709
+"HTTP durable single insert",152,3.798041
+"HTTP durable single insert",153,4.417000
+"HTTP durable single insert",154,5.025625
+"HTTP durable single insert",155,4.978334
+"HTTP durable single insert",156,4.956750
+"HTTP durable single insert",157,3.795042
+"HTTP durable single insert",158,5.035209
+"HTTP durable single insert",159,4.875833
+"HTTP durable single insert",160,5.505708
+"HTTP durable single insert",161,4.543583
+"HTTP durable single insert",162,5.196583
+"HTTP durable single insert",163,4.984125
+"HTTP durable single insert",164,4.680750
+"HTTP durable single insert",165,4.363125
+"HTTP durable single insert",166,3.446125
+"HTTP durable single insert",167,4.420208
+"HTTP durable single insert",168,4.796542
+"HTTP durable single insert",169,3.308417
+"HTTP durable single insert",170,4.576000
+"HTTP durable single insert",171,3.294667
+"HTTP durable single insert",172,4.688000
+"HTTP durable single insert",173,4.266750
+"HTTP durable single insert",174,5.043208
+"HTTP durable single insert",175,5.159333
+"HTTP durable single insert",176,4.659417
+"HTTP durable single insert",177,3.888875
+"HTTP durable single insert",178,4.035458
+"HTTP durable single insert",179,4.230666
+"HTTP durable single insert",180,3.684458
+"HTTP durable single insert",181,4.103333
+"HTTP durable single insert",182,3.882167
+"HTTP durable single insert",183,4.471292
+"HTTP durable single insert",184,3.555000
+"HTTP durable single insert",185,3.105875
+"HTTP durable single insert",186,3.871042
+"HTTP durable single insert",187,3.136750
+"HTTP durable single insert",188,3.885333
+"HTTP durable single insert",189,3.037375
+"HTTP durable single insert",190,4.335916
+"HTTP durable single insert",191,4.744334
+"HTTP durable single insert",192,4.236250
+"HTTP durable single insert",193,3.537709
+"HTTP durable single insert",194,4.505416
+"HTTP durable single insert",195,4.532333
+"HTTP durable single insert",196,3.345875
+"HTTP durable single insert",197,4.839625
+"HTTP durable single insert",198,3.991667
+"HTTP durable single insert",199,4.050625
+"HTTP schema catalog (1 relation, 1 migration)",0,0.123417
+"HTTP schema catalog (1 relation, 1 migration)",1,0.170916
+"HTTP schema catalog (1 relation, 1 migration)",2,0.177917
+"HTTP schema catalog (1 relation, 1 migration)",3,0.144375
+"HTTP schema catalog (1 relation, 1 migration)",4,0.118333
+"HTTP schema catalog (1 relation, 1 migration)",5,0.122417
+"HTTP schema catalog (1 relation, 1 migration)",6,0.123167
+"HTTP schema catalog (1 relation, 1 migration)",7,0.138958
+"HTTP schema catalog (1 relation, 1 migration)",8,0.137292
+"HTTP schema catalog (1 relation, 1 migration)",9,0.123750
+"HTTP schema catalog (1 relation, 1 migration)",10,0.129667
+"HTTP schema catalog (1 relation, 1 migration)",11,0.117292
+"HTTP schema catalog (1 relation, 1 migration)",12,0.131833
+"HTTP schema catalog (1 relation, 1 migration)",13,0.434459
+"HTTP schema catalog (1 relation, 1 migration)",14,0.293958
+"HTTP schema catalog (1 relation, 1 migration)",15,0.157291
+"HTTP schema catalog (1 relation, 1 migration)",16,0.145417
+"HTTP schema catalog (1 relation, 1 migration)",17,0.122583
+"HTTP schema catalog (1 relation, 1 migration)",18,0.115291
+"HTTP schema catalog (1 relation, 1 migration)",19,0.111917
+"HTTP schema catalog (1 relation, 1 migration)",20,0.112041
+"HTTP schema catalog (1 relation, 1 migration)",21,0.109625
+"HTTP schema catalog (1 relation, 1 migration)",22,0.123750
+"HTTP schema catalog (1 relation, 1 migration)",23,0.125500
+"HTTP schema catalog (1 relation, 1 migration)",24,0.196500
+"HTTP schema catalog (1 relation, 1 migration)",25,0.117833
+"HTTP schema catalog (1 relation, 1 migration)",26,0.391250
+"HTTP schema catalog (1 relation, 1 migration)",27,0.285667
+"HTTP schema catalog (1 relation, 1 migration)",28,0.134583
+"HTTP schema catalog (1 relation, 1 migration)",29,0.119084
+"HTTP schema catalog (1 relation, 1 migration)",30,0.138208
+"HTTP schema catalog (1 relation, 1 migration)",31,0.115875
+"HTTP schema catalog (1 relation, 1 migration)",32,0.211583
+"HTTP schema catalog (1 relation, 1 migration)",33,0.303125
+"HTTP schema catalog (1 relation, 1 migration)",34,0.195417
+"HTTP schema catalog (1 relation, 1 migration)",35,0.197917
+"HTTP schema catalog (1 relation, 1 migration)",36,0.123750
+"HTTP schema catalog (1 relation, 1 migration)",37,0.124417
+"HTTP schema catalog (1 relation, 1 migration)",38,0.120875
+"HTTP schema catalog (1 relation, 1 migration)",39,0.106916
+"HTTP schema catalog (1 relation, 1 migration)",40,0.109542
+"HTTP schema catalog (1 relation, 1 migration)",41,0.157500
+"HTTP schema catalog (1 relation, 1 migration)",42,0.222708
+"HTTP schema catalog (1 relation, 1 migration)",43,0.172167
+"HTTP schema catalog (1 relation, 1 migration)",44,0.164666
+"HTTP schema catalog (1 relation, 1 migration)",45,0.137833
+"HTTP schema catalog (1 relation, 1 migration)",46,0.148209
+"HTTP schema catalog (1 relation, 1 migration)",47,0.139625
+"HTTP schema catalog (1 relation, 1 migration)",48,0.153792
+"HTTP schema catalog (1 relation, 1 migration)",49,0.130792
+"HTTP schema catalog (1 relation, 1 migration)",50,0.136834
+"HTTP schema catalog (1 relation, 1 migration)",51,0.132291
+"HTTP schema catalog (1 relation, 1 migration)",52,0.133625
+"HTTP schema catalog (1 relation, 1 migration)",53,0.142709
+"HTTP schema catalog (1 relation, 1 migration)",54,0.156584
+"HTTP schema catalog (1 relation, 1 migration)",55,0.151042
+"HTTP schema catalog (1 relation, 1 migration)",56,0.143542
+"HTTP schema catalog (1 relation, 1 migration)",57,0.131833
+"HTTP schema catalog (1 relation, 1 migration)",58,0.131416
+"HTTP schema catalog (1 relation, 1 migration)",59,0.139500
+"HTTP schema catalog (1 relation, 1 migration)",60,0.129750
+"HTTP schema catalog (1 relation, 1 migration)",61,0.145167
+"HTTP schema catalog (1 relation, 1 migration)",62,0.337291
+"HTTP schema catalog (1 relation, 1 migration)",63,0.179875
+"HTTP schema catalog (1 relation, 1 migration)",64,0.151125
+"HTTP schema catalog (1 relation, 1 migration)",65,0.620709
+"HTTP schema catalog (1 relation, 1 migration)",66,0.527375
+"HTTP schema catalog (1 relation, 1 migration)",67,0.244667
+"HTTP schema catalog (1 relation, 1 migration)",68,0.158750
+"HTTP schema catalog (1 relation, 1 migration)",69,0.178083
+"HTTP schema catalog (1 relation, 1 migration)",70,0.166042
+"HTTP schema catalog (1 relation, 1 migration)",71,0.142917
+"HTTP schema catalog (1 relation, 1 migration)",72,0.140250
+"HTTP schema catalog (1 relation, 1 migration)",73,0.137833
+"HTTP schema catalog (1 relation, 1 migration)",74,0.258792
+"HTTP schema catalog (1 relation, 1 migration)",75,0.167333
+"HTTP schema catalog (1 relation, 1 migration)",76,0.161834
+"HTTP schema catalog (1 relation, 1 migration)",77,0.146667
+"HTTP schema catalog (1 relation, 1 migration)",78,0.147375
+"HTTP schema catalog (1 relation, 1 migration)",79,0.138708
+"HTTP schema catalog (1 relation, 1 migration)",80,0.131584
+"HTTP schema catalog (1 relation, 1 migration)",81,0.122125
+"HTTP schema catalog (1 relation, 1 migration)",82,0.129333
+"HTTP schema catalog (1 relation, 1 migration)",83,0.145167
+"HTTP schema catalog (1 relation, 1 migration)",84,0.141625
+"HTTP schema catalog (1 relation, 1 migration)",85,0.131792
+"HTTP schema catalog (1 relation, 1 migration)",86,0.130667
+"HTTP schema catalog (1 relation, 1 migration)",87,0.128833
+"HTTP schema catalog (1 relation, 1 migration)",88,0.131500
+"HTTP schema catalog (1 relation, 1 migration)",89,0.127750
+"HTTP schema catalog (1 relation, 1 migration)",90,0.126375
+"HTTP schema catalog (1 relation, 1 migration)",91,0.125541
+"HTTP schema catalog (1 relation, 1 migration)",92,0.145333
+"HTTP schema catalog (1 relation, 1 migration)",93,0.122708
+"HTTP schema catalog (1 relation, 1 migration)",94,0.118250
+"HTTP schema catalog (1 relation, 1 migration)",95,0.119792
+"HTTP schema catalog (1 relation, 1 migration)",96,0.119625
+"HTTP schema catalog (1 relation, 1 migration)",97,0.143791
+"HTTP schema catalog (1 relation, 1 migration)",98,0.142958
+"HTTP schema catalog (1 relation, 1 migration)",99,0.127375
+"HTTP schema catalog (1 relation, 1 migration)",100,0.123625
+"HTTP schema catalog (1 relation, 1 migration)",101,0.145000
+"HTTP schema catalog (1 relation, 1 migration)",102,0.139541
+"HTTP schema catalog (1 relation, 1 migration)",103,0.130541
+"HTTP schema catalog (1 relation, 1 migration)",104,0.126958
+"HTTP schema catalog (1 relation, 1 migration)",105,0.122708
+"HTTP schema catalog (1 relation, 1 migration)",106,0.124708
+"HTTP schema catalog (1 relation, 1 migration)",107,0.118792
+"HTTP schema catalog (1 relation, 1 migration)",108,0.121667
+"HTTP schema catalog (1 relation, 1 migration)",109,0.154083
+"HTTP schema catalog (1 relation, 1 migration)",110,0.122750
+"HTTP schema catalog (1 relation, 1 migration)",111,0.126125
+"HTTP schema catalog (1 relation, 1 migration)",112,0.124375
+"HTTP schema catalog (1 relation, 1 migration)",113,0.130625
+"HTTP schema catalog (1 relation, 1 migration)",114,0.141375
+"HTTP schema catalog (1 relation, 1 migration)",115,0.145208
+"HTTP schema catalog (1 relation, 1 migration)",116,0.120791
+"HTTP schema catalog (1 relation, 1 migration)",117,0.137125
+"HTTP schema catalog (1 relation, 1 migration)",118,0.201542
+"HTTP schema catalog (1 relation, 1 migration)",119,0.188000
+"HTTP schema catalog (1 relation, 1 migration)",120,0.258833
+"HTTP schema catalog (1 relation, 1 migration)",121,0.177041
+"HTTP schema catalog (1 relation, 1 migration)",122,0.140583
+"HTTP schema catalog (1 relation, 1 migration)",123,0.149292
+"HTTP schema catalog (1 relation, 1 migration)",124,0.127125
+"HTTP schema catalog (1 relation, 1 migration)",125,0.126917
+"HTTP schema catalog (1 relation, 1 migration)",126,0.118417
+"HTTP schema catalog (1 relation, 1 migration)",127,1.260792
+"HTTP schema catalog (1 relation, 1 migration)",128,0.157334
+"HTTP schema catalog (1 relation, 1 migration)",129,0.134625
+"HTTP schema catalog (1 relation, 1 migration)",130,0.145500
+"HTTP schema catalog (1 relation, 1 migration)",131,0.139375
+"HTTP schema catalog (1 relation, 1 migration)",132,0.168000
+"HTTP schema catalog (1 relation, 1 migration)",133,0.129791
+"HTTP schema catalog (1 relation, 1 migration)",134,0.132334
+"HTTP schema catalog (1 relation, 1 migration)",135,0.135541
+"HTTP schema catalog (1 relation, 1 migration)",136,0.133792
+"HTTP schema catalog (1 relation, 1 migration)",137,0.137334
+"HTTP schema catalog (1 relation, 1 migration)",138,0.150209
+"HTTP schema catalog (1 relation, 1 migration)",139,0.141958
+"HTTP schema catalog (1 relation, 1 migration)",140,0.142833
+"HTTP schema catalog (1 relation, 1 migration)",141,0.133292
+"HTTP schema catalog (1 relation, 1 migration)",142,0.124167
+"HTTP schema catalog (1 relation, 1 migration)",143,0.131334
+"HTTP schema catalog (1 relation, 1 migration)",144,0.124041
+"HTTP schema catalog (1 relation, 1 migration)",145,0.126708
+"HTTP schema catalog (1 relation, 1 migration)",146,0.129417
+"HTTP schema catalog (1 relation, 1 migration)",147,0.123708
+"HTTP schema catalog (1 relation, 1 migration)",148,0.125208
+"HTTP schema catalog (1 relation, 1 migration)",149,0.128667
+"HTTP schema catalog (1 relation, 1 migration)",150,0.126375
+"HTTP schema catalog (1 relation, 1 migration)",151,0.124958
+"HTTP schema catalog (1 relation, 1 migration)",152,0.122250
+"HTTP schema catalog (1 relation, 1 migration)",153,0.127542
+"HTTP schema catalog (1 relation, 1 migration)",154,0.124541
+"HTTP schema catalog (1 relation, 1 migration)",155,0.125125
+"HTTP schema catalog (1 relation, 1 migration)",156,0.127791
+"HTTP schema catalog (1 relation, 1 migration)",157,0.130542
+"HTTP schema catalog (1 relation, 1 migration)",158,0.139416
+"HTTP schema catalog (1 relation, 1 migration)",159,0.122542
+"HTTP schema catalog (1 relation, 1 migration)",160,0.134583
+"HTTP schema catalog (1 relation, 1 migration)",161,0.144584
+"HTTP schema catalog (1 relation, 1 migration)",162,0.134750
+"HTTP schema catalog (1 relation, 1 migration)",163,0.145083
+"HTTP schema catalog (1 relation, 1 migration)",164,0.133375
+"HTTP schema catalog (1 relation, 1 migration)",165,0.133459
+"HTTP schema catalog (1 relation, 1 migration)",166,0.148334
+"HTTP schema catalog (1 relation, 1 migration)",167,0.175375
+"HTTP schema catalog (1 relation, 1 migration)",168,0.131666
+"HTTP schema catalog (1 relation, 1 migration)",169,0.195375
+"HTTP schema catalog (1 relation, 1 migration)",170,0.132708
+"HTTP schema catalog (1 relation, 1 migration)",171,0.126958
+"HTTP schema catalog (1 relation, 1 migration)",172,0.142125
+"HTTP schema catalog (1 relation, 1 migration)",173,0.131333
+"HTTP schema catalog (1 relation, 1 migration)",174,0.133292
+"HTTP schema catalog (1 relation, 1 migration)",175,0.132458
+"HTTP schema catalog (1 relation, 1 migration)",176,0.130250
+"HTTP schema catalog (1 relation, 1 migration)",177,0.126875
+"HTTP schema catalog (1 relation, 1 migration)",178,0.155958
+"HTTP schema catalog (1 relation, 1 migration)",179,0.140583
+"HTTP schema catalog (1 relation, 1 migration)",180,0.132000
+"HTTP schema catalog (1 relation, 1 migration)",181,0.131708
+"HTTP schema catalog (1 relation, 1 migration)",182,0.134958
+"HTTP schema catalog (1 relation, 1 migration)",183,0.139333
+"HTTP schema catalog (1 relation, 1 migration)",184,0.136917
+"HTTP schema catalog (1 relation, 1 migration)",185,0.137875
+"HTTP schema catalog (1 relation, 1 migration)",186,0.146542
+"HTTP schema catalog (1 relation, 1 migration)",187,0.127583
+"HTTP schema catalog (1 relation, 1 migration)",188,0.131875
+"HTTP schema catalog (1 relation, 1 migration)",189,0.133209
+"HTTP schema catalog (1 relation, 1 migration)",190,0.133542
+"HTTP schema catalog (1 relation, 1 migration)",191,0.142167
+"HTTP schema catalog (1 relation, 1 migration)",192,0.134209
+"HTTP schema catalog (1 relation, 1 migration)",193,0.134459
+"HTTP schema catalog (1 relation, 1 migration)",194,0.146750
+"HTTP schema catalog (1 relation, 1 migration)",195,0.131334
+"HTTP schema catalog (1 relation, 1 migration)",196,0.164875
+"HTTP schema catalog (1 relation, 1 migration)",197,0.126959
+"HTTP schema catalog (1 relation, 1 migration)",198,0.138583
+"HTTP schema catalog (1 relation, 1 migration)",199,0.136416
+"HTTP schema preview (metadata-only)",0,0.191042
+"HTTP schema preview (metadata-only)",1,0.177625
+"HTTP schema preview (metadata-only)",2,0.151834
+"HTTP schema preview (metadata-only)",3,0.200208
+"HTTP schema preview (metadata-only)",4,0.265667
+"HTTP schema preview (metadata-only)",5,0.136083
+"HTTP schema preview (metadata-only)",6,0.143542
+"HTTP schema preview (metadata-only)",7,0.138834
+"HTTP schema preview (metadata-only)",8,0.127333
+"HTTP schema preview (metadata-only)",9,0.178417
+"HTTP schema preview (metadata-only)",10,0.461166
+"HTTP schema preview (metadata-only)",11,0.165958
+"HTTP schema preview (metadata-only)",12,0.148084
+"HTTP schema preview (metadata-only)",13,0.135708
+"HTTP schema preview (metadata-only)",14,0.140916
+"HTTP schema preview (metadata-only)",15,0.136542
+"HTTP schema preview (metadata-only)",16,0.131500
+"HTTP schema preview (metadata-only)",17,0.137417
+"HTTP schema preview (metadata-only)",18,0.128667
+"HTTP schema preview (metadata-only)",19,0.133041
+"HTTP schema preview (metadata-only)",20,0.143959
+"HTTP schema preview (metadata-only)",21,0.135791
+"HTTP schema preview (metadata-only)",22,0.137834
+"HTTP schema preview (metadata-only)",23,0.138167
+"HTTP schema preview (metadata-only)",24,0.155000
+"HTTP schema preview (metadata-only)",25,0.115916
+"HTTP schema preview (metadata-only)",26,0.105334
+"HTTP schema preview (metadata-only)",27,0.126083
+"HTTP schema preview (metadata-only)",28,0.119542
+"HTTP schema preview (metadata-only)",29,0.113792
+"HTTP schema preview (metadata-only)",30,0.126583
+"HTTP schema preview (metadata-only)",31,0.127334
+"HTTP schema preview (metadata-only)",32,0.113959
+"HTTP schema preview (metadata-only)",33,0.116250
+"HTTP schema preview (metadata-only)",34,0.114833
+"HTTP schema preview (metadata-only)",35,0.129625
+"HTTP schema preview (metadata-only)",36,0.116958
+"HTTP schema preview (metadata-only)",37,0.111291
+"HTTP schema preview (metadata-only)",38,0.111791
+"HTTP schema preview (metadata-only)",39,0.156958
+"HTTP schema preview (metadata-only)",40,0.306500
+"HTTP schema preview (metadata-only)",41,0.312708
+"HTTP schema preview (metadata-only)",42,0.128625
+"HTTP schema preview (metadata-only)",43,0.113167
+"HTTP schema preview (metadata-only)",44,1.573917
+"HTTP schema preview (metadata-only)",45,0.218084
+"HTTP schema preview (metadata-only)",46,0.134166
+"HTTP schema preview (metadata-only)",47,0.136625
+"HTTP schema preview (metadata-only)",48,0.131458
+"HTTP schema preview (metadata-only)",49,0.135292
+"HTTP schema preview (metadata-only)",50,0.134458
+"HTTP schema preview (metadata-only)",51,0.125209
+"HTTP schema preview (metadata-only)",52,0.119416
+"HTTP schema preview (metadata-only)",53,0.118542
+"HTTP schema preview (metadata-only)",54,0.132958
+"HTTP schema preview (metadata-only)",55,0.186958
+"HTTP schema preview (metadata-only)",56,0.183250
+"HTTP schema preview (metadata-only)",57,0.256333
+"HTTP schema preview (metadata-only)",58,0.173375
+"HTTP schema preview (metadata-only)",59,0.484291
+"HTTP schema preview (metadata-only)",60,0.557250
+"HTTP schema preview (metadata-only)",61,0.494167
+"HTTP schema preview (metadata-only)",62,0.357375
+"HTTP schema preview (metadata-only)",63,0.218083
+"HTTP schema preview (metadata-only)",64,0.139084
+"HTTP schema preview (metadata-only)",65,0.165458
+"HTTP schema preview (metadata-only)",66,0.284542
+"HTTP schema preview (metadata-only)",67,0.159708
+"HTTP schema preview (metadata-only)",68,0.139833
+"HTTP schema preview (metadata-only)",69,0.126792
+"HTTP schema preview (metadata-only)",70,0.121500
+"HTTP schema preview (metadata-only)",71,0.140875
+"HTTP schema preview (metadata-only)",72,0.119625
+"HTTP schema preview (metadata-only)",73,0.178291
+"HTTP schema preview (metadata-only)",74,0.115416
+"HTTP schema preview (metadata-only)",75,0.175709
+"HTTP schema preview (metadata-only)",76,0.127875
+"HTTP schema preview (metadata-only)",77,0.142167
+"HTTP schema preview (metadata-only)",78,0.132375
+"HTTP schema preview (metadata-only)",79,0.118209
+"HTTP schema preview (metadata-only)",80,0.118000
+"HTTP schema preview (metadata-only)",81,0.117541
+"HTTP schema preview (metadata-only)",82,0.108833
+"HTTP schema preview (metadata-only)",83,0.112916
+"HTTP schema preview (metadata-only)",84,0.125792
+"HTTP schema preview (metadata-only)",85,0.130041
+"HTTP schema preview (metadata-only)",86,0.127417
+"HTTP schema preview (metadata-only)",87,0.130167
+"HTTP schema preview (metadata-only)",88,0.114500
+"HTTP schema preview (metadata-only)",89,0.118167
+"HTTP schema preview (metadata-only)",90,0.122250
+"HTTP schema preview (metadata-only)",91,0.120042
+"HTTP schema preview (metadata-only)",92,0.122833
+"HTTP schema preview (metadata-only)",93,0.121000
+"HTTP schema preview (metadata-only)",94,0.117875
+"HTTP schema preview (metadata-only)",95,0.113916
+"HTTP schema preview (metadata-only)",96,0.135667
+"HTTP schema preview (metadata-only)",97,0.249250
+"HTTP schema preview (metadata-only)",98,0.305791
+"HTTP schema preview (metadata-only)",99,0.177208
+"HTTP schema preview (metadata-only)",100,0.189541
+"HTTP schema preview (metadata-only)",101,0.120958
+"HTTP schema preview (metadata-only)",102,0.111708
+"HTTP schema preview (metadata-only)",103,0.115125
+"HTTP schema preview (metadata-only)",104,0.109333
+"HTTP schema preview (metadata-only)",105,0.106625
+"HTTP schema preview (metadata-only)",106,0.109667
+"HTTP schema preview (metadata-only)",107,0.109416
+"HTTP schema preview (metadata-only)",108,0.122375
+"HTTP schema preview (metadata-only)",109,0.125667
+"HTTP schema preview (metadata-only)",110,0.119667
+"HTTP schema preview (metadata-only)",111,0.121959
+"HTTP schema preview (metadata-only)",112,0.114375
+"HTTP schema preview (metadata-only)",113,0.115083
+"HTTP schema preview (metadata-only)",114,0.126917
+"HTTP schema preview (metadata-only)",115,0.124125
+"HTTP schema preview (metadata-only)",116,0.125917
+"HTTP schema preview (metadata-only)",117,0.122833
+"HTTP schema preview (metadata-only)",118,0.119666
+"HTTP schema preview (metadata-only)",119,0.123542
+"HTTP schema preview (metadata-only)",120,0.114791
+"HTTP schema preview (metadata-only)",121,0.120084
+"HTTP schema preview (metadata-only)",122,0.123750
+"HTTP schema preview (metadata-only)",123,0.120125
+"HTTP schema preview (metadata-only)",124,0.121000
+"HTTP schema preview (metadata-only)",125,0.135541
+"HTTP schema preview (metadata-only)",126,0.115292
+"HTTP schema preview (metadata-only)",127,0.120292
+"HTTP schema preview (metadata-only)",128,0.124375
+"HTTP schema preview (metadata-only)",129,0.124750
+"HTTP schema preview (metadata-only)",130,0.114500
+"HTTP schema preview (metadata-only)",131,0.124709
+"HTTP schema preview (metadata-only)",132,0.120666
+"HTTP schema preview (metadata-only)",133,0.123792
+"HTTP schema preview (metadata-only)",134,0.116959
+"HTTP schema preview (metadata-only)",135,0.116042
+"HTTP schema preview (metadata-only)",136,0.108666
+"HTTP schema preview (metadata-only)",137,0.115542
+"HTTP schema preview (metadata-only)",138,0.122667
+"HTTP schema preview (metadata-only)",139,0.113875
+"HTTP schema preview (metadata-only)",140,0.118625
+"HTTP schema preview (metadata-only)",141,0.112250
+"HTTP schema preview (metadata-only)",142,0.119291
+"HTTP schema preview (metadata-only)",143,0.157958
+"HTTP schema preview (metadata-only)",144,0.120291
+"HTTP schema preview (metadata-only)",145,0.123708
+"HTTP schema preview (metadata-only)",146,0.140041
+"HTTP schema preview (metadata-only)",147,0.154167
+"HTTP schema preview (metadata-only)",148,0.140042
+"HTTP schema preview (metadata-only)",149,0.127166
+"HTTP schema preview (metadata-only)",150,0.129625
+"HTTP schema preview (metadata-only)",151,0.132542
+"HTTP schema preview (metadata-only)",152,0.126083
+"HTTP schema preview (metadata-only)",153,0.142458
+"HTTP schema preview (metadata-only)",154,0.127209
+"HTTP schema preview (metadata-only)",155,0.119250
+"HTTP schema preview (metadata-only)",156,0.145292
+"HTTP schema preview (metadata-only)",157,0.127000
+"HTTP schema preview (metadata-only)",158,0.139458
+"HTTP schema preview (metadata-only)",159,0.221500
+"HTTP schema preview (metadata-only)",160,0.148042
+"HTTP schema preview (metadata-only)",161,0.136959
+"HTTP schema preview (metadata-only)",162,0.190917
+"HTTP schema preview (metadata-only)",163,0.156708
+"HTTP schema preview (metadata-only)",164,0.700208
+"HTTP schema preview (metadata-only)",165,0.194000
+"HTTP schema preview (metadata-only)",166,0.187792
+"HTTP schema preview (metadata-only)",167,0.159625
+"HTTP schema preview (metadata-only)",168,0.207458
+"HTTP schema preview (metadata-only)",169,0.139875
+"HTTP schema preview (metadata-only)",170,0.149000
+"HTTP schema preview (metadata-only)",171,0.134458
+"HTTP schema preview (metadata-only)",172,0.156875
+"HTTP schema preview (metadata-only)",173,0.138708
+"HTTP schema preview (metadata-only)",174,0.136792
+"HTTP schema preview (metadata-only)",175,0.133208
+"HTTP schema preview (metadata-only)",176,0.136792
+"HTTP schema preview (metadata-only)",177,0.131875
+"HTTP schema preview (metadata-only)",178,0.137042
+"HTTP schema preview (metadata-only)",179,0.153125
+"HTTP schema preview (metadata-only)",180,0.144500
+"HTTP schema preview (metadata-only)",181,0.143958
+"HTTP schema preview (metadata-only)",182,0.174583
+"HTTP schema preview (metadata-only)",183,0.162792
+"HTTP schema preview (metadata-only)",184,0.147333
+"HTTP schema preview (metadata-only)",185,0.142916
+"HTTP schema preview (metadata-only)",186,0.138917
+"HTTP schema preview (metadata-only)",187,0.137166
+"HTTP schema preview (metadata-only)",188,0.133042
+"HTTP schema preview (metadata-only)",189,1.200750
+"HTTP schema preview (metadata-only)",190,0.155667
+"HTTP schema preview (metadata-only)",191,0.128791
+"HTTP schema preview (metadata-only)",192,0.153875
+"HTTP schema preview (metadata-only)",193,0.116500
+"HTTP schema preview (metadata-only)",194,0.114709
+"HTTP schema preview (metadata-only)",195,0.114375
+"HTTP schema preview (metadata-only)",196,0.129417
+"HTTP schema preview (metadata-only)",197,0.212750
+"HTTP schema preview (metadata-only)",198,0.121792
+"HTTP schema preview (metadata-only)",199,0.113458
+"HTTP typed as-of first page (1000 rows)",0,3.148208
+"HTTP typed as-of first page (1000 rows)",1,3.971834
+"HTTP typed as-of first page (1000 rows)",2,4.514208
+"HTTP typed as-of first page (1000 rows)",3,4.092250
+"HTTP typed as-of first page (1000 rows)",4,3.135291
+"HTTP typed as-of first page (1000 rows)",5,3.406083
+"HTTP typed as-of first page (1000 rows)",6,2.965250
+"HTTP typed as-of first page (1000 rows)",7,2.753583
+"HTTP typed as-of first page (1000 rows)",8,3.612583
+"HTTP typed as-of first page (1000 rows)",9,2.634875
+"HTTP typed as-of first page (1000 rows)",10,2.608458
+"HTTP typed as-of first page (1000 rows)",11,2.777750
+"HTTP typed as-of first page (1000 rows)",12,2.530917
+"HTTP typed as-of first page (1000 rows)",13,2.524708
+"HTTP typed as-of first page (1000 rows)",14,2.684417
+"HTTP typed as-of first page (1000 rows)",15,2.556250
+"HTTP typed as-of first page (1000 rows)",16,2.472458
+"HTTP typed as-of first page (1000 rows)",17,3.056167
+"HTTP typed as-of first page (1000 rows)",18,2.684542
+"HTTP typed as-of first page (1000 rows)",19,2.694708
+"HTTP typed as-of first page (1000 rows)",20,3.293042
+"HTTP typed as-of first page (1000 rows)",21,2.722084
+"HTTP typed as-of first page (1000 rows)",22,2.646166
+"HTTP typed as-of first page (1000 rows)",23,2.680834
+"HTTP typed as-of first page (1000 rows)",24,2.577708
+"HTTP typed as-of first page (1000 rows)",25,2.500833
+"HTTP typed as-of first page (1000 rows)",26,2.767833
+"HTTP typed as-of first page (1000 rows)",27,2.786583
+"HTTP typed as-of first page (1000 rows)",28,2.775917
+"HTTP typed as-of first page (1000 rows)",29,2.928875
+"HTTP typed as-of first page (1000 rows)",30,2.624083
+"HTTP typed as-of first page (1000 rows)",31,2.543042
+"HTTP typed as-of first page (1000 rows)",32,2.695959
+"HTTP typed as-of first page (1000 rows)",33,2.713792
+"HTTP typed as-of first page (1000 rows)",34,2.465250
+"HTTP typed as-of first page (1000 rows)",35,2.975375
+"HTTP typed as-of first page (1000 rows)",36,2.902042
+"HTTP typed as-of first page (1000 rows)",37,2.757250
+"HTTP typed as-of first page (1000 rows)",38,2.731417
+"HTTP typed as-of first page (1000 rows)",39,2.811250
+"HTTP typed as-of first page (1000 rows)",40,2.594625
+"HTTP typed as-of first page (1000 rows)",41,2.648125
+"HTTP typed as-of first page (1000 rows)",42,3.084250
+"HTTP typed as-of first page (1000 rows)",43,2.742458
+"HTTP typed as-of first page (1000 rows)",44,2.877958
+"HTTP typed as-of first page (1000 rows)",45,2.565375
+"HTTP typed as-of first page (1000 rows)",46,2.573750
+"HTTP typed as-of first page (1000 rows)",47,2.676834
+"HTTP typed as-of first page (1000 rows)",48,2.770334
+"HTTP typed as-of first page (1000 rows)",49,2.562417
+"HTTP typed as-of first page (1000 rows)",50,2.624667
+"HTTP typed as-of first page (1000 rows)",51,2.637958
+"HTTP typed as-of first page (1000 rows)",52,2.750917
+"HTTP typed as-of first page (1000 rows)",53,2.703084
+"HTTP typed as-of first page (1000 rows)",54,2.845083
+"HTTP typed as-of first page (1000 rows)",55,2.556500
+"HTTP typed as-of first page (1000 rows)",56,2.546916
+"HTTP typed as-of first page (1000 rows)",57,2.803250
+"HTTP typed as-of first page (1000 rows)",58,2.537583
+"HTTP typed as-of first page (1000 rows)",59,2.691083
+"HTTP typed as-of first page (1000 rows)",60,2.730000
+"HTTP typed as-of first page (1000 rows)",61,2.491834
+"HTTP typed as-of first page (1000 rows)",62,2.458042
+"HTTP typed as-of first page (1000 rows)",63,2.912292
+"HTTP typed as-of first page (1000 rows)",64,2.654583
+"HTTP typed as-of first page (1000 rows)",65,2.634959
+"HTTP typed as-of first page (1000 rows)",66,2.721834
+"HTTP typed as-of first page (1000 rows)",67,2.623500
+"HTTP typed as-of first page (1000 rows)",68,2.469875
+"HTTP typed as-of first page (1000 rows)",69,2.474958
+"HTTP typed as-of first page (1000 rows)",70,2.585166
+"HTTP typed as-of first page (1000 rows)",71,2.442291
+"HTTP typed as-of first page (1000 rows)",72,2.473000
+"HTTP typed as-of first page (1000 rows)",73,2.586833
+"HTTP typed as-of first page (1000 rows)",74,2.460208
+"HTTP typed as-of first page (1000 rows)",75,2.682209
+"HTTP typed as-of first page (1000 rows)",76,2.730792
+"HTTP typed as-of first page (1000 rows)",77,2.483875
+"HTTP typed as-of first page (1000 rows)",78,2.458041
+"HTTP typed as-of first page (1000 rows)",79,3.409916
+"HTTP typed as-of first page (1000 rows)",80,2.612334
+"HTTP typed as-of first page (1000 rows)",81,2.763917
+"HTTP typed as-of first page (1000 rows)",82,2.805583
+"HTTP typed as-of first page (1000 rows)",83,2.729208
+"HTTP typed as-of first page (1000 rows)",84,2.521958
+"HTTP typed as-of first page (1000 rows)",85,2.718459
+"HTTP typed as-of first page (1000 rows)",86,2.574958
+"HTTP typed as-of first page (1000 rows)",87,3.588541
+"HTTP typed as-of first page (1000 rows)",88,2.631583
+"HTTP typed as-of first page (1000 rows)",89,2.492125
+"HTTP typed as-of first page (1000 rows)",90,2.569500
+"HTTP typed as-of first page (1000 rows)",91,2.469916
+"HTTP typed as-of first page (1000 rows)",92,2.605334
+"HTTP typed as-of first page (1000 rows)",93,2.735750
+"HTTP typed as-of first page (1000 rows)",94,2.816667
+"HTTP typed as-of first page (1000 rows)",95,2.717167
+"HTTP typed as-of first page (1000 rows)",96,2.499958
+"HTTP typed as-of first page (1000 rows)",97,2.484125
+"HTTP typed as-of first page (1000 rows)",98,2.846708
+"HTTP typed as-of first page (1000 rows)",99,2.484875
+"HTTP typed as-of first page (1000 rows)",100,2.691334
+"HTTP typed as-of first page (1000 rows)",101,2.703584
+"HTTP typed as-of first page (1000 rows)",102,2.693417
+"HTTP typed as-of first page (1000 rows)",103,2.512000
+"HTTP typed as-of first page (1000 rows)",104,2.651750
+"HTTP typed as-of first page (1000 rows)",105,2.603083
+"HTTP typed as-of first page (1000 rows)",106,2.732750
+"HTTP typed as-of first page (1000 rows)",107,2.678625
+"HTTP typed as-of first page (1000 rows)",108,2.668916
+"HTTP typed as-of first page (1000 rows)",109,2.503375
+"HTTP typed as-of first page (1000 rows)",110,2.930541
+"HTTP typed as-of first page (1000 rows)",111,2.812000
+"HTTP typed as-of first page (1000 rows)",112,2.785209
+"HTTP typed as-of first page (1000 rows)",113,2.825125
+"HTTP typed as-of first page (1000 rows)",114,2.725375
+"HTTP typed as-of first page (1000 rows)",115,2.638958
+"HTTP typed as-of first page (1000 rows)",116,2.812917
+"HTTP typed as-of first page (1000 rows)",117,2.733083
+"HTTP typed as-of first page (1000 rows)",118,2.551583
+"HTTP typed as-of first page (1000 rows)",119,2.714416
+"HTTP typed as-of first page (1000 rows)",120,2.799209
+"HTTP typed as-of first page (1000 rows)",121,2.723167
+"HTTP typed as-of first page (1000 rows)",122,2.754167
+"HTTP typed as-of first page (1000 rows)",123,2.661375
+"HTTP typed as-of first page (1000 rows)",124,2.622875
+"HTTP typed as-of first page (1000 rows)",125,2.715542
+"HTTP typed as-of first page (1000 rows)",126,2.829000
+"HTTP typed as-of first page (1000 rows)",127,2.511250
+"HTTP typed as-of first page (1000 rows)",128,2.545167
+"HTTP typed as-of first page (1000 rows)",129,2.762708
+"HTTP typed as-of first page (1000 rows)",130,2.536500
+"HTTP typed as-of first page (1000 rows)",131,2.488458
+"HTTP typed as-of first page (1000 rows)",132,2.662959
+"HTTP typed as-of first page (1000 rows)",133,2.630917
+"HTTP typed as-of first page (1000 rows)",134,2.508291
+"HTTP typed as-of first page (1000 rows)",135,2.743375
+"HTTP typed as-of first page (1000 rows)",136,2.552500
+"HTTP typed as-of first page (1000 rows)",137,2.609750
+"HTTP typed as-of first page (1000 rows)",138,2.728916
+"HTTP typed as-of first page (1000 rows)",139,2.594667
+"HTTP typed as-of first page (1000 rows)",140,2.712708
+"HTTP typed as-of first page (1000 rows)",141,2.770333
+"HTTP typed as-of first page (1000 rows)",142,2.658583
+"HTTP typed as-of first page (1000 rows)",143,2.643208
+"HTTP typed as-of first page (1000 rows)",144,2.656042
+"HTTP typed as-of first page (1000 rows)",145,2.643209
+"HTTP typed as-of first page (1000 rows)",146,2.513542
+"HTTP typed as-of first page (1000 rows)",147,2.527875
+"HTTP typed as-of first page (1000 rows)",148,2.648292
+"HTTP typed as-of first page (1000 rows)",149,2.548000
+"HTTP typed as-of first page (1000 rows)",150,2.636333
+"HTTP typed as-of first page (1000 rows)",151,2.633458
+"HTTP typed as-of first page (1000 rows)",152,2.512250
+"HTTP typed as-of first page (1000 rows)",153,2.455500
+"HTTP typed as-of first page (1000 rows)",154,2.614125
+"HTTP typed as-of first page (1000 rows)",155,2.531041
+"HTTP typed as-of first page (1000 rows)",156,2.526917
+"HTTP typed as-of first page (1000 rows)",157,2.488750
+"HTTP typed as-of first page (1000 rows)",158,2.615042
+"HTTP typed as-of first page (1000 rows)",159,2.525792
+"HTTP typed as-of first page (1000 rows)",160,2.510792
+"HTTP typed as-of first page (1000 rows)",161,2.673250
+"HTTP typed as-of first page (1000 rows)",162,2.794083
+"HTTP typed as-of first page (1000 rows)",163,2.505958
+"HTTP typed as-of first page (1000 rows)",164,2.629167
+"HTTP typed as-of first page (1000 rows)",165,2.523375
+"HTTP typed as-of first page (1000 rows)",166,2.455458
+"HTTP typed as-of first page (1000 rows)",167,2.683750
+"HTTP typed as-of first page (1000 rows)",168,2.552959
+"HTTP typed as-of first page (1000 rows)",169,2.568542
+"HTTP typed as-of first page (1000 rows)",170,2.549541
+"HTTP typed as-of first page (1000 rows)",171,2.639833
+"HTTP typed as-of first page (1000 rows)",172,2.534000
+"HTTP typed as-of first page (1000 rows)",173,2.514750
+"HTTP typed as-of first page (1000 rows)",174,2.649500
+"HTTP typed as-of first page (1000 rows)",175,2.486166
+"HTTP typed as-of first page (1000 rows)",176,2.479250
+"HTTP typed as-of first page (1000 rows)",177,2.733500
+"HTTP typed as-of first page (1000 rows)",178,2.478667
+"HTTP typed as-of first page (1000 rows)",179,2.646250
+"HTTP typed as-of first page (1000 rows)",180,2.647917
+"HTTP typed as-of first page (1000 rows)",181,2.660583
+"HTTP typed as-of first page (1000 rows)",182,2.650042
+"HTTP typed as-of first page (1000 rows)",183,2.924375
+"HTTP typed as-of first page (1000 rows)",184,2.817250
+"HTTP typed as-of first page (1000 rows)",185,2.633417
+"HTTP typed as-of first page (1000 rows)",186,2.842584
+"HTTP typed as-of first page (1000 rows)",187,2.778125
+"HTTP typed as-of first page (1000 rows)",188,2.440875
+"HTTP typed as-of first page (1000 rows)",189,2.857917
+"HTTP typed as-of first page (1000 rows)",190,2.748750
+"HTTP typed as-of first page (1000 rows)",191,2.518666
+"HTTP typed as-of first page (1000 rows)",192,2.763042
+"HTTP typed as-of first page (1000 rows)",193,2.509375
+"HTTP typed as-of first page (1000 rows)",194,2.668416
+"HTTP typed as-of first page (1000 rows)",195,2.669459
+"HTTP typed as-of first page (1000 rows)",196,2.598750
+"HTTP typed as-of first page (1000 rows)",197,2.471500
+"HTTP typed as-of first page (1000 rows)",198,2.690333
+"HTTP typed as-of first page (1000 rows)",199,2.800291
+"HTTP typed as-of first page (1000 rows)",200,2.780209
+"HTTP typed as-of first page (1000 rows)",201,2.794875
+"HTTP typed as-of first page (1000 rows)",202,2.709667
+"HTTP typed as-of first page (1000 rows)",203,2.544917
+"HTTP typed as-of first page (1000 rows)",204,2.795500
+"HTTP typed as-of first page (1000 rows)",205,2.677250
+"HTTP typed as-of first page (1000 rows)",206,2.608875
+"HTTP typed as-of first page (1000 rows)",207,2.596750
+"HTTP typed as-of first page (1000 rows)",208,2.789458
+"HTTP typed as-of first page (1000 rows)",209,2.664250
+"HTTP typed as-of first page (1000 rows)",210,2.528750
+"HTTP typed as-of first page (1000 rows)",211,2.588458
+"HTTP typed as-of first page (1000 rows)",212,2.743708
+"HTTP typed as-of first page (1000 rows)",213,2.480375
+"HTTP typed as-of first page (1000 rows)",214,2.626833
+"HTTP typed as-of first page (1000 rows)",215,2.741709
+"HTTP typed as-of first page (1000 rows)",216,2.685625
+"HTTP typed as-of first page (1000 rows)",217,2.556000
+"HTTP typed as-of first page (1000 rows)",218,2.842542
+"HTTP typed as-of first page (1000 rows)",219,2.540875
+"HTTP typed as-of first page (1000 rows)",220,2.543417
+"HTTP typed as-of first page (1000 rows)",221,2.613916
+"HTTP typed as-of first page (1000 rows)",222,2.509666
+"HTTP typed as-of first page (1000 rows)",223,2.508500
+"HTTP typed as-of first page (1000 rows)",224,2.710208
+"HTTP typed as-of first page (1000 rows)",225,2.505708
+"HTTP typed as-of first page (1000 rows)",226,2.450375
+"HTTP typed as-of first page (1000 rows)",227,2.603750
+"HTTP typed as-of first page (1000 rows)",228,2.649375
+"HTTP typed as-of first page (1000 rows)",229,2.708250
+"HTTP typed as-of first page (1000 rows)",230,2.789959
+"HTTP typed as-of first page (1000 rows)",231,2.539792
+"HTTP typed as-of first page (1000 rows)",232,2.513209
+"HTTP typed as-of first page (1000 rows)",233,2.510792
+"HTTP typed as-of first page (1000 rows)",234,2.805042
+"HTTP typed as-of first page (1000 rows)",235,2.519250
+"HTTP typed as-of first page (1000 rows)",236,2.519416
+"HTTP typed as-of first page (1000 rows)",237,2.664500
+"HTTP typed as-of first page (1000 rows)",238,2.573583
+"HTTP typed as-of first page (1000 rows)",239,2.515459
+"HTTP typed as-of first page (1000 rows)",240,2.750416
+"HTTP typed as-of first page (1000 rows)",241,2.607750
+"HTTP typed as-of first page (1000 rows)",242,2.456667
+"HTTP typed as-of first page (1000 rows)",243,2.587916
+"HTTP typed as-of first page (1000 rows)",244,2.620625
+"HTTP typed as-of first page (1000 rows)",245,2.551125
+"HTTP typed as-of first page (1000 rows)",246,2.557542
+"HTTP typed as-of first page (1000 rows)",247,2.812250
+"HTTP typed as-of first page (1000 rows)",248,2.741750
+"HTTP typed as-of first page (1000 rows)",249,2.470750
+"HTTP typed as-of first page (1000 rows)",250,2.803292
+"HTTP typed as-of first page (1000 rows)",251,2.443792
+"HTTP typed as-of first page (1000 rows)",252,2.461417
+"HTTP typed as-of first page (1000 rows)",253,2.955791
+"HTTP typed as-of first page (1000 rows)",254,2.650500
+"HTTP typed as-of first page (1000 rows)",255,2.483167
+"HTTP typed as-of first page (1000 rows)",256,2.649416
+"HTTP typed as-of first page (1000 rows)",257,2.643250
+"HTTP typed as-of first page (1000 rows)",258,2.501500
+"HTTP typed as-of first page (1000 rows)",259,2.648125
+"HTTP typed as-of first page (1000 rows)",260,2.433125
+"HTTP typed as-of first page (1000 rows)",261,2.437000
+"HTTP typed as-of first page (1000 rows)",262,2.562125
+"HTTP typed as-of first page (1000 rows)",263,2.871125
+"HTTP typed as-of first page (1000 rows)",264,2.800208
+"HTTP typed as-of first page (1000 rows)",265,2.898292
+"HTTP typed as-of first page (1000 rows)",266,2.700125
+"HTTP typed as-of first page (1000 rows)",267,2.545833
+"HTTP typed as-of first page (1000 rows)",268,2.563125
+"HTTP typed as-of first page (1000 rows)",269,2.778583
+"HTTP typed as-of first page (1000 rows)",270,2.572083
+"HTTP typed as-of first page (1000 rows)",271,2.754541
+"HTTP typed as-of first page (1000 rows)",272,3.095875
+"HTTP typed as-of first page (1000 rows)",273,2.503000
+"HTTP typed as-of first page (1000 rows)",274,2.464334
+"HTTP typed as-of first page (1000 rows)",275,2.667000
+"HTTP typed as-of first page (1000 rows)",276,2.748500
+"HTTP typed as-of first page (1000 rows)",277,2.667125
+"HTTP typed as-of first page (1000 rows)",278,3.236709
+"HTTP typed as-of first page (1000 rows)",279,2.713666
+"HTTP typed as-of first page (1000 rows)",280,2.738875
+"HTTP typed as-of first page (1000 rows)",281,3.632125
+"HTTP typed as-of first page (1000 rows)",282,2.890083
+"HTTP typed as-of first page (1000 rows)",283,3.154917
+"HTTP typed as-of first page (1000 rows)",284,2.767667
+"HTTP typed as-of first page (1000 rows)",285,2.559875
+"HTTP typed as-of first page (1000 rows)",286,2.868417
+"HTTP typed as-of first page (1000 rows)",287,2.734459
+"HTTP typed as-of first page (1000 rows)",288,2.507667
+"HTTP typed as-of first page (1000 rows)",289,3.162541
+"HTTP typed as-of first page (1000 rows)",290,2.686875
+"HTTP typed as-of first page (1000 rows)",291,2.674750
+"HTTP typed as-of first page (1000 rows)",292,3.102875
+"HTTP typed as-of first page (1000 rows)",293,2.620000
+"HTTP typed as-of first page (1000 rows)",294,2.488167
+"HTTP typed as-of first page (1000 rows)",295,2.708375
+"HTTP typed as-of first page (1000 rows)",296,2.562625
+"HTTP typed as-of first page (1000 rows)",297,2.461417
+"HTTP typed as-of first page (1000 rows)",298,2.510333
+"HTTP typed as-of first page (1000 rows)",299,2.935750
+"MCP typed as-of first page (1000 rows)",0,3.384000
+"MCP typed as-of first page (1000 rows)",1,3.323000
+"MCP typed as-of first page (1000 rows)",2,3.524333
+"MCP typed as-of first page (1000 rows)",3,3.318542
+"MCP typed as-of first page (1000 rows)",4,3.468042
+"MCP typed as-of first page (1000 rows)",5,3.500459
+"MCP typed as-of first page (1000 rows)",6,3.287375
+"MCP typed as-of first page (1000 rows)",7,3.730833
+"MCP typed as-of first page (1000 rows)",8,3.449333
+"MCP typed as-of first page (1000 rows)",9,3.529417
+"MCP typed as-of first page (1000 rows)",10,4.039500
+"MCP typed as-of first page (1000 rows)",11,3.738208
+"MCP typed as-of first page (1000 rows)",12,3.868500
+"MCP typed as-of first page (1000 rows)",13,3.391292
+"MCP typed as-of first page (1000 rows)",14,3.665292
+"MCP typed as-of first page (1000 rows)",15,3.442791
+"MCP typed as-of first page (1000 rows)",16,3.278500
+"MCP typed as-of first page (1000 rows)",17,4.253709
+"MCP typed as-of first page (1000 rows)",18,4.854250
+"MCP typed as-of first page (1000 rows)",19,3.786583
+"MCP typed as-of first page (1000 rows)",20,3.451041
+"MCP typed as-of first page (1000 rows)",21,3.602250
+"MCP typed as-of first page (1000 rows)",22,3.305500
+"MCP typed as-of first page (1000 rows)",23,3.660167
+"MCP typed as-of first page (1000 rows)",24,3.584583
+"MCP typed as-of first page (1000 rows)",25,4.425000
+"MCP typed as-of first page (1000 rows)",26,4.527708
+"MCP typed as-of first page (1000 rows)",27,4.684125
+"MCP typed as-of first page (1000 rows)",28,3.568125
+"MCP typed as-of first page (1000 rows)",29,3.862750
+"MCP typed as-of first page (1000 rows)",30,3.525584
+"MCP typed as-of first page (1000 rows)",31,3.353042
+"MCP typed as-of first page (1000 rows)",32,3.810459
+"MCP typed as-of first page (1000 rows)",33,3.313708
+"MCP typed as-of first page (1000 rows)",34,3.577917
+"MCP typed as-of first page (1000 rows)",35,3.338291
+"MCP typed as-of first page (1000 rows)",36,3.533375
+"MCP typed as-of first page (1000 rows)",37,3.423458
+"MCP typed as-of first page (1000 rows)",38,3.242959
+"MCP typed as-of first page (1000 rows)",39,3.489208
+"MCP typed as-of first page (1000 rows)",40,3.425292
+"MCP typed as-of first page (1000 rows)",41,3.403042
+"MCP typed as-of first page (1000 rows)",42,4.382458
+"MCP typed as-of first page (1000 rows)",43,3.617000
+"MCP typed as-of first page (1000 rows)",44,3.483459
+"MCP typed as-of first page (1000 rows)",45,3.450792
+"MCP typed as-of first page (1000 rows)",46,3.495750
+"MCP typed as-of first page (1000 rows)",47,3.377000
+"MCP typed as-of first page (1000 rows)",48,3.440125
+"MCP typed as-of first page (1000 rows)",49,3.485209
+"MCP typed as-of first page (1000 rows)",50,3.303750
+"MCP typed as-of first page (1000 rows)",51,3.445417
+"MCP typed as-of first page (1000 rows)",52,3.287375
+"MCP typed as-of first page (1000 rows)",53,3.359292
+"MCP typed as-of first page (1000 rows)",54,3.394042
+"MCP typed as-of first page (1000 rows)",55,3.261500
+"MCP typed as-of first page (1000 rows)",56,3.371500
+"MCP typed as-of first page (1000 rows)",57,3.333625
+"MCP typed as-of first page (1000 rows)",58,3.370333
+"MCP typed as-of first page (1000 rows)",59,3.294167
+"MCP typed as-of first page (1000 rows)",60,3.314667
+"MCP typed as-of first page (1000 rows)",61,3.420208
+"MCP typed as-of first page (1000 rows)",62,3.313625
+"MCP typed as-of first page (1000 rows)",63,3.520875
+"MCP typed as-of first page (1000 rows)",64,3.318542
+"MCP typed as-of first page (1000 rows)",65,3.307500
+"MCP typed as-of first page (1000 rows)",66,3.630500
+"MCP typed as-of first page (1000 rows)",67,3.815875
+"MCP typed as-of first page (1000 rows)",68,3.406333
+"MCP typed as-of first page (1000 rows)",69,3.247750
+"MCP typed as-of first page (1000 rows)",70,3.536542
+"MCP typed as-of first page (1000 rows)",71,3.274959
+"MCP typed as-of first page (1000 rows)",72,3.469583
+"MCP typed as-of first page (1000 rows)",73,3.341458
+"MCP typed as-of first page (1000 rows)",74,3.582541
+"MCP typed as-of first page (1000 rows)",75,3.527500
+"MCP typed as-of first page (1000 rows)",76,3.404375
+"MCP typed as-of first page (1000 rows)",77,3.567000
+"MCP typed as-of first page (1000 rows)",78,3.237667
+"MCP typed as-of first page (1000 rows)",79,3.211625
+"MCP typed as-of first page (1000 rows)",80,3.337417
+"MCP typed as-of first page (1000 rows)",81,3.156375
+"MCP typed as-of first page (1000 rows)",82,3.491750
+"MCP typed as-of first page (1000 rows)",83,3.569667
+"MCP typed as-of first page (1000 rows)",84,3.485041
+"MCP typed as-of first page (1000 rows)",85,3.456667
+"MCP typed as-of first page (1000 rows)",86,3.536667
+"MCP typed as-of first page (1000 rows)",87,3.345584
+"MCP typed as-of first page (1000 rows)",88,3.292584
+"MCP typed as-of first page (1000 rows)",89,3.237917
+"MCP typed as-of first page (1000 rows)",90,3.446541
+"MCP typed as-of first page (1000 rows)",91,3.475250
+"MCP typed as-of first page (1000 rows)",92,4.276875
+"MCP typed as-of first page (1000 rows)",93,3.775042
+"MCP typed as-of first page (1000 rows)",94,4.376875
+"MCP typed as-of first page (1000 rows)",95,3.473458
+"MCP typed as-of first page (1000 rows)",96,3.868042
+"MCP typed as-of first page (1000 rows)",97,3.686458
+"MCP typed as-of first page (1000 rows)",98,4.487750
+"MCP typed as-of first page (1000 rows)",99,4.440584
+"MCP typed as-of first page (1000 rows)",100,4.682208
+"MCP typed as-of first page (1000 rows)",101,4.998250
+"MCP typed as-of first page (1000 rows)",102,4.201667
+"MCP typed as-of first page (1000 rows)",103,3.525291
+"MCP typed as-of first page (1000 rows)",104,4.596834
+"MCP typed as-of first page (1000 rows)",105,4.265375
+"MCP typed as-of first page (1000 rows)",106,4.484208
+"MCP typed as-of first page (1000 rows)",107,3.628000
+"MCP typed as-of first page (1000 rows)",108,3.931041
+"MCP typed as-of first page (1000 rows)",109,3.532000
+"MCP typed as-of first page (1000 rows)",110,3.607208
+"MCP typed as-of first page (1000 rows)",111,3.512959
+"MCP typed as-of first page (1000 rows)",112,3.427917
+"MCP typed as-of first page (1000 rows)",113,3.744125
+"MCP typed as-of first page (1000 rows)",114,3.262250
+"MCP typed as-of first page (1000 rows)",115,3.921166
+"MCP typed as-of first page (1000 rows)",116,3.554083
+"MCP typed as-of first page (1000 rows)",117,4.573833
+"MCP typed as-of first page (1000 rows)",118,3.420500
+"MCP typed as-of first page (1000 rows)",119,4.108084
+"MCP typed as-of first page (1000 rows)",120,3.696625
+"MCP typed as-of first page (1000 rows)",121,3.431333
+"MCP typed as-of first page (1000 rows)",122,3.896750
+"MCP typed as-of first page (1000 rows)",123,3.586000
+"MCP typed as-of first page (1000 rows)",124,3.959333
+"MCP typed as-of first page (1000 rows)",125,3.387584
+"MCP typed as-of first page (1000 rows)",126,3.840875
+"MCP typed as-of first page (1000 rows)",127,3.429875
+"MCP typed as-of first page (1000 rows)",128,3.411375
+"MCP typed as-of first page (1000 rows)",129,3.862542
+"MCP typed as-of first page (1000 rows)",130,3.467000
+"MCP typed as-of first page (1000 rows)",131,3.768333
+"MCP typed as-of first page (1000 rows)",132,3.413750
+"MCP typed as-of first page (1000 rows)",133,3.689375
+"MCP typed as-of first page (1000 rows)",134,3.311042
+"MCP typed as-of first page (1000 rows)",135,3.292375
+"MCP typed as-of first page (1000 rows)",136,3.517667
+"MCP typed as-of first page (1000 rows)",137,3.332708
+"MCP typed as-of first page (1000 rows)",138,3.490708
+"MCP typed as-of first page (1000 rows)",139,3.291208
+"MCP typed as-of first page (1000 rows)",140,3.751166
+"MCP typed as-of first page (1000 rows)",141,3.386458
+"MCP typed as-of first page (1000 rows)",142,3.939209
+"MCP typed as-of first page (1000 rows)",143,3.655375
+"MCP typed as-of first page (1000 rows)",144,3.243416
+"MCP typed as-of first page (1000 rows)",145,3.598125
+"MCP typed as-of first page (1000 rows)",146,3.580209
+"MCP typed as-of first page (1000 rows)",147,3.519375
+"MCP typed as-of first page (1000 rows)",148,3.317708
+"MCP typed as-of first page (1000 rows)",149,3.224291
+"MCP typed as-of first page (1000 rows)",150,3.547042
+"MCP typed as-of first page (1000 rows)",151,3.765791
+"MCP typed as-of first page (1000 rows)",152,3.833167
+"MCP typed as-of first page (1000 rows)",153,3.382250
+"MCP typed as-of first page (1000 rows)",154,3.763750
+"MCP typed as-of first page (1000 rows)",155,3.481750
+"MCP typed as-of first page (1000 rows)",156,3.443750
+"MCP typed as-of first page (1000 rows)",157,3.756708
+"MCP typed as-of first page (1000 rows)",158,3.425208
+"MCP typed as-of first page (1000 rows)",159,3.546042
+"MCP typed as-of first page (1000 rows)",160,3.348333
+"MCP typed as-of first page (1000 rows)",161,3.240208
+"MCP typed as-of first page (1000 rows)",162,3.648084
+"MCP typed as-of first page (1000 rows)",163,3.263459
+"MCP typed as-of first page (1000 rows)",164,3.505458
+"MCP typed as-of first page (1000 rows)",165,3.337042
+"MCP typed as-of first page (1000 rows)",166,3.461958
+"MCP typed as-of first page (1000 rows)",167,3.985917
+"MCP typed as-of first page (1000 rows)",168,3.389958
+"MCP typed as-of first page (1000 rows)",169,3.433791
+"MCP typed as-of first page (1000 rows)",170,3.255667
+"MCP typed as-of first page (1000 rows)",171,3.359916
+"MCP typed as-of first page (1000 rows)",172,3.365334
+"MCP typed as-of first page (1000 rows)",173,3.263750
+"MCP typed as-of first page (1000 rows)",174,3.550917
+"MCP typed as-of first page (1000 rows)",175,3.261625
+"MCP typed as-of first page (1000 rows)",176,3.672792
+"MCP typed as-of first page (1000 rows)",177,3.353583
+"MCP typed as-of first page (1000 rows)",178,3.559541
+"MCP typed as-of first page (1000 rows)",179,3.723958
+"MCP typed as-of first page (1000 rows)",180,3.482125
+"MCP typed as-of first page (1000 rows)",181,3.431667
+"MCP typed as-of first page (1000 rows)",182,3.333584
+"MCP typed as-of first page (1000 rows)",183,3.445083
+"MCP typed as-of first page (1000 rows)",184,3.387875
+"MCP typed as-of first page (1000 rows)",185,3.346416
+"MCP typed as-of first page (1000 rows)",186,3.469500
+"MCP typed as-of first page (1000 rows)",187,3.236916
+"MCP typed as-of first page (1000 rows)",188,3.476875
+"MCP typed as-of first page (1000 rows)",189,3.224209
+"MCP typed as-of first page (1000 rows)",190,3.272708
+"MCP typed as-of first page (1000 rows)",191,3.421000
+"MCP typed as-of first page (1000 rows)",192,3.645792
+"MCP typed as-of first page (1000 rows)",193,3.439416
+"MCP typed as-of first page (1000 rows)",194,3.311250
+"MCP typed as-of first page (1000 rows)",195,3.278166
+"MCP typed as-of first page (1000 rows)",196,3.530666
+"MCP typed as-of first page (1000 rows)",197,3.252916
+"MCP typed as-of first page (1000 rows)",198,3.480167
+"MCP typed as-of first page (1000 rows)",199,3.224125
+"HTTP typed durable single insert",0,3.887083
+"HTTP typed durable single insert",1,4.280583
+"HTTP typed durable single insert",2,3.953875
+"HTTP typed durable single insert",3,3.943084
+"HTTP typed durable single insert",4,4.144833
+"HTTP typed durable single insert",5,3.767209
+"HTTP typed durable single insert",6,4.220042
+"HTTP typed durable single insert",7,3.994125
+"HTTP typed durable single insert",8,3.962708
+"HTTP typed durable single insert",9,3.962792
+"HTTP typed durable single insert",10,4.019417
+"HTTP typed durable single insert",11,4.003333
+"HTTP typed durable single insert",12,3.986042
+"HTTP typed durable single insert",13,3.892500
+"HTTP typed durable single insert",14,4.108375
+"HTTP typed durable single insert",15,4.004541
+"HTTP typed durable single insert",16,3.963709
+"HTTP typed durable single insert",17,3.920958
+"HTTP typed durable single insert",18,3.979209
+"HTTP typed durable single insert",19,4.101000
+"HTTP typed durable single insert",20,3.838291
+"HTTP typed durable single insert",21,4.152125
+"HTTP typed durable single insert",22,3.944667
+"HTTP typed durable single insert",23,4.114709
+"HTTP typed durable single insert",24,4.049792
+"HTTP typed durable single insert",25,3.883625
+"HTTP typed durable single insert",26,4.022625
+"HTTP typed durable single insert",27,4.024292
+"HTTP typed durable single insert",28,3.978833
+"HTTP typed durable single insert",29,3.931000
+"HTTP typed durable single insert",30,4.026292
+"HTTP typed durable single insert",31,4.076833
+"HTTP typed durable single insert",32,4.149792
+"HTTP typed durable single insert",33,3.822875
+"HTTP typed durable single insert",34,4.000625
+"HTTP typed durable single insert",35,4.026792
+"HTTP typed durable single insert",36,3.976334
+"HTTP typed durable single insert",37,4.052291
+"HTTP typed durable single insert",38,3.923750
+"HTTP typed durable single insert",39,4.074542
+"HTTP typed durable single insert",40,3.933458
+"HTTP typed durable single insert",41,4.108917
+"HTTP typed durable single insert",42,3.919291
+"HTTP typed durable single insert",43,4.383209
+"HTTP typed durable single insert",44,4.771833
+"HTTP typed durable single insert",45,3.996083
+"HTTP typed durable single insert",46,3.926083
+"HTTP typed durable single insert",47,4.064875
+"HTTP typed durable single insert",48,3.871458
+"HTTP typed durable single insert",49,4.083000
+"HTTP typed durable single insert",50,3.882583
+"HTTP typed durable single insert",51,4.118833
+"HTTP typed durable single insert",52,3.929750
+"HTTP typed durable single insert",53,4.090041
+"HTTP typed durable single insert",54,3.922708
+"HTTP typed durable single insert",55,4.007000
+"HTTP typed durable single insert",56,3.981208
+"HTTP typed durable single insert",57,4.083416
+"HTTP typed durable single insert",58,3.990417
+"HTTP typed durable single insert",59,4.006792
+"HTTP typed durable single insert",60,3.970375
+"HTTP typed durable single insert",61,4.009000
+"HTTP typed durable single insert",62,4.033541
+"HTTP typed durable single insert",63,4.430250
+"HTTP typed durable single insert",64,4.648208
+"HTTP typed durable single insert",65,4.285959
+"HTTP typed durable single insert",66,6.198958
+"HTTP typed durable single insert",67,4.758292
+"HTTP typed durable single insert",68,4.832042
+"HTTP typed durable single insert",69,4.887959
+"HTTP typed durable single insert",70,4.388708
+"HTTP typed durable single insert",71,4.690333
+"HTTP typed durable single insert",72,4.137250
+"HTTP typed durable single insert",73,5.020750
+"HTTP typed durable single insert",74,4.936958
+"HTTP typed durable single insert",75,5.140292
+"HTTP typed durable single insert",76,4.857375
+"HTTP typed durable single insert",77,5.177083
+"HTTP typed durable single insert",78,4.934916
+"HTTP typed durable single insert",79,5.041958
+"HTTP typed durable single insert",80,4.930625
+"HTTP typed durable single insert",81,4.803458
+"HTTP typed durable single insert",82,5.186250
+"HTTP typed durable single insert",83,4.745625
+"HTTP typed durable single insert",84,4.992208
+"HTTP typed durable single insert",85,4.049542
+"HTTP typed durable single insert",86,5.036708
+"HTTP typed durable single insert",87,5.138292
+"HTTP typed durable single insert",88,5.052333
+"HTTP typed durable single insert",89,5.252500
+"HTTP typed durable single insert",90,4.435375
+"HTTP typed durable single insert",91,4.062417
+"HTTP typed durable single insert",92,5.003792
+"HTTP typed durable single insert",93,4.917084
+"HTTP typed durable single insert",94,3.945791
+"HTTP typed durable single insert",95,4.118375
+"HTTP typed durable single insert",96,3.947250
+"HTTP typed durable single insert",97,4.039292
+"HTTP typed durable single insert",98,3.874667
+"HTTP typed durable single insert",99,4.087416
+"HTTP typed durable single insert",100,3.838709
+"HTTP typed durable single insert",101,4.049334
+"HTTP typed durable single insert",102,4.115916
+"HTTP typed durable single insert",103,3.985917
+"HTTP typed durable single insert",104,3.958208
+"HTTP typed durable single insert",105,4.211500
+"HTTP typed durable single insert",106,4.760667
+"HTTP typed durable single insert",107,3.019459
+"HTTP typed durable single insert",108,3.900583
+"HTTP typed durable single insert",109,4.314375
+"HTTP typed durable single insert",110,4.738083
+"HTTP typed durable single insert",111,3.962291
+"HTTP typed durable single insert",112,2.881958
+"HTTP typed durable single insert",113,3.030167
+"HTTP typed durable single insert",114,3.107791
+"HTTP typed durable single insert",115,3.920542
+"HTTP typed durable single insert",116,3.018333
+"HTTP typed durable single insert",117,3.797375
+"HTTP typed durable single insert",118,4.181333
+"HTTP typed durable single insert",119,3.941959
+"HTTP typed durable single insert",120,6.942375
+"HTTP typed durable single insert",121,8.216625
+"HTTP typed durable single insert",122,7.757834
+"HTTP typed durable single insert",123,3.956791
+"HTTP typed durable single insert",124,3.027583
+"HTTP typed durable single insert",125,2.961459
+"HTTP typed durable single insert",126,3.222166
+"HTTP typed durable single insert",127,2.934833
+"HTTP typed durable single insert",128,3.930708
+"HTTP typed durable single insert",129,3.992209
+"HTTP typed durable single insert",130,3.934041
+"HTTP typed durable single insert",131,3.218000
+"HTTP typed durable single insert",132,4.028084
+"HTTP typed durable single insert",133,3.719417
+"HTTP typed durable single insert",134,4.176667
+"HTTP typed durable single insert",135,4.055958
+"HTTP typed durable single insert",136,3.977291
+"HTTP typed durable single insert",137,3.967750
+"HTTP typed durable single insert",138,3.978708
+"HTTP typed durable single insert",139,4.039000
+"HTTP typed durable single insert",140,3.953792
+"HTTP typed durable single insert",141,4.092042
+"HTTP typed durable single insert",142,3.857459
+"HTTP typed durable single insert",143,4.127584
+"HTTP typed durable single insert",144,3.936250
+"HTTP typed durable single insert",145,4.029166
+"HTTP typed durable single insert",146,4.013292
+"HTTP typed durable single insert",147,3.986916
+"HTTP typed durable single insert",148,3.943833
+"HTTP typed durable single insert",149,3.942916
+"HTTP typed durable single insert",150,3.965000
+"HTTP typed durable single insert",151,4.165667
+"HTTP typed durable single insert",152,3.851250
+"HTTP typed durable single insert",153,4.135167
+"HTTP typed durable single insert",154,4.069875
+"HTTP typed durable single insert",155,3.907250
+"HTTP typed durable single insert",156,4.208167
+"HTTP typed durable single insert",157,3.822167
+"HTTP typed durable single insert",158,3.926041
+"HTTP typed durable single insert",159,4.099958
+"HTTP typed durable single insert",160,4.006416
+"HTTP typed durable single insert",161,2.956708
+"HTTP typed durable single insert",162,4.011875
+"HTTP typed durable single insert",163,4.004792
+"HTTP typed durable single insert",164,4.017250
+"HTTP typed durable single insert",165,2.953750
+"HTTP typed durable single insert",166,4.542500
+"HTTP typed durable single insert",167,5.050500
+"HTTP typed durable single insert",168,3.431833
+"HTTP typed durable single insert",169,3.657792
+"HTTP typed durable single insert",170,4.644333
+"HTTP typed durable single insert",171,4.189708
+"HTTP typed durable single insert",172,4.713875
+"HTTP typed durable single insert",173,2.897792
+"HTTP typed durable single insert",174,3.947375
+"HTTP typed durable single insert",175,3.401458
+"HTTP typed durable single insert",176,4.776083
+"HTTP typed durable single insert",177,2.908417
+"HTTP typed durable single insert",178,4.070709
+"HTTP typed durable single insert",179,3.934958
+"HTTP typed durable single insert",180,2.957875
+"HTTP typed durable single insert",181,2.979584
+"HTTP typed durable single insert",182,4.140042
+"HTTP typed durable single insert",183,4.891291
+"HTTP typed durable single insert",184,3.980292
+"HTTP typed durable single insert",185,2.986000
+"HTTP typed durable single insert",186,3.995167
+"HTTP typed durable single insert",187,4.118500
+"HTTP typed durable single insert",188,3.853917
+"HTTP typed durable single insert",189,3.155167
+"HTTP typed durable single insert",190,4.993375
+"HTTP typed durable single insert",191,3.942125
+"HTTP typed durable single insert",192,4.013959
+"HTTP typed durable single insert",193,3.990333
+"HTTP typed durable single insert",194,3.920958
+"HTTP typed durable single insert",195,5.175708
+"HTTP typed durable single insert",196,5.376291
+"HTTP typed durable single insert",197,4.734500
+"HTTP typed durable single insert",198,4.819625
+"HTTP typed durable single insert",199,3.876917

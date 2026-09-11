@@ -1,0 +1,13 @@
+#!/bin/sh
+# Relocatable launcher. Runtime state is always outside the extracted bundle.
+set -eu
+bundle=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+state=${CHRONOGRAPH_HOME:-${XDG_DATA_HOME:-"$HOME/.local/share"}/chronograph}
+case "$state" in /*) ;; *) printf '%s\n' 'CHRONOGRAPH_HOME must be absolute' >&2; exit 2 ;; esac
+umask 077
+mkdir -p "$state"
+export CHRONOGRAPH_DATA=${CHRONOGRAPH_DATA:-"$state/data"}
+export CHRONOGRAPH_AUTH=${CHRONOGRAPH_AUTH:-"$state/config/auth.json"}
+export CHRONOGRAPH_UI="$bundle/ui"
+export CHRONOGRAPH_DOCS="$bundle/docs"
+exec "$bundle/bin/chronograph-server" "$@"

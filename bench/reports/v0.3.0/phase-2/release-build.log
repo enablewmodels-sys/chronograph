@@ -1,0 +1,14 @@
+$ cargo build --locked --release --workspace --bins --examples
+   Compiling flatbuffers v25.12.19
+   Compiling arrow-string v59.3.0
+   Compiling rustix v1.1.4
+   Compiling tower-http v0.6.11
+   Compiling arrow-ipc v59.3.0
+   Compiling tempfile v3.27.0
+   Compiling rusty-fork v0.3.1
+   Compiling proptest v1.11.0
+   Compiling arrow v59.3.0
+   Compiling chronograph-db v0.3.0 (<workspace>/crates/chronograph-core)
+   Compiling chronograph-bench v0.3.0 (<workspace>/crates/chronograph-bench)
+   Compiling chronograph-server v0.3.0 (<workspace>/crates/chronograph-server)
+    Finished `release` profile [optimized] target(s) in 43.87s

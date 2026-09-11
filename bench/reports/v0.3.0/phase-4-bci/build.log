@@ -1,0 +1,6 @@
+$ cargo build --locked --workspace
+   Compiling serde_spanned v1.1.1
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling toml v1.1.5+spec-1.1.0
+   Compiling chronograph-conn-bci v0.3.0 (<workspace>/crates/chronograph-conn-bci)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.33s

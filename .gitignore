@@ -1,0 +1,42 @@
+/target/
+/bench/data/
+/bench/results/
+*.cgraph
+*.cgraph.lock
+__pycache__/
+
+# Service state, secrets, frontend outputs and local test artifacts.
+/data/
+/ui/node_modules/
+/ui/dist/
+/ui/test-results/
+/ui/playwright-report/
+/ui/*.tsbuildinfo
+/deploy/.env
+/deploy/secrets/
+*.pending
+.DS_Store
+/launch/private/
+/.work/
+/config/
+/community-data/
+/community-backups/
+/.venv-connectors/
+/robotics-demo/
+/worldmodel-demo/
+
+/fork-demo/
+
+/dist/
+
+# Python connector packaging intermediates
+sdk/python/build/
+sdk/python/*.egg-info/
+
+# Internal planning and outreach drafts are not Community source.
+/docs/plans/
+/docs/design/
+/docs/DESIGN.md
+/docs/DELIVERY.md
+/docs/BRANCHING_DESIGN.md
+/launch/

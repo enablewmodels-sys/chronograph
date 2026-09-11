@@ -1,0 +1,4 @@
+ Documenting chronograph-server v0.3.0 (<workspace>/crates/chronograph-server)
+ Documenting chronograph-conn-quantum v0.3.0 (<workspace>/crates/chronograph-conn-quantum)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.94s
+   Generated <workspace>/target/doc/chronograph_bench/index.html and 9 other files

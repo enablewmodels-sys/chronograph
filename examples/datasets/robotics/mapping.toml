@@ -1,0 +1,24 @@
+robot_node = 20000
+clock_domain = "simulation_ns"
+fps = 20
+
+[[topics]]
+name = "/joint_states"
+node = 20001
+edge_kind = 200
+message_type = "sensor_msgs/msg/JointState"
+role = "observation"
+
+[[topics]]
+name = "/commands"
+node = 20002
+edge_kind = 201
+message_type = "sensor_msgs/msg/JointState"
+role = "action"
+
+[[topics]]
+name = "/camera/reference"
+node = 20003
+edge_kind = 202
+message_type = "chronograph/VideoReference"
+role = "video"

@@ -1,0 +1,96 @@
+{
+  "date": "2026-09-09T11:36:16.006Z",
+  "environment": {
+    "platform": "darwin",
+    "release": "25.5.0",
+    "arch": "arm64",
+    "cpu": "Apple M5",
+    "logical_cpus": 10,
+    "memory_gib": 16,
+    "node": "v20.20.2",
+    "rust": "rustc 1.93.0 (254b59607 2026-01-19)"
+  },
+  "workload": {
+    "versions": 100000,
+    "nodes": "1032",
+    "active_at_query": 32000,
+    "page_limit": 1000,
+    "warmups": 20,
+    "durability": "Initial 100k ingest buffered + final sync; durable single-insert workload requests fsync",
+    "transport": "loopback HTTP, no TLS, release build; full client response parsed",
+    "initial_ingest_ms": 221.63845899999995,
+    "initial_ingest_edges_per_second": 451185.23405723565
+  },
+  "summary": [
+    {
+      "name": "HTTP stats",
+      "samples": 500,
+      "concurrency": 1,
+      "p50_ms": 0.32104100000003655,
+      "p95_ms": 0.4856250000000273,
+      "p99_ms": 0.652084000000059,
+      "max_ms": 3.7975000000000136,
+      "requests_per_second": 2858.0839833688096
+    },
+    {
+      "name": "HTTP as-of first page (1000 rows)",
+      "samples": 300,
+      "concurrency": 1,
+      "p50_ms": 3.7784589999998843,
+      "p95_ms": 5.309459000000061,
+      "p99_ms": 6.4267909999998665,
+      "max_ms": 7.447499999999991,
+      "requests_per_second": 252.40867116402606
+    },
+    {
+      "name": "HTTP uniform sample (16 edges)",
+      "samples": 300,
+      "concurrency": 1,
+      "p50_ms": 0.2731250000001637,
+      "p95_ms": 0.44174999999995634,
+      "p99_ms": 0.5402500000000146,
+      "max_ms": 1.531833000000006,
+      "requests_per_second": 3341.0083720101393
+    },
+    {
+      "name": "MCP as-of first page (1000 rows)",
+      "samples": 300,
+      "concurrency": 1,
+      "p50_ms": 4.70083300000033,
+      "p95_ms": 5.363125000000309,
+      "p99_ms": 6.452291000000059,
+      "max_ms": 7.719583000000057,
+      "requests_per_second": 208.56609338322417
+    },
+    {
+      "name": "HTTP as-of first page, 8 clients",
+      "samples": 400,
+      "concurrency": 8,
+      "p50_ms": 7.15520800000013,
+      "p95_ms": 11.092542000000321,
+      "p99_ms": 13.899625000000015,
+      "max_ms": 15.885416999999961,
+      "requests_per_second": 1034.4211151479074
+    },
+    {
+      "name": "MCP as-of first page, 8 concurrent requests",
+      "samples": 400,
+      "concurrency": 8,
+      "p50_ms": 10.843458999999712,
+      "p95_ms": 15.939332999999351,
+      "p99_ms": 17.874041999999463,
+      "max_ms": 18.459874999999556,
+      "requests_per_second": 693.7916551534107
+    },
+    {
+      "name": "HTTP durable single insert",
+      "samples": 200,
+      "concurrency": 1,
+      "p50_ms": 3.853374999999687,
+      "p95_ms": 5.21283399999993,
+      "p99_ms": 6.041166999999405,
+      "max_ms": 6.1840000000001965,
+      "requests_per_second": 284.56467815577696
+    }
+  ]
+}

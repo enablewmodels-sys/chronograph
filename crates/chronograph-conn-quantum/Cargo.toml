@@ -1,0 +1,28 @@
+[package]
+name = "chronograph-conn-quantum"
+description = "Exploratory static OpenQASM circuit DAG and calibration windows for Chronograph"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+repository.workspace = true
+
+[dependencies]
+chronograph-db.workspace = true
+chronograph-connector-common = { path = "../chronograph-connector-common" }
+arrow = { workspace = true, features = ["ipc"] }
+serde.workspace = true
+thiserror.workspace = true
+# The Qiskit project's real OpenQASM 3 lexer and AST, lowered through an explicit static whitelist.
+oq3_parser = "=0.7.0"
+oq3_syntax = "=0.7.0"
+# Typed mapping and source/calibration provenance.
+toml = "1.1"
+serde_json = { version = "1", features = ["float_roundtrip"] }
+
+[dev-dependencies]
+tempfile = "3"
+
+[[example]]
+name = "quantum_connector"
+path = "../../examples/quantum_connector.rs"

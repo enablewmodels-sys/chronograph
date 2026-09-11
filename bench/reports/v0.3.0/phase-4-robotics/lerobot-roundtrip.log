@@ -1,0 +1,99 @@
+$ cargo run --locked -p chronograph-conn-robotics --example robotics_connector -- /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph <workspace>/examples/datasets/robotics/references.mcap
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running `target/debug/examples/robotics_connector /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph <workspace>/examples/datasets/robotics/references.mcap`
+Robotics: 12 source messages, 12 graph versions, 12 exported messages, 4 LeRobot handoff frames
+Dataset retained at /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph
+
+$ <workspace>/.work/connector-python/bin/python <workspace>/scripts/connectors/export-lerobot.py /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph/lerobot.arrow /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph/lerobot --dtype float64
+objc[62229]: Class AVFFrameReceiver is implemented in both <workspace>/.work/connector-python/lib/python3.12/site-packages/av/.dylibs/libavdevice.61.3.100.dylib (0x11bad03a8) and /opt/homebrew/Cellar/ffmpeg/8.1.2/lib/libavdevice.62.3.102.dylib (0x124be8328). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+objc[62229]: Class AVFAudioReceiver is implemented in both <workspace>/.work/connector-python/lib/python3.12/site-packages/av/.dylibs/libavdevice.61.3.100.dylib (0x11bad03f8) and /opt/homebrew/Cellar/ffmpeg/8.1.2/lib/libavdevice.62.3.102.dylib (0x124be8378). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+
+Map:   0%|          | 0/4 [00:00<?, ? examples/s]
+Map: 100%|██████████| 4/4 [00:00<00:00, 542.83 examples/s]
+{
+  "frames": 4,
+  "features": [
+    "observation.state",
+    "action",
+    "chronograph.timestamp_us",
+    "chronograph.observation_time_ns",
+    "chronograph.action_time_ns",
+    "chronograph.video_refs"
+  ],
+  "dtype": "float64",
+  "reader_roundtrip": "passed",
+  "delta_timestamps": "passed",
+  "output": "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph/lerobot"
+}
+
+$ <workspace>/.work/connector-python/bin/python <workspace>/scripts/connectors/export-lerobot.py /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph/lerobot.arrow /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph/lerobot-f32 --dtype float32
+objc[62232]: Class AVFFrameReceiver is implemented in both <workspace>/.work/connector-python/lib/python3.12/site-packages/av/.dylibs/libavdevice.61.3.100.dylib (0x11c11c3a8) and /opt/homebrew/Cellar/ffmpeg/8.1.2/lib/libavdevice.62.3.102.dylib (0x124a14328). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+objc[62232]: Class AVFAudioReceiver is implemented in both <workspace>/.work/connector-python/lib/python3.12/site-packages/av/.dylibs/libavdevice.61.3.100.dylib (0x11c11c3f8) and /opt/homebrew/Cellar/ffmpeg/8.1.2/lib/libavdevice.62.3.102.dylib (0x124a14378). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+
+Map:   0%|          | 0/4 [00:00<?, ? examples/s]
+Map: 100%|██████████| 4/4 [00:00<00:00, 522.87 examples/s]
+{
+  "frames": 4,
+  "features": [
+    "observation.state",
+    "action",
+    "chronograph.timestamp_us",
+    "chronograph.observation_time_ns",
+    "chronograph.action_time_ns",
+    "chronograph.video_refs"
+  ],
+  "dtype": "float32",
+  "reader_roundtrip": "passed",
+  "delta_timestamps": "passed",
+  "output": "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-98zywjyw/graph/lerobot-f32"
+}
+
+$ cargo run --locked -p chronograph-conn-robotics --example robotics_connector -- /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph <workspace>/examples/datasets/robotics/references.mcap
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running `target/debug/examples/robotics_connector /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph <workspace>/examples/datasets/robotics/references.mcap`
+Robotics: 12 source messages, 12 graph versions, 12 exported messages, 4 LeRobot handoff frames
+Dataset retained at /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph
+
+$ <workspace>/.work/connector-python/bin/python <workspace>/scripts/connectors/export-lerobot.py /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph/lerobot.arrow /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph/lerobot --dtype float64
+objc[62240]: Class AVFFrameReceiver is implemented in both <workspace>/.work/connector-python/lib/python3.12/site-packages/av/.dylibs/libavdevice.61.3.100.dylib (0x11db443a8) and /opt/homebrew/Cellar/ffmpeg/8.1.2/lib/libavdevice.62.3.102.dylib (0x126d58328). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+objc[62240]: Class AVFAudioReceiver is implemented in both <workspace>/.work/connector-python/lib/python3.12/site-packages/av/.dylibs/libavdevice.61.3.100.dylib (0x11db443f8) and /opt/homebrew/Cellar/ffmpeg/8.1.2/lib/libavdevice.62.3.102.dylib (0x126d58378). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+
+Map:   0%|          | 0/4 [00:00<?, ? examples/s]
+Map: 100%|██████████| 4/4 [00:00<00:00, 454.22 examples/s]
+{
+  "frames": 4,
+  "features": [
+    "observation.state",
+    "action",
+    "chronograph.timestamp_us",
+    "chronograph.observation_time_ns",
+    "chronograph.action_time_ns",
+    "chronograph.video_refs"
+  ],
+  "dtype": "float64",
+  "reader_roundtrip": "passed",
+  "delta_timestamps": "passed",
+  "output": "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph/lerobot"
+}
+
+$ <workspace>/.work/connector-python/bin/python <workspace>/scripts/connectors/export-lerobot.py /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph/lerobot.arrow /var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph/lerobot-f32 --dtype float32
+objc[62244]: Class AVFFrameReceiver is implemented in both <workspace>/.work/connector-python/lib/python3.12/site-packages/av/.dylibs/libavdevice.61.3.100.dylib (0x11e2983a8) and /opt/homebrew/Cellar/ffmpeg/8.1.2/lib/libavdevice.62.3.102.dylib (0x126bfc328). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+objc[62244]: Class AVFAudioReceiver is implemented in both <workspace>/.work/connector-python/lib/python3.12/site-packages/av/.dylibs/libavdevice.61.3.100.dylib (0x11e2983f8) and /opt/homebrew/Cellar/ffmpeg/8.1.2/lib/libavdevice.62.3.102.dylib (0x126bfc378). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+
+Map:   0%|          | 0/4 [00:00<?, ? examples/s]
+Map: 100%|██████████| 4/4 [00:00<00:00, 465.17 examples/s]
+{
+  "frames": 4,
+  "features": [
+    "observation.state",
+    "action",
+    "chronograph.timestamp_us",
+    "chronograph.observation_time_ns",
+    "chronograph.action_time_ns",
+    "chronograph.video_refs"
+  ],
+  "dtype": "float32",
+  "reader_roundtrip": "passed",
+  "delta_timestamps": "passed",
+  "output": "/var/folders/7p/c670hx3d42960r52hjxy_3kc0000gn/T/chronograph-robotics-e2e-cadx3bku/graph/lerobot-f32"
+}

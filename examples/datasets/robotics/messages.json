@@ -1,0 +1,250 @@
+[
+  {
+    "topic": "/joint_states",
+    "log_time_ns": 1150000000,
+    "publish_time_ns": 1150000000,
+    "sequence": 1,
+    "data": {
+      "type": "joint_state",
+      "value": {
+        "header": {
+          "stamp": {
+            "sec": 1,
+            "nanosec": 150000000
+          },
+          "frame_id": "base"
+        },
+        "name": [
+          "shoulder",
+          "elbow"
+        ],
+        "position": [
+          3.0,
+          -3.0
+        ],
+        "velocity": [
+          0.1,
+          0.2
+        ],
+        "effort": []
+      }
+    }
+  },
+  {
+    "topic": "/commands",
+    "log_time_ns": 1150000000,
+    "publish_time_ns": 1150000000,
+    "sequence": 2,
+    "data": {
+      "type": "joint_state",
+      "value": {
+        "header": {
+          "stamp": {
+            "sec": 1,
+            "nanosec": 150000000
+          },
+          "frame_id": "base"
+        },
+        "name": [
+          "shoulder",
+          "elbow"
+        ],
+        "position": [
+          3.25,
+          -3.25
+        ],
+        "velocity": [
+          0.1,
+          0.2
+        ],
+        "effort": []
+      }
+    }
+  },
+  {
+    "topic": "/joint_states",
+    "log_time_ns": 1000000000,
+    "publish_time_ns": 1000000000,
+    "sequence": 3,
+    "data": {
+      "type": "joint_state",
+      "value": {
+        "header": {
+          "stamp": {
+            "sec": 1,
+            "nanosec": 0
+          },
+          "frame_id": "base"
+        },
+        "name": [
+          "shoulder",
+          "elbow"
+        ],
+        "position": [
+          0.0,
+          0.0
+        ],
+        "velocity": [
+          0.1,
+          0.2
+        ],
+        "effort": []
+      }
+    }
+  },
+  {
+    "topic": "/commands",
+    "log_time_ns": 1000000000,
+    "publish_time_ns": 1000000000,
+    "sequence": 4,
+    "data": {
+      "type": "joint_state",
+      "value": {
+        "header": {
+          "stamp": {
+            "sec": 1,
+            "nanosec": 0
+          },
+          "frame_id": "base"
+        },
+        "name": [
+          "shoulder",
+          "elbow"
+        ],
+        "position": [
+          0.25,
+          -0.25
+        ],
+        "velocity": [
+          0.1,
+          0.2
+        ],
+        "effort": []
+      }
+    }
+  },
+  {
+    "topic": "/joint_states",
+    "log_time_ns": 1100000000,
+    "publish_time_ns": 1100000000,
+    "sequence": 5,
+    "data": {
+      "type": "joint_state",
+      "value": {
+        "header": {
+          "stamp": {
+            "sec": 1,
+            "nanosec": 100000000
+          },
+          "frame_id": "base"
+        },
+        "name": [
+          "shoulder",
+          "elbow"
+        ],
+        "position": [
+          2.0,
+          -2.0
+        ],
+        "velocity": [
+          0.1,
+          0.2
+        ],
+        "effort": []
+      }
+    }
+  },
+  {
+    "topic": "/commands",
+    "log_time_ns": 1100000000,
+    "publish_time_ns": 1100000000,
+    "sequence": 6,
+    "data": {
+      "type": "joint_state",
+      "value": {
+        "header": {
+          "stamp": {
+            "sec": 1,
+            "nanosec": 100000000
+          },
+          "frame_id": "base"
+        },
+        "name": [
+          "shoulder",
+          "elbow"
+        ],
+        "position": [
+          2.25,
+          -2.25
+        ],
+        "velocity": [
+          0.1,
+          0.2
+        ],
+        "effort": []
+      }
+    }
+  },
+  {
+    "topic": "/joint_states",
+    "log_time_ns": 1050000000,
+    "publish_time_ns": 1050000000,
+    "sequence": 7,
+    "data": {
+      "type": "joint_state",
+      "value": {
+        "header": {
+          "stamp": {
+            "sec": 1,
+            "nanosec": 50000000
+          },
+          "frame_id": "base"
+        },
+        "name": [
+          "shoulder",
+          "elbow"
+        ],
+        "position": [
+          1.0,
+          -1.0
+        ],
+        "velocity": [
+          0.1,
+          0.2
+        ],
+        "effort": []
+      }
+    }
+  },
+  {
+    "topic": "/commands",
+    "log_time_ns": 1050000000,
+    "publish_time_ns": 1050000000,
+    "sequence": 8,
+    "data": {
+      "type": "joint_state",
+      "value": {
+        "header": {
+          "stamp": {
+            "sec": 1,
+            "nanosec": 50000000
+          },
+          "frame_id": "base"
+        },
+        "name": [
+          "shoulder",
+          "elbow"
+        ],
+        "position": [
+          1.25,
+          -1.25
+        ],
+        "velocity": [
+          0.1,
+          0.2
+        ],
+        "effort": []
+      }
+    }
+  }
+]

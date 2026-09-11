@@ -1,0 +1,81 @@
+$ cargo test --locked --workspace
+   Compiling chronograph-db v0.3.0 (<workspace>/crates/chronograph-core)
+   Compiling chronograph-server v0.3.0 (<workspace>/crates/chronograph-server)
+   Compiling chronograph-bench v0.3.0 (<workspace>/crates/chronograph-bench)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.93s
+     Running unittests src/lib.rs (target/debug/deps/chronograph_bench-c32ce75513256b9c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/measure.rs (target/debug/deps/measure-518be587ae260164)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_db-f3f21817bf25007f)
+
+running 18 tests
+test tests::crash_child ... ignored, subprocess-only crash writer
+test tests::arrow_export_and_parallel_reads ... ok
+test tests::application_revision_and_drop_durability ... ok
+test tests::failed_sync_disables_writer_and_requires_reopen ... ok
+test tests::corrupted_length_cannot_hide_later_records_as_a_torn_tail ... ok
+test tests::interval_math_and_late_replacement ... ok
+test tests::independently_encoded_v1_fixture_is_compatible ... ok
+test tests::late_event_fills_gap_without_changing_successor ... ok
+test tests::corruption_and_format_errors_do_not_rewrite_files ... ok
+test tests::lock_and_sync_mode ... ok
+test tests::kill_mid_append_recovers_whole_operations ... ok
+test tests::codec_rejects_unbounded_counts_and_invalid_options ... ok
+test tests::migration_rejects_existing_locked_and_incomplete_files ... ok
+test tests::batches_match_sequential_and_reject_invalid_input_atomically ... ok
+test tests::sampling_and_block_pruning ... ok
+test tests::partial_header_and_trailing_checksum_recovery ... ok
+test tests::arbitrary_history_matches_naive_model ... ok
+test tests::partial_append_every_byte_preserves_atomic_replacement ... ok
+
+test result: ok. 17 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.29s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_server-59c78f2632bc9231)
+
+running 3 tests
+test auth::tests::token_expiry_and_scope_fail_closed ... ok
+test auth::tests::failed_credential_commit_does_not_publish_new_state ... ok
+test auth::tests::salted_passwords_verify_and_respect_boundaries ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.91s
+
+     Running unittests src/main.rs (target/debug/deps/chronograph_server-68c6b11d4ece4a23)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_bench
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_db
+
+running 1 test
+test crates/chronograph-core/src/lib.rs - (line 3) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 1 test
+test crates/chronograph-core/src/graph.rs - graph::Graph (line 24) - compile fail ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+all doctests ran in 0.57s; merged doctests compilation took 0.19s
+   Doc-tests chronograph_server
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

@@ -1,0 +1,97 @@
+$ CXXFLAGS=-Wno-enum-constexpr-conversion cargo test --locked -p chronograph-conn-bci --features lsl
+   Compiling lsl-sys v0.1.1
+error: failed to run custom build command for `lsl-sys v0.1.1`
+
+Caused by:
+  process didn't exit successfully: `<workspace>/target/debug/build/lsl-sys-0b9e818906c68be3/build-script-build` (exit status: 101)
+  --- stdout
+  CMAKE_TOOLCHAIN_FILE_aarch64-apple-darwin = None
+  CMAKE_TOOLCHAIN_FILE_aarch64_apple_darwin = None
+  HOST_CMAKE_TOOLCHAIN_FILE = None
+  CMAKE_TOOLCHAIN_FILE = None
+  CMAKE_GENERATOR_aarch64-apple-darwin = None
+  CMAKE_GENERATOR_aarch64_apple_darwin = None
+  HOST_CMAKE_GENERATOR = None
+  CMAKE_GENERATOR = None
+  CMAKE_PREFIX_PATH_aarch64-apple-darwin = None
+  CMAKE_PREFIX_PATH_aarch64_apple_darwin = None
+  HOST_CMAKE_PREFIX_PATH = None
+  CMAKE_PREFIX_PATH = None
+  CMAKE_aarch64-apple-darwin = None
+  CMAKE_aarch64_apple_darwin = None
+  HOST_CMAKE = None
+  CMAKE = None
+  -- Git version information: /
+  -- Included LSL CMake helpers, rev. 12, <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl/cmake
+  -- Installing Components: liblsl
+  -- Configuring done (0.1s)
+  -- Generating done (0.1s)
+  -- Build files have been written to: <workspace>/target/debug/build/lsl-sys-4681215f830e8696/out/build
+  [  4%] Building CXX object CMakeFiles/lslboost.dir/lslboost/asio_objects.cpp.o
+  [  4%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/atomic/src/lockpool.cpp.o
+  [  6%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/chrono/src/chrono.cpp.o
+  [ 10%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/serialization/src/basic_archive.cpp.o
+  [ 10%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/serialization/src/archive_exception.cpp.o
+  [ 14%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/serialization/src/basic_iarchive.cpp.o
+  [ 14%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/serialization/src/basic_iserializer.cpp.o
+  [ 17%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/serialization/src/basic_oarchive.cpp.o
+  [ 19%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/serialization/src/basic_oserializer.cpp.o
+  [ 21%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/serialization/src/basic_serializer_map.cpp.o
+  [ 23%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/serialization/src/extended_type_info.cpp.o
+  [ 25%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/serialization/src/extended_type_info_typeid.cpp.o
+  [ 27%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/serialization/src/void_cast.cpp.o
+  [ 29%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/thread/src/pthread/once.cpp.o
+  [ 31%] Building CXX object CMakeFiles/lslboost.dir/lslboost/libs/thread/src/pthread/thread.cpp.o
+  [ 31%] Built target lslboost
+  [ 34%] Building CXX object CMakeFiles/lslobj.dir/src/common.cpp.o
+  [ 36%] Building CXX object CMakeFiles/lslobj.dir/src/cancellation.cpp.o
+  [ 38%] Building CXX object CMakeFiles/lslobj.dir/src/api_config.cpp.o
+  [ 40%] Building CXX object CMakeFiles/lslobj.dir/src/consumer_queue.cpp.o
+  [ 44%] Building CXX object CMakeFiles/lslobj.dir/src/info_receiver.cpp.o
+  [ 44%] Building CXX object CMakeFiles/lslobj.dir/src/cast.cpp.o
+  [ 46%] Building CXX object CMakeFiles/lslobj.dir/src/data_receiver.cpp.o
+  [ 48%] Building CXX object CMakeFiles/lslobj.dir/src/inlet_connection.cpp.o
+  [ 51%] Building CXX object CMakeFiles/lslobj.dir/src/lsl_continuous_resolver_c.cpp.o
+  [ 53%] Building CXX object CMakeFiles/lslobj.dir/src/lsl_freefuncs_c.cpp.o
+  [ 55%] Building CXX object CMakeFiles/lslobj.dir/src/lsl_inlet_c.cpp.o
+  [ 57%] Building CXX object CMakeFiles/lslobj.dir/src/lsl_outlet_c.cpp.o
+  [ 59%] Building CXX object CMakeFiles/lslobj.dir/src/lsl_streaminfo_c.cpp.o
+
+  --- stderr
+  running: cd "<workspace>/target/debug/build/lsl-sys-4681215f830e8696/out/build" && CMAKE_PREFIX_PATH="" LC_ALL="C" "cmake" "<operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl" "-B" "<workspace>/target/debug/build/lsl-sys-4681215f830e8696/out/build" "-DCMAKE_OSX_ARCHITECTURES=arm64" "-DLSL_NO_FANCY_LIBNAME=ON" "-DLSL_BUILD_STATIC=ON" "-DCMAKE_INSTALL_PREFIX=<workspace>/target/debug/build/lsl-sys-4681215f830e8696/out" "-DCMAKE_C_FLAGS= -ffunction-sections -fdata-sections -fPIC --target=arm64-apple-macosx -mmacosx-version-min=26.2 -w" "-DCMAKE_C_COMPILER=/usr/bin/cc" "-DCMAKE_CXX_FLAGS= -ffunction-sections -fdata-sections -fPIC --target=arm64-apple-macosx -mmacosx-version-min=26.2 -w -Wno-enum-constexpr-conversion" "-DCMAKE_CXX_COMPILER=/usr/bin/c++" "-DCMAKE_ASM_FLAGS= -ffunction-sections -fdata-sections -fPIC --target=arm64-apple-macosx -mmacosx-version-min=26.2 -w" "-DCMAKE_ASM_COMPILER=/usr/bin/cc" "-DCMAKE_BUILD_TYPE=Debug"
+  fatal: not a git repository (or any of the parent directories): .git
+  fatal: not a git repository (or any of the parent directories): .git
+  running: cd "<workspace>/target/debug/build/lsl-sys-4681215f830e8696/out/build" && LC_ALL="C" "cmake" "--build" "<workspace>/target/debug/build/lsl-sys-4681215f830e8696/out/build" "--target" "install" "--config" "Debug" "--parallel" "10"
+  In file included from <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl/src/consumer_queue.cpp:3:
+  In file included from <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl/src/send_buffer.h:4:
+  In file included from <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl/lslboost/boost/container/flat_set.hpp:29:
+  <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl/lslboost/boost/container/detail/flat_tree.hpp:1216:13: error: no member named 'insert' in 'flat_tree<Value, KeyOfValue, Compare, AllocatorOrContainer>'
+   1216 |       this->insert( lslboost::make_move_iterator(source.begin())
+        |       ~~~~  ^
+  <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl/lslboost/boost/container/detail/flat_tree.hpp:1223:13: error: no member named 'insert' in 'flat_tree<Value, KeyOfValue, Compare, AllocatorOrContainer>'
+   1223 |       this->insert( lslboost::make_move_iterator(source.begin())
+        |       ~~~~  ^
+  2 errors generated.
+  make[2]: *** [CMakeFiles/lslobj.dir/src/consumer_queue.cpp.o] Error 1
+  make[2]: *** Waiting for unfinished jobs....
+  In file included from <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl/src/lsl_outlet_c.cpp:1:
+  In file included from <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl/src/stream_outlet_impl.h:6:
+  In file included from <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl/src/send_buffer.h:4:
+  In file included from <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl/lslboost/boost/container/flat_set.hpp:29:
+  <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl/lslboost/boost/container/detail/flat_tree.hpp:1216:13: error: no member named 'insert' in 'flat_tree<Value, KeyOfValue, Compare, AllocatorOrContainer>'
+   1216 |       this->insert( lslboost::make_move_iterator(source.begin())
+        |       ~~~~  ^
+  <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/lsl-sys-0.1.1/liblsl/lslboost/boost/container/detail/flat_tree.hpp:1223:13: error: no member named 'insert' in 'flat_tree<Value, KeyOfValue, Compare, AllocatorOrContainer>'
+   1223 |       this->insert( lslboost::make_move_iterator(source.begin())
+        |       ~~~~  ^
+  2 errors generated.
+  make[2]: *** [CMakeFiles/lslobj.dir/src/lsl_outlet_c.cpp.o] Error 1
+  make[1]: *** [CMakeFiles/lslobj.dir/all] Error 2
+  make: *** [all] Error 2
+
+  thread 'main' (16360779) panicked at <operator-home>/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cmake-0.1.58/src/lib.rs:1132:5:
+
+  command did not execute successfully, got: exit status: 2
+
+  build script failed, must exit now
+  note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

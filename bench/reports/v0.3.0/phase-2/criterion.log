@@ -1,0 +1,71 @@
+$ cargo bench --locked -p chronograph-bench --bench engine
+   Compiling chronograph-db v0.3.0 (<workspace>/crates/chronograph-core)
+   Compiling chronograph-bench v0.3.0 (<workspace>/crates/chronograph-bench)
+    Finished `bench` profile [optimized + debuginfo] target(s) in 7.76s
+     Running benches/engine.rs (target/release/deps/engine-3b47856b7a2c2387)
+Benchmarking temporal_10000000_versions/as_of_full_traversal
+Benchmarking temporal_10000000_versions/as_of_full_traversal: Warming up for 1.0000 s
+Benchmarking temporal_10000000_versions/as_of_full_traversal: Collecting 20 samples in estimated 3.9692 s (420 iterations)
+Benchmarking temporal_10000000_versions/as_of_full_traversal: Analyzing
+temporal_10000000_versions/as_of_full_traversal
+                        time:   [8.9180 ms 9.0071 ms 9.1500 ms]
+                        change: [−34.807% −29.806% −25.490%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Benchmarking temporal_10000000_versions/between_full_traversal
+Benchmarking temporal_10000000_versions/between_full_traversal: Warming up for 1.0000 s
+Benchmarking temporal_10000000_versions/between_full_traversal: Collecting 20 samples in estimated 5.0587 s (420 iterations)
+Benchmarking temporal_10000000_versions/between_full_traversal: Analyzing
+temporal_10000000_versions/between_full_traversal
+                        time:   [11.520 ms 12.556 ms 13.825 ms]
+Found 3 outliers among 20 measurements (15.00%)
+  3 (15.00%) high severe
+
+Benchmarking sample_10k_k10/LatestFirst
+Benchmarking sample_10k_k10/LatestFirst: Warming up for 1.0000 s
+Benchmarking sample_10k_k10/LatestFirst: Collecting 100 samples in estimated 5.6575 s (10k iterations)
+Benchmarking sample_10k_k10/LatestFirst: Analyzing
+sample_10k_k10/LatestFirst
+                        time:   [524.47 µs 546.14 µs 567.81 µs]
+                        thrpt:  [65.474 Melem/s 68.073 Melem/s 70.884 Melem/s]
+                 change:
+                        time:   [−44.404% −42.004% −39.552%] (p = 0.00 < 0.05)
+                        thrpt:  [+65.432% +72.426% +79.868%]
+                        Performance has improved.
+Benchmarking sample_10k_k10/Uniform
+Benchmarking sample_10k_k10/Uniform: Warming up for 1.0000 s
+Benchmarking sample_10k_k10/Uniform: Collecting 100 samples in estimated 4.5426 s (10k iterations)
+Benchmarking sample_10k_k10/Uniform: Analyzing
+sample_10k_k10/Uniform  time:   [455.07 µs 478.44 µs 503.01 µs]
+                        thrpt:  [73.910 Melem/s 77.705 Melem/s 81.695 Melem/s]
+                 change:
+                        time:   [−59.269% −56.981% −54.549%] (p = 0.00 < 0.05)
+                        thrpt:  [+120.02% +132.45% +145.51%]
+                        Performance has improved.
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
+
+Benchmarking ingest_100000_versions/single_with_sync
+Benchmarking ingest_100000_versions/single_with_sync: Warming up for 1.0000 s
+Benchmarking ingest_100000_versions/single_with_sync: Collecting 10 samples in estimated 5.3801 s (110 iterations)
+Benchmarking ingest_100000_versions/single_with_sync: Analyzing
+ingest_100000_versions/single_with_sync
+                        time:   [30.409 ms 32.430 ms 34.357 ms]
+                        thrpt:  [2.9106 Melem/s 3.0836 Melem/s 3.2885 Melem/s]
+                 change:
+                        time:   [−16.054% −6.8535% +2.4619%] (p = 0.20 > 0.05)
+                        thrpt:  [−2.4028% +7.3578% +19.124%]
+                        No change in performance detected.
+Benchmarking ingest_100000_versions/batch_10k_with_sync
+Benchmarking ingest_100000_versions/batch_10k_with_sync: Warming up for 1.0000 s
+Benchmarking ingest_100000_versions/batch_10k_with_sync: Collecting 10 samples in estimated 4.8649 s (110 iterations)
+Benchmarking ingest_100000_versions/batch_10k_with_sync: Analyzing
+ingest_100000_versions/batch_10k_with_sync
+                        time:   [28.838 ms 30.893 ms 33.113 ms]
+                        thrpt:  [3.0200 Melem/s 3.2370 Melem/s 3.4676 Melem/s]
+                 change:
+                        time:   [−20.504% −15.409% −9.8514%] (p = 0.00 < 0.05)
+                        thrpt:  [+10.928% +18.216% +25.793%]
+                        Performance has improved.
+Found 3 outliers among 10 measurements (30.00%)
+  1 (10.00%) low mild
+  2 (20.00%) high mild

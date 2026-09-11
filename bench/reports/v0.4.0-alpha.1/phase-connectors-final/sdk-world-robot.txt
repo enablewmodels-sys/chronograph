@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "mode": "world-robot",
+  "checks": [
+    "multi-chunk tensor, endian conversion, range download, real lost-ack recovery",
+    "PyTorch 2.11.0: exact BF16 JEPA outputs and parent-linked hierarchy; structured transitions",
+    "LeRobot 0.6.1: real v3 dataset including exact decoded image tensors"
+  ]
+}

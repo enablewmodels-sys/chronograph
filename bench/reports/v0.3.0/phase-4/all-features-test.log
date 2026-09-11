@@ -1,0 +1,198 @@
+$ cargo test --locked --workspace --all-features
+   Compiling lamquant-lsl-sys v0.1.2
+   Compiling lamquant-lsl v0.1.2
+   Compiling chronograph-conn-bci v0.3.0 (<workspace>/crates/chronograph-conn-bci)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.08s
+     Running unittests src/lib.rs (target/debug/deps/chronograph_bench-fb7413cb52efa58d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/measure.rs (target/debug/deps/measure-0ad1552d6f5887a7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_conn_bci-ae753e3402136bcc)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/lsl_loopback.rs (target/debug/deps/lsl_loopback-dbe5a4518c5848c3)
+
+running 1 test
+test native_lsl_source_to_graph_to_arrow ... ignored, requires local LSL socket discovery; see docs/connectors/bci.md
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/roundtrip.rs (target/debug/deps/roundtrip-44c2247dec73ab6f)
+
+running 2 tests
+test invalid_frames_are_atomic_and_simulator_is_deterministic ... ok
+test source_graph_arrow_roundtrip_and_late_arrival ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_conn_quantum-b057819aef4139d5)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/roundtrip.rs (target/debug/deps/roundtrip-525857e766ff81ae)
+
+running 3 tests
+test unsupported_qasm_is_rejected_instead_of_silently_lowered ... ok
+test calibration_windows_are_atomic_durable_and_have_real_gaps ... ok
+test openqasm_ast_dag_reopen_arrow_and_tamper_detection ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_conn_robotics-e3029b410b310233)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/roundtrip.rs (target/debug/deps/roundtrip-fb66d0ca8fba7407)
+
+running 4 tests
+test cdr_endianness_truncation_huge_arrays_and_atomic_invalid_input ... ok
+test referenced_video_and_sub_microsecond_times_are_explicit ... ok
+test damaged_and_unsupported_files_fail_without_source_mutation ... ok
+test independent_rosbag_and_compressed_mcap_to_reopen_arrow_and_training ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_conn_worldmodel-b107afa2ee2e0558)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/roundtrip.rs (target/debug/deps/roundtrip-2a4bd18c85f57861)
+
+running 3 tests
+test reject_broken_sequences_wrong_codec_and_incomplete_exports_atomically ... ok
+test independent_gymnasium_source_reopen_arrow_and_exact_dynamics_restore ... ok
+test random_state_restore_preserves_hidden_rng_and_future ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.95s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_connector_common-a9ff34933d386009)
+
+running 1 test
+test tests::durable_rows_integrity_collision_and_bounds ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_db-9944b619e568f439)
+
+running 20 tests
+test tests::crash_child ... ignored, subprocess-only crash writer
+test tests::failed_sync_disables_writer_and_requires_reopen ... ok
+test tests::arrow_export_and_parallel_reads ... ok
+test tests::bounded_batch_preserves_gaps_late_arrivals_atomicity_and_replay ... ok
+test tests::application_revision_and_drop_durability ... ok
+test tests::corrupted_length_cannot_hide_later_records_as_a_torn_tail ... ok
+test tests::interval_math_and_late_replacement ... ok
+test tests::corruption_and_format_errors_do_not_rewrite_files ... ok
+test tests::independently_encoded_v1_fixture_is_compatible ... ok
+test tests::late_event_fills_gap_without_changing_successor ... ok
+test tests::codec_rejects_unbounded_counts_and_invalid_options ... ok
+test tests::lock_and_sync_mode ... ok
+test tests::kill_mid_append_recovers_whole_operations ... ok
+test tests::batches_match_sequential_and_reject_invalid_input_atomically ... ok
+test tests::migration_rejects_existing_locked_and_incomplete_files ... ok
+test tests::sampling_and_temporal_filtering ... ok
+test tests::partial_header_and_trailing_checksum_recovery ... ok
+test tests::bounded_temporal_batches_match_reference ... ok
+test tests::arbitrary_history_matches_naive_model ... ok
+test tests::partial_append_every_byte_preserves_atomic_replacement ... ok
+
+test result: ok. 19 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.93s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_server-b37d05672ecd935e)
+
+running 8 tests
+test auth::tests::rate_limits_invalid_credentials_before_expensive_hashing ... ok
+test backup::tests::invalid_and_incomplete_archives_leave_no_destination ... ok
+test backup::tests::backup_restore_sidecars_and_source_preservation ... ok
+test auth::tests::malformed_credentials_and_commit_failure_fail_closed ... ok
+test auth::tests::salted_tokens_cache_revocation_expiry_and_lock ... ok
+test service_tests::worker_queue_is_bounded_and_cancellation_releases_waiters ... ok
+test service_tests::invalid_requests_cannot_mutate_and_cookie_routes_are_retired ... ok
+test service_tests::scopes_exact_ids_durability_pagination_and_revocation ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.71s
+
+     Running unittests src/bin/chronograph-mcp.rs (target/debug/deps/chronograph_mcp-361883aa1d6c4ffc)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/chronograph_server-f9df0d5a2ea88b0d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_bench
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_conn_bci
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_conn_quantum
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_conn_robotics
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_conn_worldmodel
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_connector_common
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_db
+
+running 1 test
+test crates/chronograph-core/src/lib.rs - (line 3) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 1 test
+test crates/chronograph-core/src/graph.rs - graph::Graph (line 24) - compile fail ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+all doctests ran in 1.45s; merged doctests compilation took 0.99s
+   Doc-tests chronograph_server
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

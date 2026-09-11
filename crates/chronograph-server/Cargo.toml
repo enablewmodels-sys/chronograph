@@ -1,0 +1,35 @@
+[package]
+name = "chronograph-server"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+chronograph-db.workspace = true
+chronograph-connector-common = { path = "../chronograph-connector-common" }
+serde.workspace = true
+rand.workspace = true
+# Network/auth dependencies are isolated from the embedded engine.
+axum = "0.8"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal", "fs", "io-util"] }
+tower-http = { version = "0.6", features = ["fs", "limit"] }
+serde_json = "1"
+argon2 = "0.5"
+sha2 = "0.10"
+subtle = "2"
+url = "2"
+rmcp = { version = "=3.2.0", features = ["transport-streamable-http-server", "transport-streamable-http-client-reqwest", "transport-io", "client", "reqwest"] }
+arrow = { workspace = true, features = ["ipc"] }
+# Portable streamed backup bundles; only validated regular files are restored.
+tar = "0.4"
+# Configure TLS, disabled redirects and bounded responses for the native MCP bridge.
+reqwest = { version = "0.13", default-features = false, features = ["rustls"] }
+tokio-util = { version = "0.7", features = ["io"] }
+
+[dev-dependencies]
+tempfile = "3"
+
+tower = { version = "0.5", features = ["util"] }

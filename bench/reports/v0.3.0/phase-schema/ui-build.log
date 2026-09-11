@@ -1,0 +1,32 @@
+
+> chronograph-console@0.3.0 build
+> tsc -b && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 2025 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                0.62 kB │ gzip:  0.40 kB
+dist/assets/manrope-cyrillic-ext-wght-normal-C8S-KRRz.woff2    2.55 kB
+dist/assets/manrope-vietnamese-wght-normal-usUDDRr7.woff2      8.52 kB
+dist/assets/manrope-greek-wght-normal-DL7QRZyv.woff2           9.44 kB
+dist/assets/manrope-cyrillic-wght-normal-Dvxsihut.woff2       14.50 kB
+dist/assets/manrope-latin-ext-wght-normal-Ch3YOpNY.woff2      15.12 kB
+dist/assets/manrope-latin-wght-normal-DHIcAJRg.woff2          24.84 kB
+dist/assets/index-CVFfA19g.css                                53.18 kB │ gzip: 11.82 kB
+dist/assets/plus-CmXLtHnP.js                                   0.15 kB │ gzip:  0.15 kB
+dist/assets/download-DLxcbe23.js                               0.23 kB │ gzip:  0.19 kB
+dist/assets/trash-2-ZRS3ydG7.js                                0.33 kB │ gzip:  0.22 kB
+dist/assets/demo-F6OpKEHx.js                                   1.55 kB │ gzip:  0.87 kB
+dist/assets/Overview-BY6NljP-.js                               3.55 kB │ gzip:  1.45 kB
+dist/assets/Connectors-D2x8hUkX.js                             3.78 kB │ gzip:  1.61 kB
+dist/assets/Operations-BUN9drm8.js                             4.13 kB │ gzip:  1.62 kB
+dist/assets/Access-D1-IR2v_.js                                 4.86 kB │ gzip:  1.96 kB
+dist/assets/Write-eeoKro9g.js                                  7.21 kB │ gzip:  2.68 kB
+dist/assets/Branches-CCk8g052.js                               9.52 kB │ gzip:  3.50 kB
+dist/assets/Explorer-J_Q61acn.js                              12.81 kB │ gzip:  4.69 kB
+dist/assets/SchemaWorkspace-5fqXFI6e.js                       18.02 kB │ gzip:  5.76 kB
+dist/assets/Documentation-BJAViAux.js                        161.15 kB │ gzip: 49.05 kB
+dist/assets/index-BYhZMKv2.js                                264.35 kB │ gzip: 85.46 kB
+✓ built in 1.12s

@@ -1,0 +1,7 @@
+{"name":"HTTP stats","samples":500,"concurrency":1,"p50_ms":0.32408299999997325,"p95_ms":0.404042000000004,"p99_ms":0.5615829999999846,"max_ms":3.5346250000000055,"requests_per_second":2929.8276968331493}
+{"name":"HTTP as-of first page (1000 rows)","samples":300,"concurrency":1,"p50_ms":4.0307920000000195,"p95_ms":4.409832999999935,"p99_ms":4.545875000000024,"max_ms":4.676208999999972,"requests_per_second":244.5216453616995}
+{"name":"HTTP uniform sample (16 edges)","samples":300,"concurrency":1,"p50_ms":0.25470800000016425,"p95_ms":0.33512500000006185,"p99_ms":0.4343340000000353,"max_ms":1.3236669999998867,"requests_per_second":3714.127701144252}
+{"name":"MCP as-of first page (1000 rows)","samples":300,"concurrency":1,"p50_ms":5.009541999999783,"p95_ms":5.599834000000101,"p99_ms":5.839167000000089,"max_ms":6.7177090000000135,"requests_per_second":196.68297441695378}
+{"name":"HTTP as-of first page, 8 clients","samples":400,"concurrency":8,"p50_ms":6.872624999999971,"p95_ms":10.012292000000343,"p99_ms":14.081874999999854,"max_ms":16.61691699999983,"requests_per_second":1098.484767138722}
+{"name":"MCP as-of first page, 8 concurrent requests","samples":400,"concurrency":8,"p50_ms":8.680957999999919,"p95_ms":11.638084000000163,"p99_ms":15.217792000000372,"max_ms":16.315082999999504,"requests_per_second":865.0039668541295}
+{"name":"HTTP durable single insert","samples":200,"concurrency":1,"p50_ms":4.00629200000003,"p95_ms":4.810292000000118,"p99_ms":4.965333000000101,"max_ms":5.038000000000466,"requests_per_second":246.27089439073765}

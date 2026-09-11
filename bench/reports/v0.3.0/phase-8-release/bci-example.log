@@ -1,0 +1,23 @@
+$ target/release/examples/bci_stream
+128 channels, simulated 1 kHz: 1000000 edges in 0.824s (1213640 edges/s including sync)
+High-synchrony window [2s, 3s): 128000 edge versions
+At 2.5s: 128 active relations; 128 sampled relations
+History: 1000000 versions; log: 67005848 bytes
+        1.19 real         5.11 user         0.50 sys
+           237305856  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               21221  page reclaims
+                   0  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                 109  voluntary context switches
+               23801  involuntary context switches
+         21663098255  instructions retired
+         14651119866  cycles elapsed
+           232882800  peak memory footprint

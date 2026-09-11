@@ -1,0 +1,5 @@
+$ target/release/examples/bci_stream
+128 channels, simulated 1 kHz: 1000000 edges in 0.667s (1498772 edges/s including sync)
+High-synchrony window [2s, 3s): 128000 edge versions
+At 2.5s: 128 active relations; 128 sampled relations
+History: 1000000 versions; log: 67005848 bytes

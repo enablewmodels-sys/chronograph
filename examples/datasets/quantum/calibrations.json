@@ -1,0 +1,5 @@
+[
+  {"from_qubit":0,"to_qubit":1,"valid_from":100,"valid_to":200,"error_rate":0.01,"duration_ns":120.0},
+  {"from_qubit":0,"to_qubit":1,"valid_from":300,"valid_to":400,"error_rate":0.03,"duration_ns":125.0},
+  {"from_qubit":1,"to_qubit":2,"valid_from":100,"valid_to":400,"error_rate":0.02,"duration_ns":150.0}
+]

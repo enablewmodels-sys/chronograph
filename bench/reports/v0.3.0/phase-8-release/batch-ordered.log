@@ -1,0 +1,28 @@
+$ target/release/measure
+dataset=10000000, nodes=100000, seed=4848215499434033153, mode=batch-ordered, rayon_threads=10
+Generated in 1.340s
+Ingest: 1106939 edges/s buffered, 1104833 edges/s including sync; 9.034s / 9.051s
+Reopen: 10.645s, 10000000 versions, 698050224 bytes
+Full graph traversal: p50=19.053ms p99=19.805ms (200 individual queries)
+Between full traversal: p50=22.812ms p99=23.782ms
+LatestFirst: 27686055 sampled edges/s (17747039 outputs)
+Uniform: 24740808 sampled edges/s (17747039 outputs)
+Arrow: 949342 rows in 31.154ms
+       32.22 real        50.42 user         3.67 sys
+          3491495936  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              348560  page reclaims
+               31247  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                 165  voluntary context switches
+              121088  involuntary context switches
+        111766324614  instructions retired
+        131237239641  cycles elapsed
+          2781563352  peak memory footprint

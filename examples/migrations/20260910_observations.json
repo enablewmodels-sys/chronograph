@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "id": "20260910_observations",
+  "name": "Define observation properties",
+  "operations": [
+    {
+      "op": "upsert_relation",
+      "relation": {
+        "kind": 10,
+        "name": "observes",
+        "description": "A sensor observes an object with a confidence and sequence number.",
+        "source_label": "sensor",
+        "target_label": "object",
+        "properties": [
+          { "name": "confidence", "type": "f32", "offset": 0 },
+          { "name": "sequence", "type": "u64", "offset": 8 }
+        ]
+      }
+    }
+  ]
+}

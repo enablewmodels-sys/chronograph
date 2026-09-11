@@ -1,0 +1,7 @@
+stream_node = 9000
+channel_base = 10000
+channels = 4
+edge_kind = 100
+sample_rate_hz = 1000
+unit = "microvolt"
+clock_domain = "simulation"

@@ -1,0 +1,5 @@
+$ cargo run --locked -p chronograph-conn-bci --example bci_connector
+   Compiling chronograph-conn-bci v0.3.0 (<workspace>/crates/chronograph-conn-bci)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.66s
+     Running `target/debug/examples/bci_connector`
+Synthetic BCI: 10000 frames, 40000 channel versions, 4000 epoch rows, 4 active at 2.5 s

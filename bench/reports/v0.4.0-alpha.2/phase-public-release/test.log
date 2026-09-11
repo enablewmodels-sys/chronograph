@@ -1,0 +1,223 @@
+$ cargo test --locked --workspace
+   Compiling chronograph-db v0.4.0-alpha.2 (<workspace>/crates/chronograph-core)
+   Compiling chronograph-connector-common v0.4.0-alpha.2 (<workspace>/crates/chronograph-connector-common)
+   Compiling chronograph-conn-bci v0.4.0-alpha.2 (<workspace>/crates/chronograph-conn-bci)
+   Compiling chronograph-conn-worldmodel v0.4.0-alpha.2 (<workspace>/crates/chronograph-conn-worldmodel)
+   Compiling chronograph-server v0.4.0-alpha.2 (<workspace>/crates/chronograph-server)
+   Compiling chronograph-conn-robotics v0.4.0-alpha.2 (<workspace>/crates/chronograph-conn-robotics)
+   Compiling chronograph-conn-quantum v0.4.0-alpha.2 (<workspace>/crates/chronograph-conn-quantum)
+   Compiling chronograph-bench v0.4.0-alpha.2 (<workspace>/crates/chronograph-bench)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5m 07s
+     Running unittests src/lib.rs (target/debug/deps/chronograph_bench-6ff96f62787d9275)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/measure.rs (target/debug/deps/measure-b6b765fce7f629df)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_conn_bci-b162922cae4bdaa1)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/lsl_loopback.rs (target/debug/deps/lsl_loopback-59f000274a511574)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/roundtrip.rs (target/debug/deps/roundtrip-cb242ac96c36cbab)
+
+running 2 tests
+test invalid_frames_are_atomic_and_simulator_is_deterministic ... ok
+test source_graph_arrow_roundtrip_and_late_arrival ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_conn_quantum-e4b9281e3ea05df3)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/roundtrip.rs (target/debug/deps/roundtrip-a5ae9572adbf2b11)
+
+running 3 tests
+test unsupported_qasm_is_rejected_instead_of_silently_lowered ... ok
+test calibration_windows_are_atomic_durable_and_have_real_gaps ... ok
+test openqasm_ast_dag_reopen_arrow_and_tamper_detection ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_conn_robotics-055d26afe0f62b2b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/roundtrip.rs (target/debug/deps/roundtrip-4cd748c89efed95f)
+
+running 4 tests
+test cdr_endianness_truncation_huge_arrays_and_atomic_invalid_input ... ok
+test referenced_video_and_sub_microsecond_times_are_explicit ... ok
+test damaged_and_unsupported_files_fail_without_source_mutation ... ok
+test independent_rosbag_and_compressed_mcap_to_reopen_arrow_and_training ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_conn_worldmodel-341cfb8e3c144d21)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/roundtrip.rs (target/debug/deps/roundtrip-f036f44a5ca910b8)
+
+running 4 tests
+test reject_broken_sequences_wrong_codec_and_incomplete_exports_atomically ... ok
+test fork_continuation_preserves_complete_state_and_mapping_after_merge ... ok
+test independent_gymnasium_source_reopen_arrow_and_exact_dynamics_restore ... ok
+test random_state_restore_preserves_hidden_rng_and_future ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.01s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_connector_common-1d592fbb70b47f71)
+
+running 2 tests
+test assets::tests::exact_tensor_validation_and_checksum ... ok
+test tests::durable_rows_integrity_collision_and_bounds ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_db-a5bd70b8cc777cb4)
+
+running 30 tests
+test tests::arrow_export_and_parallel_reads ... ok
+test tests::bounded_batch_preserves_gaps_late_arrivals_atomicity_and_replay ... ok
+test branch::tests::one_hundred_forks_share_one_frozen_base_and_release_it_when_closed ... ok
+test tests::application_revision_and_drop_durability ... ok
+test ingestion::tests::explicit_v2_upgrade_preserves_source_and_forks ... ok
+test tests::crash_child ... ignored, subprocess-only crash writer
+test ingestion::tests::receipts_survive_restart_and_reject_conflicting_retries ... ok
+test tests::corrupted_length_cannot_hide_later_records_as_a_torn_tail ... ok
+test tests::durable_forks_freeze_state_isolate_writes_and_remap_on_merge ... ok
+test tests::batches_match_sequential_and_reject_invalid_input_atomically ... ok
+test tests::codec_rejects_unbounded_counts_and_invalid_options ... ok
+test tests::corruption_and_format_errors_do_not_rewrite_files ... ok
+test tests::failed_sync_disables_writer_and_requires_reopen ... ok
+test tests::failed_merge_sync_has_atomic_recoverable_result ... ok
+test tests::independently_encoded_v1_fixture_is_compatible ... ok
+test tests::late_event_fills_gap_without_changing_successor ... ok
+test tests::interval_math_and_late_replacement ... ok
+test tests::kill_mid_append_recovers_whole_operations ... ok
+test tests::lock_and_sync_mode ... ok
+test tests::frozen_forks_exclude_parent_future_and_reject_conflicting_merges ... ok
+test tests::migration_rejects_existing_locked_and_incomplete_files ... ok
+test tests::malformed_branch_records_never_rewrite_the_source ... ok
+test tests::sampling_and_temporal_filtering ... ok
+test tests::partial_header_and_trailing_checksum_recovery ... ok
+test tests::arbitrary_history_matches_naive_model ... ok
+test tests::bounded_temporal_batches_match_reference ... ok
+test tests::branch_batches_and_merge_match_reference ... ok
+test tests::partial_append_every_byte_preserves_atomic_replacement ... ok
+test ingestion::tests::every_torn_ingest_frame_recovers_without_half_checkpoint ... ok
+test tests::every_truncated_branch_operation_recovers_atomically ... ok
+
+test result: ok. 29 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 8.14s
+
+     Running unittests src/lib.rs (target/debug/deps/chronograph_server-4924d4bfdd885ef8)
+
+running 17 tests
+test schema::tests::invalid_layout_limits_and_adoption_are_checked ... ok
+test auth::tests::rate_limits_invalid_credentials_before_expensive_hashing ... ok
+test schema::tests::typed_properties_preserve_exact_integers_and_validate_bytes ... ok
+test schema::version_one_checksum_serialization_is_frozen ... ok
+test backup::tests::invalid_and_incomplete_archives_leave_no_destination ... ok
+test schema::tests::persistence_failure_fails_closed_and_symlinks_are_rejected ... ok
+test schema::tests::rejects_stale_preview_checksum_and_partial_migration ... ok
+test schema::tests::protects_main_and_active_branch_layouts_and_enforces_strict_kinds ... ok
+test schema::tests::persistence_retry_drift_and_backup_restore ... ok
+test backup::tests::backup_restore_sidecars_and_source_preservation ... ok
+test auth::tests::malformed_credentials_and_commit_failure_fail_closed ... ok
+test auth::tests::salted_tokens_cache_revocation_expiry_and_lock ... ok
+test service_tests::invalid_requests_cannot_mutate_and_cookie_routes_are_retired ... ok
+test service_tests::worker_queue_is_bounded_and_cancellation_releases_waiters ... ok
+test service_tests::branch_scopes_preview_merge_cursor_and_bounded_edges ... ok
+test service_tests::schema_scope_settings_structured_writes_and_concurrent_apply ... ok
+test service_tests::scopes_exact_ids_durability_pagination_and_revocation ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.08s
+
+     Running unittests src/bin/chronograph-mcp.rs (target/debug/deps/chronograph_mcp-dc5f5d051a6f2fe2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/chronograph_server-85e9e6587588cc9b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_bench
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_conn_bci
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_conn_quantum
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_conn_robotics
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_conn_worldmodel
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_connector_common
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests chronograph_db
+
+running 1 test
+test crates/chronograph-core/src/lib.rs - (line 3) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+
+running 1 test
+test crates/chronograph-core/src/graph.rs - graph::Graph (line 24) - compile fail ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.67s
+
+all doctests ran in 8.22s; merged doctests compilation took 7.00s
+   Doc-tests chronograph_server
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

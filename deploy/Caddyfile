@@ -1,0 +1,25 @@
+{
+    email {$ACME_EMAIL}
+    servers {
+        timeouts {
+            read_header 10s
+            read_body 30s
+            idle 2m
+        }
+    }
+}
+
+{$DOMAIN} {
+    encode zstd gzip
+    request_body {
+        max_size 4MB
+    }
+    reverse_proxy chronograph:8080 {
+        # Preserve Host for exact origin validation. Do not retry graph writes.
+        flush_interval -1
+        transport http {
+            dial_timeout 5s
+            response_header_timeout 60s
+        }
+    }
+}

@@ -1,0 +1,10 @@
+$ target/release/measure
+dataset=10000000, nodes=100000, seed=4848215499434033153, mode=batch-ordered, rayon_threads=10
+Generated in 0.693s
+Ingest: 2310888 edges/s buffered, 2303587 edges/s including sync; 4.327s / 4.341s
+Reopen: 3.625s, 10000000 versions, 698050224 bytes
+Full graph traversal: p50=8.440ms p99=9.040ms (200 individual queries)
+Between full traversal: p50=10.582ms p99=11.163ms
+LatestFirst: 40402684 sampled edges/s (17747039 outputs)
+Uniform: 38883270 sampled edges/s (17747039 outputs)
+Arrow: 949342 rows in 17.282ms

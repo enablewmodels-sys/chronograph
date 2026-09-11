@@ -1,0 +1,4 @@
+PASS Official MCP client: discovery, scopes, preview, apply, idempotency, encode, structured ingestion and history
+PASS File CLI preview/apply retries and invalid files leave schema unchanged
+PASS Backup archive restores the catalog and decoded temporal records
+PASS Abrupt process termination/restart preserves applied migration and exact property values

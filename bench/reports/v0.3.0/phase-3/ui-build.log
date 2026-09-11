@@ -1,0 +1,27 @@
+$ npm --prefix ui run build
+
+> chronograph-console@0.3.0 build
+> tsc -b && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 2018 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                0.62 kB │ gzip:  0.40 kB
+dist/assets/manrope-cyrillic-ext-wght-normal-C8S-KRRz.woff2    2.55 kB
+dist/assets/manrope-vietnamese-wght-normal-usUDDRr7.woff2      8.52 kB
+dist/assets/manrope-greek-wght-normal-DL7QRZyv.woff2           9.44 kB
+dist/assets/manrope-cyrillic-wght-normal-Dvxsihut.woff2       14.50 kB
+dist/assets/manrope-latin-ext-wght-normal-Ch3YOpNY.woff2      15.12 kB
+dist/assets/manrope-latin-wght-normal-DHIcAJRg.woff2          24.84 kB
+dist/assets/index-Uxd-mNC9.css                                22.71 kB │ gzip:  5.85 kB
+dist/assets/demo-F6OpKEHx.js                                   1.55 kB │ gzip:  0.87 kB
+dist/assets/Overview-D2VHO9S9.js                               3.81 kB │ gzip:  1.58 kB
+dist/assets/Operations-BJAUJct9.js                             4.13 kB │ gzip:  1.61 kB
+dist/assets/Write-DBEJwvLC.js                                  4.44 kB │ gzip:  1.63 kB
+dist/assets/Access-DqnRkeDv.js                                 4.86 kB │ gzip:  1.96 kB
+dist/assets/Explorer-DuHr1L4o.js                               6.04 kB │ gzip:  2.27 kB
+dist/assets/Documentation-DHS86vKU.js                        158.95 kB │ gzip: 48.26 kB
+dist/assets/index-CBdGuBSu.js                                249.92 kB │ gzip: 80.96 kB
+✓ built in 1.78s

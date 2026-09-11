@@ -1,0 +1,11 @@
+{
+  "status": "Community local candidate complete; external/performance gates remain open",
+  "native_archive_smoke": "PASS",
+  "source_archive_checks": "PASS",
+  "sha256sums": "3/3 PASS",
+  "actionlint": "PASS",
+  "yaml_syntax": "PASS",
+  "running_chronograph_processes": [],
+  "publication": "deferred",
+  "managed": "agreed review gate"
+}

@@ -1,0 +1,11 @@
+circuit_node = 40000
+device_node = 40100
+qubit_base = 41000
+operation_base = 42000
+manifest_kind = 400
+contains_kind = 401
+uses_kind = 402
+acts_on_kind = 403
+precedes_kind = 404
+coupled_to_kind = 405
+clock_domain = "simulation_us"

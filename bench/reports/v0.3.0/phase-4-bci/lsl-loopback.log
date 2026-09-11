@@ -1,0 +1,68 @@
+$ cargo test --locked -p chronograph-conn-bci --features lsl --test lsl_loopback -- --ignored --nocapture
+   Compiling chronograph-conn-bci v0.3.0 (<workspace>/crates/chronograph-conn-bci)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.50s
+     Running tests/lsl_loopback.rs (target/debug/deps/lsl_loopback-a53fb2a716f586e7)
+
+running 1 test
+2026-09-09 14:04:08.231 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'lo0' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.231 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'lo0' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.231 (   0.003s) [          F9C56F]      netinterfaces.cpp:102   INFO| 	IPv4 addr: 7f000001
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'lo0' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: ::1
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'lo0' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: fe80::1%lo0
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'gif0' (status: 0, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'stf0' (status: 0, multicast: 0, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'anpi3' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'anpi0' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'anpi1' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'en4' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'en5' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'en6' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'en1' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'en2' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'en3' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'bridge0' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'utun0' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'utun0' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: fe80::c984:8fa6:1ab9:58bb%utun0
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'utun1' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'utun1' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: fe80::b5c0:3041:80ee:8776%utun1
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'utun2' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'utun2' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: fe80::84db:9e38:51ae:f618%utun2
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'utun3' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'utun3' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: fe80::ce81:b1c:bd2c:69e%utun3
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'ap1' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'en0' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'en0' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: fe80::18f3:5706:5f96:e3a4%en0
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'en0' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: fd52:727b:5381:0:f2:c2a3:b48f:1e7a
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'en0' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:102   INFO| 	IPv4 addr: c0a8b236
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'en0' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: 2001:9e8:6629:7800:88c:db0b:afa2:b165
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'en0' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: 2001:9e8:6629:7800:1d51:3372:c4e8:8143
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'awdl0' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'awdl0' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: fe80::3cd8:f8ff:fe62:3a97%awdl0
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'llw0' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'llw0' (status: 1, multicast: 32768, broadcast: 2)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: fe80::3cd8:f8ff:fe62:3a97%llw0
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'utun4' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'utun4' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: fe80::c2e:5e61:34a5:c47f%utun4
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'utun5' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:91    INFO| netif 'utun5' (status: 1, multicast: 32768, broadcast: 0)
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]      netinterfaces.cpp:105   INFO| 	IPv6 addr: fe80::af63:251:4b6a:89aa%utun5
+2026-09-09 14:04:08.232 (   0.003s) [          F9C56F]         api_config.cpp:268   INFO| Configuration loaded from <workspace>/examples/datasets/bci/lsl-loopback.cfg
+2026-09-09 14:04:08.233 (   0.004s) [          F9C56F]             common.cpp:65    INFO| git:/branch:/build:Debug/compiler:AppleClang-17.0.0.17000604/link:STATIC
+2026-09-09 14:04:08.891 (   0.662s) [R_Chronograph   ]      data_receiver.cpp:344    ERR| Stream transmission broke off (Input stream error.); re-connecting...
+Native LSL loopback: 32 four-channel frames received, 128 graph versions and Arrow rows matched
+test native_lsl_source_to_graph_to_arrow ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.22s

@@ -1,0 +1,9 @@
+environment_id = "ChronographGridWorld-v1"
+environment_node = 30000
+episode_base = 31000
+max_episodes = 1000
+state_kind = 300
+state_codec = "chronograph-gridworld-xorshift64-v1"
+observation_dim = 4
+action_count = 4
+clock_domain = "simulation_us"

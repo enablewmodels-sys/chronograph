@@ -1,0 +1,29 @@
+[package]
+name = "chronograph-conn-robotics"
+description = "Bounded rosbag2/MCAP replay and LeRobot export for Chronograph"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+repository.workspace = true
+
+[dependencies]
+chronograph-db.workspace = true
+chronograph-connector-common = { path = "../chronograph-connector-common" }
+arrow = { workspace = true, features = ["ipc"] }
+serde.workspace = true
+thiserror.workspace = true
+# Validated mapping configuration and standard ROS JSON messages.
+toml = "1.1"
+serde_json = { version = "1", features = ["float_roundtrip"] }
+# Official MCAP reader/writer with LZ4/Zstandard and CRC verification.
+mcap = "0.25"
+# Read-only rosbag2 SQLite ingestion, using a bundled reproducible native SQLite.
+rusqlite = { version = "0.40", default-features = false, features = ["libsqlite3-sys", "bundled", "limits"] }
+
+[dev-dependencies]
+tempfile = "3"
+
+[[example]]
+name = "robotics_connector"
+path = "../../examples/robotics_connector.rs"

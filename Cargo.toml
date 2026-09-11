@@ -1,0 +1,34 @@
+[workspace]
+members = ["crates/chronograph-core", "crates/chronograph-bench", "crates/chronograph-server", "crates/chronograph-conn-bci", "crates/chronograph-connector-common", "crates/chronograph-conn-robotics", "crates/chronograph-conn-worldmodel", "crates/chronograph-conn-quantum"]
+resolver = "2"
+
+[workspace.package]
+version = "0.4.0-alpha.2"
+edition = "2024"
+rust-version = "1.93"
+license-file = "LICENSE"
+repository = "https://github.com/enablewmodels-sys/chronograph"
+
+[workspace.dependencies]
+chronograph-db = { path = "crates/chronograph-core" }
+rayon = "1.11"
+serde = { version = "1", features = ["derive"] }
+memmap2 = "0.9"
+arrow = { version = "59", default-features = false }
+thiserror = "2"
+criterion = { version = "0.8", default-features = false, features = ["cargo_bench_support"] }
+# Required FxHashMap implementation; avoids hand-rolling a hash function.
+rustc-hash = "2"
+# Hardware-accelerated record checksums detect incomplete/corrupt appends.
+crc32fast = "1"
+# Audited unbiased sampling and reproducible benchmark generators.
+rand = { version = "0.9", features = ["small_rng"] }
+# Required randomized reference-model tests (development dependency only).
+proptest = "1"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+
+[profile.bench]
+debug = 1

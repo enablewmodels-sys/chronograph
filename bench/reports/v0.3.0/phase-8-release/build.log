@@ -1,0 +1,3 @@
+$ cargo build --locked --workspace
+   Compiling chronograph-conn-quantum v0.3.0 (<workspace>/crates/chronograph-conn-quantum)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.67s

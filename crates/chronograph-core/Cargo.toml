@@ -1,0 +1,30 @@
+[package]
+name = "chronograph-db"
+description = "An embedded temporal graph database for evolving world models"
+readme = "../../README.md"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+repository.workspace = true
+
+[dependencies]
+rayon.workspace = true
+serde.workspace = true
+memmap2.workspace = true
+arrow.workspace = true
+thiserror.workspace = true
+rustc-hash.workspace = true
+crc32fast.workspace = true
+rand.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[[example]]
+name = "world_model"
+path = "../../examples/world_model.rs"
+
+[[example]]
+name = "bci_stream"
+path = "../../examples/bci_stream.rs"

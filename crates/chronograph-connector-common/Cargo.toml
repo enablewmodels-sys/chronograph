@@ -1,0 +1,19 @@
+[package]
+name = "chronograph-connector-common"
+description = "Checked Arrow sidecars for Chronograph public-API connectors"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+repository.workspace = true
+
+[dependencies]
+arrow = { workspace = true, features = ["ipc"] }
+thiserror.workspace = true
+serde.workspace = true
+# Preserve typed source records within an Arrow UTF-8 column, without opaque binary serializers.
+serde_json = { version = "1", features = ["float_roundtrip"] }
+# Content addressing and full SHA-256 integrity verification for immutable Arrow batches.
+sha2 = "0.10"
+# Atomic no-clobber publication of synchronized sidecar files.
+tempfile = "3"

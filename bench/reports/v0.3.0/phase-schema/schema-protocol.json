@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "checks": [
+    "Official MCP client: discovery, scopes, preview, apply, idempotency, encode, structured ingestion and history",
+    "File CLI preview/apply retries and invalid files leave schema unchanged",
+    "Backup archive restores the catalog and decoded temporal records",
+    "Abrupt process termination/restart preserves applied migration and exact property values"
+  ],
+  "timestamp": "2026-09-10T09:31:23.494Z"
+}
