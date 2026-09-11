@@ -3,6 +3,8 @@
 /bench/results/
 *.cgraph
 *.cgraph.lock
+# Checked synthetic migration input; never include user journals.
+!crates/chronograph-core/tests/fixtures/v1.cgraph
 __pycache__/
 
 # Service state, secrets, frontend outputs and local test artifacts.

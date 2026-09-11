@@ -24,6 +24,7 @@ TOP = ['Cargo.toml', 'Cargo.lock', 'README.md', 'CHANGELOG.md', 'CONTRIBUTING.md
 TREES = ['crates', 'examples', 'scripts', '.github', 'deploy', 'third_party', 'sdk']
 UI_TOP = ['package.json', 'package-lock.json', 'index.html', 'tsconfig.json', 'vite.config.ts', 'playwright.config.ts']
 FORBIDDEN = {'node_modules', 'target', 'data', 'config', 'community-data', '.work', 'private', '__pycache__', 'secrets', '.git', 'build', 'chronograph_connectors.egg-info'}
+FIXTURES = {'crates/chronograph-core/tests/fixtures/v1.cgraph'}
 SECRET = re.compile(rb'cg_[a-f0-9]{16}_[a-f0-9]{64}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----')
 
 
@@ -44,7 +45,7 @@ def selected_tree(directory):
             raise RuntimeError(f'Symlink refused: {rel}')
         if any(p in FORBIDDEN for p in rel.parts) or path.name == '.DS_Store':
             continue
-        if path.name == '.env' or path.suffix in ('.pyc', '.cgraph', '.token', '.lockfile'):
+        if path.name == '.env' or (path.suffix in ('.pyc', '.cgraph', '.token', '.lockfile') and rel.as_posix() not in FIXTURES):
             continue
         yield path
 

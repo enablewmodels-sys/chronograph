@@ -4,10 +4,11 @@ import argparse
 import hashlib
 import json
 import pathlib
+import re
 import subprocess
 import tarfile
 import tempfile
-from package import FORBIDDEN, SECRET
+from package import FORBIDDEN, FIXTURES, SECRET
 
 parser = argparse.ArgumentParser()
 parser.add_argument('archive', type=pathlib.Path)
@@ -20,6 +21,8 @@ with tempfile.TemporaryDirectory(prefix='chronograph-source-') as temp:
                 raise RuntimeError('Unsafe source archive member')
             if set(path.parts[1:]) & FORBIDDEN or path.name in ('.env', 'admin.token', 'auth.json'):
                 raise RuntimeError('Private source archive member: ' + member.name)
+            if path.suffix == '.cgraph' and pathlib.PurePosixPath(*path.parts[1:]).as_posix() not in FIXTURES:
+                raise RuntimeError('Runtime journal in source archive: ' + member.name)
             if SECRET.search(archive.extractfile(member).read()):
                 raise RuntimeError('Credential-shaped bytes in source archive')
         archive.extractall(temp, filter='data')
@@ -36,6 +39,11 @@ with tempfile.TemporaryDirectory(prefix='chronograph-source-') as temp:
     assert (root / 'NOTICE').is_file()
     assert not (root / 'LICENSE-MIT').exists()
     assert not (root / 'LICENSE-APACHE').exists()
+    # Cargo metadata alone does not notice omitted include_bytes!/include_str! inputs.
+    for source in root.rglob('*.rs'):
+        for relative in re.findall(r'include_(?:bytes|str)!\(\s*"([^"]+)"', source.read_text()):
+            included = (source.parent / relative).resolve()
+            assert included.is_relative_to(root) and included.is_file(), (source, relative)
     for package in metadata['packages']:
         assert package['version'] == __import__('tomllib').loads((root / 'Cargo.toml').read_text())['workspace']['package']['version']
         assert pathlib.Path(package['license_file']).read_bytes() == (root / 'LICENSE').read_bytes()

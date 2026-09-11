@@ -40,3 +40,12 @@ also covers free competing products. Third-party licenses are preserved.
 This is source-available, not OSI open source. Public static hosting provides a
 synthetic demo, not a persistent database. Managed infrastructure and billing are
 not in this repository. Existing graph data and credentials were not changed.
+
+## Clean checkout follow-up
+
+The committed Vercel site installed and built successfully in a fresh temporary
+checkout with no local state or build caches. The first Linux CI run found that
+the broad runtime-journal exclusion omitted the 242-byte synthetic migration
+fixture. The exact fixture path is now allowlisted, and source-archive verification
+checks every literal Rust include_bytes!/include_str! input for existence. The
+follow-up Linux CI run remains the source of truth for Linux verification.
