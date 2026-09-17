@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>Chronograph.Community</PackageId>
+    <Version>0.4.0-alpha.3</Version>
+    <Description>Chronograph Community bounded HTTP client</Description>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/enablewmodels-sys/chronograph</RepositoryUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="../LICENSE" Pack="true" PackagePath="" />
+    <None Include="../NOTICE" Pack="true" PackagePath="" />
+    <None Include="../README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+</Project>

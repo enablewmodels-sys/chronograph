@@ -1,0 +1,11 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.chronograph</groupId><artifactId>chronograph-community</artifactId><version>0.4.0-alpha.3</version>
+  <properties><maven.compiler.release>17</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>
+  <licenses><license><name>PolyForm Perimeter 1.0.0</name><url>https://polyformproject.org/licenses/perimeter/1.0.0/</url></license></licenses>
+  <dependencies><dependency><groupId>com.google.code.gson</groupId><artifactId>gson</artifactId><version>2.14.0</version></dependency></dependencies>
+  <build>
+    <resources><resource><directory>.</directory><includes><include>LICENSE</include><include>NOTICE</include></includes><targetPath>META-INF</targetPath></resource></resources>
+    <plugins><plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.14.1</version></plugin></plugins>
+  </build>
+</project>

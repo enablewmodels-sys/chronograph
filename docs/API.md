@@ -1,5 +1,7 @@
 # HTTP API — Community 0.4 alpha
 
+Use the [language SDKs](SDK.md) for authenticated clients and [platform recipes](INTEGRATIONS.md) for BCI, robotics, world-model and quantum producers. The [generated OpenAPI 3.1 contract](https://github.com/enablewmodels-sys/chronograph/blob/main/sdk/schema/openapi.json) shares request definitions with MCP.
+
 The service and built UI share one origin. Default: `http://127.0.0.1:8080`.
 All `/v1` and `/mcp` requests require `Authorization: Bearer <token>`.
 There are no browser sessions, cookies, CSRF tokens or login/password endpoints.

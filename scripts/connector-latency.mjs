@@ -107,7 +107,7 @@ try {
     },
   );
   await report("connector-latency.json", {
-    version: "0.4.0-alpha.2",
+    version: (await api.json("/v1/info")).version,
     transport: "loopback HTTP, no TLS",
     durability: "fsync",
     fixture: "synthetic model outputs; 256 KiB little-endian f32 tensor",

@@ -160,7 +160,7 @@ fn validate_record(
                 ));
             }
         }
-        "gymnasium" | "minari" => {
+        "gymnasium" | "minari" | "physical-ai" => {
             if !field("terminated").is_boolean()
                 || !field("truncated").is_boolean()
                 || field("reward").as_f64().is_none_or(|v| !v.is_finite())
@@ -188,7 +188,7 @@ fn validate_record(
                 ));
             }
         }
-        "lsl" | "mne" => {
+        "lsl" | "mne" | "brainflow" => {
             if !has_tensor("signal") || b.channels.is_empty() || b.units.len() != b.channels.len() {
                 return Err(ApiError::bad(
                     "Signal records require signal tensor, configured channels and units",
@@ -197,14 +197,16 @@ fn validate_record(
             if r.assets
                 .get("signal")
                 .and_then(|id| assets.get(id))
-                .is_none_or(|m| m.shape.first().copied() != Some(b.channels.len() as u64))
+                .is_none_or(|m| {
+                    m.shape.len() != 2 || m.shape.first().copied() != Some(b.channels.len() as u64)
+                })
             {
                 return Err(ApiError::bad(
                     "Signal tensor uses [channels, samples] layout",
                 ));
             }
         }
-        "openqasm" | "qiskit" | "cirq"
+        "openqasm" | "qiskit" | "cirq" | "qsharp"
             if b.preset.contains("source") || b.preset.contains("circuit") =>
         {
             if r.assets
@@ -214,6 +216,47 @@ fn validate_record(
             {
                 return Err(ApiError::bad(
                     "Circuit source requires an opaque source asset; no uploaded code is executed",
+                ));
+            }
+        }
+        "model-output" => {
+            if r.assets.is_empty()
+                || !r.assets.keys().all(|name| has_tensor(name))
+                || field("model").as_str().is_none_or(str::is_empty)
+                || field("checkpoint").as_str().is_none_or(str::is_empty)
+            {
+                return Err(ApiError::bad(
+                    "Model outputs require named tensor assets, model and checkpoint strings",
+                ));
+            }
+        }
+        "quantum-results" | "qsharp" if b.preset == "counts-v1" || b.preset == "result-v1" => {
+            if field("basis").as_str().is_none_or(str::is_empty)
+                || field("counts").as_object().is_none_or(|counts| {
+                    counts.is_empty()
+                        || counts.len() > 4096
+                        || counts.iter().any(|(key, value)| {
+                            key.is_empty()
+                                || key.len() > 256
+                                || value.as_str().and_then(|s| s.parse::<u64>().ok()).is_none()
+                        })
+                })
+            {
+                return Err(ApiError::bad(
+                    "Quantum counts require an explicit basis and 1–4096 outcome-to-u64-string counts",
+                ));
+            }
+        }
+        "quantum-results" => {
+            if field("observables").as_object().is_none_or(|values| {
+                values.is_empty()
+                    || values.len() > 4096
+                    || values
+                        .values()
+                        .any(|v| v.as_f64().is_none_or(|n| !n.is_finite()))
+            }) {
+                return Err(ApiError::bad(
+                    "Quantum observables require 1–4096 named finite numbers",
                 ));
             }
         }
@@ -457,4 +500,103 @@ pub fn reject_raw_sidecar(schema: &Snapshot, kind: u16) -> AppResult<()> {
         ));
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod domain_tests {
+    use super::*;
+
+    fn binding(connector: &str, preset: &str) -> Binding {
+        serde_json::from_value(json!({"id":"fixture","connector":connector,"preset":preset,
+            "contract_version":1,"kind":500,"clock_domain":"simulation_us",
+            "channels":["C3","C4"],"units":["uV","uV"]}))
+        .unwrap()
+    }
+    fn record(fields: Value, asset_names: Value) -> Record {
+        serde_json::from_value(
+            json!({"src":"9007199254740993","dst":"18446744073709551614",
+            "timestamp_us":"0","fields":fields,"assets":asset_names}),
+        )
+        .unwrap()
+    }
+    fn tensor(shape: Value) -> AssetMetadata {
+        serde_json::from_value(
+            json!({"version":1,"kind":"tensor","encoding":"raw_le","dtype":"f32","shape":shape}),
+        )
+        .unwrap()
+    }
+    #[test]
+    fn signal_contract_requires_channel_sample_axes() {
+        let r = record(json!({}), json!({"signal":"a"}));
+        for connector in ["brainflow", "lsl", "mne"] {
+            let b = binding(
+                connector,
+                if connector == "mne" {
+                    "eeg-v1"
+                } else {
+                    "signal-v1"
+                },
+            );
+            for shape in [json!([2]), json!([2, 3, 4]), json!([1, 4])] {
+                let assets = BTreeMap::from([("a".into(), tensor(shape))]);
+                assert!(validate_record(&r, &b, &assets).is_err());
+            }
+            let assets = BTreeMap::from([("a".into(), tensor(json!([2, 4])))]);
+            assert!(validate_record(&r, &b, &assets).is_ok());
+        }
+    }
+    #[test]
+    fn quantum_counts_require_exact_unsigned_frequencies_and_basis() {
+        for (connector, preset) in [("quantum-results", "counts-v1"), ("qsharp", "result-v1")] {
+            let b = binding(connector, preset);
+            for counts in [
+                json!({"00": 2}),
+                json!({"00":"-1"}),
+                json!({"00":"18446744073709551616"}),
+                json!({}),
+            ] {
+                assert!(
+                    validate_record(
+                        &record(json!({"basis":"Z","counts":counts}), json!({})),
+                        &b,
+                        &BTreeMap::new()
+                    )
+                    .is_err()
+                );
+            }
+            assert!(
+                validate_record(
+                    &record(
+                        json!({"basis":"Z","counts":{"00":"18446744073709551615"}}),
+                        json!({})
+                    ),
+                    &b,
+                    &BTreeMap::new()
+                )
+                .is_ok()
+            );
+        }
+    }
+    #[test]
+    fn model_outputs_require_tensor_assets_and_provenance() {
+        let b = binding("model-output", "tensors-v1");
+        let assets = BTreeMap::from([("a".into(), tensor(json!([2])))]);
+        let r = record(
+            json!({"model":"model","checkpoint":"sha256:fixture"}),
+            json!({"output_0":"a"}),
+        );
+        assert!(validate_record(&r, &b, &assets).is_ok());
+        assert!(validate_record(&r, &b, &BTreeMap::new()).is_err());
+        assert!(
+            validate_record(
+                &record(
+                    json!({"model":"model","checkpoint":""}),
+                    json!({"output_0":"a"})
+                ),
+                &b,
+                &assets
+            )
+            .is_err()
+        );
+    }
 }

@@ -182,7 +182,7 @@ function Login() {
         </Link>
       </div>
       <footer>
-        Temporal data, with a persistent history.<span>v0.4.0-alpha.2</span>
+        Temporal data, with a persistent history.<span>v0.4.0-alpha.3</span>
       </footer>
     </main>
   );

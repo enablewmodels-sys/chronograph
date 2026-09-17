@@ -44,7 +44,7 @@ pub fn definitions() -> Vec<Tool> {
         (
             "asset_compose",
             "Publish a typed asset from 1–16 immutable chunk_v1 uploads in order (≤16 MiB). Safe to retry.",
-            json!({"metadata":{"type":"object"},"chunks":{"type":"array","minItems":1,"maxItems":16,"items":{"type":"string"}}}),
+            json!({"metadata":crate::contract::asset_metadata(),"chunks":{"type":"array","minItems":1,"maxItems":16,"items":{"type":"string"}}}),
             vec!["metadata", "chunks"],
         ),
         (
@@ -69,7 +69,7 @@ pub fn definitions() -> Vec<Tool> {
         (
             "connector_ingest",
             "Durably ingest 1–500 normalized records. Sequence starts at zero per instance/partition. Identical latest retries return the original receipt; conflicts fail. Upload referenced assets first.",
-            json!({"instance":{"type":"string"},"partition":{"type":"string"},"sequence":id,"records":{"type":"array","minItems":1,"maxItems":500,"items":{"type":"object","description":"src/dst/timestamp_us decimal strings, optional valid_to/episode, assets name-to-ID map, fields object. See CONNECTOR_PLATFORM.md."}}}),
+            json!({"instance":{"type":"string"},"partition":{"type":"string"},"sequence":id,"records":{"type":"array","minItems":1,"maxItems":500,"items":crate::contract::record()}}),
             vec!["instance", "partition", "sequence", "records"],
         ),
         (
@@ -87,7 +87,7 @@ pub fn definitions() -> Vec<Tool> {
         (
             "asset_put",
             "Synchronize one content-addressed binary asset, up to 1 MiB decoded. Tensor metadata requires dtype, shape and raw_le encoding. No content is executed.",
-            json!({"metadata":{"type":"object"},"data_hex":{"type":"string","maxLength":2097152}}),
+            json!({"metadata":crate::contract::asset_metadata(),"data_hex":{"type":"string","maxLength":2097152}}),
             vec!["metadata", "data_hex"],
         ),
         (

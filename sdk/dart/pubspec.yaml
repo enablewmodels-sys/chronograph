@@ -1,0 +1,6 @@
+name: chronograph
+description: Bounded authenticated client for the Chronograph Community v1 API.
+version: 0.4.0-alpha.3
+repository: https://github.com/enablewmodels-sys/chronograph
+environment:
+  sdk: '>=3.3.0 <4.0.0'

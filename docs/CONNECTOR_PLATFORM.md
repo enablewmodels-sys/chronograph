@@ -12,7 +12,7 @@ The server checks both catalog definitions and stored main/active-branch kinds. 
 
 ## What the presets mean
 
-The registry contains 28 normalized presets across 12 connectors. Retrieve the authoritative catalog through `POST /v1/connector_catalog` or the MCP tool with the same name.
+The registry contains 35 normalized presets across 17 connectors. Retrieve the authoritative catalog through `POST /v1/connector_catalog` or the MCP tool with the same name.
 
 | Connector | Presets | Local integration boundary |
 |---|---|---|
@@ -119,3 +119,7 @@ Use a fresh spool per instance/partition. When attaching a fresh spool to an exi
 See [format-3 upgrade](UPGRADE_0_4.md). Backups include journal/checkpoints, catalog/bindings and both sidecar namespaces; credentials stay separate. Restore validates checksums and catalog history before exposing a new destination. Restoring a format-2 backup upgrades its staged copy, preserving the archive.
 
 This is a Community alpha, not a completed managed release. Hosted invitations/auth/provisioning, remote agent job control, automatic LSL reconnection, full ROS message readers, LeRobot video export, asset GC and hardware compatibility certification remain in the implementation ledger. Request-size limits and worker queues are bounded; disk quotas must still be enforced by the deployment volume.
+
+## Additional alpha.3 producers
+
+The catalog now includes BrainFlow signal chunks, Q# source/results, portable quantum counts/observables, named model tensors and physical-AI transitions. These entries appear automatically in the migration dropdowns. See [platform recipes and verification boundaries](INTEGRATIONS.md) and the [multi-language clients](SDK.md). The alpha.2 binary release does not include these additions.

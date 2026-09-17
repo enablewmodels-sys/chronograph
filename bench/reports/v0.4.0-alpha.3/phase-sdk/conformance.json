@@ -1,0 +1,106 @@
+{
+  "date": "2026-09-17T14:43:31.276Z",
+  "transport": "real Rust Community server plus controlled HTTP faults",
+  "results": [
+    {
+      "language": "python",
+      "checks": [
+        "authenticated GET",
+        "migration template, preview and apply",
+        "binary tensor upload and exact roundtrip",
+        "u64/i64 precision, Unicode, durable ingest, retry and checkpoint",
+        "conflict, read-only, invalid credentials and validation errors",
+        "binary Arrow export",
+        "origin, header, path and request size rejection",
+        "redirect isolation, response limit, malformed JSON, proxy errors, Retry-After and timeout",
+        "multi-chunk asset helper roundtrip"
+      ],
+      "duration_ms": 518
+    },
+    {
+      "language": "typescript",
+      "checks": [
+        "authenticated GET",
+        "migration template, preview and apply",
+        "binary tensor upload and exact roundtrip",
+        "u64/i64 precision, Unicode, durable ingest, retry and checkpoint",
+        "conflict, read-only, invalid credentials and validation errors",
+        "binary Arrow export",
+        "origin, header, path and request size rejection",
+        "redirect isolation, response limit, malformed JSON, proxy errors, Retry-After and timeout",
+        "multi-chunk asset helper roundtrip"
+      ],
+      "duration_ms": 814
+    },
+    {
+      "language": "go",
+      "checks": [
+        "authenticated GET",
+        "migration template, preview and apply",
+        "binary tensor upload and exact roundtrip",
+        "u64/i64 precision, Unicode, durable ingest, retry and checkpoint",
+        "conflict, read-only, invalid credentials and validation errors",
+        "binary Arrow export",
+        "origin, header, path and request size rejection",
+        "redirect isolation, response limit, malformed JSON, proxy errors, Retry-After and timeout"
+      ],
+      "duration_ms": 717
+    },
+    {
+      "language": "java",
+      "checks": [
+        "authenticated GET",
+        "migration template, preview and apply",
+        "binary tensor upload and exact roundtrip",
+        "u64/i64 precision, Unicode, durable ingest, retry and checkpoint",
+        "conflict, read-only, invalid credentials and validation errors",
+        "binary Arrow export",
+        "origin, header, path and request size rejection",
+        "redirect isolation, response limit, malformed JSON, proxy errors, Retry-After and timeout"
+      ],
+      "duration_ms": 616
+    },
+    {
+      "language": "cpp",
+      "checks": [
+        "authenticated GET",
+        "migration template, preview and apply",
+        "binary tensor upload and exact roundtrip",
+        "u64/i64 precision, Unicode, durable ingest, retry and checkpoint",
+        "conflict, read-only, invalid credentials and validation errors",
+        "binary Arrow export",
+        "origin, header, path and request size rejection",
+        "redirect isolation, response limit, malformed JSON, proxy errors, Retry-After and timeout"
+      ],
+      "duration_ms": 946
+    },
+    {
+      "language": "dart",
+      "checks": [
+        "authenticated GET",
+        "migration template, preview and apply",
+        "binary tensor upload and exact roundtrip",
+        "u64/i64 precision, Unicode, durable ingest, retry and checkpoint",
+        "conflict, read-only, invalid credentials and validation errors",
+        "binary Arrow export",
+        "origin, header, path and request size rejection",
+        "redirect isolation, response limit, malformed JSON, proxy errors, Retry-After and timeout"
+      ],
+      "duration_ms": 591
+    },
+    {
+      "language": "csharp",
+      "checks": [
+        "authenticated GET",
+        "migration template, preview and apply",
+        "binary tensor upload and exact roundtrip",
+        "u64/i64 precision, Unicode, durable ingest, retry and checkpoint",
+        "conflict, read-only, invalid credentials and validation errors",
+        "binary Arrow export",
+        "origin, header, path and request size rejection",
+        "redirect isolation, response limit, malformed JSON, proxy errors, Retry-After and timeout"
+      ],
+      "duration_ms": 295
+    }
+  ]
+}

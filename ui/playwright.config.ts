@@ -10,7 +10,7 @@ export default defineConfig({
     [
       "json",
       {
-        outputFile: `../bench/reports/v0.4.0-alpha.2/${process.env.CHRONOGRAPH_REPORT_PHASE || "phase-7-ui"}/e2e.json`,
+        outputFile: `../bench/reports/v0.4.0-alpha.3/${process.env.CHRONOGRAPH_REPORT_PHASE || "phase-7-ui"}/e2e.json`,
       },
     ],
   ],

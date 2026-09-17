@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "presets": 35,
+  "checks": [
+    "asset exact bits, shape checks, deduplication and read scope",
+    "35 registry presets: migration → ingest → exact source export → retry/conflict",
+    "invalid records and missing assets cannot advance checkpoints",
+    "official MCP client discovers connector contracts",
+    "SIGKILL restart and independent backup restore preserve every preset, asset and receipt"
+  ]
+}

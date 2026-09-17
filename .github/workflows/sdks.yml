@@ -1,0 +1,52 @@
+name: SDK conformance
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  sdk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      CHRONOGRAPH_TEST_PROFILE: target/debug
+      CARGO_BUILD_JOBS: 2
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.93.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.1'
+          cache: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.11.5'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev pkg-config
+      - run: python3 scripts/sdk/fetch-test-deps.py --linux-lsl
+      - run: sudo apt-get install -y ./.work/sdk-tools/liblsl.deb
+      - run: python3 -m pip install -r scripts/sdk/requirements.txt
+      - run: cargo build --locked -p chronograph-server --bins --example export_openapi
+      - run: python3 scripts/sdk/verify-contract.py
+      - run: scripts/sdk/build.sh
+      - run: PYTHONPATH=sdk/python python3 -m unittest discover -s sdk/python/tests -v
+      - run: npm --prefix sdk/typescript test
+      - run: node scripts/sdk/conformance.mjs
+      - run: node scripts/sdk/adapters.mjs
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: sdk-conformance-evidence
+          path: .work/sdk-evidence/
+          include-hidden-files: true

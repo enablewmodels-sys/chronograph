@@ -3,13 +3,13 @@
 **An embedded temporal graph database in Rust. Replay a world, branch its future,
 and carry the selected history forward.**
 
-Community 0.4.0-alpha.2 stores directed, typed relationship versions with microsecond
+Community 0.4.0-alpha.3 (development checkout) stores directed, typed relationship versions with microsecond
 validity and 16-byte opaque payloads. It runs inside a Rust application or through
 an optional single-workspace service with a browser console and scoped MCP tools.
 Domain adapters connect BCI streams, robotics recordings and world-model episodes;
 quantum circuit/calibration support is exploratory.
 
-This checkout is a **Community alpha**, **source-available under PolyForm Perimeter 1.0.0**. The new [connector platform](docs/CONNECTOR_PLATFORM.md) adds 28 migration presets, typed assets and durable ingestion receipts. Existing format-2 workspaces require an [explicit upgrade to a separate destination](docs/UPGRADE_0_4.md).
+This checkout is a **Community alpha**, **source-available under PolyForm Perimeter 1.0.0**. The new [connector platform](docs/CONNECTOR_PLATFORM.md) adds 35 migration presets, typed assets and durable ingestion receipts. Existing format-2 workspaces require an [explicit upgrade to a separate destination](docs/UPGRADE_0_4.md).
 Modification and noncompeting commercial use are allowed; offering a competing product is restricted, including free competing products. See [licensing](docs/LICENSING.md).
 
 [Source repository](https://github.com/enablewmodels-sys/chronograph) · [Download the alpha](https://github.com/enablewmodels-sys/chronograph/releases/tag/v0.4.0-alpha.2).
@@ -17,6 +17,10 @@ Managed hosting is not available. See [release status](docs/REQUIREMENTS.md),
 [known limits](docs/LIMITATIONS.md) and [edition boundaries](docs/EDITIONS.md).
 
 To host the Community landing, documentation and read-only demo on Vercel, import this repository with its root directory unchanged. [Vercel setup](docs/WEBSITE.md). The Rust database runs separately on your own machine or server.
+
+## Language SDKs
+
+[Python, TypeScript/JavaScript, Java, C++, Go, Dart and C#](docs/SDK.md) share the authenticated API. [Q# uses a Python host bridge](docs/INTEGRATIONS.md); Rust applications can embed the engine directly. The SDK guide covers source installation, retry semantics and tested platform adapters. New SDK sources are on `main`; the linked alpha.2 release predates this expansion.
 
 ## Start locally
 

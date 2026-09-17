@@ -1,4 +1,4 @@
-# Chronograph Community 0.4.0-alpha.2 native bundle
+# Chronograph Community 0.4.0-alpha.3 native bundle
 
 This is an unsigned Community alpha under PolyForm Perimeter 1.0.0 (LICENSE).
 Preserve NOTICE when redistributing. Download from the versioned GitHub release.

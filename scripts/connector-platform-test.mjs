@@ -123,6 +123,10 @@ try {
         },
         fields: {
           checkpoint: "fixture-v1",
+          model: "fixture",
+          basis: "Z",
+          counts: { "00": "8" },
+          observables: { z: 0.5 },
           level: 1,
           horizon_us: "500000",
           parent_node: "9007199254740993",
@@ -135,6 +139,7 @@ try {
           lost_samples: "7",
         },
       };
+      if (d.id === "model-output") delete record.assets.source;
       const batch = {
         instance: id,
         partition: "fixture",

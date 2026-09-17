@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "mode": "quantum-eeg",
+  "checks": [
+    "multi-chunk tensor, endian conversion, range download, real lost-ack recovery",
+    "MNE 1.13.0: real FIF reader, exact channel values and clocks",
+    "Qiskit 2.5.2: official OpenQASM exporter and exact source",
+    "Cirq 1.6.1: circuit JSON and simulator measurement tensors"
+  ]
+}

@@ -116,7 +116,7 @@ export async function report(name, value) {
   const phase = process.env.CHRONOGRAPH_REPORT_PHASE || "phase-3";
   if (!/^phase-[a-z0-9-]+$/.test(phase))
     throw new Error("Invalid report phase");
-  const dir = join(root, "bench/reports/v0.4.0-alpha.2", phase);
+  const dir = join(root, "bench/reports/v0.4.0-alpha.3", phase);
   await mkdir(dir, { recursive: true });
   await writeFile(
     join(dir, name),

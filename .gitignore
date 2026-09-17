@@ -42,3 +42,13 @@ sdk/python/*.egg-info/
 /docs/DELIVERY.md
 /docs/BRANCHING_DESIGN.md
 /launch/
+
+# SDK build output and local dependency caches
+/sdk/**/node_modules/
+/sdk/**/dist/
+/sdk/**/target/
+/sdk/**/build/
+/sdk/**/bin/
+/sdk/**/obj/
+/sdk/**/.dart_tool/
+/sdk/**/.packages

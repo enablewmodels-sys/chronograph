@@ -520,7 +520,7 @@ dependencies = [
 
 [[package]]
 name = "chronograph-bench"
-version = "0.4.0-alpha.2"
+version = "0.4.0-alpha.3"
 dependencies = [
  "chronograph-db",
  "criterion",
@@ -530,7 +530,7 @@ dependencies = [
 
 [[package]]
 name = "chronograph-conn-bci"
-version = "0.4.0-alpha.2"
+version = "0.4.0-alpha.3"
 dependencies = [
  "arrow",
  "chronograph-db",
@@ -544,7 +544,7 @@ dependencies = [
 
 [[package]]
 name = "chronograph-conn-quantum"
-version = "0.4.0-alpha.2"
+version = "0.4.0-alpha.3"
 dependencies = [
  "arrow",
  "chronograph-connector-common",
@@ -560,7 +560,7 @@ dependencies = [
 
 [[package]]
 name = "chronograph-conn-robotics"
-version = "0.4.0-alpha.2"
+version = "0.4.0-alpha.3"
 dependencies = [
  "arrow",
  "chronograph-connector-common",
@@ -576,7 +576,7 @@ dependencies = [
 
 [[package]]
 name = "chronograph-conn-worldmodel"
-version = "0.4.0-alpha.2"
+version = "0.4.0-alpha.3"
 dependencies = [
  "arrow",
  "chronograph-connector-common",
@@ -593,7 +593,7 @@ dependencies = [
 
 [[package]]
 name = "chronograph-connector-common"
-version = "0.4.0-alpha.2"
+version = "0.4.0-alpha.3"
 dependencies = [
  "arrow",
  "serde",
@@ -605,7 +605,7 @@ dependencies = [
 
 [[package]]
 name = "chronograph-db"
-version = "0.4.0-alpha.2"
+version = "0.4.0-alpha.3"
 dependencies = [
  "arrow",
  "crc32fast",
@@ -620,7 +620,7 @@ dependencies = [
 
 [[package]]
 name = "chronograph-server"
-version = "0.4.0-alpha.2"
+version = "0.4.0-alpha.3"
 dependencies = [
  "argon2",
  "arrow",

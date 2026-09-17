@@ -8,6 +8,8 @@
 - [Connector platform](CONNECTOR_PLATFORM.md)
 - [Upgrade to 0.4](UPGRADE_0_4.md)
 - [HTTP API](API.md)
+- [Language SDKs](SDK.md)
+- [Platform integration recipes](INTEGRATIONS.md)
 - [Agent integrations](MCP.md)
 - [BCI and LSL](connectors/bci.md)
 - [Robotics and LeRobot](connectors/robotics.md)

@@ -136,6 +136,51 @@ pub static DEFINITIONS: &[Definition] = &[
         "https://quantumai.google/cirq"
     ),
     definition!(
+        "brainflow",
+        "BCI",
+        "BrainFlow / OpenBCI",
+        ["signal-v1"],
+        "python_brainflow_adapter",
+        "Locally acquired BrainFlow channel matrices with explicit units and board provenance. Synthetic board is tested; physical board support depends on your installed BrainFlow driver.",
+        "https://brainflow.readthedocs.io/"
+    ),
+    definition!(
+        "qsharp",
+        "Quantum",
+        "Q# / QDK",
+        ["source-v1", "result-v1"],
+        "python_qdk_host",
+        "A Python host stores Q# source, QIR artifacts and local simulation results. The database never executes quantum programs or contacts a QPU.",
+        "https://learn.microsoft.com/en-us/azure/quantum/"
+    ),
+    definition!(
+        "quantum-results",
+        "Quantum",
+        "Portable quantum results",
+        ["counts-v1", "observables-v1"],
+        "normalized_only",
+        "Counts or observables from caller-run PennyLane, Braket or other quantum runtimes, with explicit basis and execution provenance. No provider authentication or job execution.",
+        ""
+    ),
+    definition!(
+        "model-output",
+        "World models",
+        "Named model outputs",
+        ["tensors-v1"],
+        "python_tensor_adapter",
+        "Named NumPy/PyTorch output tensors with model and checkpoint identifiers; usable for ONNX or other runtimes after local conversion. This does not load models.",
+        ""
+    ),
+    definition!(
+        "physical-ai",
+        "Robotics",
+        "Physical AI transitions",
+        ["transition-v1"],
+        "normalized_only",
+        "Observation/action/reward transitions exported by caller-run robotics or simulation environments. Isaac, MuJoCo and other producers must supply their own complete-state codecs.",
+        ""
+    ),
+    definition!(
         "custom",
         "Custom",
         "Custom records",

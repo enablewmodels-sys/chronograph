@@ -53,7 +53,7 @@ jobs:
           name: verification-evidence
           # Never upload browser traces, temporary configs or raw credentials.
           path: |
-            bench/reports/v0.4.0-alpha.2/phase-ci/
+            bench/reports/v0.4.0-alpha.3/phase-ci/
             /tmp/chronograph-schema-*.png
             /tmp/chronograph-landing-*.png
             /tmp/chronograph-branches-*.png

@@ -1,5 +1,6 @@
 """Explicit normalized transport: no model execution or automatic device discovery."""
 import http.client
+import math
 import json
 import os
 from pathlib import Path
@@ -9,14 +10,14 @@ from urllib.parse import urlsplit
 
 
 class ApiError(RuntimeError):
-    def __init__(self, status, message):
-        self.status = status
+    def __init__(self, status, message, code="HTTP_ERROR", retry_after=None):
+        self.status, self.code, self.retry_after = status, code, retry_after
         super().__init__(f"HTTP {status}: {message}")
 
 
 class Client:
     """Scoped bearer client. Redirects are rejected; remote endpoints require TLS."""
-    def __init__(self, url, token, timeout=30):
+    def __init__(self, url, token, timeout=30, max_response_bytes=4*1024*1024):
         parsed = urlsplit(url)
         if (parsed.scheme not in ("http", "https") or not parsed.hostname
                 or parsed.username or parsed.password or parsed.query or parsed.fragment
@@ -24,36 +25,75 @@ class Client:
             raise ValueError("Use an HTTP(S) origin without credentials or a path")
         if parsed.scheme == "http" and parsed.hostname not in ("localhost", "127.0.0.1", "::1"):
             raise ValueError("Remote endpoints require HTTPS")
-        if not token or any(c in token for c in "\r\n"):
+        if not token or any(ord(c) <= 32 or ord(c) == 127 for c in token):
             raise ValueError("A bearer token is required")
+        if not math.isfinite(timeout) or timeout <= 0 or type(max_response_bytes) is not int or not 1 <= max_response_bytes <= 256*1024*1024:
+            raise ValueError("Invalid client bounds")
         self._origin, self._token, self.timeout = parsed, token, timeout
+        self.max_response_bytes = max_response_bytes
 
-    def call(self, operation, arguments=None):
-        if not re.fullmatch(r"[a-z_]+", operation):
-            raise ValueError("Invalid operation")
-        body = json.dumps(arguments or {}, separators=(",", ":"), allow_nan=False).encode()
-        if len(body) > 4 * 1024 * 1024:
+    def request(self, path, method="POST", body=None):
+        """Bounded bytes for JSON, Arrow and backup endpoints; timeout is socket inactivity."""
+        if not re.fullmatch(r"/v1/[a-z_]+(?:/[A-Za-z0-9_-]+)?", path) or method not in ("GET", "POST", "DELETE"):
+            raise ValueError("Invalid API path/method")
+        payload = None if body is None else json.dumps(body, separators=(",", ":"), allow_nan=False).encode()
+        if payload is not None and len(payload) > 4 * 1024 * 1024:
             raise ValueError("Request exceeds 4 MiB")
         cls = http.client.HTTPSConnection if self._origin.scheme == "https" else http.client.HTTPConnection
         conn = cls(self._origin.hostname, self._origin.port, timeout=self.timeout)
         try:
-            conn.request("POST", "/v1/" + operation, body, {
+            conn.request(method, path, payload, {
                 "Authorization": "Bearer " + self._token, "Content-Type": "application/json"
             })
             response = conn.getresponse()
-            raw = response.read(4 * 1024 * 1024 + 1)
-            if len(raw) > 4 * 1024 * 1024:
-                raise ApiError(response.status, "Response exceeds 4 MiB")
-            try:
-                result = json.loads(raw)
-            except (ValueError, UnicodeDecodeError):
-                raise ApiError(response.status, "Expected JSON response") from None
-            if response.status != 200:
-                message = result.get("error", {}).get("message", "Request rejected")
-                raise ApiError(response.status, str(message)[:1000])
-            return result
+            raw = response.read(self.max_response_bytes + 1)
+            if len(raw) > self.max_response_bytes:
+                raise ApiError(response.status, "Response exceeds configured limit", "RESPONSE_LIMIT")
+            if not 200 <= response.status < 300:
+                code, message = "HTTP_ERROR", "Request rejected"
+                try:
+                    error = json.loads(raw)["error"]
+                    code, message = str(error.get("code", code)), str(error.get("message", message))
+                except (ValueError, KeyError, TypeError, AttributeError):
+                    pass
+                raise ApiError(response.status, message[:1000], code, response.getheader("Retry-After"))
+            return raw
         finally:
             conn.close()
+
+    def call(self, operation, arguments=None):
+        if not re.fullmatch(r"[a-z_]+", operation):
+            raise ValueError("Invalid operation")
+        raw = self.request("/v1/" + operation, body=arguments if arguments is not None else {})
+        try:
+            result = json.loads(raw, parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))
+            if not isinstance(result, dict):
+                raise ValueError()
+            return result
+        except (ValueError, UnicodeDecodeError):
+            raise ApiError(200, "Expected JSON object response", "INVALID_JSON") from None
+
+    def info(self):
+        return json.loads(self.request("/v1/info", "GET"))
+
+    def ingest(self, instance, partition, sequence, records):
+        return self.call("connector_ingest", {"instance":instance,"partition":partition,"sequence":str(sequence),"records":records})
+
+    def pages(self, operation, arguments=None, *, max_pages=1000):
+        if operation not in ("as_of", "between", "history", "neighbors") or type(max_pages) is not int or max_pages < 1:
+            raise ValueError("Invalid paginated operation or limit")
+        args, seen = dict(arguments or {}), set()
+        for _ in range(max_pages):
+            result = self.call(operation, args)
+            yield result
+            cursor = result.get("next_cursor")
+            if cursor is None:
+                return
+            if not isinstance(cursor, str) or cursor in seen:
+                raise ValueError("Invalid pagination cursor")
+            seen.add(cursor)
+            args["cursor"] = cursor
+        raise ValueError("Pagination limit reached")
 
     def asset(self, data, *, kind="tensor", encoding="raw_le", dtype="f32", shape=(), provenance=None):
         if not 0 < len(data) <= 16 * 1024 * 1024:
@@ -69,15 +109,29 @@ class Client:
         return self.call("asset_compose", {"metadata":metadata,"chunks":chunks})["asset"]
 
     def read_asset(self, asset):
-        result=self.call("asset_get", {"asset":asset,"content":True})
-        metadata=result["metadata"]
-        data=bytearray.fromhex(result["data_hex"])
-        while result.get("next_offset") is not None:
-            result=self.call("asset_get", {"asset":asset,"content":True,"offset":result["next_offset"]})
-            data.extend(bytes.fromhex(result["data_hex"]))
-            if len(data)>16*1024*1024:
-                raise ValueError("Asset exceeds client bounds")
-        return metadata,bytes(data)
+        data, expected, metadata = bytearray(), None, None
+        for _ in range(16):
+            result = self.call("asset_get", {"asset":asset,"content":True,"offset":len(data)})
+            size, encoded = result.get("bytes"), result.get("data_hex")
+            if (result.get("asset") != asset or result.get("offset") != len(data)
+                    or type(size) is not int or not 1 <= size <= 16*1024*1024
+                    or (expected is not None and expected != size)
+                    or not isinstance(encoded, str) or len(encoded) > 2*1024*1024
+                    or not re.fullmatch(r"(?:[0-9a-fA-F]{2})+", encoded)):
+                raise ValueError("Invalid asset page")
+            if metadata is not None and metadata != result["metadata"]:
+                raise ValueError("Asset metadata changed between pages")
+            expected, metadata = size, result["metadata"]
+            data.extend(bytes.fromhex(encoded))
+            if len(data) > size:
+                raise ValueError("Invalid asset length")
+            if result.get("next_offset") is None:
+                if len(data) != size:
+                    raise ValueError("Truncated asset")
+                return metadata, bytes(data)
+            if result["next_offset"] != len(data) or len(data) >= size:
+                raise ValueError("Non-progressing asset cursor")
+        raise ValueError("Asset page limit exceeded")
 
     def tensor(self, array, *, provenance=None):
         """Upload a NumPy-compatible array without requiring NumPy at installation time."""

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chronograph-connectors"
-version = "0.4.0a2"
+version = "0.4.0a3"
 description = "Normalized record transport and durable local spool for Chronograph"
 requires-python = ">=3.10"
 license = "LicenseRef-PolyForm-Perimeter-1.0.0"

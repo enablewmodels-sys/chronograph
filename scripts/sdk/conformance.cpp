@@ -1,0 +1,4 @@
+#include <chronograph/client.hpp>
+#include <iostream>
+std::string hex(const std::string& s){const char* alphabet="0123456789abcdef";std::string r;r.reserve(2*s.size());for(unsigned char c:s){r+=alphabet[c>>4];r+=alphabet[c&15];}return r;}
+int main(){std::string line;while(std::getline(std::cin,line)){chronograph::json r;try{auto q=chronograph::json::parse(line);chronograph::client c(q.at("url"),q.at("token"),q.value("timeout",30000L),q.value("limit",4194304));chronograph::json v;if(q.value("construct",false))v=true;else if(q.contains("method"))v=hex(c.request(q.at("path"),q.at("method"),q.value("body",chronograph::json())));else v=c.call(q.at("op"),q.value("body",chronograph::json::object()));r={{"ok",true},{"value",v}};}catch(const chronograph::api_error& e){r={{"ok",false},{"status",e.status},{"code",e.code},{"retry",e.retry_after}};}catch(const std::exception&){r={{"ok",false},{"local",true}};}std::cout<<r.dump()<<std::endl;}}

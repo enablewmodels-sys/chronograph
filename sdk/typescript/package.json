@@ -1,0 +1,31 @@
+{
+  "name": "@chronograph-community/sdk",
+  "version": "0.4.0-alpha.3",
+  "type": "module",
+  "description": "Chronograph Community HTTP client and normalized connector transport",
+  "license": "SEE LICENSE IN LICENSE",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.mjs"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3"
+  }
+}

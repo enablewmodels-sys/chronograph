@@ -1,0 +1,7 @@
+PASS BrainFlow 5.22.2 synthetic board acquisition, exact signal/timestamps and channel validation
+PASS pylsl 1.18.2 local outlet/inlet, explicit local clock, exact per-sample timestamps
+PASS QDK 1.32.3 Bell program, 128 simulated correlated shots, source and result roundtrip
+PASS Portable quantum counts preserve u64 frequencies; observables reject malformed records
+PASS Named model tensors, reversible output names, endian conversion and required provenance
+PASS Physical-AI transition contract and decoded ROS image with exact opaque media
+{"checks": 6, "physical_hardware_tested": false, "qpu_tested": false}

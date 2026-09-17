@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("phase")
 args = parser.parse_args()
 root = pathlib.Path(__file__).resolve().parent.parent
-out = root / "bench" / "reports" / "v0.4.0-alpha.2" / args.phase
+out = root / "bench" / "reports" / "v0.4.0-alpha.3" / args.phase
 out.mkdir(parents=True, exist_ok=True)
 checks = [
     ("build", ["cargo", "build", "--locked", "--workspace"]),

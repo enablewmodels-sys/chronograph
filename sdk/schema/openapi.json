@@ -1,0 +1,3325 @@
+{
+  "components": {
+    "schemas": {
+      "AssetMetadata": {
+        "additionalProperties": false,
+        "description": "Tensors require raw_le encoding, non-null dtype and exact row-major little-endian bytes. Scalars have shape []. Non-tensors require null/omitted dtype and empty/omitted shape. 1 byte to 16 MiB per composed asset.",
+        "properties": {
+          "dtype": {
+            "enum": [
+              null,
+              "u8",
+              "i8",
+              "u16",
+              "u32",
+              "u64",
+              "i16",
+              "i32",
+              "i64",
+              "f16",
+              "bf16",
+              "f32",
+              "f64",
+              "bool"
+            ]
+          },
+          "encoding": {
+            "maxLength": 80,
+            "minLength": 1,
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "tensor",
+              "opaque",
+              "image",
+              "audio",
+              "video"
+            ]
+          },
+          "provenance": {
+            "additionalProperties": {
+              "maxLength": 1024,
+              "type": "string"
+            },
+            "maxProperties": 32,
+            "type": "object"
+          },
+          "shape": {
+            "items": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "maxItems": 8,
+            "type": "array"
+          },
+          "version": {
+            "const": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "kind",
+          "encoding"
+        ],
+        "type": "object"
+      },
+      "Error": {
+        "properties": {
+          "error": {
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "type": "object"
+      },
+      "RecordV1": {
+        "additionalProperties": false,
+        "description": "IDs are u64 strings; times are i64 microsecond strings in the binding's clock domain. Asset/field names are identifiers of at most 48 ASCII characters. Domain validation depends on the immutable connector binding.",
+        "properties": {
+          "assets": {
+            "additionalProperties": {
+              "pattern": "^[0-9a-f]{32}$",
+              "type": "string"
+            },
+            "maxProperties": 32,
+            "type": "object"
+          },
+          "dst": {
+            "pattern": "^[0-9]+$",
+            "type": "string"
+          },
+          "episode": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fields": {
+            "maxProperties": 64,
+            "type": "object"
+          },
+          "src": {
+            "pattern": "^[0-9]+$",
+            "type": "string"
+          },
+          "timestamp_us": {
+            "pattern": "^-?[0-9]+$",
+            "type": "string"
+          },
+          "valid_to": {
+            "pattern": "^-?[0-9]+$",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "src",
+          "dst",
+          "timestamp_us",
+          "fields"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "REST v1 with decimal-string IDs and timestamps, scoped bearer authentication and bounded requests. Input schemas are shared with MCP. Responses remain extensible JSON objects; this specification is not a complete generated response type library.",
+    "title": "Chronograph Community API",
+    "version": "0.4.0-alpha.3"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/add_edges": {
+      "post": {
+        "description": "Compatibility alias for ingest_edges with the same durability and scope rules.",
+        "operationId": "add_edges",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "durability": {
+                    "description": "Omitted uses schema settings. fsync acknowledges disk synchronization; buffered needs a later sync",
+                    "enum": [
+                      "buffered",
+                      "fsync"
+                    ],
+                    "type": "string"
+                  },
+                  "edges": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "dst": {
+                          "description": "Exact u64 ID as a decimal string",
+                          "pattern": "^[0-9]+$",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "maximum": 65535,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "payload": {
+                          "pattern": "^[0-9a-fA-F]{32}$",
+                          "type": "string"
+                        },
+                        "properties": {
+                          "description": "Values matching schema property names/types. Use this or payload. u64/i64 values are decimal strings.",
+                          "type": "object"
+                        },
+                        "src": {
+                          "description": "Exact u64 ID as a decimal string",
+                          "pattern": "^[0-9]+$",
+                          "type": "string"
+                        },
+                        "valid_from": {
+                          "description": "Exact i64 microseconds as a decimal string",
+                          "pattern": "^-?[0-9]+$",
+                          "type": "string"
+                        },
+                        "valid_to": {
+                          "description": "Exact i64 microseconds as a decimal string",
+                          "pattern": "^-?[0-9]+$",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "src",
+                        "dst",
+                        "kind",
+                        "valid_from"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 10000,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "fork": {
+                    "description": "Optional selected fork ID; omitted uses the parent. Edge IDs belong to the selected fork. Query/write times must be at or after the fork time.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "edges"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "ingest"
+      }
+    },
+    "/v1/add_node": {
+      "post": {
+        "description": "Register an isolated node. Ingest/admin scope; repeating it is a no-op.",
+        "operationId": "add_node",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "durability": {
+                    "description": "Omitted uses schema settings. fsync acknowledges disk synchronization; buffered needs a later sync",
+                    "enum": [
+                      "buffered",
+                      "fsync"
+                    ],
+                    "type": "string"
+                  },
+                  "fork": {
+                    "description": "Optional selected fork ID; omitted uses the parent. Edge IDs belong to the selected fork. Query/write times must be at or after the fork time.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "id": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "ingest"
+      }
+    },
+    "/v1/as_of": {
+      "post": {
+        "description": "Read a bounded page of relationships active at t, using [from,to) validity.",
+        "operationId": "as_of",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "cursor": {
+                    "description": "Opaque revision-bound cursor from the previous identical query; restart after a conflict",
+                    "type": "string"
+                  },
+                  "fork": {
+                    "description": "Optional selected fork ID; omitted uses the parent. Edge IDs belong to the selected fork. Query/write times must be at or after the fork time.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "t": {
+                    "description": "Exact i64 microseconds as a decimal string",
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "t"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/asset_compose": {
+      "post": {
+        "description": "Publish a typed asset from 1–16 immutable chunk_v1 uploads in order (≤16 MiB). Safe to retry.",
+        "operationId": "asset_compose",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "chunks": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 16,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "metadata": {
+                    "additionalProperties": false,
+                    "description": "Tensors require raw_le encoding, non-null dtype and exact row-major little-endian bytes. Scalars have shape []. Non-tensors require null/omitted dtype and empty/omitted shape. 1 byte to 16 MiB per composed asset.",
+                    "properties": {
+                      "dtype": {
+                        "enum": [
+                          null,
+                          "u8",
+                          "i8",
+                          "u16",
+                          "u32",
+                          "u64",
+                          "i16",
+                          "i32",
+                          "i64",
+                          "f16",
+                          "bf16",
+                          "f32",
+                          "f64",
+                          "bool"
+                        ]
+                      },
+                      "encoding": {
+                        "maxLength": 80,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "kind": {
+                        "enum": [
+                          "tensor",
+                          "opaque",
+                          "image",
+                          "audio",
+                          "video"
+                        ]
+                      },
+                      "provenance": {
+                        "additionalProperties": {
+                          "maxLength": 1024,
+                          "type": "string"
+                        },
+                        "maxProperties": 32,
+                        "type": "object"
+                      },
+                      "shape": {
+                        "items": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "maxItems": 8,
+                        "type": "array"
+                      },
+                      "version": {
+                        "const": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "version",
+                      "kind",
+                      "encoding"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "metadata",
+                  "chunks"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "ingest"
+      }
+    },
+    "/v1/asset_get": {
+      "post": {
+        "description": "Read verified asset metadata; set content=true to return bounded binary content as hex.",
+        "operationId": "asset_get",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "asset": {
+                    "pattern": "^[0-9a-f]{32}$",
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "boolean"
+                  },
+                  "limit": {
+                    "maximum": 1048576,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "offset": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "asset"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/asset_put": {
+      "post": {
+        "description": "Synchronize one content-addressed binary asset, up to 1 MiB decoded. Tensor metadata requires dtype, shape and raw_le encoding. No content is executed.",
+        "operationId": "asset_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "data_hex": {
+                    "maxLength": 2097152,
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "additionalProperties": false,
+                    "description": "Tensors require raw_le encoding, non-null dtype and exact row-major little-endian bytes. Scalars have shape []. Non-tensors require null/omitted dtype and empty/omitted shape. 1 byte to 16 MiB per composed asset.",
+                    "properties": {
+                      "dtype": {
+                        "enum": [
+                          null,
+                          "u8",
+                          "i8",
+                          "u16",
+                          "u32",
+                          "u64",
+                          "i16",
+                          "i32",
+                          "i64",
+                          "f16",
+                          "bf16",
+                          "f32",
+                          "f64",
+                          "bool"
+                        ]
+                      },
+                      "encoding": {
+                        "maxLength": 80,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      "kind": {
+                        "enum": [
+                          "tensor",
+                          "opaque",
+                          "image",
+                          "audio",
+                          "video"
+                        ]
+                      },
+                      "provenance": {
+                        "additionalProperties": {
+                          "maxLength": 1024,
+                          "type": "string"
+                        },
+                        "maxProperties": 32,
+                        "type": "object"
+                      },
+                      "shape": {
+                        "items": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "maxItems": 8,
+                        "type": "array"
+                      },
+                      "version": {
+                        "const": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "version",
+                      "kind",
+                      "encoding"
+                    ],
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "metadata",
+                  "data_hex"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "ingest"
+      }
+    },
+    "/v1/backup": {
+      "post": {
+        "description": "Synchronize and create a checksummed journal/index/sidecar backup, excluding credentials. Admin scope; download through the HTTP backup endpoint.",
+        "operationId": "backup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {},
+                "required": [],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "admin"
+      }
+    },
+    "/v1/backups": {
+      "get": {
+        "description": "backups",
+        "operationId": "backups",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "admin"
+      }
+    },
+    "/v1/backups/{id}": {
+      "delete": {
+        "description": "delete_backup",
+        "operationId": "delete_backup",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "admin"
+      },
+      "get": {
+        "description": "download_backup",
+        "operationId": "download_backup",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "admin"
+      }
+    },
+    "/v1/between": {
+      "post": {
+        "description": "Read versions overlapping [start,end). Superseded empty intervals are excluded.",
+        "operationId": "between",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "cursor": {
+                    "description": "Opaque revision-bound cursor from the previous identical query; restart after a conflict",
+                    "type": "string"
+                  },
+                  "end": {
+                    "description": "Exact i64 microseconds as a decimal string",
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  },
+                  "fork": {
+                    "description": "Optional selected fork ID; omitted uses the parent. Edge IDs belong to the selected fork. Query/write times must be at or after the fork time.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "start": {
+                    "description": "Exact i64 microseconds as a decimal string",
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "start",
+                  "end"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/connector_catalog": {
+      "post": {
+        "description": "Read versioned connector families, presets and exact native/normalized capabilities.",
+        "operationId": "connector_catalog",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {},
+                "required": [],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/connector_checkpoint": {
+      "post": {
+        "description": "Read the last durable ingestion receipt for a configured instance and partition.",
+        "operationId": "connector_checkpoint",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "instance": {
+                    "type": "string"
+                  },
+                  "partition": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "instance",
+                  "partition"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/connector_ingest": {
+      "post": {
+        "description": "Durably ingest 1–500 normalized records. Sequence starts at zero per instance/partition. Identical latest retries return the original receipt; conflicts fail. Upload referenced assets first.",
+        "operationId": "connector_ingest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "instance": {
+                    "type": "string"
+                  },
+                  "partition": {
+                    "type": "string"
+                  },
+                  "records": {
+                    "items": {
+                      "additionalProperties": false,
+                      "description": "IDs are u64 strings; times are i64 microsecond strings in the binding's clock domain. Asset/field names are identifiers of at most 48 ASCII characters. Domain validation depends on the immutable connector binding.",
+                      "properties": {
+                        "assets": {
+                          "additionalProperties": {
+                            "pattern": "^[0-9a-f]{32}$",
+                            "type": "string"
+                          },
+                          "maxProperties": 32,
+                          "type": "object"
+                        },
+                        "dst": {
+                          "pattern": "^[0-9]+$",
+                          "type": "string"
+                        },
+                        "episode": {
+                          "maxLength": 128,
+                          "minLength": 1,
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "fields": {
+                          "maxProperties": 64,
+                          "type": "object"
+                        },
+                        "src": {
+                          "pattern": "^[0-9]+$",
+                          "type": "string"
+                        },
+                        "timestamp_us": {
+                          "pattern": "^-?[0-9]+$",
+                          "type": "string"
+                        },
+                        "valid_to": {
+                          "pattern": "^-?[0-9]+$",
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "src",
+                        "dst",
+                        "timestamp_us",
+                        "fields"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 500,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "sequence": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "instance",
+                  "partition",
+                  "sequence",
+                  "records"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "ingest"
+      }
+    },
+    "/v1/connector_record": {
+      "post": {
+        "description": "Read the verified normalized source record and immutable binding associated with a main graph edge.",
+        "operationId": "connector_record",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "edge": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "edge"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/connector_template": {
+      "post": {
+        "description": "Generate a version-2 migration with immutable connector binding and unused sidecar kind. Preview then apply the returned source.",
+        "operationId": "connector_template",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "channels": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "clock_domain": {
+                    "enum": [
+                      "unix_us",
+                      "simulation_us",
+                      "lsl_local_us",
+                      "device_us"
+                    ],
+                    "type": "string"
+                  },
+                  "connector": {
+                    "type": "string"
+                  },
+                  "contract_version": {
+                    "const": 1,
+                    "type": "integer"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "maximum": 65535,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "modalities": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "preset": {
+                    "type": "string"
+                  },
+                  "secret_refs": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "tensor_shapes": {
+                    "type": "object"
+                  },
+                  "topics": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "units": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "id",
+                  "connector",
+                  "preset",
+                  "contract_version",
+                  "kind",
+                  "clock_domain"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/contains_node": {
+      "post": {
+        "description": "Check an identity, including isolated nodes.",
+        "operationId": "contains_node",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "fork": {
+                    "description": "Optional selected fork ID; omitted uses the parent. Edge IDs belong to the selected fork. Query/write times must be at or after the fork time.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "id": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/discard": {
+      "post": {
+        "description": "Durably discard an active fork without changing the parent. Closed metadata is retained; repeating a discard is a no-op. Ingest/admin scope.",
+        "operationId": "discard",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "durability": {
+                    "description": "Omitted uses schema settings. fsync acknowledges disk synchronization; buffered needs a later sync",
+                    "enum": [
+                      "buffered",
+                      "fsync"
+                    ],
+                    "type": "string"
+                  },
+                  "fork": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fork"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "ingest"
+      }
+    },
+    "/v1/export_arrow": {
+      "post": {
+        "description": "export_arrow",
+        "operationId": "export_arrow",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "description": "Arrow IPC stream at t, optionally in a fork. Maximum 1M stored versions; configure the SDK response byte limit for large exports.",
+                "properties": {
+                  "fork": {
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "t": {
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "t"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/fork": {
+      "post": {
+        "description": "Freeze the parent state active at t into a durable named fork. Ingest/admin scope. Future parent observations are excluded. Do not retry an ambiguous creation without listing forks.",
+        "operationId": "fork",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "durability": {
+                    "description": "Omitted uses schema settings. fsync acknowledges disk synchronization; buffered needs a later sync",
+                    "enum": [
+                      "buffered",
+                      "fsync"
+                    ],
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 80,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "t": {
+                    "description": "Exact i64 microseconds as a decimal string",
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "t",
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "ingest"
+      }
+    },
+    "/v1/fork_info": {
+      "post": {
+        "description": "Read one fork and its retained merge mappings if it is merged. All fork edge IDs are local to the selected fork.",
+        "operationId": "fork_info",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "fork": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fork"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/forks": {
+      "post": {
+        "description": "List fork metadata in ID order, including closed forks. after is the last ID from the prior page; metadata can change between pages.",
+        "operationId": "forks",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "after": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/get_edge": {
+      "post": {
+        "description": "Read one stored edge version by ID.",
+        "operationId": "get_edge",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "fork": {
+                    "description": "Optional selected fork ID; omitted uses the parent. Edge IDs belong to the selected fork. Query/write times must be at or after the fork time.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "id": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/history": {
+      "post": {
+        "description": "Read all stored versions, including inactive and empty intervals.",
+        "operationId": "history",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "cursor": {
+                    "description": "Opaque revision-bound cursor from the previous identical query; restart after a conflict",
+                    "type": "string"
+                  },
+                  "fork": {
+                    "description": "Optional selected fork ID; omitted uses the parent. Edge IDs belong to the selected fork. Query/write times must be at or after the fork time.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/info": {
+      "get": {
+        "description": "info",
+        "operationId": "info",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/invalidate_edge": {
+      "post": {
+        "description": "Shorten an interval without erasing history. Cannot extend or resurrect it. Ingest/admin scope.",
+        "operationId": "invalidate_edge",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "durability": {
+                    "description": "Omitted uses schema settings. fsync acknowledges disk synchronization; buffered needs a later sync",
+                    "enum": [
+                      "buffered",
+                      "fsync"
+                    ],
+                    "type": "string"
+                  },
+                  "fork": {
+                    "description": "Optional selected fork ID; omitted uses the parent. Edge IDs belong to the selected fork. Query/write times must be at or after the fork time.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "id": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "t": {
+                    "description": "Exact i64 microseconds as a decimal string",
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "t"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "ingest"
+      }
+    },
+    "/v1/load_demo": {
+      "post": {
+        "description": "load_demo",
+        "operationId": "load_demo",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "admin"
+      }
+    },
+    "/v1/merge": {
+      "post": {
+        "description": "Atomically apply an eligible fork delta to the unchanged parent, remap new IDs and close the fork. Payloads are unchanged. Ingest/admin scope. Returns retained result on retries. HTTP/MCP limit: 10000 mappings.",
+        "operationId": "merge",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "durability": {
+                    "description": "Omitted uses schema settings. fsync acknowledges disk synchronization; buffered needs a later sync",
+                    "enum": [
+                      "buffered",
+                      "fsync"
+                    ],
+                    "type": "string"
+                  },
+                  "fork": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fork"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "ingest"
+      }
+    },
+    "/v1/neighbors": {
+      "post": {
+        "description": "Read outgoing edges active at t for one node.",
+        "operationId": "neighbors",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "cursor": {
+                    "description": "Opaque revision-bound cursor from the previous identical query; restart after a conflict",
+                    "type": "string"
+                  },
+                  "fork": {
+                    "description": "Optional selected fork ID; omitted uses the parent. Edge IDs belong to the selected fork. Query/write times must be at or after the fork time.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "node": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "t": {
+                    "description": "Exact i64 microseconds as a decimal string",
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "node",
+                  "t"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/preview_merge": {
+      "post": {
+        "description": "Validate a proposed merge and read ID mappings without changing state. Parent changes or known future observations/expirations on touched relationships cause a conflict. Actual merge validates again.",
+        "operationId": "preview_merge",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "fork": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fork"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/query": {
+      "post": {
+        "description": "Compatibility query tool. Prefer the specific as_of/between/history/neighbors tools. Cursor must be the opaque string returned by 0.3.0.",
+        "operationId": "query",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "cursor": {
+                    "description": "Opaque revision-bound cursor from the previous identical query; restart after a conflict",
+                    "type": "string"
+                  },
+                  "end": {
+                    "description": "Exact i64 microseconds as a decimal string",
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  },
+                  "fork": {
+                    "description": "Optional selected fork ID; omitted uses the parent. Edge IDs belong to the selected fork. Query/write times must be at or after the fork time.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "k": {
+                    "maximum": 1000,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "limit": {
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "mode": {
+                    "enum": [
+                      "as_of",
+                      "between",
+                      "history",
+                      "neighbors",
+                      "sample"
+                    ],
+                    "type": "string"
+                  },
+                  "node": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "seed": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "start": {
+                    "description": "Exact i64 microseconds as a decimal string",
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  },
+                  "strategy": {
+                    "enum": [
+                      "latest",
+                      "uniform"
+                    ],
+                    "type": "string"
+                  },
+                  "t": {
+                    "description": "Exact i64 microseconds as a decimal string",
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/sample": {
+      "post": {
+        "description": "Sample up to k active neighbors per node. nodes × k must be at most 1000. Uniform is seeded reservoir sampling.",
+        "operationId": "sample",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "fork": {
+                    "description": "Optional selected fork ID; omitted uses the parent. Edge IDs belong to the selected fork. Query/write times must be at or after the fork time.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "k": {
+                    "maximum": 1000,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "nodes": {
+                    "items": {
+                      "description": "Exact u64 ID as a decimal string",
+                      "pattern": "^[0-9]+$",
+                      "type": "string"
+                    },
+                    "maxItems": 1000,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "seed": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "strategy": {
+                    "enum": [
+                      "latest",
+                      "uniform"
+                    ],
+                    "type": "string"
+                  },
+                  "t": {
+                    "description": "Exact i64 microseconds as a decimal string",
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "nodes",
+                  "t"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/schema": {
+      "post": {
+        "description": "Read workspace relation definitions, property layouts, settings and migration history. Shared by main and all branches; service constraints do not change the embedded Rust engine.",
+        "operationId": "schema",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {},
+                "required": [],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/schema_apply": {
+      "post": {
+        "description": "Admin only. Revalidate and durably apply a previewed migration atomically. Same ID and checksum retries are idempotent. Different checksum or stale schema revision fails. Does not rewrite existing edges.",
+        "operationId": "schema_apply",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "checksum": {
+                    "type": "string"
+                  },
+                  "expected_revision": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "source": {
+                    "maxLength": 262144,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "source",
+                  "checksum",
+                  "expected_revision"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "admin"
+      }
+    },
+    "/v1/schema_encode": {
+      "post": {
+        "description": "Validate and encode typed relation properties into 16 little-endian bytes without writing. All defined properties are required. u64/i64 require decimal strings.",
+        "operationId": "schema_encode",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "maximum": 65535,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "properties": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "properties"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/schema_migration": {
+      "post": {
+        "description": "Read the original applied migration source for export or review.",
+        "operationId": "schema_migration",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/schema_preview": {
+      "post": {
+        "description": "Validate a version-1 or version-2 JSON migration without writing. Returns checksum, expected_revision and before/after catalogs. Use schema_apply with both values after review.",
+        "operationId": "schema_preview",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "source": {
+                    "description": "JSON migration file contents with version, id, name and operations. Operations: upsert_relation, drop_relation, set_settings. See /docs/SCHEMA.md.",
+                    "maxLength": 262144,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "source"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/stats": {
+      "get": {
+        "description": "stats_get",
+        "operationId": "stats_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      },
+      "post": {
+        "description": "Read workspace size, revision and default durability.",
+        "operationId": "stats",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {},
+                "required": [],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/sync": {
+      "post": {
+        "description": "Flush and synchronize the journal. Ingest/admin scope.",
+        "operationId": "sync",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {},
+                "required": [],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "ingest"
+      }
+    },
+    "/v1/tokens": {
+      "get": {
+        "description": "tokens",
+        "operationId": "tokens",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "admin"
+      },
+      "post": {
+        "description": "create_token",
+        "operationId": "create_token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "days": {
+                    "maximum": 365,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "name": {
+                    "maxLength": 80,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "scope": {
+                    "enum": [
+                      "read",
+                      "ingest",
+                      "admin"
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "scope",
+                  "days"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "admin"
+      }
+    },
+    "/v1/tokens/{id}": {
+      "delete": {
+        "description": "revoke_token",
+        "operationId": "revoke_token",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "admin"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "servers": [
+    {
+      "description": "Local development; use HTTPS remotely",
+      "url": "http://127.0.0.1:8080"
+    }
+  ],
+  "x-connector-catalog": {
+    "connectors": [
+      {
+        "contract_version": 1,
+        "description": "Store output tensors, masks, actions and checkpoint provenance from your model process.",
+        "family": "JEPA",
+        "id": "jepa",
+        "name": "JEPA outputs",
+        "native_import": "external_runtime",
+        "presets": [
+          "i-jepa",
+          "v-jepa-1",
+          "v-jepa-2",
+          "v-jepa-2-ac",
+          "v-jepa-2.1",
+          "jepa-wms"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://github.com/facebookresearch/vjepa2"
+      },
+      {
+        "contract_version": 1,
+        "description": "Generic multi-level latent contract with parent IDs and prediction horizons; no upstream-specific architecture assumed.",
+        "family": "H-JEPA",
+        "id": "hierarchical-jepa",
+        "name": "Hierarchical JEPA",
+        "native_import": "external_runtime",
+        "presets": [
+          "hierarchical-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": ""
+      },
+      {
+        "contract_version": 1,
+        "description": "Multimodal transitions, structured actions, rewards and independent terminated/truncated flags. Simulator restoration requires an external complete-state codec.",
+        "family": "World models",
+        "id": "gymnasium",
+        "name": "Gymnasium",
+        "native_import": "normalized_only",
+        "presets": [
+          "transition-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://gymnasium.farama.org/"
+      },
+      {
+        "contract_version": 1,
+        "description": "Episode transitions converted by the local producer. Existing CLI supports the documented Gridworld codec; generalized native conversion remains separate.",
+        "family": "World models",
+        "id": "minari",
+        "name": "Minari",
+        "native_import": "legacy_cli",
+        "presets": [
+          "episode-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://minari.farama.org/main/content/dataset_standards/"
+      },
+      {
+        "contract_version": 1,
+        "description": "Timestamped signal chunks, markers and explicit gaps. Existing Rust LSL float32 acquisition remains available separately.",
+        "family": "BCI",
+        "id": "lsl",
+        "name": "Lab Streaming Layer",
+        "native_import": "legacy_rust",
+        "presets": [
+          "signal-v1",
+          "marker-v1",
+          "gap-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://labstreaminglayer.readthedocs.io/"
+      },
+      {
+        "contract_version": 1,
+        "description": "EEG tensors with channel names, units and source-clock timestamps, prepared by the local Python MNE reader.",
+        "family": "BCI",
+        "id": "mne",
+        "name": "MNE recorded EEG",
+        "native_import": "python_mne_reader",
+        "presets": [
+          "eeg-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://mne.tools/stable/auto_tutorials/io/20_reading_eeg_data.html"
+      },
+      {
+        "contract_version": 1,
+        "description": "Normalized episode records with binary image/video assets. Existing v3 CLI exports joint vectors; native media dataset conversion is not provided by this endpoint.",
+        "family": "Robotics",
+        "id": "lerobot",
+        "name": "LeRobot",
+        "native_import": "legacy_cli",
+        "presets": [
+          "v3-records",
+          "v2.1-records"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://huggingface.co/docs/lerobot/lerobot-dataset-v3"
+      },
+      {
+        "contract_version": 1,
+        "description": "Normalized message records. Existing Rust bag reader handles JointState; other native message decoders require local conversion.",
+        "family": "Robotics",
+        "id": "ros2",
+        "name": "ROS 2 / MCAP",
+        "native_import": "legacy_joint_state",
+        "presets": [
+          "joint-state",
+          "image",
+          "compressed-image",
+          "imu",
+          "odometry",
+          "tf"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://docs.ros.org/en/rolling/p/rosbag2/"
+      },
+      {
+        "contract_version": 1,
+        "description": "Preserve circuit source as an opaque asset. The existing Rust parser supports its documented static unitary subset; uploading source never executes it.",
+        "family": "Quantum",
+        "id": "openqasm",
+        "name": "OpenQASM",
+        "native_import": "legacy_static_subset",
+        "presets": [
+          "source-v1",
+          "calibration-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://openqasm.com/"
+      },
+      {
+        "contract_version": 1,
+        "description": "Circuit source and result provenance exported by your Qiskit process; no QPU connection or executable DAG is inferred.",
+        "family": "Quantum",
+        "id": "qiskit",
+        "name": "Qiskit",
+        "native_import": "python_qiskit_adapter",
+        "presets": [
+          "circuit-v1",
+          "result-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://quantum.cloud.ibm.com/docs/en/api/qiskit/qasm3"
+      },
+      {
+        "contract_version": 1,
+        "description": "Circuit artifacts and measurement results exported by your Cirq process.",
+        "family": "Quantum",
+        "id": "cirq",
+        "name": "Cirq",
+        "native_import": "python_cirq_adapter",
+        "presets": [
+          "circuit-v1",
+          "result-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://quantumai.google/cirq"
+      },
+      {
+        "contract_version": 1,
+        "description": "Locally acquired BrainFlow channel matrices with explicit units and board provenance. Synthetic board is tested; physical board support depends on your installed BrainFlow driver.",
+        "family": "BCI",
+        "id": "brainflow",
+        "name": "BrainFlow / OpenBCI",
+        "native_import": "python_brainflow_adapter",
+        "presets": [
+          "signal-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://brainflow.readthedocs.io/"
+      },
+      {
+        "contract_version": 1,
+        "description": "A Python host stores Q# source, QIR artifacts and local simulation results. The database never executes quantum programs or contacts a QPU.",
+        "family": "Quantum",
+        "id": "qsharp",
+        "name": "Q# / QDK",
+        "native_import": "python_qdk_host",
+        "presets": [
+          "source-v1",
+          "result-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://learn.microsoft.com/en-us/azure/quantum/"
+      },
+      {
+        "contract_version": 1,
+        "description": "Counts or observables from caller-run PennyLane, Braket or other quantum runtimes, with explicit basis and execution provenance. No provider authentication or job execution.",
+        "family": "Quantum",
+        "id": "quantum-results",
+        "name": "Portable quantum results",
+        "native_import": "normalized_only",
+        "presets": [
+          "counts-v1",
+          "observables-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": ""
+      },
+      {
+        "contract_version": 1,
+        "description": "Named NumPy/PyTorch output tensors with model and checkpoint identifiers; usable for ONNX or other runtimes after local conversion. This does not load models.",
+        "family": "World models",
+        "id": "model-output",
+        "name": "Named model outputs",
+        "native_import": "python_tensor_adapter",
+        "presets": [
+          "tensors-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": ""
+      },
+      {
+        "contract_version": 1,
+        "description": "Observation/action/reward transitions exported by caller-run robotics or simulation environments. Isaac, MuJoCo and other producers must supply their own complete-state codecs.",
+        "family": "Robotics",
+        "id": "physical-ai",
+        "name": "Physical AI transitions",
+        "native_import": "normalized_only",
+        "presets": [
+          "transition-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": ""
+      },
+      {
+        "contract_version": 1,
+        "description": "Versioned records, tensors, binary assets and temporal graph relationships.",
+        "family": "Custom",
+        "id": "custom",
+        "name": "Custom records",
+        "native_import": "extension_sdk",
+        "presets": [
+          "record-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": ""
+      }
+    ],
+    "execution": "external producers; normalized transport does not load models or execute uploaded files",
+    "limits": {
+      "assets_per_batch": 64,
+      "http_asset_bytes": 1048576,
+      "partitions": 4096,
+      "records_per_batch": 500
+    },
+    "registry_version": 1
+  }
+}

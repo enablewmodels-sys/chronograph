@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0-alpha.3 — development checkout
+
+- Community SDKs for Python, TypeScript/JavaScript, Java, C++, Go, Dart and C#, plus a Q# Python host example. Native transports enforce bounded bodies, TLS for remote endpoints, redirect rejection and structured errors.
+- Shared OpenAPI 3.1 input schemas derived from the MCP operation registry; JSON responses remain extensible.
+- Five additional migration descriptors: BrainFlow, Q#, portable quantum results, named model outputs and physical-AI transitions (35 presets total). Python adapters preserve source clocks, tensor bytes, quantum counts and decoded ROS media.
+- Real-server polyglot conformance tests, controlled transport fault tests and synthetic/local BrainFlow, LSL and QDK fixtures. Physical hardware and QPU jobs are not certified.
+- Source distribution only at this step; no SDK package registry or new binary release is implied.
+
 ## 0.4.0-alpha.2 — 2026-09-11
 
 - First public Community release preparation: source, Apple Silicon native bundle and Python connector wheel.

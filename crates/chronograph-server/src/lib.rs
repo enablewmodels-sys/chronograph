@@ -1,6 +1,7 @@
 pub mod auth;
 pub mod backup;
 mod connectors;
+pub mod contract;
 mod mcp;
 mod operations;
 pub mod schema;

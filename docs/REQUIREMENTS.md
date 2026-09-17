@@ -6,13 +6,15 @@ Community **0.4.0-alpha.2** is the first public source-available alpha prepared 
 is the source of truth for published binaries and checksums. It is an alpha with
 documented limitations, not a managed-service launch or a production SLA.
 
+The table below describes the current **alpha.3 development checkout**. Its multi-language SDKs and expanded catalog are distributed as source on `main`; alpha.2 downloads remain unchanged. No alpha.3 binary or package-registry publication is implied.
+
 | Area | Delivered | Limit or remaining work |
 | --- | --- | --- |
 | Temporal engine | Directed typed relationships, valid-time history, late observations, ordered neighborhood indexes | History/indexes reside in RAM; no compaction or replication |
 | Durable branching | Fork, conflict-checked merge, discard, replay and backup | One journal owner; application payload references remain opaque |
 | Community service | Scoped expiring tokens, bounded API, HTTP MCP, native stdio bridge, local backups | One workspace per process; deployed TLS and interactive agent-app checks remain separate |
-| Schema and connectors | Visual designer, checksum migrations, 28 presets, 12 connector descriptors, typed assets, durable ingestion/checkpoint transactions | See connector-specific limits; descriptors do not imply every native format is decoded |
-| Python SDK and agent | Durable SQLite spool, retry/checkpoint recovery, byte-exact arrays and selected dataset adapters | Optional model/hardware dependencies are installed separately |
+| Schema and connectors | Visual designer, checksum migrations, 35 presets, 17 connector descriptors, typed assets, durable ingestion/checkpoint transactions | See connector-specific limits; descriptors do not imply every native format is decoded |
+| Language SDKs and agent | Python, TypeScript/JavaScript, Java, C++, Go, Dart, C# transports; Q# Python host; durable Python spool and optional adapters | Source packages; physical hardware/QPUs and Windows remain unverified. See [SDK coverage](SDK.md) |
 | Browser console | Temporal queries, branches, schemas, connectors, access and operations; desktop/mobile tests | Public static demo is synthetic and read only |
 | Packaging | Source, Apple Silicon native bundle, Python wheel, checksums, license and third-party inventory | Unsigned/not notarized; inspect CI before assuming Linux/container support |
 | Public website | Static landing, full docs and synthetic demo; Vercel configuration | Owner imports and deploys repository in Vercel |

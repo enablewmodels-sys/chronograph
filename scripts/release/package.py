@@ -41,10 +41,12 @@ def selected_tree(directory):
         rel = path.relative_to(ROOT)
         if path.is_dir():
             continue
+        if (any(p in FORBIDDEN for p in rel.parts)
+                or (rel.parts[0] == 'sdk' and any(p in {'bin', 'obj', 'dist', '.dart_tool'} for p in rel.parts))
+                or path.name == '.DS_Store'):
+            continue
         if path.is_symlink():
             raise RuntimeError(f'Symlink refused: {rel}')
-        if any(p in FORBIDDEN for p in rel.parts) or path.name == '.DS_Store':
-            continue
         if path.name == '.env' or (path.suffix in ('.pyc', '.cgraph', '.token', '.lockfile') and rel.as_posix() not in FIXTURES):
             continue
         yield path
@@ -115,7 +117,7 @@ def main():
             shutil.copy2(ROOT / 'bench' / p, source / 'bench' / p)
         shutil.copytree(ROOT / 'bench/neo4j', source / 'bench/neo4j', ignore=shutil.ignore_patterns('__pycache__', '.env'))
         # Evidence must be public and sanitized; raw browser traces stay private.
-        reports = [ROOT / 'bench/reports' / version for version in ('v0.3.0', 'v0.4.0-alpha.1', f'v{VERSION}')]
+        reports = [ROOT / 'bench/reports' / version for version in ('v0.3.0', 'v0.4.0-alpha.1', 'v0.4.0-alpha.2', f'v{VERSION}')]
         for path in sorted(p for folder in reports for p in folder.rglob('*')):
             if not path.is_file() or path.suffix not in ('.md', '.json', '.csv', '.log', '.txt', '.png'):
                 continue

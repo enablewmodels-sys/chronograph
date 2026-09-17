@@ -167,3 +167,170 @@ def cirq_circuit(client,circuit,*,src,dst,timestamp_us):
 def cirq_result(client,result,*,src,dst,timestamp_us):
     assets={f"measurement_{i}":tensor(client,value) for i,value in enumerate(result.measurements.values())}
     return record(src,dst,timestamp_us,assets=assets,fields={"measurement_names":list(result.measurements),"parameters":{str(k):_json(v) for k,v in result.params.param_dict.items()}})
+
+
+def signal_chunk(client, samples, timestamps, *, channels, units, src, dst,
+                 clock_domain, layout="samples_channels", provenance=None):
+    """Normalize a bounded numeric signal chunk; retain every original timestamp.
+
+    LSL timestamps use lsl_local_us, not Unix time. The caller must explicitly
+    transform clocks before selecting another domain. Units are never inferred.
+    """
+    import numpy as np
+    if clock_domain not in ("unix_us", "lsl_local_us", "device_us", "simulation_us"):
+        raise ValueError("An explicit supported clock domain is required")
+    data, times = np.asarray(samples), np.asarray(timestamps, dtype=np.float64)
+    if layout == "samples_channels":
+        data = data.T
+    elif layout != "channels_samples":
+        raise ValueError("Unknown signal layout")
+    if (data.ndim != 2 or times.ndim != 1 or data.shape[1] != len(times)
+            or not len(times) or data.shape[0] != len(channels)
+            or not 1 <= len(channels) <= 512 or len(units) != len(channels)
+            or any(not isinstance(v, str) or not v for v in [*channels, *units])
+            or not np.isfinite(times).all() or np.any(np.diff(times) < 0)
+            or data.nbytes > 16*1024*1024 or times.nbytes > 16*1024*1024):
+        raise ValueError("Signal shape, channel units, timestamps or chunk bounds are invalid")
+    timestamp_us = round(float(times[0])*1_000_000)
+    if not -(2**63) <= timestamp_us < 2**63-1:
+        raise ValueError("Signal timestamp exceeds i64 microseconds")
+    assets = {"signal":tensor(client,data,provenance=provenance),
+              "timestamps":tensor(client,times,provenance={"units":"seconds","clock_domain":clock_domain})}
+    return record(src,dst,timestamp_us,assets=assets,
+                  fields={"channels":list(channels),"units":list(units),"clock_domain":clock_domain})
+
+
+def lsl_chunk(client, samples, timestamps, *, channels, units, src, dst, source_id=None):
+    """Adapt StreamInlet.pull_chunk() output, without discovering or opening devices."""
+    return signal_chunk(client,samples,timestamps,channels=channels,units=units,src=src,dst=dst,
+                        clock_domain="lsl_local_us",provenance={"runtime":"pylsl","source_id":source_id or "unspecified"})
+
+
+def brainflow(client, data, *, board_id, channels, units, src, dst, chunk_samples=1024,
+              channel_indices=None):
+    """Adapt BoardShim.get_board_data() from an already acquired DEFAULT_PRESET.
+
+    Default row selection is BoardShim.get_eeg_channels(board_id). Provide row
+    indices for another signal type. Caller supplies names and original units.
+    Acquisition/session ownership remains with the caller. Board timestamps are
+    retained as provided; this adapter uses the BrainFlow Unix-seconds convention.
+    """
+    import numpy as np
+    from brainflow.board_shim import BoardShim
+    data=np.asarray(data)
+    indices=BoardShim.get_eeg_channels(board_id) if channel_indices is None else list(channel_indices)
+    if (type(chunk_samples) is not int or chunk_samples < 1 or data.ndim != 2
+            or len(indices) != len(channels) or len(units) != len(channels)
+            or any(type(i) is not int or i < 0 or i >= data.shape[0] for i in indices)
+            or BoardShim.get_timestamp_channel(board_id) >= data.shape[0]):
+        raise ValueError("Invalid BrainFlow rows, channels or chunk size")
+    times=data[BoardShim.get_timestamp_channel(board_id)]
+    for start in range(0,data.shape[1],chunk_samples):
+        stop=min(start+chunk_samples,data.shape[1])
+        item=signal_chunk(client,data[indices,start:stop],times[start:stop],channels=channels,units=units,
+                          src=src,dst=dst,clock_domain="unix_us",layout="channels_samples",
+                          provenance={"runtime":"brainflow","board_id":str(board_id)})
+        item["fields"].update(board_id=board_id,sample_rate_hz=BoardShim.get_sampling_rate(board_id))
+        yield item
+
+
+def model_outputs(client, outputs, *, model, checkpoint, src, dst, timestamp_us, episode=None):
+    """Adapt named NumPy/PyTorch outputs, including caller-run ONNX inference.
+
+    Original names are stored separately so dotted model names remain reversible.
+    No architecture, tensor semantics or inference runtime is guessed.
+    """
+    if not isinstance(model,str) or not model or not isinstance(checkpoint,str) or not checkpoint:
+        raise ValueError("Model and checkpoint identifiers are required")
+    if not isinstance(outputs,dict) or not 1 <= len(outputs) <= 32:
+        raise ValueError("Provide 1–32 named output tensors")
+    assets, names = {}, {}
+    for index,(name,value) in enumerate(outputs.items()):
+        if not isinstance(name,str) or not name:
+            raise ValueError("Output names must be nonempty strings")
+        key=f"output_{index}"
+        assets[key]=tensor(client,value,provenance={"model":model,"checkpoint":checkpoint,"output":name})
+        names[key]=name
+    return record(src,dst,timestamp_us,assets=assets,fields={"model":model,"checkpoint":checkpoint,"output_names":names},episode=episode)
+
+
+def quantum_counts(counts, *, basis, runtime, backend, src, dst, timestamp_us, job_id=None):
+    """Portable observed counts from Qiskit, PennyLane, Braket or another host.
+
+    Counts must be nonnegative integers, not probabilities/quasi-distributions.
+    Outcome order is retained; basis describes the producer's bit ordering.
+    """
+    if not all(isinstance(v,str) and v for v in (basis,runtime,backend)):
+        raise ValueError("Provide basis, runtime and backend provenance")
+    if not isinstance(counts,dict) or not 1 <= len(counts) <= 4096:
+        raise ValueError("Provide 1–4096 observed outcomes")
+    normalized={}
+    for key,value in counts.items():
+        if hasattr(value,"item"): value=value.item()
+        if type(value) is not int or not 0 <= value < 2**64 or not isinstance(key,str) or not 1 <= len(key) <= 256:
+            raise ValueError("Counts require outcome strings and u64 integer frequencies")
+        normalized[key]=str(value)
+    fields={"counts":normalized,"basis":basis,"runtime":runtime,"backend":backend}
+    if job_id is not None: fields["job_id"]=str(job_id)
+    return record(src,dst,timestamp_us,fields=fields)
+
+
+def quantum_observables(observables, *, runtime, backend, src, dst, timestamp_us, job_id=None):
+    """Named finite expectation values; units/operator definitions belong in names/provenance."""
+    import math
+    if not isinstance(observables,dict) or not 1 <= len(observables) <= 4096:
+        raise ValueError("Provide 1–4096 named observables")
+    values={}
+    for name,value in observables.items():
+        if not isinstance(name,str) or not name or isinstance(value,bool) or not math.isfinite(float(value)):
+            raise ValueError("Observables require names and finite numbers")
+        values[name]=float(value)
+    if not all(isinstance(v,str) and v for v in (runtime,backend)):
+        raise ValueError("Runtime and backend are required")
+    fields={"observables":values,"runtime":runtime,"backend":backend}
+    if job_id is not None: fields["job_id"]=str(job_id)
+    return record(src,dst,timestamp_us,fields=fields)
+
+
+def qsharp_result(shots, *, src, dst, timestamp_us, backend="qdk-local-simulator"):
+    """Adapt QDK host results where the Q# entry point returns Int[] bits.
+
+    Result enums are deliberately not guessed; convert them explicitly in Q#.
+    This helper never evaluates source or submits a quantum job.
+    """
+    from collections import Counter
+    counts=Counter()
+    width=None
+    for shot in shots:
+        if not isinstance(shot,(list,tuple)) or not 1 <= len(shot) <= 256 or any(type(bit) is not int or bit not in (0,1) for bit in shot):
+            raise ValueError("Q# entry point must return a nonempty Int[] of 0/1")
+        if width is not None and width != len(shot):
+            raise ValueError("Q# shots have inconsistent widths")
+        width=len(shot)
+        counts["".join(str(bit) for bit in shot)]+=1
+    return quantum_counts(dict(counts),basis="Z; entry-point array order left-to-right",runtime="qdk-qsharp",backend=backend,src=src,dst=dst,timestamp_us=timestamp_us)
+
+
+def quantum_source(client, source, *, encoding, runtime, src, dst, timestamp_us):
+    """Store caller-supplied Q#, QIR or other source as an immutable opaque asset."""
+    if isinstance(source,str): source=source.encode("utf-8")
+    if not isinstance(source,(bytes,bytearray)) or not runtime or not encoding:
+        raise ValueError("Provide source bytes, encoding and runtime")
+    asset=client.asset(source,kind="opaque",encoding=encoding,provenance={"runtime":runtime})
+    return record(src,dst,timestamp_us,assets={"source":asset},fields={"runtime":runtime,"representation":"opaque_source"})
+
+
+def ros_message(client, message, *, message_type, topic, src, dst, timestamp_us, binary=None):
+    """Store an already decoded ROS 2 message dictionary and optional raw media.
+
+    Call your ROS/rosbags decoder locally. No CDR, bag or MCAP decoding is implied
+    here. Image width/height/step/endianness and coordinate frames must be retained
+    in the message dictionary; binary values need explicit named assets.
+    """
+    if not isinstance(message,dict) or not message_type or not topic:
+        raise ValueError("A decoded message mapping, ROS type and topic are required")
+    decoded=_json(message)
+    assets={}
+    for name,value in (binary or {}).items():
+        assets[name]=client.asset(value,kind="opaque",encoding="ros2_message_bytes",provenance={"message_type":message_type,"topic":topic})
+    return record(src,dst,timestamp_us,assets=assets,fields={"message_type":message_type,"topic":topic,"message":decoded})

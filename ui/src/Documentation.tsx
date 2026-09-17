@@ -9,6 +9,8 @@ const docs = [
   ["TUTORIAL", "Temporal model"],
   ["BRANCHES", "Durable branches"],
   ["API", "HTTP API"],
+  ["SDK", "Language SDKs"],
+  ["INTEGRATIONS", "Platform integration recipes"],
   ["SCHEMA", "Schema & migrations"],
   ["CONNECTOR_PLATFORM", "Connector platform"],
   ["UPGRADE_0_4", "Upgrade to 0.4"],
@@ -47,7 +49,7 @@ function slug(node: ReactNode) {
 }
 export default function Documentation() {
   const params = useParams(),
-    doc = params["*"] || "QUICKSTART";
+    doc = params["*"]?.replace(/\/+$/, "") || "QUICKSTART";
   const [text, setText] = useState(""),
     [error, setError] = useState("");
   useEffect(() => {

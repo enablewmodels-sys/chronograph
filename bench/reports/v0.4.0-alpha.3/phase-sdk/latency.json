@@ -1,0 +1,146 @@
+{
+  "date": "2026-09-17T14:46:53.277Z",
+  "environment": {
+    "platform": "darwin",
+    "release": "25.5.0",
+    "arch": "arm64",
+    "cpu": "Apple M5",
+    "logical_cpus": 10,
+    "memory_gib": 16,
+    "node": "v20.20.2",
+    "rust": "rustc 1.93.0 (254b59607 2026-01-19)"
+  },
+  "workload": {
+    "versions": 100000,
+    "nodes": "1032",
+    "active_at_query": 32000,
+    "page_limit": 1000,
+    "warmups": 20,
+    "durability": "Initial 100k ingest buffered + final sync; durable single-insert workload requests fsync",
+    "transport": "loopback HTTP, no TLS, release build; full client response parsed",
+    "initial_ingest_ms": 226.534291,
+    "initial_ingest_edges_per_second": 441434.27274769626
+  },
+  "summary": [
+    {
+      "name": "HTTP stats",
+      "samples": 500,
+      "concurrency": 1,
+      "p50_ms": 0.31129199999998036,
+      "p95_ms": 0.3818749999999227,
+      "p99_ms": 0.5216249999999718,
+      "max_ms": 3.565625000000068,
+      "requests_per_second": 3050.401776349007
+    },
+    {
+      "name": "HTTP as-of first page (1000 rows)",
+      "samples": 300,
+      "concurrency": 1,
+      "p50_ms": 4.005957999999964,
+      "p95_ms": 4.350125000000162,
+      "p99_ms": 4.584833000000117,
+      "max_ms": 6.706875000000082,
+      "requests_per_second": 246.02248276458747
+    },
+    {
+      "name": "HTTP uniform sample (16 edges)",
+      "samples": 300,
+      "concurrency": 1,
+      "p50_ms": 0.26404200000001765,
+      "p95_ms": 0.39837499999998727,
+      "p99_ms": 0.4862500000001546,
+      "max_ms": 1.9950000000001182,
+      "requests_per_second": 3450.1430636322875
+    },
+    {
+      "name": "MCP as-of first page (1000 rows)",
+      "samples": 300,
+      "concurrency": 1,
+      "p50_ms": 5.214416000000256,
+      "p95_ms": 5.742457999999715,
+      "p99_ms": 5.996291999999812,
+      "max_ms": 7.134417000000212,
+      "requests_per_second": 189.92562731481908
+    },
+    {
+      "name": "HTTP as-of first page, 8 clients",
+      "samples": 400,
+      "concurrency": 8,
+      "p50_ms": 7.022540999999364,
+      "p95_ms": 9.72137500000008,
+      "p99_ms": 11.772208999999748,
+      "max_ms": 14.150833000000148,
+      "requests_per_second": 1073.373703794922
+    },
+    {
+      "name": "MCP as-of first page, 8 concurrent requests",
+      "samples": 400,
+      "concurrency": 8,
+      "p50_ms": 8.288125000000036,
+      "p95_ms": 11.2959579999997,
+      "p99_ms": 13.679291999999805,
+      "max_ms": 14.629291999999623,
+      "requests_per_second": 889.4685258782541
+    },
+    {
+      "name": "HTTP durable single insert",
+      "samples": 200,
+      "concurrency": 1,
+      "p50_ms": 4.974500000000262,
+      "p95_ms": 5.055915999999343,
+      "p99_ms": 5.165125000000444,
+      "max_ms": 5.226832999999715,
+      "requests_per_second": 214.36016608827163
+    },
+    {
+      "name": "HTTP schema catalog (1 relation, 1 migration)",
+      "samples": 200,
+      "concurrency": 1,
+      "p50_ms": 0.18887499999982538,
+      "p95_ms": 0.21870799999942392,
+      "p99_ms": 0.23479199999928824,
+      "max_ms": 1.6612499999991996,
+      "requests_per_second": 5112.082406768332
+    },
+    {
+      "name": "HTTP schema preview (metadata-only)",
+      "samples": 200,
+      "concurrency": 1,
+      "p50_ms": 0.16499999999996362,
+      "p95_ms": 0.213249999999789,
+      "p99_ms": 0.23666599999978644,
+      "max_ms": 1.430040999999619,
+      "requests_per_second": 5478.789046268139
+    },
+    {
+      "name": "HTTP typed as-of first page (1000 rows)",
+      "samples": 300,
+      "concurrency": 1,
+      "p50_ms": 4.733791999999994,
+      "p95_ms": 5.053957999999511,
+      "p99_ms": 5.236667000000125,
+      "max_ms": 5.332209000000148,
+      "requests_per_second": 209.48950811077904
+    },
+    {
+      "name": "MCP typed as-of first page (1000 rows)",
+      "samples": 200,
+      "concurrency": 1,
+      "p50_ms": 6.3854169999995065,
+      "p95_ms": 6.896458999999595,
+      "p99_ms": 7.455082999999831,
+      "max_ms": 7.93304199999875,
+      "requests_per_second": 155.23495947047667
+    },
+    {
+      "name": "HTTP typed durable single insert",
+      "samples": 200,
+      "concurrency": 1,
+      "p50_ms": 4.974667000000409,
+      "p95_ms": 5.057749999999942,
+      "p99_ms": 5.160749999999098,
+      "max_ms": 10.973916999999346,
+      "requests_per_second": 214.58186607617867
+    }
+  ]
+}

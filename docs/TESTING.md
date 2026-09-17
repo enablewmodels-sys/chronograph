@@ -112,3 +112,12 @@ servers are stopped after each run. No existing runtime `data/` directory is use
 `CHRONOGRAPH_REPORT_PHASE=phase-schema node scripts/schema-test.mjs` tests the five schema tools through the official MCP client, read/admin boundaries, file CLI, exact typed values, backup restoration and abrupt restart. Rust tests cover layout overlap/ranges, invalid input, failed persistence, checksum drift, concurrent idempotency, stale previews, active-branch protection and real settings defaults.
 
 The expanded browser suite has six journeys across two viewports, each repeated twice (24 runs). Schema journeys create a visual definition, import/export a file, review and apply, insert typed values, change settings, preserve drafts, reject stale previews, and check read-only controls. Evidence for this source extension is in `bench/reports/v0.3.0/phase-schema/`; the earlier `dist/v0.3.0` release candidate archives predate this feature.
+
+
+## Polyglot SDK and alpha.3 connector verification
+
+The [SDK guide](SDK.md) documents the reproducible language conformance suite and optional local runtime fixtures. Seven HTTP clients passed against the release server, including precision above 2^53, migration apply, asset bytes, durable receipts, conflict handling, auth scope, binary Arrow responses and controlled HTTP faults. Python/TypeScript bounded asset and pagination tests also pass. BrainFlow synthetic acquisition, LSL loopback and QDK Bell simulation were exercised; existing MNE, Qiskit, Cirq, PyTorch/JEPA and LeRobot tests remain passing. No physical device or QPU certification is claimed.
+
+The migration catalog now has 35 presets. All were tested through migration, ingest, restart and independent backup restore. Three focused Rust tests enforce new signal axes, exact quantum counts and model-output provenance. The workspace all-feature suite and strict Clippy checks pass. The browser suite passed 24 desktop/mobile runs (each scenario twice), and the new SDK/integration docs passed eight viewport/repeat checks, including trailing-slash direct links.
+
+Sanitized local evidence is in `bench/reports/v0.4.0-alpha.3/phase-sdk` in the source repository. Timing files describe one macOS ARM64 loopback run without TLS, not deployment guarantees. Package checks covered npm contents, a Python wheel, a .NET package and the allowlisted source archive; no package registry upload is implied.
