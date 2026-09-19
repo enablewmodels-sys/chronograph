@@ -1653,3 +1653,56 @@ html {
     font-size: 22px;
   }
 }
+
+.release-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 24px;
+  background: #17382e;
+  color: #edf7ed;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.release-banner .release-label {
+  flex-shrink: 0;
+  border: 1px solid #7caa89;
+  border-radius: 4px;
+  color: #c7e6b7;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.release-banner a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #e5f5b6;
+  font-weight: 700;
+  flex-shrink: 0;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.release-banner a:hover {
+  color: white;
+}
+.release-banner a:focus-visible {
+  outline: 2px solid #e5f5b6;
+  outline-offset: 5px;
+}
+@media (max-width: 760px) {
+  .release-banner {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 7px 12px;
+    padding: 13px 20px;
+  }
+  .release-banner > span:nth-child(2) {
+    flex: 1 1 230px;
+  }
+  .release-banner > a {
+    margin-left: 0;
+  }
+}

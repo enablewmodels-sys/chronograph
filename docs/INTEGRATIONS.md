@@ -2,7 +2,7 @@
 
 Chronograph stores temporal relationships and immutable binary assets. Producers own acquisition, model inference, simulators and quantum execution. Connector presets describe validated ingestion contracts; selecting a preset does not install a driver, load a checkpoint or authenticate to an upstream cloud service.
 
-Use the [SDK guide](SDK.md) to connect and [schema migrations](SCHEMA.md) to configure a binding. The live catalog supplies 35 presets across 17 connectors. Raw HTTP and MCP consumers can implement any of these contracts without Python.
+Use the [SDK guide](SDK.md) to connect and [schema migrations](SCHEMA.md) to configure a binding. The live catalog supplies 36 presets across 18 connectors. Raw HTTP and MCP consumers can implement any of these contracts without Python.
 
 ## Support matrix
 
@@ -112,3 +112,10 @@ Use `quantum-results/counts-v1` for integer frequencies and `observables-v1` for
 ## Add a producer
 
 A new producer needs a deterministic record mapping, declared clock and units, bounded asset conversion, durable sequence ownership and a fixture that roundtrips the original values. Start with the custom preset, then add a dedicated server validator only when the format's invariants are known. Add its descriptor to the Rust registry so migration dropdowns and MCP discover it automatically. Update the generated OpenAPI contract, support matrix and `scripts/sdk` tests together.
+
+## TypeSafe Jev
+
+Use the [Jev integration guide](JEV.md) for Python/TypeScript decision bindings,
+Choice/Score/Noul validation, an explicit input-attachment option and runnable
+examples. The migration dropdown exposes `jev` / `decisions-v1` under Decision
+models. JEPA tensor integrations are separate.

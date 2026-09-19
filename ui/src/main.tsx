@@ -37,7 +37,7 @@ import { SchemaProvider } from "./schema-store";
 import { api, setToken, useDemo, demoConnection, type Connection } from "./api";
 import { Busy, Field, Logo, SubmitForm, useAction } from "./shared";
 import Landing from "./Landing";
-import { publicSite } from "./site";
+import { managedSite, publicSite } from "./site";
 import { BranchPicker, WorkspaceProvider } from "./workspace";
 const Explorer = lazy(() => import("./Explorer"));
 const Overview = lazy(() => import("./Overview"));
@@ -164,9 +164,11 @@ function Login() {
           {action.feedback}
         </SubmitForm>
         <p className="small">
-          Create a token with chronograph-server admin create-token. Read tokens
-          can explore; ingest tokens can write; admin tokens manage access and
-          backups.
+          {managedSite
+            ? "Use the token issued by your workspace operator. "
+            : "Create a token with chronograph-server admin create-token. "}
+          Read tokens can explore; ingest tokens can write; admin tokens manage
+          access and backups.
         </p>
         <button
           className="outline"
@@ -208,7 +210,9 @@ function Console() {
           <aside className="sidebar">
             <div>
               <Logo />
-              <span className="sidebar-caption">Community console</span>
+              <span className="sidebar-caption">
+                {managedSite ? "Managed alpha console" : "Community console"}
+              </span>
             </div>
             <nav aria-label="Console navigation">
               {navigation

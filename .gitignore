@@ -16,6 +16,7 @@ __pycache__/
 /ui/*.tsbuildinfo
 /deploy/.env
 /deploy/secrets/
+*.pem
 *.pending
 .DS_Store
 /launch/private/
@@ -52,3 +53,6 @@ sdk/python/*.egg-info/
 /sdk/**/obj/
 /sdk/**/.dart_tool/
 /sdk/**/.packages
+
+/examples/jev/node_modules/
+/.chronograph-jev/

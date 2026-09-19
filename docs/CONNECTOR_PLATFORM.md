@@ -12,7 +12,7 @@ The server checks both catalog definitions and stored main/active-branch kinds. 
 
 ## What the presets mean
 
-The registry contains 35 normalized presets across 17 connectors. Retrieve the authoritative catalog through `POST /v1/connector_catalog` or the MCP tool with the same name.
+The registry contains 36 normalized presets across 18 connectors. Retrieve the authoritative catalog through `POST /v1/connector_catalog` or the MCP tool with the same name.
 
 | Connector | Presets | Local integration boundary |
 |---|---|---|

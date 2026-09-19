@@ -4,3 +4,4 @@ brainflow==5.22.2
 pylsl==1.18.2
 qdk==1.32.3
 openapi-spec-validator==0.7.2
+typesafe-sdk==0.7.0

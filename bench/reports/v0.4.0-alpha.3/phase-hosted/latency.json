@@ -1,0 +1,322 @@
+{
+  "measured_at_unix": 1789861912,
+  "target": "AWS t4g.medium, ARM64, us-west-1",
+  "transport": "operator laptop to public HTTPS endpoint; warm persistent TLS connection",
+  "limitations": "30 serial samples, tiny synthetic graph, warm cache, no inference; p99 is sample maximum, not a service guarantee",
+  "results": {
+    "as_of_small_fixture": {
+      "samples": 30,
+      "p50_ms": 172.62,
+      "p95_ms": 224.421,
+      "p99_ms": 228.367
+    },
+    "jev_record_fsync_shared_assets": {
+      "samples": 30,
+      "p50_ms": 179.541,
+      "p95_ms": 228.661,
+      "p99_ms": 242.003
+    }
+  },
+  "samples": [
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 0,
+      "ms": 228.366666
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 1,
+      "ms": 172.619792
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 2,
+      "ms": 171.137666
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 3,
+      "ms": 174.89125
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 4,
+      "ms": 169.499583
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 5,
+      "ms": 176.858583
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 6,
+      "ms": 210.1925
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 7,
+      "ms": 224.420917
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 8,
+      "ms": 207.032459
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 9,
+      "ms": 176.521792
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 10,
+      "ms": 172.313208
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 11,
+      "ms": 166.943916
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 12,
+      "ms": 167.952458
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 13,
+      "ms": 168.654583
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 14,
+      "ms": 167.771416
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 15,
+      "ms": 168.697
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 16,
+      "ms": 174.7995
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 17,
+      "ms": 186.649875
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 18,
+      "ms": 171.81425
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 19,
+      "ms": 186.814583
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 20,
+      "ms": 178.822333
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 21,
+      "ms": 170.474084
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 22,
+      "ms": 169.099042
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 23,
+      "ms": 172.659375
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 24,
+      "ms": 175.717291
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 25,
+      "ms": 182.178166
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 26,
+      "ms": 168.8625
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 27,
+      "ms": 169.590416
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 28,
+      "ms": 168.682417
+    },
+    {
+      "operation": "as_of_small_fixture",
+      "sample": 29,
+      "ms": 169.30425
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 0,
+      "ms": 179.571709
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 1,
+      "ms": 176.693833
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 2,
+      "ms": 182.529
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 3,
+      "ms": 203.894
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 4,
+      "ms": 182.800291
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 5,
+      "ms": 195.29425
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 6,
+      "ms": 180.188
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 7,
+      "ms": 178.868542
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 8,
+      "ms": 176.625041
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 9,
+      "ms": 177.043042
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 10,
+      "ms": 242.003208
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 11,
+      "ms": 228.661375
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 12,
+      "ms": 177.65425
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 13,
+      "ms": 178.231916
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 14,
+      "ms": 177.039167
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 15,
+      "ms": 180.880583
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 16,
+      "ms": 184.188208
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 17,
+      "ms": 177.480584
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 18,
+      "ms": 175.663375
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 19,
+      "ms": 183.882208
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 20,
+      "ms": 206.544417
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 21,
+      "ms": 177.570458
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 22,
+      "ms": 177.561083
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 23,
+      "ms": 179.258709
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 24,
+      "ms": 176.56125
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 25,
+      "ms": 180.165458
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 26,
+      "ms": 178.945
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 27,
+      "ms": 177.144792
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 28,
+      "ms": 179.540792
+    },
+    {
+      "operation": "jev_record_fsync_shared_assets",
+      "sample": 29,
+      "ms": 181.644792
+    }
+  ]
+}

@@ -11,6 +11,8 @@ const docs = [
   ["API", "HTTP API"],
   ["SDK", "Language SDKs"],
   ["INTEGRATIONS", "Platform integration recipes"],
+  ["JEV", "TypeSafe Jev & examples"],
+  ["HOSTED", "Hosted alpha"],
   ["SCHEMA", "Schema & migrations"],
   ["CONNECTOR_PLATFORM", "Connector platform"],
   ["UPGRADE_0_4", "Upgrade to 0.4"],

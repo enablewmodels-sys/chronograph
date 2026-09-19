@@ -1,0 +1,1 @@
+{"name":"chronograph-jev-example","private":true,"type":"module","dependencies":{"@typesafe-ai/sdk":"0.6.0"},"scripts":{"fixture":"node typescript_example.mjs"}}

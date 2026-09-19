@@ -9,11 +9,11 @@ an optional single-workspace service with a browser console and scoped MCP tools
 Domain adapters connect BCI streams, robotics recordings and world-model episodes;
 quantum circuit/calibration support is exploratory.
 
-This checkout is a **Community alpha**, **source-available under PolyForm Perimeter 1.0.0**. The new [connector platform](docs/CONNECTOR_PLATFORM.md) adds 35 migration presets, typed assets and durable ingestion receipts. Existing format-2 workspaces require an [explicit upgrade to a separate destination](docs/UPGRADE_0_4.md).
+This checkout is a **Community alpha**, **source-available under PolyForm Perimeter 1.0.0**. The new [connector platform](docs/CONNECTOR_PLATFORM.md) adds 36 migration presets, typed assets and durable ingestion receipts. Existing format-2 workspaces require an [explicit upgrade to a separate destination](docs/UPGRADE_0_4.md).
 Modification and noncompeting commercial use are allowed; offering a competing product is restricted, including free competing products. See [licensing](docs/LICENSING.md).
 
 [Source repository](https://github.com/enablewmodels-sys/chronograph) · [Download the alpha](https://github.com/enablewmodels-sys/chronograph/releases/tag/v0.4.0-alpha.2).
-Managed hosting is not available. See [release status](docs/REQUIREMENTS.md),
+An invitation-only [hosted alpha](docs/HOSTED.md) is available with operator-issued tokens. Self-service accounts and billing are not implemented. See [release status](docs/REQUIREMENTS.md),
 [known limits](docs/LIMITATIONS.md) and [edition boundaries](docs/EDITIONS.md).
 
 To host the Community landing, documentation and read-only demo on Vercel, import this repository with its root directory unchanged. [Vercel setup](docs/WEBSITE.md). The Rust database runs separately on your own machine or server.

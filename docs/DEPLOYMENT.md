@@ -1,15 +1,16 @@
 # Deployment preparation
 
-Community 0.4.0-alpha.2 is currently verified locally as a single-workspace service.
-**Container and deployed TLS verification are PENDING.** Docker's daemon did not
-respond to bounded checks on this machine, including after opening Docker Desktop.
-Community source and versioned alpha downloads are published on GitHub. Managed
-hosting is not available. The static public site serves docs and a synthetic demo;
-it does not host a database or accept API tokens. See [Vercel website deployment](WEBSITE.md).
+The alpha.3 engine has been deployed natively on an ARM64 EC2 instance behind
+Caddy with public HTTPS. The [hosted pilot](HOSTED.md) uses scoped tokens,
+loopback-only database access, an unprivileged systemd service, persistent private
+data/config directories and a six-hour local backup timer. Public API/MCP,
+Jev ingestion and independent workspace restore were verified on September 20,
+2026. This does not establish high availability or multi-tenant readiness.
 
-Use the [native quickstart](QUICKSTART.md) for the tested installation. Docker/Compose
-now uses a separate private config volume and offline scoped-token bootstrap.
-The recipe below is prepared; its execution is pending a responsive Docker daemon.
+The static Community website still serves documentation and a synthetic demo;
+see [Vercel website deployment](WEBSITE.md). Docker/Compose is a separate recipe:
+its local execution remains unverified on the developer machine. Use the
+[native quickstart](QUICKSTART.md) or the recipe below for your own deployment.
 
 ## Native configuration
 
@@ -30,7 +31,7 @@ investigation. Removed settings: `CHRONOGRAPH_PASSWORD_FILE` and browser session
 ## Intended single-host container boundary
 
 The supplied Caddyfile terminates HTTPS, preserves Host, caps request bodies and
-does not retry writes. Deployed verification remains due. Publish only ports
+does not retry writes. Verify this container topology independently. Publish only ports
 80/443 from the proxy; keep the plaintext database socket private. Run as an
 unprivileged UID with a read-only root filesystem and writable data/config volumes.
 Config must have a separate private mount. Retain certificate state separately.

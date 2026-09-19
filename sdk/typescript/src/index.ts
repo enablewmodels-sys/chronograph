@@ -1,3 +1,5 @@
+export { jevDecision } from "./jev.js";
+export type { JevAnswer, JevResponse, JevRequest } from "./jev.js";
 export type Json =
   null | boolean | number | string | Json[] | { [key: string]: Json };
 export type ObjectValue = { [key: string]: Json };

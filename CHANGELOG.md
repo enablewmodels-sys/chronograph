@@ -2,6 +2,10 @@
 
 ## 0.4.0-alpha.3 — development checkout
 
+- TypeSafe Jev `decisions-v1` preset, validated Python/TypeScript decision bindings, opt-in JSON attachments, example bundle and Binder notebook (36 presets across 18 connectors).
+- Hosted invitation-only alpha documentation and console build mode, Jev homepage announcement, fixed SDK CI setup and an explicit static Pages workflow.
+- Upgrade rustls to 0.23.45 to address RUSTSEC-2026-0285.
+
 - Community SDKs for Python, TypeScript/JavaScript, Java, C++, Go, Dart and C#, plus a Q# Python host example. Native transports enforce bounded bodies, TLS for remote endpoints, redirect rejection and structured errors.
 - Shared OpenAPI 3.1 input schemas derived from the MCP operation registry; JSON responses remain extensible.
 - Five additional migration descriptors: BrainFlow, Q#, portable quantum results, named model outputs and physical-AI transitions (35 presets total). Python adapters preserve source clocks, tensor bytes, quantum counts and decoded ROS media.

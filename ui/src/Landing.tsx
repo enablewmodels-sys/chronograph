@@ -1,4 +1,4 @@
-import { publicPath, publicSite } from "./site";
+import { managedSite, publicPath, publicSite } from "./site";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -109,6 +109,16 @@ function FuturesIllustration() {
 export default function Landing() {
   return (
     <div className="landing">
+      <aside className="release-banner" aria-label="New Jev integration">
+        <span className="release-label">NEW INTEGRATION</span>
+        <span>
+          <strong>TypeSafe Jev, with a memory.</strong> Keep decisions,
+          probabilities and model history.
+        </span>
+        <Link to="/documentation/JEV">
+          Get the examples <ArrowRight size={15} />
+        </Link>
+      </aside>
       <nav className="public-nav">
         <Logo />
         <div className="nav-links">
@@ -117,15 +127,22 @@ export default function Landing() {
           <a href="#managed">Managed</a>
           <Link to="/documentation/QUICKSTART">Docs</Link>
         </div>
-        <a className="button primary" href="#quickstart">
-          Start locally <ArrowUpRight size={16} />
-        </a>
+        {managedSite ? (
+          <Link className="button primary" to="/login">
+            Open workspace <ArrowUpRight size={16} />
+          </Link>
+        ) : (
+          <a className="button primary" href="#quickstart">
+            Start locally <ArrowUpRight size={16} />
+          </a>
+        )}
       </nav>
       <main id="main">
         <section className="hero" id="product">
           <div className="hero-copy">
             <p className="eyebrow">
-              Temporal graph database · Rust · Community 0.4 alpha
+              Temporal graph database · Rust ·{" "}
+              {managedSite ? "Managed alpha" : "Community 0.4 alpha"}
             </p>
             <h1>
               Build worlds
@@ -134,12 +151,21 @@ export default function Landing() {
             </h1>
             <p>
               An embedded temporal graph database in Rust. Replay relationships,
-              explore alternate futures, and keep your data local.
+              explore alternate futures, and{" "}
+              {managedSite
+                ? "connect to your hosted workspace."
+                : "keep your data local."}
             </p>
             <div className="hero-actions">
-              <a className="button primary" href="#quickstart">
-                Start locally <ArrowRight size={18} />
-              </a>
+              {managedSite ? (
+                <Link className="button primary" to="/login">
+                  Connect your workspace <ArrowRight size={18} />
+                </Link>
+              ) : (
+                <a className="button primary" href="#quickstart">
+                  Start locally <ArrowRight size={18} />
+                </a>
+              )}
               <Link className="button outline" to="/app">
                 {publicSite ? "Explore the demo" : "Explore the console"}
               </Link>
@@ -329,35 +355,37 @@ export default function Landing() {
               </p>
             </article>
             <article className="edition managed-edition" id="managed">
-              <span className="scope-badge">MANAGED · PLANNED</span>
+              <span className="scope-badge">
+                MANAGED · INVITATION-ONLY ALPHA
+              </span>
               <h3>
-                A future home
+                A hosted home
                 <br />
-                for your workspaces.
+                for your workspace.
               </h3>
               <p>
-                Planned as a separate service built on the same Community
-                engine. Infrastructure and billing implementation are awaiting
-                review.
+                Your temporal graph, available over HTTPS. Connect the console,
+                your SDK or an MCP client with a scoped workspace token.
               </p>
               <ul>
                 {[
-                  "Isolated workspace containers and volumes",
-                  "GitHub sign-in and team roles",
-                  "Scheduled off-host backups and recovery",
-                  "Usage-based billing and service monitoring",
+                  "Hosted database, console and migration editor",
+                  "Scoped API credentials and MCP endpoint",
+                  "Scheduled local backups and restore tools",
+                  "Dedicated single-workspace service",
                 ].map((s) => (
                   <li key={s}>
-                    <span className="planned-dot" />
+                    <Check size={16} />
                     {s}
                   </li>
                 ))}
               </ul>
-              <Link className="button outline" to="/documentation/EDITIONS">
-                Read the edition plan <ArrowUpRight size={17} />
+              <Link className="button outline" to="/documentation/HOSTED">
+                Hosted setup & limits <ArrowUpRight size={17} />
               </Link>
               <p className="small muted">
-                No hosted signup, subscription or availability commitment yet.
+                Operator-issued access. Self-service signup, teams, billing and
+                an uptime SLA are not available.
               </p>
             </article>
           </div>

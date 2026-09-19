@@ -137,6 +137,11 @@ try {
           marker: "start",
           reason: "reconnect",
           lost_samples: "7",
+          provider: "typesafe",
+          requested_model: "jev-latest",
+          mode: "fixture",
+          input_sha256: "a".repeat(64),
+          answers: { review: { type: "noul", noul: 0.75 } },
         },
       };
       if (d.id === "model-output") delete record.assets.source;

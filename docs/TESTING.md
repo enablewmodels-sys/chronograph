@@ -121,3 +121,30 @@ The [SDK guide](SDK.md) documents the reproducible language conformance suite an
 The migration catalog now has 35 presets. All were tested through migration, ingest, restart and independent backup restore. Three focused Rust tests enforce new signal axes, exact quantum counts and model-output provenance. The workspace all-feature suite and strict Clippy checks pass. The browser suite passed 24 desktop/mobile runs (each scenario twice), and the new SDK/integration docs passed eight viewport/repeat checks, including trailing-slash direct links.
 
 Sanitized local evidence is in `bench/reports/v0.4.0-alpha.3/phase-sdk` in the source repository. Timing files describe one macOS ARM64 loopback run without TLS, not deployment guarantees. Package checks covered npm contents, a Python wheel, a .NET package and the allowlisted source archive; no package registry upload is implied.
+
+## Hosted alpha and Jev — September 20, 2026
+
+The current catalog has **36 presets across 18 connectors**. The Jev addition
+passed Python/TypeScript validation tests, official TypeSafe SDK mock-transport
+checks and actual hosted database ingestion through both example programs.
+The server's 21 library tests passed on the ARM64 deployment host. The
+[hosted alpha guide](HOSTED.md) describes the operational boundary.
+
+Public TLS tests covered unauthorized access, Origin rejection, read-only scopes,
+revocation, official MCP discovery, atomic ingestion retry, input/response asset
+round trips and independent workspace restoration of an off-host-downloaded
+backup. A six-hour local backup timer is installed and its service was exercised.
+The Jev notebook and extracted download examples ran without service credentials.
+Live Jev inference remains untested without a TypeSafe API key.
+
+For a tiny synthetic graph over warm persistent public TLS, 30 serial samples
+measured as-of p50 **172.620 ms**, p99 **228.367 ms**, and single Jev-record fsync
+p50 **179.541 ms**, p99 **242.003 ms**. These include the operator's network path;
+with this sample count, p99 is the maximum. They establish neither an SLA nor
+production capacity. Sanitized evidence is under
+`bench/reports/v0.4.0-alpha.3/phase-hosted/` in the source repository.
+
+Public-browser QA passed two full rounds each at 1440×1000 and 390×844: banner,
+docs/download, token connection, Jev migration selectors, reload logout, no
+credential in browser storage and no console/runtime errors. Browser plugin was
+unavailable; headed Playwright provided screenshots and interaction checks.

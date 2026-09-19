@@ -12,13 +12,13 @@ The table below describes the current **alpha.3 development checkout**. Its mult
 | --- | --- | --- |
 | Temporal engine | Directed typed relationships, valid-time history, late observations, ordered neighborhood indexes | History/indexes reside in RAM; no compaction or replication |
 | Durable branching | Fork, conflict-checked merge, discard, replay and backup | One journal owner; application payload references remain opaque |
-| Community service | Scoped expiring tokens, bounded API, HTTP MCP, native stdio bridge, local backups | One workspace per process; deployed TLS and interactive agent-app checks remain separate |
-| Schema and connectors | Visual designer, checksum migrations, 35 presets, 17 connector descriptors, typed assets, durable ingestion/checkpoint transactions | See connector-specific limits; descriptors do not imply every native format is decoded |
+| Community service | Scoped expiring tokens, bounded API, HTTP MCP, native stdio bridge, local backups | One workspace per process; public TLS and official MCP client verified on the pilot; interactive agent-app checks remain separate |
+| Schema and connectors | Visual designer, checksum migrations, 36 presets, 18 connector descriptors, typed assets, durable ingestion/checkpoint transactions | See connector-specific limits; descriptors do not imply every native format is decoded |
 | Language SDKs and agent | Python, TypeScript/JavaScript, Java, C++, Go, Dart, C# transports; Q# Python host; durable Python spool and optional adapters | Source packages; physical hardware/QPUs and Windows remain unverified. See [SDK coverage](SDK.md) |
 | Browser console | Temporal queries, branches, schemas, connectors, access and operations; desktop/mobile tests | Public static demo is synthetic and read only |
 | Packaging | Source, Apple Silicon native bundle, Python wheel, checksums, license and third-party inventory | Unsigned/not notarized; inspect CI before assuming Linux/container support |
 | Public website | Static landing, full docs and synthetic demo; Vercel configuration | Owner imports and deploys repository in Vercel |
-| Managed | Edition boundary and deployment recipes documented | Hosted accounts, teams, billing, off-host recovery and cloud operations not delivered |
+| Managed alpha | One hosted workspace, public TLS, restricted systemd service, fsync defaults, scheduled local archives and verified independent restore | Self-service accounts, teams, billing, automatic off-host recovery, multi-tenancy and SLA not delivered; see [hosted limits](HOSTED.md) |
 
 ## Evidence and compatibility
 

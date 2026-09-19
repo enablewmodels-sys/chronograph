@@ -31,6 +31,8 @@
 !docs/connectors/
 !docs/connectors/*.md
 **/__pycache__/**
+**/node_modules/**
+**/*.pem
 **/.DS_Store
 **/*.cgraph
 **/*.cgraph.lock

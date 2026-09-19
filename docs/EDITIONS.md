@@ -5,22 +5,24 @@ under **PolyForm Perimeter 1.0.0**. You can modify it and use it commercially fo
 noncompeting purposes. Offering a competing product, including a free one, is
 restricted. See [licensing](LICENSING.md) for the full boundary.
 
-| Capability | Community alpha | Managed plan |
+| Capability | Community alpha | Hosted alpha / planned expansion |
 | --- | --- | --- |
 | Embedded Rust engine, history and durable branches | Included | Same underlying engine |
-| Scoped tokens, HTTP and native MCP | Included | Hosted workspace endpoints |
+| Scoped tokens, HTTP and native MCP | Included | Hosted HTTPS workspace endpoint |
 | Browser console, migration editor, connector presets | Included | Hosted console |
-| Typed assets, checkpointed ingestion, Python SDK and local agent | Included | Managed ingestion operations |
-| Consistent backup and restore | Local tools | Scheduled off-host backups and recovery |
+| Typed assets, checkpointed ingestion and language SDKs | Included | Same transport over HTTPS |
+| Consistent backup and restore | Local tools | Scheduled local archives; remote automation planned |
 | Infrastructure | Operated by you | Isolated hosted workspace and storage |
-| Accounts and teams | Workspace-wide token scopes | GitHub sign-in and team roles |
+| Accounts and teams | Workspace-wide token scopes | Operator-issued tokens; accounts/team roles planned |
 | Billing | No license fee for permitted use; infrastructure costs apply | Subscription pricing not announced |
 | Reliability | Alpha with documented limits | No service commitment available yet |
 
-Community requires no cloud account or license server. Managed will be a separate
-private platform; it is not included in this public repository. There is no live
-hosted signup, billing integration, subscription or uptime guarantee. A static
-website demo does not run a database for visitors.
+Community requires no cloud account or license server. An invitation-only
+[hosted alpha](HOSTED.md) runs the same engine on a dedicated single-workspace
+service. Its private operator deployment configuration is not included in this
+public repository. Self-service accounts, tenant provisioning and billing remain
+unimplemented; there is no subscription or uptime guarantee. The static Community
+website demo still uses synthetic data.
 
 Start with [installation](INSTALL.md), [release status](REQUIREMENTS.md) and
 [security](SECURITY.md). Build noncompeting applications on Community today;

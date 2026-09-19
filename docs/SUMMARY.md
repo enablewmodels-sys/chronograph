@@ -10,6 +10,8 @@
 - [HTTP API](API.md)
 - [Language SDKs](SDK.md)
 - [Platform integration recipes](INTEGRATIONS.md)
+- [TypeSafe Jev](JEV.md)
+- [Hosted alpha](HOSTED.md)
 - [Agent integrations](MCP.md)
 - [BCI and LSL](connectors/bci.md)
 - [Robotics and LeRobot](connectors/robotics.md)

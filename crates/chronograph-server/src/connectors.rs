@@ -138,6 +138,28 @@ fn validate_record(
             .is_some_and(|m| m.kind == "tensor")
     };
     match b.connector.as_str() {
+        "jev" => {
+            if field("provider") != "typesafe"
+                || field("model")
+                    .as_str()
+                    .is_none_or(|s| s.is_empty() || s.len() > 128)
+                || field("requested_model")
+                    .as_str()
+                    .is_none_or(|s| s.is_empty() || s.len() > 128)
+                || !matches!(field("mode").as_str(), Some("live" | "fixture"))
+                || field("input_sha256").as_str().is_none_or(|s| {
+                    s.len() != 64
+                        || !s
+                            .bytes()
+                            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+                })
+                || !valid_jev_answers(field("answers"))
+            {
+                return Err(ApiError::bad(
+                    "Jev requires model provenance, live/fixture mode, input_sha256 and valid typed answers",
+                ));
+            }
+        }
         "jepa" | "hierarchical-jepa" => {
             if !has_tensor("latent") || !field("checkpoint").is_string() {
                 return Err(ApiError::bad(
@@ -272,6 +294,75 @@ fn validate_record(
         },
         valid_to: to,
     })
+}
+
+fn probability(value: &Value) -> bool {
+    value
+        .as_f64()
+        .is_some_and(|n| n.is_finite() && (0.0..=1.0).contains(&n))
+}
+
+fn valid_jev_answers(value: &Value) -> bool {
+    let Some(answers) = value.as_object() else {
+        return false;
+    };
+    !answers.is_empty()
+        && answers.len() <= 64
+        && answers.iter().all(|(name, answer)| {
+            if name.is_empty() || name.len() > 128 {
+                return false;
+            }
+            match answer["type"].as_str() {
+                Some("noul") => probability(&answer["noul"]),
+                Some("choice" | "score") => {
+                    let Some(probs) = answer["probabilities"].as_object() else {
+                        return false;
+                    };
+                    if probs.is_empty()
+                        || probs.len() > 255
+                        || !probability(&answer["confidence"])
+                        || probs
+                            .iter()
+                            .any(|(k, p)| k.is_empty() || k.len() > 256 || !probability(p))
+                        || (probs.values().filter_map(Value::as_f64).sum::<f64>() - 1.0).abs()
+                            > 0.001
+                    {
+                        return false;
+                    }
+                    if answer["type"] == "choice" {
+                        answer["choice"]
+                            .as_str()
+                            .is_some_and(|s| probs.contains_key(s))
+                    } else {
+                        let Some(legend) = answer["legend"].as_object() else {
+                            return false;
+                        };
+                        if legend.len() != probs.len() || !(2..=10).contains(&legend.len()) {
+                            return false;
+                        }
+                        let levels: Option<Vec<f64>> = legend
+                            .iter()
+                            .map(|(k, v)| {
+                                if !(v.is_string() || v.is_object() || v.is_array())
+                                    || !probs.contains_key(k)
+                                {
+                                    return None;
+                                }
+                                k.parse::<u32>().ok().map(f64::from)
+                            })
+                            .collect();
+                        levels.is_some_and(|levels| {
+                            answer["score"].as_f64().is_some_and(|s| {
+                                s.is_finite()
+                                    && s >= levels.iter().copied().fold(f64::INFINITY, f64::min)
+                                    && s <= levels.iter().copied().fold(f64::NEG_INFINITY, f64::max)
+                            })
+                        })
+                    }
+                }
+                _ => false,
+            }
+        })
 }
 
 /// Called within the bounded blocking worker pool, before the generic operation takes locks.
@@ -505,6 +596,26 @@ pub fn reject_raw_sidecar(schema: &Snapshot, kind: u16) -> AppResult<()> {
 #[cfg(test)]
 mod domain_tests {
     use super::*;
+
+    #[test]
+    fn jev_contract_rejects_malformed_decisions() {
+        let good = json!({"route":{"type":"choice","choice":"wait","probabilities":{"wait":0.7,"inspect":0.3},"confidence":0.4},
+            "review":{"type":"noul","noul":0.95},
+            "priority":{"type":"score","score":0.5,"legend":{"0":"low","1":{"label":"high"}},"probabilities":{"0":0.5,"1":0.5},"confidence":0.1}});
+        assert!(valid_jev_answers(&good));
+        for (name, key, value) in [
+            ("route", "choice", json!("missing")),
+            ("route", "confidence", json!(1.1)),
+            ("review", "noul", json!(true)),
+            ("priority", "score", json!(2)),
+            ("route", "probabilities", json!({"wait":0.5})),
+        ] {
+            let mut bad = good.clone();
+            bad[name][key] = value;
+            assert!(!valid_jev_answers(&bad));
+        }
+        assert!(!valid_jev_answers(&json!({})));
+    }
 
     fn binding(connector: &str, preset: &str) -> Binding {
         serde_json::from_value(json!({"id":"fixture","connector":connector,"preset":preset,

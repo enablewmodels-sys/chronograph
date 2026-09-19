@@ -23,6 +23,15 @@ macro_rules! definition {
 }
 pub static DEFINITIONS: &[Definition] = &[
     definition!(
+        "jev",
+        "Decision models",
+        "TypeSafe Jev",
+        ["decisions-v1"],
+        "python_typescript_adapter",
+        "Store Jev Choice, Score and Noul decisions with probabilities, input fingerprints and model provenance. Inference runs in your producer using a separate TypeSafe API key.",
+        "https://docs.typesafe.ai/api"
+    ),
+    definition!(
         "jepa",
         "JEPA",
         "JEPA outputs",

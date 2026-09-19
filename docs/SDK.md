@@ -134,3 +134,9 @@ CHRONOGRAPH_TEST_PROFILE=target/debug node scripts/sdk/adapters.mjs
 Install Go, JDK, libcurl, a C++ compiler, Dart and .NET first. `GO`, `DOTNET`, `SDK_TOOLS`, `GSON_JAR`, `JSON_INCLUDE`, `SDK_PYTHON` and `SDK_LANGUAGES` let the scripts use isolated tools. Linux pylsl needs liblsl; the workflow pins and verifies the Ubuntu 24.04 package. LSL fixtures discover only a random local test source with the supplied loopback config.
 
 Local validation used Python 3.12/3.14, Node 20.20, Go 1.27.1, JDK 25 with Java 17 target, Apple Clang, Dart 3.11.5 and .NET SDK 8.0.425 on macOS ARM64. Windows has not been exercised. Synthetic device/local simulator tests do not certify physical devices, cross-host clock accuracy, clinical performance, model quality or QPU behavior.
+
+## Jev decision binding
+
+Python exports `chronograph_connectors.jev.jev_decision`; TypeScript exports
+`jevDecision`. Both retain TypeSafe Jev typed answers and provenance in normalized
+records, with optional raw JSON attachments. See [Jev examples](JEV.md).
