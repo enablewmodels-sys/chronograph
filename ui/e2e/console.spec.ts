@@ -366,7 +366,12 @@ test("landing artwork, documentation and connector navigation render at this vie
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(page.viewportSize()!.width + 1);
-  await expect(page.locator("#managed")).toContainText("MANAGED · PLANNED");
+  await expect(page.locator("#managed")).toContainText(
+    "MANAGED · LAUNCH PREVIEW",
+  );
+  await expect(page.locator("#managed")).toContainText(
+    "MFA, project roles and encrypted secrets",
+  );
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await page
     .locator(".quickstart-section")
@@ -377,7 +382,7 @@ test("landing artwork, documentation and connector navigation render at this vie
   );
   expect(copiedCommand).toContain("--example fork_demo -- ./fork-demo");
   expect(copiedCommand).not.toContain("\\n");
-  await page.getByRole("link", { name: "Read the edition plan" }).click();
+  await page.getByRole("link", { name: "Editions", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Community and Managed", exact: true }),
   ).toBeVisible();

@@ -424,7 +424,7 @@ export default function Landing() {
               <span className="scope-badge">
                 {managedSite
                   ? "APPLICATIONS & AGENTS"
-                  : "MANAGED · INVITATION-ONLY ALPHA"}
+                  : "MANAGED · LAUNCH PREVIEW"}
               </span>
               <h3>
                 {managedSite ? "Your stack," : "A hosted home"}
@@ -434,7 +434,7 @@ export default function Landing() {
               <p>
                 {managedSite
                   ? "Connect Codex, Cursor, Claude and your own backends to a project endpoint. Store provider secrets separately from graph credentials."
-                  : "Your temporal graph, available over HTTPS. Connect the console, your SDK or an MCP client with a scoped workspace token."}
+                  : "Sign in with GitHub or an invited email account. Create private graph projects and connect your backend or agents over HTTPS."}
               </p>
               <ul>
                 {(managedSite
@@ -445,10 +445,10 @@ export default function Landing() {
                       "Project audit events and revocable sessions",
                     ]
                   : [
-                      "Hosted database, console and migration editor",
-                      "Scoped API credentials and MCP endpoint",
-                      "Scheduled local backups and restore tools",
-                      "Dedicated single-workspace service",
+                      "Private graph projects and migration editor",
+                      "Scoped API keys and project MCP endpoints",
+                      "MFA, project roles and encrypted secrets",
+                      "Scheduled local graph and account backups",
                     ]
                 ).map((s) => (
                   <li key={s}>
@@ -466,7 +466,7 @@ export default function Landing() {
               <p className="small muted">
                 {managedSite
                   ? "Launch preview with bounded host capacity. Model inference runs in your application; hardware compatibility and availability SLAs are not implied."
-                  : "Operator-issued access. Self-service signup, teams, billing and an uptime SLA are not available."}
+                  : "Bounded capacity on a shared host. Automated email delivery, billing, off-host backup schedules and an uptime SLA are not available."}
               </p>
             </article>
           </div>
@@ -611,7 +611,7 @@ export default function Landing() {
             Download alpha
           </a>
           <Link to="/documentation/BENCHMARKS">Benchmarks</Link>
-          <a href="/brand/chronograph-logo.png" download>
+          <a href={publicPath("/brand/chronograph-logo.png")} download>
             Download the logo
           </a>
         </div>
