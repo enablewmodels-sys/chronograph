@@ -814,7 +814,7 @@ export default function Schema() {
                     {(new TextEncoder().encode(source).length / 1024).toFixed(
                       1,
                     )}{" "}
-                    / 1 MiB plan · 256 KiB per migration
+                    KiB · 1 MiB plan limit · 256 KiB per migration
                   </span>
                   <button
                     className="outline"
