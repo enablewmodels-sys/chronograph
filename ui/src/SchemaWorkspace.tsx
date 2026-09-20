@@ -17,6 +17,8 @@ import { useAuth } from "./main";
 import { Busy, Field, Head, SubmitForm, useAction } from "./shared";
 import {
   migrationSource,
+  migrationSources,
+  migrationBundle,
   saveJson,
   sizes,
   useSchema,
@@ -29,8 +31,15 @@ import "./schema.css";
 import ConnectorPresets from "./ConnectorPresets";
 
 type Preview = {
-  id: string;
-  name: string;
+  id?: string;
+  name?: string;
+  schema_revision?: number;
+  migrations?: {
+    id: string;
+    name: string;
+    already_applied: boolean;
+    requires: string[];
+  }[];
   checksum: string;
   expected_revision: number;
   already_applied: boolean;
@@ -93,11 +102,18 @@ export default function Schema() {
   const [preview, setPreview] = useState<Preview | null>(null);
   const [previewSource, setPreviewSource] = useState("");
   const [viewing, setViewing] = useState("");
+  const [rollbackRevision, setRollbackRevision] = useState("0");
   const editor = useRef<HTMLTextAreaElement>(null);
   const savedDraft = useRef(source);
   useEffect(() => {
-    if (catalog) setSettings(catalog.settings);
-  }, [catalog]);
+    if (catalog)
+      setSettings({
+        ...catalog.settings,
+        ...(connection?.require_fsync
+          ? { default_durability: "fsync" as const }
+          : {}),
+      });
+  }, [catalog, connection?.require_fsync]);
   useEffect(() => {
     try {
       if (admin && !viewing) {
@@ -152,6 +168,20 @@ export default function Schema() {
             (r) => !preview.after.relations.some((a) => a.kind === r.kind),
           )
           .map((r) => `Drop ${r.name} · kind ${r.kind}`),
+        ...(preview.after.connectors || [])
+          .filter(
+            (b) =>
+              !(preview.before.connectors || []).some((old) => old.id === b.id),
+          )
+          .map((b) => `Bind connector ${b.id} · kind ${b.kind}`),
+        ...(preview.before.connectors || [])
+          .filter(
+            (b) =>
+              !(preview.after.connectors || []).some(
+                (next) => next.id === b.id,
+              ),
+          )
+          .map((b) => `Unbind connector ${b.id}`),
         ...(Object.keys(preview.after.settings) as (keyof Settings)[])
           .filter(
             (k) => preview.before.settings[k] !== preview.after.settings[k],
@@ -168,6 +198,24 @@ export default function Schema() {
         title="Give your graph a language."
         text="Define relationships, map their properties and evolve your workspace through migrations."
       >
+        <button
+          className="outline"
+          disabled={synthetic || action.busy || !catalog}
+          onClick={() =>
+            void action.run(async () => {
+              const identity = JSON.parse(
+                migrationSource([], "Schema baseline"),
+              );
+              const result = await graph<{ sources: string[] }>(
+                "schema_export",
+                { id: identity.id, name: identity.name },
+              );
+              saveJson(migrationBundle(result.sources), "schema-baseline.json");
+            })
+          }
+        >
+          <Download size={15} /> Export schema
+        </button>
         <button
           className="outline"
           disabled={action.busy}
@@ -635,7 +683,9 @@ export default function Schema() {
               <section className="panel schema-editor">
                 <div className="schema-editor-head">
                   <div>
-                    <span className="eyebrow">CHRONOGRAPH JSON · V1 / V2</span>
+                    <span className="eyebrow">
+                      CHRONOGRAPH JSON · V1 / V2 / V3
+                    </span>
                     <h2>
                       {viewing ? "Applied migration" : "Migration editor"}
                     </h2>
@@ -654,20 +704,38 @@ export default function Schema() {
                     <label
                       className={`outline schema-upload ${!admin || action.busy ? "disabled" : ""}`}
                     >
-                      <Upload size={15} /> Import file
+                      <Upload size={15} /> Import files
                       <input
                         aria-label="Import migration file"
                         type="file"
+                        multiple
                         accept=".json,application/json"
                         disabled={!admin || action.busy}
                         onChange={(e) => {
-                          const file = e.target.files?.[0];
+                          const files = Array.from(e.target.files || []).sort(
+                            (a, b) =>
+                              a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
+                          );
                           e.target.value = "";
-                          if (file)
+                          if (files.length)
                             void action.run(async () => {
-                              if (file.size > 262144)
-                                throw new Error("Migration exceeds 256 KiB.");
-                              changeSource(await file.text());
+                              if (
+                                files.length > 64 ||
+                                files.reduce((n, f) => n + f.size, 0) > 1048576
+                              )
+                                throw new Error(
+                                  "Import at most 64 files within 1 MiB total.",
+                                );
+                              const sources = (
+                                await Promise.all(
+                                  files.map(async (file) =>
+                                    migrationSources(await file.text()),
+                                  ),
+                                )
+                              ).flat();
+                              const bundle = migrationBundle(sources);
+                              migrationSources(bundle);
+                              changeSource(bundle);
                             });
                         }}
                       />
@@ -684,9 +752,9 @@ export default function Schema() {
                   </div>
                 </div>
                 <p>
-                  Import a migration file, write JSON, or generate it from a
-                  relation or settings form. Each apply is recorded once by ID
-                  and checksum.
+                  Import ordered JSON files, paste a migration bundle, or use
+                  the relation and settings forms. All pending files commit
+                  together. Each migration is recorded once by ID and checksum.
                 </p>
                 {!viewing && (
                   <ConnectorPresets
@@ -715,6 +783,7 @@ export default function Schema() {
                             migrationSource(
                               value.operations,
                               `Amend ${value.name}`,
+                              [value.id],
                             ),
                           );
                         })
@@ -745,7 +814,7 @@ export default function Schema() {
                     {(new TextEncoder().encode(source).length / 1024).toFixed(
                       1,
                     )}{" "}
-                    / 256 KiB
+                    / 1 MiB plan · 256 KiB per migration
                   </span>
                   <button
                     className="outline"
@@ -753,9 +822,15 @@ export default function Schema() {
                     onClick={() =>
                       void action.run(async () => {
                         setPreview(null);
-                        const result = await graph<Preview>("schema_preview", {
-                          source,
-                        });
+                        const sources = migrationSources(source);
+                        const result = await graph<Preview>(
+                          sources.length === 1
+                            ? "schema_preview"
+                            : "schema_plan",
+                          sources.length === 1
+                            ? { source: sources[0] }
+                            : { sources },
+                        );
                         setPreview(result);
                         setPreviewSource(source);
                       })
@@ -778,10 +853,26 @@ export default function Schema() {
                       </h3>
                       <span className="scope-badge">
                         Revision {preview.expected_revision} →{" "}
-                        {preview.expected_revision +
-                          (preview.already_applied ? 0 : 1)}
+                        {preview.schema_revision ??
+                          preview.expected_revision +
+                            (preview.already_applied ? 0 : 1)}
                       </span>
                     </div>
+                    {preview.migrations && (
+                      <ol aria-label="Ordered migration plan">
+                        {preview.migrations.map((m) => (
+                          <li key={m.id}>
+                            <strong>{m.name}</strong> ·{" "}
+                            {m.already_applied ? "Already applied" : "Pending"}
+                            <div className="small muted">
+                              {m.id}
+                              {m.requires.length > 0 &&
+                                ` · requires ${m.requires.join(", ")}`}
+                            </div>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
                     {changes.length ? (
                       <ul>
                         {changes.map((c) => (
@@ -823,12 +914,26 @@ export default function Schema() {
                       }
                       onClick={() =>
                         void action.run(async () => {
-                          await graph("schema_apply", {
-                            source,
-                            checksum: preview.checksum,
-                            expected_revision: preview.expected_revision,
-                          });
-                          setViewing(preview.id);
+                          const sources = migrationSources(source);
+                          await graph(
+                            sources.length === 1
+                              ? "schema_apply"
+                              : "schema_apply_plan",
+                            {
+                              ...(sources.length === 1
+                                ? { source: sources[0] }
+                                : { sources }),
+                              checksum: preview.checksum,
+                              expected_revision: preview.expected_revision,
+                            },
+                          );
+                          setSource(sources[sources.length - 1]);
+                          setViewing(
+                            preview.migrations?.[preview.migrations.length - 1]
+                              ?.id ||
+                              preview.id ||
+                              "applied",
+                          );
                           setPreview(null);
                           await refresh();
                         }, "Migration applied and synchronized to disk.")
@@ -848,6 +953,56 @@ export default function Schema() {
                   Applied in this workspace. Choose an entry to inspect or
                   export its original file.
                 </p>
+                {admin && catalog.history.length > 0 && (
+                  <div className="schema-rollback">
+                    <Field
+                      label="Restore definitions from revision"
+                      hint="Creates a new migration for review. Data and history remain intact; unsafe changes are rejected."
+                    >
+                      <select
+                        value={rollbackRevision}
+                        disabled={action.busy}
+                        onChange={(e) => setRollbackRevision(e.target.value)}
+                      >
+                        <option value="0">0 · Empty schema</option>
+                        {[...catalog.history]
+                          .reverse()
+                          .filter((h) => h.revision < catalog.revision)
+                          .map((h) => (
+                            <option key={h.id} value={h.revision}>
+                              {h.revision} · {h.name}
+                            </option>
+                          ))}
+                      </select>
+                    </Field>
+                    <button
+                      className="outline"
+                      disabled={action.busy}
+                      onClick={() =>
+                        void action.run(async () => {
+                          const identity = JSON.parse(
+                            migrationSource(
+                              [],
+                              `Restore schema revision ${rollbackRevision}`,
+                            ),
+                          );
+                          const result = await graph<{ sources: string[] }>(
+                            "schema_rollback",
+                            {
+                              id: identity.id,
+                              name: identity.name,
+                              target_revision: Number(rollbackRevision),
+                            },
+                          );
+                          changeSource(migrationBundle(result.sources));
+                          editor.current?.focus();
+                        }, "Rollback drafted. Preview and review before applying.")
+                      }
+                    >
+                      Prepare rollback
+                    </button>
+                  </div>
+                )}
                 {!catalog.history.length && (
                   <div className="schema-history-empty">
                     <GitCommitHorizontal size={24} />
@@ -928,7 +1083,11 @@ export default function Schema() {
                   <div className="fields two">
                     <Field
                       label="Default write durability"
-                      hint="Used by HTTP/MCP writes that omit durability. Console writes explicitly use fsync."
+                      hint={
+                        connection?.require_fsync
+                          ? "This deployment requires fsync. Migrations cannot weaken the server durability policy."
+                          : "Used by HTTP/MCP writes that omit durability. Console writes explicitly use fsync."
+                      }
                     >
                       <select
                         value={settings.default_durability}
@@ -940,7 +1099,10 @@ export default function Schema() {
                           })
                         }
                       >
-                        <option value="buffered">
+                        <option
+                          value="buffered"
+                          disabled={connection?.require_fsync}
+                        >
                           Buffered acknowledgment
                         </option>
                         <option value="fsync">
@@ -995,7 +1157,8 @@ export default function Schema() {
               <p className="small muted">
                 Network binding, TLS and authentication stay in server
                 configuration and Agent access. These settings govern the
-                Community service; direct Rust writes bypass them.
+                selected workspace in Community and Managed; direct Rust writes
+                bypass service validation.
               </p>
             </section>
           )}

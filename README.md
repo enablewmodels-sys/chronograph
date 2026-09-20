@@ -48,7 +48,7 @@ matching prebuilt target. Download only the assets attached to the versioned Git
 The console supports exact temporal queries, clickable graph inspection, durable
 branches, bounded writes, Arrow export, expiring scoped tokens and local backups.
 [Schema & migrations](docs/SCHEMA.md) adds a visual relation designer, typed payload
-properties, importable JSON migrations, settings, preview/apply and tracked history.
+properties, dependency-ordered migration folders, atomic batch apply, schema export, safe rollback drafts, settings and tracked history. The same workflow serves isolated Community workspaces and Managed projects.
 The landing's synthetic preview works without a backend and is explicitly read only.
 
 ## Fork a world into 100 futures

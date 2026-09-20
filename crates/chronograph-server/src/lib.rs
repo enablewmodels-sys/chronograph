@@ -737,6 +737,41 @@ mod service_tests {
         (status, serde_json::from_slice(&bytes).unwrap())
     }
     #[tokio::test]
+    async fn migration_plan_scopes_and_concurrent_compare_and_swap() {
+        let f = fixture();
+        let source = json!({"version":3,"id":"a","name":"First","operations":[{"op":"set_settings","settings":{"name":"First"}}]}).to_string();
+        let preview = call(&f, "/v1/schema_plan", &f.read, json!({"sources":[source]})).await;
+        assert_eq!(preview.0, StatusCode::OK);
+        let request =
+            json!({"sources":[source],"checksum":preview.1["checksum"],"expected_revision":0});
+        for token in [&f.read, &f.ingest] {
+            assert_eq!(
+                call(&f, "/v1/schema_apply_plan", token, request.clone())
+                    .await
+                    .0,
+                StatusCode::FORBIDDEN
+            );
+        }
+        let other = json!({"version":3,"id":"b","name":"Other","operations":[{"op":"set_settings","settings":{"name":"Other"}}]}).to_string();
+        let preview2 = call(&f, "/v1/schema_plan", &f.read, json!({"sources":[other]}))
+            .await
+            .1;
+        let other_request =
+            json!({"sources":[other],"checksum":preview2["checksum"],"expected_revision":0});
+        let (a, b) = tokio::join!(
+            call(&f, "/v1/schema_apply_plan", &f.admin, request),
+            call(&f, "/v1/schema_apply_plan", &f.admin, other_request)
+        );
+        assert!(
+            (a.0 == StatusCode::OK && b.0 == StatusCode::CONFLICT)
+                || (b.0 == StatusCode::OK && a.0 == StatusCode::CONFLICT)
+        );
+        assert_eq!(
+            call(&f, "/v1/schema", &f.read, json!({})).await.1["revision"],
+            1
+        );
+    }
+    #[tokio::test]
     async fn production_policy_requires_durable_writes_and_protects_metrics() {
         let f = fixture_with_policy(true);
         let (status, _) = call(
@@ -764,6 +799,19 @@ mod service_tests {
                 call(&f, &format!("/v1/{op}"), &f.admin, json!({"source":source}))
                     .await
                     .0,
+                StatusCode::BAD_REQUEST
+            );
+        }
+        for op in ["schema_plan", "schema_apply_plan"] {
+            assert_eq!(
+                call(
+                    &f,
+                    &format!("/v1/{op}"),
+                    &f.admin,
+                    json!({"sources":[source]})
+                )
+                .await
+                .0,
                 StatusCode::BAD_REQUEST
             );
         }

@@ -104,7 +104,7 @@ pub fn definitions() -> Vec<Tool> {
         ),
         (
             "schema_preview",
-            "Validate a version-1 or version-2 JSON migration without writing. Returns checksum, expected_revision and before/after catalogs. Use schema_apply with both values after review.",
+            "Validate a version-1, version-2 or version-3 JSON migration without writing. Returns checksum, expected_revision and before/after catalogs. Use schema_apply with both values after review.",
             json!({"source":{"type":"string","maxLength":262144,"description":"JSON migration file contents with version, id, name and operations. Operations: upsert_relation, drop_relation, set_settings. See /docs/SCHEMA.md."}}),
             vec!["source"],
         ),
@@ -113,6 +113,30 @@ pub fn definitions() -> Vec<Tool> {
             "Admin only. Revalidate and durably apply a previewed migration atomically. Same ID and checksum retries are idempotent. Different checksum or stale schema revision fails. Does not rewrite existing edges.",
             json!({"source":{"type":"string","maxLength":262144},"checksum":{"type":"string"},"expected_revision":{"type":"integer","minimum":0}}),
             vec!["source", "checksum", "expected_revision"],
+        ),
+        (
+            "schema_plan",
+            "Preview 1–64 ordered migration files totaling at most 1 MiB. Validate dependencies, checksums, layouts and all intermediate catalogs. Already applied files are skipped. No writes.",
+            json!({"sources":{"type":"array","minItems":1,"maxItems":64,"items":{"type":"string","maxLength":262144}}}),
+            vec!["sources"],
+        ),
+        (
+            "schema_apply_plan",
+            "Admin only. Atomically commit every pending file in a reviewed schema_plan. Requires its checksum and expected_revision. Failure leaves the entire catalog unchanged; identical completed plans can be retried.",
+            json!({"sources":{"type":"array","minItems":1,"maxItems":64,"items":{"type":"string","maxLength":262144}},"checksum":{"type":"string"},"expected_revision":{"type":"integer","minimum":0}}),
+            vec!["sources", "checksum", "expected_revision"],
+        ),
+        (
+            "schema_export",
+            "Generate a portable baseline as migration sources for a new empty workspace. Includes relations, connector bindings and settings; excludes data, assets, credentials and old migration history. Does not apply anything.",
+            json!({"id":{"type":"string","minLength":1,"maxLength":90},"name":{"type":"string","minLength":1,"maxLength":100}}),
+            vec!["id", "name"],
+        ),
+        (
+            "schema_rollback",
+            "Generate and preview a compensating migration for an earlier schema revision. Appends history when applied; never deletes data. Rejects removal of used kinds or bindings and unsafe byte-layout changes. Retains the operator fsync floor. Review sources then use schema_apply_plan.",
+            json!({"target_revision":{"type":"integer","minimum":0},"id":{"type":"string","minLength":1,"maxLength":90},"name":{"type":"string","minLength":1,"maxLength":100}}),
+            vec!["target_revision", "id", "name"],
         ),
         (
             "schema_migration",

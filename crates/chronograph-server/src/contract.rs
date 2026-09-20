@@ -45,7 +45,10 @@ pub fn openapi() -> Value {
     let mut paths = serde_json::Map::new();
     for tool in crate::mcp::definitions() {
         let op = crate::operations::canonical(&tool.name);
-        let scope = if matches!(op, "backup" | "schema_apply" | "load_demo") {
+        let scope = if matches!(
+            op,
+            "backup" | "schema_apply" | "schema_apply_plan" | "load_demo"
+        ) {
             "admin"
         } else if crate::operations::is_write(op) {
             "ingest"

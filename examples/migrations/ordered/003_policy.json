@@ -1,0 +1,18 @@
+{
+  "version": 3,
+  "id": "003_policy",
+  "name": "003 policy",
+  "requires": [
+    "002_score"
+  ],
+  "operations": [
+    {
+      "op": "set_settings",
+      "settings": {
+        "name": "World model memory",
+        "default_durability": "fsync",
+        "strict_relations": true
+      }
+    }
+  ]
+}

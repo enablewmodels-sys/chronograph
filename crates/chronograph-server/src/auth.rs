@@ -75,6 +75,7 @@ impl Principal {
                 | "revoke_token"
                 | "load_demo"
                 | "schema_apply"
+                | "schema_apply_plan"
         );
         if (admin && self.scope != Scope::Admin)
             || (crate::operations::is_write(op) && self.scope == Scope::Read)

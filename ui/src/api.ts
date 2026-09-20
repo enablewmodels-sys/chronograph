@@ -31,6 +31,7 @@ export interface Stats {
   duration_ms: number | null;
 }
 export interface Connection {
+  require_fsync?: boolean;
   credential: { id: string; scope: "read" | "ingest" | "admin" };
   edition: "community" | "managed" | "synthetic";
   mcp_url: string;

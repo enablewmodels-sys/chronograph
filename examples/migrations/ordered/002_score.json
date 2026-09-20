@@ -1,0 +1,23 @@
+{
+  "version": 3,
+  "id": "002_score",
+  "name": "002 score",
+  "requires": [
+    "001_observations"
+  ],
+  "operations": [
+    {
+      "op": "rename_property",
+      "kind": 42,
+      "from": "confidence",
+      "to": "score"
+    },
+    {
+      "op": "patch_relation",
+      "kind": 42,
+      "patch": {
+        "description": "Decision score and exact sequence number"
+      }
+    }
+  ]
+}

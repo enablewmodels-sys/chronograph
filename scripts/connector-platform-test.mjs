@@ -20,7 +20,8 @@ let server = await startServer({ port: 18087 }),
   decisionBatch;
 const checks = [],
   receipts = [],
-  batches = [];
+  batches = [],
+  migrationSources = [];
 const pass = (name) => {
   checks.push(name);
   console.log(`PASS ${name}`);
@@ -95,6 +96,7 @@ try {
         secret_refs: [],
       };
       const generated = await api.json("/v1/connector_template", binding);
+      migrationSources.push(generated.source);
       const preview = await api.json("/v1/schema_preview", {
         source: generated.source,
       });
@@ -210,6 +212,84 @@ try {
     }
   pass(
     `${receipts.length} registry presets: migration → ingest → exact source export → retry/conflict`,
+  );
+  // Replay every model/BCI/robotics/quantum contract as one ordered schema plan.
+  const clean = await startServer({ port: 18089 });
+  try {
+    const cleanApi = client(clean);
+    const annotation = JSON.stringify({
+      version: 3,
+      id: "connector_notes",
+      name: "Annotate model relation",
+      requires: [JSON.parse(migrationSources.at(-1)).id],
+      operations: [
+        {
+          op: "patch_relation",
+          kind: 1000,
+          patch: { description: "Model contract managed through a batch" },
+        },
+      ],
+    });
+    const sources = [...migrationSources, annotation];
+    const plan = await cleanApi.json("/v1/schema_plan", { sources });
+    assert.equal(plan.pending, receipts.length + 1);
+    const applied = await cleanApi.json("/v1/schema_apply_plan", {
+      sources,
+      checksum: plan.checksum,
+      expected_revision: plan.expected_revision,
+    });
+    assert.equal(applied.applied_count, receipts.length + 1);
+    const catalog = await cleanApi.json("/v1/schema", {});
+    assert.deepEqual(
+      catalog.connectors,
+      (await api.json("/v1/schema", {})).connectors,
+    );
+    const binding = catalog.connectors[0];
+    const removal = JSON.stringify({
+      version: 3,
+      id: "remove_unused",
+      name: "Remove unused model contract",
+      operations: [
+        { op: "unbind_connector", id: binding.id },
+        { op: "drop_relation", kind: binding.kind },
+      ],
+    });
+    const preview = await cleanApi.json("/v1/schema_preview", {
+      source: removal,
+    });
+    await cleanApi.json("/v1/schema_apply", {
+      source: removal,
+      checksum: preview.checksum,
+      expected_revision: preview.expected_revision,
+    });
+    assert.equal(
+      (await cleanApi.json("/v1/schema", {})).connectors.length,
+      receipts.length - 1,
+    );
+    // In the populated database every binding is retained, even if its relation stays.
+    for (const used of catalog.connectors) {
+      const source = JSON.stringify({
+        version: 3,
+        id: "forbidden_remove",
+        name: "Used binding",
+        operations: [{ op: "unbind_connector", id: used.id }],
+      });
+      assert.equal(
+        (await api.request("/v1/schema_preview", { source })).status,
+        409,
+      );
+    }
+    const baseline = await api.json("/v1/schema_export", {
+      id: "model_baseline",
+      name: "All model contracts",
+    });
+    assert.ok(baseline.sources.length > 0);
+    assert.equal(JSON.parse(baseline.sources[0]).version, 3);
+  } finally {
+    await clean.stop();
+  }
+  pass(
+    "All connector presets apply in one dependency-ordered plan; unused bindings can be removed and populated contracts remain protected",
   );
   assert.ok(
     tensorBatch,

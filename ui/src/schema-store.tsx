@@ -101,10 +101,25 @@ export function SchemaProvider({
   );
 }
 export const useSchema = () => useContext(SchemaContext);
-export function migrationSource(operations: unknown[], name: string) {
+export function migrationSource(
+  operations: unknown[],
+  name: string,
+  requires: string[] = [],
+) {
   return JSON.stringify(
     {
-      version: JSON.stringify(operations).includes("arrow_record_v1") ? 2 : 1,
+      version:
+        requires.length ||
+        operations.some((op) =>
+          ["patch_relation", "rename_property", "unbind_connector"].includes(
+            (op as { op: string }).op,
+          ),
+        )
+          ? 3
+          : JSON.stringify(operations).includes("arrow_record_v1")
+            ? 2
+            : 1,
+      ...(requires.length ? { requires } : {}),
       id: `${new Date().toISOString().replace(/[^0-9]/g, "")}_${crypto.randomUUID().slice(0, 8)}`,
       name,
       operations,
@@ -122,4 +137,39 @@ export function saveJson(source: string, filename: string) {
   a.download = filename;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// The server is authoritative; these bounds keep browser imports manageable.
+export function migrationSources(source: string): string[] {
+  if (new TextEncoder().encode(source).length > 1048576)
+    throw new Error("Migration input exceeds 1 MiB.");
+  const value = JSON.parse(source);
+  const list: unknown[] = Array.isArray(value)
+    ? value
+    : value &&
+        Object.keys(value).length === 1 &&
+        Array.isArray(value.migrations)
+      ? value.migrations
+      : [value];
+  if (!list.length || list.length > 64)
+    throw new Error("A plan requires 1–64 migrations.");
+  const sources = list.map((m) => {
+    if (!m || typeof m !== "object" || Array.isArray(m))
+      throw new Error("Each migration must be a JSON object.");
+    return list.length === 1 && !Array.isArray(value) && !value.migrations
+      ? source
+      : JSON.stringify(m);
+  });
+  if (sources.some((s) => new TextEncoder().encode(s).length > 262144))
+    throw new Error("Each migration must fit within 256 KiB.");
+  return sources;
+}
+export function migrationBundle(sources: string[]) {
+  return sources.length === 1
+    ? sources[0]
+    : JSON.stringify(
+        { migrations: sources.map((s) => JSON.parse(s)) },
+        null,
+        2,
+      );
 }

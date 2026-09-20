@@ -124,4 +124,4 @@ while writes are active. Neither checks free space or full journal integrity.
 
 ## Schema management
 
-The console, HTTP API and MCP support relation definitions, typed payloads, service settings and versioned JSON migration files. See [schema and migrations](SCHEMA.md) for all five schema endpoints, file examples, permissions and compatibility limits. `edges` accepts a `properties` object instead of raw `payload` when a definition exists.
+The console, HTTP API and MCP support relation definitions, typed payloads, service settings and versioned JSON migration files. See [schema and migrations](SCHEMA.md) for single-file and atomic batch endpoints, export/rollback preparation, file examples, permissions and compatibility limits. `edges` accepts a `properties` object instead of raw `payload` when a definition exists.

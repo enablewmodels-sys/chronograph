@@ -1,0 +1,29 @@
+{
+  "version": 3,
+  "id": "001_observations",
+  "name": "001 observations",
+  "requires": [],
+  "operations": [
+    {
+      "op": "upsert_relation",
+      "relation": {
+        "kind": 42,
+        "name": "observes",
+        "source_label": "sensor",
+        "target_label": "object",
+        "properties": [
+          {
+            "name": "confidence",
+            "type": "f32",
+            "offset": 0
+          },
+          {
+            "name": "sequence",
+            "type": "u64",
+            "offset": 8
+          }
+        ]
+      }
+    }
+  ]
+}

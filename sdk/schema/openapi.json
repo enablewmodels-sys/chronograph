@@ -2629,6 +2629,77 @@
         "x-required-scope": "admin"
       }
     },
+    "/v1/schema_apply_plan": {
+      "post": {
+        "description": "Admin only. Atomically commit every pending file in a reviewed schema_plan. Requires its checksum and expected_revision. Failure leaves the entire catalog unchanged; identical completed plans can be retried.",
+        "operationId": "schema_apply_plan",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "checksum": {
+                    "type": "string"
+                  },
+                  "expected_revision": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "sources": {
+                    "items": {
+                      "maxLength": 262144,
+                      "type": "string"
+                    },
+                    "maxItems": 64,
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "sources",
+                  "checksum",
+                  "expected_revision"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "admin"
+      }
+    },
     "/v1/schema_encode": {
       "post": {
         "description": "Validate and encode typed relation properties into 16 little-endian bytes without writing. All defined properties are required. u64/i64 require decimal strings.",
@@ -2651,6 +2722,70 @@
                 "required": [
                   "kind",
                   "properties"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/schema_export": {
+      "post": {
+        "description": "Generate a portable baseline as migration sources for a new empty workspace. Includes relations, connector bindings and settings; excludes data, assets, credentials and old migration history. Does not apply anything.",
+        "operationId": "schema_export",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "maxLength": 90,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
                 ],
                 "type": "object"
               }
@@ -2747,9 +2882,71 @@
         "x-required-scope": "read"
       }
     },
+    "/v1/schema_plan": {
+      "post": {
+        "description": "Preview 1–64 ordered migration files totaling at most 1 MiB. Validate dependencies, checksums, layouts and all intermediate catalogs. Already applied files are skipped. No writes.",
+        "operationId": "schema_plan",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "sources": {
+                    "items": {
+                      "maxLength": 262144,
+                      "type": "string"
+                    },
+                    "maxItems": 64,
+                    "minItems": 1,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "sources"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
     "/v1/schema_preview": {
       "post": {
-        "description": "Validate a version-1 or version-2 JSON migration without writing. Returns checksum, expected_revision and before/after catalogs. Use schema_apply with both values after review.",
+        "description": "Validate a version-1, version-2 or version-3 JSON migration without writing. Returns checksum, expected_revision and before/after catalogs. Use schema_apply with both values after review.",
         "operationId": "schema_preview",
         "requestBody": {
           "content": {
@@ -2765,6 +2962,75 @@
                 },
                 "required": [
                   "source"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/schema_rollback": {
+      "post": {
+        "description": "Generate and preview a compensating migration for an earlier schema revision. Appends history when applied; never deletes data. Rejects removal of used kinds or bindings and unsafe byte-layout changes. Retains the operator fsync floor. Review sources then use schema_apply_plan.",
+        "operationId": "schema_rollback",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "maxLength": 90,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "target_revision": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "target_revision",
+                  "id",
+                  "name"
                 ],
                 "type": "object"
               }

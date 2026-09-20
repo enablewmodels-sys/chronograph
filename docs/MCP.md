@@ -129,4 +129,4 @@ All tool IDs and microsecond timestamps are decimal strings. Check `next_cursor`
 
 ## Schema tools
 
-`schema`, `schema_preview`, `schema_migration` and `schema_encode` are available to every scope. `schema_apply` requires admin scope and the checksum/revision returned by preview. All clients (Codex, Cursor, Claude) use the same tools and authorization boundary. See [migration format, property encoding and service-only constraints](SCHEMA.md).
+`schema`, `schema_preview`, `schema_plan`, `schema_export`, `schema_rollback`, `schema_migration` and `schema_encode` are available to every scope. `schema_apply` and `schema_apply_plan` require admin scope and the checksum/revision returned by their corresponding preview. `schema_rollback` only drafts a safe compensation; it does not apply changes. Agents can submit dependency-ordered files in one atomic plan, inspect before/after definitions, and explicitly apply the reviewed plan. All clients (Codex, Cursor, Claude) use the same tools and authorization boundary. See [migration format, property encoding and service-only constraints](SCHEMA.md).

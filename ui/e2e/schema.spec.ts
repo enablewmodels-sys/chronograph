@@ -312,3 +312,138 @@ test("invalid files, stale previews, draft preservation and read-only access", a
     headers,
   });
 });
+
+test("ordered multi-file plan, baseline export and reviewed rollback", async ({
+  page,
+}, info) => {
+  await connect(page);
+  await page.getByRole("tab", { name: /^Migrations/ }).click();
+  const c = await config();
+  const headers = { Authorization: `Bearer ${c.token}` };
+  const before = await (
+    await page.request.post(c.url + "/v1/schema", { headers, data: {} })
+  ).json();
+  const suffix = `${info.project.name}_${info.repeatEachIndex}`;
+  const kind =
+    42000 +
+    (info.project.name.startsWith("mobile") ? 100 : 0) +
+    info.repeatEachIndex;
+  const first = {
+    version: 3,
+    id: `plan_first_${suffix}`,
+    name: "Plan relation",
+    operations: [
+      {
+        op: "upsert_relation",
+        relation: {
+          kind,
+          name: `plan_relation_${suffix.replaceAll("-", "_")}`,
+          source_label: "a",
+          target_label: "b",
+          properties: [{ name: "value", type: "f32", offset: 0 }],
+        },
+      },
+    ],
+  };
+  const second = {
+    version: 3,
+    id: `plan_second_${suffix}`,
+    name: "Plan property rename",
+    requires: [first.id],
+    operations: [{ op: "rename_property", kind, from: "value", to: "score" }],
+  };
+  // Selecting in reverse order still imports in lexical filename order.
+  await page
+    .getByLabel("Import migration file", { exact: true })
+    .setInputFiles([
+      {
+        name: "002.json",
+        mimeType: "application/json",
+        buffer: Buffer.from(JSON.stringify(second)),
+      },
+      {
+        name: "001.json",
+        mimeType: "application/json",
+        buffer: Buffer.from(JSON.stringify(first)),
+      },
+    ]);
+  const editor = page.getByRole("textbox", {
+    name: "Migration JSON",
+    exact: true,
+  });
+  await expect(editor).toHaveValue(/migrations/);
+  await page
+    .getByRole("button", { name: "Preview migration", exact: true })
+    .click();
+  const plan = page.getByRole("list", { name: "Ordered migration plan" });
+  await expect(plan.getByRole("listitem")).toHaveCount(2);
+  await expect(plan.getByRole("listitem").first()).toContainText(
+    "Plan relation",
+  );
+  await expect(plan).toContainText(`requires ${first.id}`);
+  await page
+    .getByRole("button", { name: "Apply migration", exact: true })
+    .click();
+  await expect(
+    page.getByText("Migration applied and synchronized to disk.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  const after = await (
+    await page.request.post(c.url + "/v1/schema", { headers, data: {} })
+  ).json();
+  expect(after.revision).toBe(before.revision + 2);
+  expect(
+    after.relations.find((r: { kind: number }) => r.kind === kind).properties[0]
+      .name,
+  ).toBe("score");
+  const downloadPromise = page.waitForEvent("download");
+  await page
+    .getByRole("button", { name: "Export schema", exact: true })
+    .click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe("schema-baseline.json");
+  expect(await readFile((await download.path())!, "utf8")).toContain(
+    `plan_relation_${suffix.replaceAll("-", "_")}`,
+  );
+  await page
+    .getByLabel("Restore definitions from revision", { exact: false })
+    .selectOption(String(before.revision));
+  await page
+    .getByRole("button", { name: "Prepare rollback", exact: true })
+    .click();
+  await expect(
+    page.getByText("Rollback drafted. Preview and review before applying.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  // Draft preparation is read-only, even when the target is the empty catalog.
+  expect(
+    (
+      await (
+        await page.request.post(c.url + "/v1/schema", { headers, data: {} })
+      ).json()
+    ).revision,
+  ).toBe(after.revision);
+  await expect(editor).toHaveValue(/drop_relation/);
+  await applyDraft(page);
+  const final = await (
+    await page.request.post(c.url + "/v1/schema", { headers, data: {} })
+  ).json();
+  expect(final.revision).toBe(after.revision + 1);
+  expect(final.relations.some((r: { kind: number }) => r.kind === kind)).toBe(
+    false,
+  );
+  expect(final.history.some((h: { id: string }) => h.id === first.id)).toBe(
+    true,
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: `/tmp/chronograph-schema-plan-${info.project.name}-${info.repeatEachIndex}.png`,
+    fullPage: true,
+  });
+});

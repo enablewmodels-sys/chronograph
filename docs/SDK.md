@@ -153,3 +153,9 @@ Local validation used Python 3.12/3.14, Node 20.20, Go 1.27.1, JDK 25 with Java 
 Python exports `chronograph_connectors.jev.jev_decision`; TypeScript exports
 `jevDecision`. Both retain TypeSafe Jev typed answers and provenance in normalized
 records, with optional raw JSON attachments. See [Jev examples](JEV.md).
+
+## Applying migration folders from an SDK
+
+Every SDK's generic operation call can use `schema_plan` with `{ "sources": ["JSON file contents", "next file contents"] }`. Keep the files in dependency order. After reviewing the returned before/after definitions, call `schema_apply_plan` with the same sources, `checksum` and `expected_revision`. Only an admin API key can apply the plan. Pending files commit atomically; applied files with the same checksum are skipped.
+
+The same calls work at a Community origin or a Managed base URL ending in `/p/PROJECT_ID`. `schema_export` produces a portable definition baseline, and `schema_rollback` drafts a compensation for explicit review. See the [migration guide](SCHEMA.md) for formats, examples, limits and compatibility. These calls change the service catalog; they do not execute arbitrary transformation code or rewrite historical payloads.

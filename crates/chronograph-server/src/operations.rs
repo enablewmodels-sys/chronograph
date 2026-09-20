@@ -17,6 +17,7 @@ pub const WRITES: &[&str] = &[
     "load_demo",
     "backup",
     "schema_apply",
+    "schema_apply_plan",
     "asset_put",
     "asset_compose",
     "connector_ingest",
@@ -231,23 +232,35 @@ pub async fn execute(state: Shared, op: String, mut args: Value) -> AppResult<Va
             }
             durability = json!("fsync");
         }
-        if matches!(op.as_str(), "schema_preview" | "schema_apply")
-            && let Some(source) = args.get("source").and_then(Value::as_str)
-        {
-            let migration: Value = serde_json::from_str(source).map_err(ApiError::bad)?;
-            if migration
-                .get("operations")
-                .and_then(Value::as_array)
-                .is_some_and(|ops| {
-                    ops.iter().any(|change| {
-                        change["op"] == "set_settings"
-                            && change["settings"]["default_durability"] == "buffered"
+        if matches!(
+            op.as_str(),
+            "schema_preview" | "schema_apply" | "schema_plan" | "schema_apply_plan"
+        ) {
+            let sources: Vec<&str> =
+                if let Some(source) = args.get("source").and_then(Value::as_str) {
+                    vec![source]
+                } else {
+                    args.get("sources")
+                        .and_then(Value::as_array)
+                        .map(|a| a.iter().filter_map(Value::as_str).collect())
+                        .unwrap_or_default()
+                };
+            for source in sources {
+                let migration: Value = serde_json::from_str(source).map_err(ApiError::bad)?;
+                if migration
+                    .get("operations")
+                    .and_then(Value::as_array)
+                    .is_some_and(|ops| {
+                        ops.iter().any(|change| {
+                            change["op"] == "set_settings"
+                                && change["settings"]["default_durability"] == "buffered"
+                        })
                     })
-                })
-            {
-                return Err(ApiError::bad(
-                    "This deployment requires fsync; migrations cannot select buffered durability",
-                ));
+                {
+                    return Err(ApiError::bad(
+                        "This deployment requires fsync; migrations cannot select buffered durability",
+                    ));
+                }
             }
         }
     }
@@ -262,6 +275,9 @@ pub async fn execute(state: Shared, op: String, mut args: Value) -> AppResult<Va
             let mut g = state.graph.write().map_err(ApiError::internal)?;
             if op == "schema_apply" {
                 return state.schema.write().map_err(ApiError::internal)?.apply(&mut g, &state.data, parse(args)?);
+            }
+            if op == "schema_apply_plan" {
+                return state.schema.write().map_err(ApiError::internal)?.apply_plan(&mut g, &state.data, parse(args)?);
             }
             let catalog = state.schema.read().map_err(ApiError::internal)?;
             let schema = catalog.snapshot()?;
@@ -381,6 +397,12 @@ pub async fn execute(state: Shared, op: String, mut args: Value) -> AppResult<Va
                     let request: crate::schema::PreviewRequest = parse(args)?;
                     catalog.preview(&g, &request.source)?
                 }
+                "schema_plan" => {
+                    let request: crate::schema::PlanRequest = parse(args)?;
+                    catalog.preview_plan(&g, &request.sources)?
+                }
+                "schema_export" => catalog.export(parse(args)?, state.require_fsync)?,
+                "schema_rollback" => catalog.rollback(&g, parse(args)?, state.require_fsync)?,
                 "schema_migration" => {
                     #[derive(Deserialize)]
                     #[serde(deny_unknown_fields)]

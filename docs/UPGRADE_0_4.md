@@ -26,3 +26,9 @@ Create `new-data` first. The destination journal must not exist. This command ta
 Never copy a live journal and sidecars independently and assume the snapshot is consistent. Do not point a 0.3 binary at format-3 data. Rollback means using the retained 0.3 workspace; there is no format-3-to-2 downgrade and new 0.4 writes are not present in that retained copy.
 
 The workspace in this checkout has not been upgraded in place. Test harnesses create their own temporary data/auth directories.
+
+## Schema migration version 3
+
+The current server reads existing version-1/version-2 migration histories with their original normalized checksums. Version 3 adds dependencies, metadata patches, safe property renames and unused connector removal. Atomic batch APIs also accept v1/v2 files. No existing schema is automatically rewritten during deployment.
+
+After a v3 migration is applied, older binaries that only understand v1/v2 cannot replay that catalog. Keep a synchronized pre-upgrade backup and compatible binary. A code-only rollback is safe only before v3 entries are written; otherwise restore the retained backup into a separate destination and account for subsequent writes before switching traffic. Never delete history entries to force compatibility. The new compensating rollback tool restores definitions through another forward migration; it is not a binary-format downgrade.

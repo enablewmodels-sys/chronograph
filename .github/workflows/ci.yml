@@ -40,6 +40,7 @@ jobs:
       - run: npm --prefix ui run build
       - run: cargo build --locked --release -p chronograph-server --bins
       - run: node scripts/protocol-test.mjs
+      - run: node scripts/migration-client-test.mjs
       - run: node scripts/schema-test.mjs
       - run: node scripts/connector-platform-test.mjs
       - run: npx playwright install --with-deps chromium
