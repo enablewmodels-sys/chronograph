@@ -23,6 +23,8 @@ export interface Stats {
   log_bytes: string;
   recovered_tail_bytes: string;
   default_durability: string;
+  require_fsync?: boolean;
+  writer_healthy?: boolean;
   revision: string;
   parent_revision?: string;
   active_forks?: string;

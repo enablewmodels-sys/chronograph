@@ -15,7 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         std::env::var("CHRONOGRAPH_ORIGIN").unwrap_or_else(|_| "http://127.0.0.1:8080".into());
     if matches!(cmd.as_str(), "--help" | "-h") {
         println!(
-            "preview — not benchmarked, not production-hardened\nchronograph-server [serve|check|restore BACKUP|migrate-v1 SOURCE DEST|migrate-v2 SOURCE DEST|admin create-token NAME SCOPE DAYS OUTPUT_FILE]\nSCOPE: read, ingest, admin. Offline admin locks config; stop the service first. Tokens are written once to a new mode-0600 file.\nEnvironment: CHRONOGRAPH_DATA (./community-data), CHRONOGRAPH_AUTH (./config/auth.json, outside data), CHRONOGRAPH_BIND (127.0.0.1:8080), CHRONOGRAPH_ORIGIN (http://127.0.0.1:8080), CHRONOGRAPH_UI (ui/dist), CHRONOGRAPH_DOCS (docs).\nRestore requires an absent or empty destination. Migration preserves its source and creates a new journal destination. Legacy password/cookie auth is retired."
+            "alpha — validate operational limits for your deployment\nchronograph-server [serve|check|restore BACKUP|migrate-v1 SOURCE DEST|migrate-v2 SOURCE DEST|admin create-token NAME SCOPE DAYS OUTPUT_FILE]\nSCOPE: read, ingest, admin. Offline admin locks config; stop the service first. Tokens are written once to a new mode-0600 file.\nEnvironment: CHRONOGRAPH_DATA (./community-data), CHRONOGRAPH_AUTH (./config/auth.json, outside data), CHRONOGRAPH_BIND (127.0.0.1:8080), CHRONOGRAPH_ORIGIN (http://127.0.0.1:8080), CHRONOGRAPH_UI (ui/dist), CHRONOGRAPH_DOCS (docs), CHRONOGRAPH_REQUIRE_FSYNC (false; set true to require durable writes).\nRestore requires an absent or empty destination. Migration preserves its source and creates a new journal destination. Legacy password/cookie auth is retired."
         );
         return Ok(());
     }
@@ -89,7 +89,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if cmd != "serve" || args.next().is_some() {
         return Err("Unknown command or arguments; see --help".into());
     }
-    let state = AppState::open(&data, &config, &origin)?;
+    let require_fsync = std::env::var("CHRONOGRAPH_REQUIRE_FSYNC")
+        .unwrap_or_else(|_| "false".into())
+        .parse::<bool>()?;
+    let state = AppState::open_with_policy(&data, &config, &origin, require_fsync)?;
     let ui = std::env::var("CHRONOGRAPH_UI").unwrap_or_else(|_| "ui/dist".into());
     if !PathBuf::from(&ui).join("index.html").is_file() {
         return Err(

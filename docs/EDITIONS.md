@@ -29,6 +29,7 @@ policies, organization SSO, automated off-host recovery, HA, or uptime guarantee
 Its application/process isolation is not a claim of independently audited tenant
 security. The static Community website demo still uses synthetic data.
 
-Start with [installation](INSTALL.md), [release status](REQUIREMENTS.md) and
+Start with [Managed hosting](HOSTED.md), [isolated self-hosting](ISOLATED.md),
+[production operations](PRODUCTION.md), [installation](INSTALL.md), [release status](REQUIREMENTS.md) and
 [security](SECURITY.md). Build noncompeting applications on Community today;
 evaluate the alpha against your own workload before relying on it operationally.

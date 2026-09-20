@@ -385,6 +385,7 @@ fn failed_sync_disables_writer_and_requires_reopen() {
         },
     )
     .unwrap();
+    assert!(graph.is_writable());
     graph.journal.fault_sync = true;
     assert!(
         graph
@@ -392,10 +393,12 @@ fn failed_sync_disables_writer_and_requires_reopen() {
             .is_err()
     );
     assert!(graph.history().is_empty());
+    assert!(!graph.is_writable());
     assert!(matches!(graph.sync(), Err(Error::WriterFailed)));
     drop(graph);
     // A failed sync is ambiguous: fully appended operations may survive. They remain atomic.
     let reopened = Graph::open(&f.0).unwrap();
+    assert!(reopened.is_writable());
     assert_eq!(reopened.history().len(), 2);
     assert_eq!(reopened.edge(EdgeId(0)).unwrap().valid_to, 20);
 }

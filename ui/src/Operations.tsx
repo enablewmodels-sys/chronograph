@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { managedSite } from "./site";
 import { api, bytes, download, graph, type Stats } from "./api";
 import { Busy, DocLink, Head, useAction } from "./shared";
 interface Backup {
@@ -34,7 +35,21 @@ export default function Operations() {
           <dl>
             <div>
               <dt>Commit policy</dt>
-              <dd>Buffered API default; console writes fsync</dd>
+              <dd>
+                {stats
+                  ? `${stats.default_durability === "fsync" ? "Fsync" : "Buffered"}${stats.require_fsync ? " · enforced by the operator" : " · workspace default"}`
+                  : "—"}
+              </dd>
+            </div>
+            <div>
+              <dt>Journal writer</dt>
+              <dd>
+                {stats?.writer_healthy === true
+                  ? "Healthy"
+                  : stats?.writer_healthy === false
+                    ? "Recovery required — contact the operator"
+                    : "Not reported by this engine"}
+              </dd>
             </div>
             <div>
               <dt>Log size</dt>
@@ -46,9 +61,10 @@ export default function Operations() {
             </div>
           </dl>
           <p>
-            Console mutations explicitly request synchronization. API and MCP
-            writers default to buffered unless they select fsync. Sync also
-            provides an explicit durability checkpoint.
+            API and MCP writes follow the effective commit policy shown above.
+            Fsync synchronizes accepted writes before acknowledging them. An
+            operator-enforced policy rejects requests to use buffered
+            durability.
           </p>
           <button
             className="primary"
@@ -64,12 +80,19 @@ export default function Operations() {
           </button>
         </section>
         <section className="panel form-panel">
-          <h2>Token security</h2>
+          <h2>
+            {managedSite
+              ? "Account and application security"
+              : "Credential security"}
+          </h2>
           <p>
-            Use Agent access to create and revoke scoped credentials. Tokens
-            remain in browser memory only; reloading disconnects this console.
+            {managedSite
+              ? "Console access uses your account, MFA and project role. Applications and agents use separate scoped keys. Provider secrets belong in the encrypted vault."
+              : "Use Connections & API keys to create and revoke scoped credentials. The console token stays in browser memory; reloading disconnects it."}
           </p>
-          <DocLink to="SECURITY">Security model and rotation</DocLink>
+          <DocLink to={managedSite ? "HOSTED" : "SECURITY"}>
+            Security model and rotation
+          </DocLink>
         </section>
       </div>
       <section className="panel form-panel">
@@ -153,12 +176,24 @@ export default function Operations() {
         </div>
         <p className="small">
           Backups contain the journal, index snapshot and owned sidecars.
-          Credentials are excluded; keep their external store in private
-          operator backups. Restore is an offline CLI operation into an empty
-          directory.
+          {managedSite
+            ? "Account, membership and vault recovery also requires the operator’s encrypted control-plane backup. Contact the operator to restore a project."
+            : "Credentials are excluded; keep their external store in encrypted operator backups. Restore is an offline CLI operation into an empty directory."}
         </p>
         <DocLink to="OPERATIONS">
           Backup, restore and incident procedures
+        </DocLink>
+      </section>
+      <section className="panel form-panel">
+        <h2>Monitoring and production checks</h2>
+        <p>
+          Scrape the project’s authenticated <code>/v1/metrics</code> endpoint
+          with a read key. Track writer health, journal growth, available
+          workers and HTTP errors. Pair it with host disk, memory and backup-age
+          monitoring.
+        </p>
+        <DocLink to="PRODUCTION">
+          Deployment checks, alerts and recovery drills
         </DocLink>
       </section>
       <section className="panel form-panel">

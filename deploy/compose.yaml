@@ -10,6 +10,7 @@ services:
       CHRONOGRAPH_BIND: 0.0.0.0:8080
       CHRONOGRAPH_DATA: /data
       CHRONOGRAPH_AUTH: /config/auth.json
+      CHRONOGRAPH_REQUIRE_FSYNC: "true"
     volumes:
       - graph-data:/data
       - graph-config:/config

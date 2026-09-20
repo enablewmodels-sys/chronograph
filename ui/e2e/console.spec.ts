@@ -401,6 +401,9 @@ test("landing artwork, documentation and connector navigation render at this vie
     }),
   ).toBeVisible();
   const docs = [
+    "HOSTED",
+    "ISOLATED",
+    "PRODUCTION",
     "QUICKSTART",
     "TUTORIAL",
     "BRANCHES",

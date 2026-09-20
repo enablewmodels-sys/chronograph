@@ -185,3 +185,9 @@ work; see the [current hosting boundaries](docs/HOSTED.md#hosting-and-recovery-b
 Licensed under [PolyForm Perimeter 1.0.0](LICENSE), with required [notices](NOTICE).
 This restriction means Community is source-available, not OSI open source.
 Bundled third-party code retains its own license notices and dependency inventory.
+
+### Deployment guides
+
+- [Managed: accounts, projects, keys and secrets](docs/HOSTED.md)
+- [Self-hosted and isolated Community](docs/ISOLATED.md)
+- [Production operations, metrics and recovery gates](docs/PRODUCTION.md)

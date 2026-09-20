@@ -1,16 +1,16 @@
-# Deployment preparation
+# Deploy Managed or isolated Community
 
-The alpha.3 engine has been deployed natively on an ARM64 EC2 instance behind
-Caddy with public HTTPS. The [hosted pilot](HOSTED.md) uses scoped tokens,
-loopback-only database access, an unprivileged systemd service, persistent private
-data/config directories and a six-hour local backup timer. Public API/MCP,
-Jev ingestion and independent workspace restore were verified on September 20,
-2026. This does not establish high availability or multi-tenant readiness.
+The public repository builds **self-hosted Community**. Follow the [isolated
+quickstart](ISOLATED.md) and [production gates](PRODUCTION.md) when operating your
+own database. The private Managed control plane adds accounts, projects, roles
+and secrets; its service is documented in [Managed](HOSTED.md). Deploying the
+Community container does not install that private account service.
 
-The static Community website still serves documentation and a synthetic demo;
-see [Vercel website deployment](WEBSITE.md). Docker/Compose is a separate recipe:
-its local execution remains unverified on the developer machine. Use the
-[native quickstart](QUICKSTART.md) or the recipe below for your own deployment.
+The Managed preview runs natively on ARM64 EC2 behind Caddy HTTPS. Docker build
+and an isolated non-root container bootstrap/restart smoke test passed in GitHub
+CI on September 20, 2026. That check does not validate your public TLS deployment,
+disaster recovery or capacity. The static [Community website](WEBSITE.md) serves
+documentation and a synthetic demo; Vercel is not hosting a persistent Rust database.
 
 ## Native configuration
 
@@ -21,19 +21,22 @@ its local execution remains unverified on the developer machine. Use the
 | `CHRONOGRAPH_BIND` | `127.0.0.1:8080` | Listen socket |
 | `CHRONOGRAPH_ORIGIN` | `http://127.0.0.1:8080` | Exact public origin; remote origins require HTTPS |
 | `CHRONOGRAPH_UI` | `ui/dist` | Built UI files |
+| `CHRONOGRAPH_REQUIRE_FSYNC` | `false` | Set `true` to enforce fsync and reject buffered writes/settings |
 | `CHRONOGRAPH_DOCS` | `docs` | Public documentation only; never a secret directory |
 
 Create the initial admin token before serving. Stop the service for offline auth
 commands, journal checks, migration or destination restore. `check` replays and
 may repair a torn tail; it is not a forensic read-only operation. Use a copy for
-investigation. Removed settings: `CHRONOGRAPH_PASSWORD_FILE` and browser sessions.
+investigation. The Community engine has no account sessions; Managed owns account authentication
+separately. The old `CHRONOGRAPH_PASSWORD_FILE` setting is removed.
 
-## Intended single-host container boundary
+## Single-host container boundary
 
 The supplied Caddyfile terminates HTTPS, preserves Host, caps request bodies and
 does not retry writes. Verify this container topology independently. Publish only ports
 80/443 from the proxy; keep the plaintext database socket private. Run as an
-unprivileged UID with a read-only root filesystem and writable data/config volumes.
+unprivileged UID with a read-only root filesystem and writable data/config volumes. Enable `CHRONOGRAPH_REQUIRE_FSYNC=true`; the Compose recipe
+already sets it.
 Config must have a separate private mount. Retain certificate state separately.
 Pin reviewed image digests at release and preserve the built binaries/lockfiles.
 
@@ -54,7 +57,7 @@ Measure representative traffic through the deployed TLS proxy. Verify resource
 limits, disk exhaustion handling and log redaction. These are deployment gates,
 not completed claims; see [testing evidence](TESTING.md).
 
-## Container bootstrap recipe (execution pending)
+## Container bootstrap recipe
 
 Requires Docker with Compose, a hostname pointing to your host, and inbound 80/443.
 Copy `deploy/.env.example` to `deploy/.env` and replace its hostname/email. Values

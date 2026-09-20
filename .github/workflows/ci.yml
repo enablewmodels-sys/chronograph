@@ -34,6 +34,7 @@ jobs:
       - run: cargo install mdbook --locked --version 0.5.3
       - run: mdbook build
       - run: python3 scripts/release/check-docs.py
+      - run: python3 scripts/test-production-check.py
       - run: RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --no-deps
       - run: node scripts/build-site.mjs
       - run: npm --prefix ui run build

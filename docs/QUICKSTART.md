@@ -1,8 +1,9 @@
-# Quickstart
+# Embedded and local quickstart
 
 Using the hosted service? Start with the [Managed quickstart](HOSTED.md) for
 GitHub/email login, projects, API keys and secrets. The instructions below are
-for self-hosting Community.
+for local Community development. Use the [isolated deployment guide](ISOLATED.md)
+and [production operations](PRODUCTION.md) for an independently operated service.
 
 Chronograph Community runs embedded in Rust or as a single-workspace service with
 a console and MCP. The service remains a preview pending the release gates.
@@ -59,7 +60,8 @@ graph.close()?;
 # Ok::<(), chronograph_db::Error>(())
 ```
 
-Both embedded and service defaults are buffered. The embedded `OpenOptions`
+The embedded default and an unconfigured local service default are buffered.
+Managed and production deployments enforce fsync with `CHRONOGRAPH_REQUIRE_FSYNC=true`. The embedded `OpenOptions`
 can select `Durability::Fsync`; API writers select per request. Use `sync()` or
 `close()` for an error-reporting checkpoint. Drop synchronizes best effort only.
 

@@ -57,6 +57,7 @@ pub fn openapi() -> Value {
     for (path, method, name, scope, binary, schema) in [
         ("/v1/info", "get", "info", "read", false, None),
         ("/v1/stats", "get", "stats_get", "read", false, None),
+        ("/v1/metrics", "get", "metrics", "read", false, None),
         ("/v1/tokens", "get", "tokens", "admin", false, None),
         (
             "/v1/tokens",
@@ -113,6 +114,12 @@ pub fn openapi() -> Value {
         ),
     ] {
         let mut entry = operation(name, name, scope, schema, binary);
+        if name == "metrics" {
+            entry["description"] =
+                json!("Authenticated Prometheus operational metrics; counters reset on restart.");
+            entry["responses"]["200"]["content"] =
+                json!({"text/plain":{"schema":{"type":"string"}}});
+        }
         if path.contains("{id}") {
             entry["parameters"] = json!([{"name":"id","in":"path","required":true,"schema":{"type":"string","pattern":"^[A-Za-z0-9_-]+$"}}]);
         }

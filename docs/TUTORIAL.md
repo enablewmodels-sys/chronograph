@@ -14,6 +14,45 @@ its relation and map its properties. Changes are persisted in that project.
 Switch the graph preview to **Tree layout** to inspect its displayed hierarchy.
 API keys and MCP clients query the same database; see [Managed connections](HOSTED.md#api-keys-and-endpoints).
 
+## Try the same workflow in isolated Community
+
+Follow the [self-hosted quickstart](ISOLATED.md), open your local console and
+connect with a scoped key. Load the same sample into an empty workspace and use
+**Temporal explorer**, **Write data** and **Schema & migrations** as described above.
+The temporal semantics are identical; Community credentials belong to your one
+workspace, while Managed keys belong to the selected project.
+
+For programmatic access, create a read key and save it privately as
+`/private/chronograph-read.token` (mode 0600). This Python standard-library example
+queries either deployment. Set the base to your exact Managed project URL or to
+`http://127.0.0.1:8080` for a local Community server. Keep remote URLs on HTTPS.
+
+```python
+import json
+from pathlib import Path
+import urllib.request
+
+base = "https://YOUR_HOST/p/YOUR_PROJECT_ID"
+token = Path("/private/chronograph-read.token").read_text().strip()
+request = urllib.request.Request(
+    base + "/v1/as_of",
+    data=json.dumps({"t": "2000000", "limit": 100}).encode(),
+    headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"},
+    method="POST",
+)
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args, **kwargs):
+        return None
+with urllib.request.build_opener(NoRedirect()).open(request, timeout=15) as response:
+    graph = json.load(response)
+print(graph["count"], "relationships active at 2 seconds")
+```
+
+The sample loaded by the console has eight active relationships at this time.
+An empty database returns zero. Do not log the token or use an admin key for this
+read. See [SDKs](SDK.md) for reusable clients and [production operations](PRODUCTION.md)
+for durability, metrics and deployment checks for both editions.
+
 The embedded example below is a separate, smaller fixture demonstrating delayed
 observations and exact interval boundaries. It does not write to your hosted project.
 

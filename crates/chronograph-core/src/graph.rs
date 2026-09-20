@@ -379,6 +379,14 @@ impl Graph {
         edges_to_arrow(self.as_of(t).edges())
     }
 
+    /// Whether this handle can accept writes after its last filesystem operation.
+    ///
+    /// An ambiguous append or sync failure disables the writer until reopen.
+    /// This is not a prediction of available disk space or future I/O success.
+    pub fn is_writable(&self) -> bool {
+        self.journal.ensure_writable().is_ok()
+    }
+
     /// Constant-time graph and log statistics.
     pub fn stats(&self) -> GraphStats {
         GraphStats {

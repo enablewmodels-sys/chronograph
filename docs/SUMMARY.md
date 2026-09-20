@@ -1,6 +1,9 @@
 # Summary
 
-- [Quickstart](QUICKSTART.md)
+- [Managed quickstart](HOSTED.md)
+- [Self-hosted and isolated](ISOLATED.md)
+- [Production operations](PRODUCTION.md)
+- [Embedded and local setup](QUICKSTART.md)
 - [Install and upgrade](INSTALL.md)
 - [Temporal model](TUTORIAL.md)
 - [Durable branches](BRANCHES.md)
@@ -11,7 +14,6 @@
 - [Language SDKs](SDK.md)
 - [Platform integration recipes](INTEGRATIONS.md)
 - [TypeSafe Jev](JEV.md)
-- [Hosted alpha](HOSTED.md)
 - [Agent integrations](MCP.md)
 - [BCI and LSL](connectors/bci.md)
 - [Robotics and LeRobot](connectors/robotics.md)

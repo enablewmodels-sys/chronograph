@@ -3,7 +3,9 @@
 [Open Chronograph](https://chronograph.13.57.235.204.nip.io). Managed adds accounts,
 project provisioning, team roles, an encrypted secret vault, and project routing
 around the Rust temporal graph engine. This deployment is a **launch preview**,
-with bounded capacity and no availability SLA.
+with bounded capacity and no availability SLA. Running your own infrastructure?
+Use the [self-hosted / isolated guide](ISOLATED.md). See [production operations](PRODUCTION.md)
+for durability, monitoring and recovery responsibilities.
 
 ## Start a project
 
@@ -139,7 +141,9 @@ model, attach BCI hardware, or execute a quantum circuit automatically.
 
 ## Database behavior
 
-New Managed projects start with `default_durability: fsync`. Settings and relation
+New Managed projects start with `default_durability: fsync`. Every hosted engine
+also enforces a fsync floor: explicit buffered writes and settings downgrades are
+rejected. The Operations page reports the effective policy and writer health. Settings and relation
 changes are persisted as migrations in that project's catalog. The migration
 preview supplies a checksum and expected revision; concurrent conflicting changes
 are rejected. Uploading a migration does not apply it until explicitly confirmed.

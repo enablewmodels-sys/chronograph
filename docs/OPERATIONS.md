@@ -1,5 +1,10 @@
 # Operations
 
+For hosted projects, start with [Managed](HOSTED.md). For an independently
+operated database, start with [isolated Community](ISOLATED.md). The graph archive
+commands below apply to both engines; Managed account/vault recovery is a separate
+operator responsibility. See [production monitoring and recovery gates](PRODUCTION.md).
+
 One process owns `community-data/graph.cgraph`; `config/auth.json` stays outside
 that directory. Both use OS advisory locks. Do not remove or bypass locks while
 a process is active. The embedded graph and its indexes retain complete history
@@ -7,12 +12,17 @@ in memory; monitor RAM and disk growth.
 
 ## Observe and synchronize
 
-`/healthz` checks process liveness, `/readyz` attempts a read lock, and `/v1/stats`
+`/healthz` checks process liveness, `/readyz` attempts a read lock and checks writer health, and `/v1/stats`
 returns counts, revision, journal size and recovered tail bytes. Readiness can
 return 503 during writes. It is not a disk-capacity or integrity check.
 
-API/MCP writes default to buffered. Send `durability: "fsync"` or explicitly call
-`/v1/sync` for a durable acknowledgement. The console sends fsync for writes.
+API/MCP writes use the catalog default, initially buffered in a local Community
+workspace. Managed and the production Compose recipe enforce fsync. Set
+`CHRONOGRAPH_REQUIRE_FSYNC=true` on independently operated production engines.
+The floor rejects explicit buffered writes and buffered settings migrations.
+Without the floor, send `durability: "fsync"` for a durable acknowledgement.
+The console sends fsync for writes. `/v1/metrics` exposes authenticated operational
+metrics; `/v1/stats` reports the effective policy and known writer health.
 SIGINT/SIGTERM drain requests and synchronize. Allow sufficient shutdown time for
 large snapshots; a forced kill can lose buffered acknowledgements. An uncertain
 write may survive even without acknowledgement: inspect history before retrying.
@@ -104,5 +114,6 @@ Larger exports use the embedded API. Rate limits return 429; saturation returns
 503. Respect Retry-After, reduce concurrency, and inspect write outcomes before
 retrying mutations. Backups and long scans hold the graph lock while executing.
 
-Deployment recipes remain subject to container/TLS verification. See [testing](TESTING.md)
+Container bootstrap/restart is covered by CI; your TLS topology and recovery
+procedure still require deployment-specific verification. See [testing](TESTING.md)
 and the [release contract](REQUIREMENTS.md) for actual gate status.

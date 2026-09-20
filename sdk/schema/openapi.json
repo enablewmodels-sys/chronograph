@@ -2138,6 +2138,42 @@
         "x-required-scope": "ingest"
       }
     },
+    "/v1/metrics": {
+      "get": {
+        "description": "Authenticated Prometheus operational metrics; counters reset on restart.",
+        "operationId": "metrics",
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
     "/v1/neighbors": {
       "post": {
         "description": "Read outgoing edges active at t for one node.",

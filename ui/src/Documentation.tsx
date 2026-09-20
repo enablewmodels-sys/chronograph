@@ -1,19 +1,20 @@
 import { isValidElement, useEffect, useState, type ReactNode } from "react";
-import { Link, NavLink, useParams } from "react-router-dom";
+import { Link, NavLink, useParams, useSearchParams } from "react-router-dom";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Logo } from "./shared";
 import { publicPath, publicSite, managedSite } from "./site";
 const docs = [
-  ...(managedSite ? [["HOSTED", "Managed quickstart"]] : []),
-  ["QUICKSTART", "Quickstart"],
+  ["HOSTED", "Managed quickstart"],
+  ["ISOLATED", "Self-hosted quickstart"],
+  ["PRODUCTION", "Production operations"],
+  ["QUICKSTART", "Embedded and local setup"],
   ["TUTORIAL", "Temporal model"],
   ["BRANCHES", "Durable branches"],
   ["API", "HTTP API"],
   ["SDK", "Language SDKs"],
   ["INTEGRATIONS", "Platform integration recipes"],
   ["JEV", "TypeSafe Jev & examples"],
-  ...(!managedSite ? [["HOSTED", "Managed hosting"]] : []),
   ["SCHEMA", "Schema & migrations"],
   ["CONNECTOR_PLATFORM", "Connector platform"],
   ["UPGRADE_0_4", "Upgrade to 0.4"],
@@ -51,10 +52,35 @@ function slug(node: ReactNode) {
     .replace(/\s+/g, "-");
 }
 export default function Documentation() {
-  const params = useParams(),
-    doc =
-      params["*"]?.replace(/\/+$/, "") ||
-      (managedSite ? "HOSTED" : "QUICKSTART");
+  const params = useParams();
+  const [search] = useSearchParams();
+  const requested = search.get("edition");
+  const route = params["*"]?.replace(/\/+$/, "");
+  const edition =
+    route === "ISOLATED"
+      ? "isolated"
+      : route === "HOSTED"
+        ? "managed"
+        : requested === "managed" || requested === "isolated"
+          ? requested
+          : managedSite
+            ? "managed"
+            : "isolated";
+  const doc = route || (edition === "managed" ? "HOSTED" : "ISOLATED");
+  const docUrl = (target: string, hash = "", chosen = edition) =>
+    `/documentation/${target}?edition=${target === "HOSTED" ? "managed" : target === "ISOLATED" ? "isolated" : chosen}${hash}`;
+  const switchDoc = (chosen: string) =>
+    docUrl(
+      !route || ["HOSTED", "ISOLATED", "QUICKSTART"].includes(doc)
+        ? chosen === "managed"
+          ? "HOSTED"
+          : "ISOLATED"
+        : doc,
+      ["HOSTED", "ISOLATED", "QUICKSTART"].includes(doc)
+        ? ""
+        : window.location.hash,
+      chosen,
+    );
   const [text, setText] = useState(""),
     [error, setError] = useState("");
   useEffect(() => {
@@ -107,11 +133,7 @@ export default function Documentation() {
       ) {
         const target = resolved.pathname.slice(6, -3);
         if (docs.some(([id]) => id === target))
-          return (
-            <Link to={`/documentation/${target}${resolved.hash}`}>
-              {children}
-            </Link>
-          );
+          return <Link to={docUrl(target, resolved.hash)}>{children}</Link>;
         return (
           <a href={`${publicPath(`/docs/${target}.md`)}${resolved.hash}`}>
             {children}
@@ -138,11 +160,36 @@ export default function Documentation() {
       <div className="docs-layout">
         <aside>
           <h2>
-            {managedSite ? "Managed documentation" : "Community documentation"}
+            {edition === "managed"
+              ? "Managed documentation"
+              : "Self-hosted documentation"}
           </h2>
+          <div
+            className="docs-edition-switch"
+            role="group"
+            aria-label="Documentation edition"
+          >
+            <Link
+              to={switchDoc("managed")}
+              aria-current={edition === "managed" ? "true" : undefined}
+            >
+              Managed
+            </Link>
+            <Link
+              to={switchDoc("isolated")}
+              aria-current={edition === "isolated" ? "true" : undefined}
+            >
+              Self-hosted / isolated
+            </Link>
+          </div>
+          <p className="docs-edition-note">
+            {edition === "managed"
+              ? "Hosted projects, accounts and team access."
+              : "Run Community on infrastructure you control."}
+          </p>
           <nav aria-label="Documentation">
             {docs.map(([id, title]) => (
-              <NavLink key={id} to={`/documentation/${id}`}>
+              <NavLink key={id} to={docUrl(id)}>
                 {title}
               </NavLink>
             ))}
@@ -150,6 +197,21 @@ export default function Documentation() {
           <Link to="/">← Back to home</Link>
         </aside>
         <main id="main" className="prose">
+          <div className="docs-context" role="note">
+            <strong>
+              {edition === "managed"
+                ? "Managed hosting"
+                : "Isolated self-hosting"}
+            </strong>
+            <span>
+              {edition === "managed"
+                ? "Sign in with an account; use a scoped project key for your applications."
+                : "Operate your own database; use scoped keys for the Community console and applications."}
+            </span>
+            <Link to={docUrl(edition === "managed" ? "HOSTED" : "ISOLATED")}>
+              Open this deployment’s quickstart →
+            </Link>
+          </div>
           {error ? (
             <p role="alert">{error}</p>
           ) : text ? (

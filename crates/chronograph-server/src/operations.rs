@@ -45,7 +45,7 @@ pub fn edge(e: &Edge) -> Value {
 }
 fn stats(g: &Graph) -> Value {
     let s = g.stats();
-    json!({"nodes":s.nodes.to_string(),"edge_versions":s.edge_versions.to_string(),"revision":g.revision().to_string(),"parent_revision":g.parent_revision().to_string(),"active_forks":g.forks().filter(|f|f.status==chronograph_db::ForkStatus::Active).count().to_string(),"log_bytes":s.log_bytes.to_string(),"recovered_tail_bytes":s.recovered_tail_bytes.to_string(),"default_durability":"buffered"})
+    json!({"nodes":s.nodes.to_string(),"edge_versions":s.edge_versions.to_string(),"revision":g.revision().to_string(),"parent_revision":g.parent_revision().to_string(),"active_forks":g.forks().filter(|f|f.status==chronograph_db::ForkStatus::Active).count().to_string(),"log_bytes":s.log_bytes.to_string(),"recovered_tail_bytes":s.recovered_tail_bytes.to_string(),"default_durability":"buffered","writer_healthy":g.is_writable()})
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -213,7 +213,7 @@ pub async fn execute(state: Shared, op: String, mut args: Value) -> AppResult<Va
     if !args.is_object() {
         return Err(ApiError::bad("Expected a JSON object"));
     }
-    let durability = if is_write(&op) {
+    let mut durability = if is_write(&op) {
         args.as_object_mut()
             .unwrap()
             .remove("durability")
@@ -223,6 +223,33 @@ pub async fn execute(state: Shared, op: String, mut args: Value) -> AppResult<Va
     };
     if !durability.is_null() && durability != "buffered" && durability != "fsync" {
         return Err(ApiError::bad("durability must be buffered or fsync"));
+    }
+    if state.require_fsync {
+        if is_write(&op) {
+            if durability == "buffered" {
+                return Err(ApiError::bad("This deployment requires fsync durability"));
+            }
+            durability = json!("fsync");
+        }
+        if matches!(op.as_str(), "schema_preview" | "schema_apply")
+            && let Some(source) = args.get("source").and_then(Value::as_str)
+        {
+            let migration: Value = serde_json::from_str(source).map_err(ApiError::bad)?;
+            if migration
+                .get("operations")
+                .and_then(Value::as_array)
+                .is_some_and(|ops| {
+                    ops.iter().any(|change| {
+                        change["op"] == "set_settings"
+                            && change["settings"]["default_durability"] == "buffered"
+                    })
+                })
+            {
+                return Err(ApiError::bad(
+                    "This deployment requires fsync; migrations cannot select buffered durability",
+                ));
+            }
+        }
     }
     let permit = state.admit().await?;
     tokio::task::spawn_blocking(move || {
@@ -384,7 +411,8 @@ pub async fn execute(state: Shared, op: String, mut args: Value) -> AppResult<Va
                 "stats" => {
                     empty(&args)?;
                     let mut result = stats(&g);
-                    result["default_durability"] = json!(schema.settings.default_durability);
+                    result["default_durability"] = if state.require_fsync { json!("fsync") } else { json!(schema.settings.default_durability) };
+                    result["require_fsync"] = json!(state.require_fsync);
                     result
                 }
                 "sample" => sample(&g, parse(args)?)?,

@@ -23,7 +23,10 @@ use serde::Deserialize;
 use serde_json::{Value, json};
 use std::{
     path::{Path, PathBuf},
-    sync::{Arc, Mutex, RwLock},
+    sync::{
+        Arc, Mutex, RwLock,
+        atomic::{AtomicU64, Ordering},
+    },
     time::Instant,
 };
 use tokio::sync::{OwnedSemaphorePermit, Semaphore};
@@ -155,6 +158,9 @@ pub struct AppState {
     admission: Arc<Semaphore>,
     auth_jobs: Arc<Semaphore>,
     started: Instant,
+    require_fsync: bool,
+    requests_total: AtomicU64,
+    server_errors_total: AtomicU64,
 }
 pub struct WorkPermit {
     _admission: OwnedSemaphorePermit,
@@ -165,6 +171,15 @@ impl AppState {
         data: impl AsRef<Path>,
         config: impl AsRef<Path>,
         origin: &str,
+    ) -> AppResult<Shared> {
+        Self::open_with_policy(data, config, origin, false)
+    }
+    /// Open a workspace with an operator-enforced durable acknowledgement floor.
+    pub fn open_with_policy(
+        data: impl AsRef<Path>,
+        config: impl AsRef<Path>,
+        origin: &str,
+        require_fsync: bool,
     ) -> AppResult<Shared> {
         let url = validate_origin(origin)?;
         auth::private_dir(data.as_ref())?;
@@ -207,6 +222,9 @@ impl AppState {
             admission: Arc::new(Semaphore::new(40)),
             auth_jobs: Arc::new(Semaphore::new(2)),
             started: Instant::now(),
+            require_fsync,
+            requests_total: AtomicU64::new(0),
+            server_errors_total: AtomicU64::new(0),
         }))
     }
     pub fn sync(&self) -> AppResult<()> {
@@ -291,6 +309,7 @@ async fn authenticate(
     Ok(next.run(req).await)
 }
 async fn boundary(State(s): State<Shared>, req: Request, next: Next) -> Response {
+    s.requests_total.fetch_add(1, Ordering::Relaxed);
     // Reject DNS rebinding and cross-origin requests. Never trust forwarded host headers.
     let origin_ok = req
         .headers()
@@ -329,6 +348,9 @@ async fn boundary(State(s): State<Shared>, req: Request, next: Next) -> Response
     ] {
         r.headers_mut().insert(k, HeaderValue::from_static(v));
     }
+    if r.status().is_server_error() {
+        s.server_errors_total.fetch_add(1, Ordering::Relaxed);
+    }
     if s.secure {
         r.headers_mut().insert(
             "strict-transport-security",
@@ -341,6 +363,7 @@ async fn boundary(State(s): State<Shared>, req: Request, next: Next) -> Response
 pub fn router(state: Shared, ui: impl AsRef<Path>, docs: impl AsRef<Path>) -> Router {
     let v1 = Router::new()
         .route("/info", get(info))
+        .route("/metrics", get(metrics))
         .route("/stats", get(stats).post(stats_post))
         .route("/tokens", get(tokens).post(create_token))
         .route("/tokens/{id}", axum::routing::delete(revoke_token))
@@ -357,7 +380,9 @@ pub fn router(state: Shared, ui: impl AsRef<Path>, docs: impl AsRef<Path>) -> Ro
         .merge(private)
         .route(
             "/healthz",
-            get(|| async { Json(json!({"status":"ok","version":env!("CARGO_PKG_VERSION"),"stage":"preview — not benchmarked, not production-hardened"})) }),
+            get(|| async {
+                Json(json!({"status":"ok","version":env!("CARGO_PKG_VERSION"),"stage":"alpha"}))
+            }),
         )
         .route("/readyz", get(ready))
         .route(
@@ -391,21 +416,71 @@ async fn info(
 ) -> AppResult<Json<Value>> {
     let catalog = s.schema.read().map_err(ApiError::internal)?;
     let settings = &catalog.snapshot()?.settings;
+    let effective = if s.require_fsync {
+        schema::Durability::Fsync
+    } else {
+        settings.default_durability.clone()
+    };
     Ok(Json(
-        json!({"version":env!("CARGO_PKG_VERSION"),"edition":"community","credential":{"id":p.id,"scope":p.scope},"mcp_url":format!("{}/mcp",s.origin),"uptime_seconds":s.started.elapsed().as_secs(),"limits":{"body_bytes":4194304,"batch_edges":10000,"query_results":1000,"workers":8,"queue":32},"default_durability":settings.default_durability,"workspace_name":settings.name}),
+        json!({"version":env!("CARGO_PKG_VERSION"),"edition":"community","credential":{"id":p.id,"scope":p.scope},"mcp_url":format!("{}/mcp",s.origin),"uptime_seconds":s.started.elapsed().as_secs(),"limits":{"body_bytes":4194304,"batch_edges":10000,"query_results":1000,"workers":8,"queue":32},"default_durability":effective,"require_fsync":s.require_fsync,"configured_default_durability":settings.default_durability,"workspace_name":settings.name}),
     ))
 }
 async fn ready(State(s): State<Shared>) -> AppResult<Json<Value>> {
+    readiness(&s)
+}
+fn readiness(s: &Shared) -> AppResult<Json<Value>> {
     s.schema
         .try_read()
         .map_err(|_| ApiError::unavailable("Schema busy"))?
         .snapshot()?;
-    drop(
-        s.graph
-            .try_read()
-            .map_err(|_| ApiError::unavailable("Engine busy"))?,
-    );
+    if !s
+        .graph
+        .try_read()
+        .map_err(|_| ApiError::unavailable("Engine busy"))?
+        .is_writable()
+    {
+        return Err(ApiError::unavailable(
+            "Journal writer requires operator recovery",
+        ));
+    }
     Ok(Json(json!({"status":"ready"})))
+}
+/// Prometheus text format; protected by the same read-scope authentication as stats.
+async fn metrics(State(s): State<Shared>) -> AppResult<Response> {
+    let graph = s
+        .graph
+        .try_read()
+        .map_err(|_| ApiError::unavailable("Engine busy"))?;
+    let stats = graph.stats();
+    let body = format!(
+        "# TYPE chronograph_uptime_seconds gauge\nchronograph_uptime_seconds {}\n\
+# TYPE chronograph_http_requests_total counter\nchronograph_http_requests_total {}\n\
+# TYPE chronograph_http_server_errors_total counter\nchronograph_http_server_errors_total {}\n\
+# TYPE chronograph_graph_nodes gauge\nchronograph_graph_nodes {}\n\
+# TYPE chronograph_edge_versions gauge\nchronograph_edge_versions {}\n\
+# TYPE chronograph_journal_bytes gauge\nchronograph_journal_bytes {}\n\
+# TYPE chronograph_recovered_tail_bytes gauge\nchronograph_recovered_tail_bytes {}\n\
+# TYPE chronograph_writer_healthy gauge\nchronograph_writer_healthy {}\n\
+# TYPE chronograph_workers_available gauge\nchronograph_workers_available {}\n\
+# TYPE chronograph_admission_available gauge\nchronograph_admission_available {}\n\
+# TYPE chronograph_fsync_required gauge\nchronograph_fsync_required {}\n",
+        s.started.elapsed().as_secs(),
+        s.requests_total.load(Ordering::Relaxed),
+        s.server_errors_total.load(Ordering::Relaxed),
+        stats.nodes,
+        stats.edge_versions,
+        stats.log_bytes,
+        stats.recovered_tail_bytes,
+        u8::from(graph.is_writable()),
+        s.jobs.available_permits(),
+        s.admission.available_permits(),
+        u8::from(s.require_fsync)
+    );
+    Ok((
+        [("content-type", "text/plain; version=0.0.4; charset=utf-8")],
+        body,
+    )
+        .into_response())
 }
 async fn stats(State(s): State<Shared>) -> AppResult<Json<Value>> {
     Ok(Json(
@@ -604,6 +679,9 @@ mod service_tests {
         read_id: String,
     }
     fn fixture() -> Fixture {
+        fixture_with_policy(false)
+    }
+    fn fixture_with_policy(require_fsync: bool) -> Fixture {
         let dir = tempfile::tempdir().unwrap();
         let config = dir.path().join("config/auth.json");
         let mut auth = auth::Auth::open(&config, true).unwrap();
@@ -615,8 +693,13 @@ mod service_tests {
             auth.insert(t).unwrap();
         }
         drop(auth);
-        let state =
-            AppState::open(dir.path().join("data"), config, "http://127.0.0.1:18081").unwrap();
+        let state = AppState::open_with_policy(
+            dir.path().join("data"),
+            config,
+            "http://127.0.0.1:18081",
+            require_fsync,
+        )
+        .unwrap();
         let app = router(
             state.clone(),
             dir.path().join("ui"),
@@ -652,6 +735,67 @@ mod service_tests {
         let status = r.status();
         let bytes = to_bytes(r.into_body(), 8 * 1024 * 1024).await.unwrap();
         (status, serde_json::from_slice(&bytes).unwrap())
+    }
+    #[tokio::test]
+    async fn production_policy_requires_durable_writes_and_protects_metrics() {
+        let f = fixture_with_policy(true);
+        let (status, _) = call(
+            &f,
+            "/v1/add_node",
+            &f.ingest,
+            json!({"id":"90","durability":"buffered"}),
+        )
+        .await;
+        assert_eq!(status, StatusCode::BAD_REQUEST);
+        assert_eq!(f.state.graph.read().unwrap().stats().nodes, 0);
+        assert_eq!(
+            call(&f, "/v1/add_node", &f.ingest, json!({"id":"90"}))
+                .await
+                .0,
+            StatusCode::OK
+        );
+        let stats = call(&f, "/v1/stats", &f.read, json!({})).await.1;
+        assert_eq!(stats["default_durability"], "fsync");
+        assert_eq!(stats["require_fsync"], true);
+        assert_eq!(stats["writer_healthy"], true);
+        let source = json!({"version":1,"id":"unsafe_policy","name":"Unsafe","operations":[{"op":"set_settings","settings":{"default_durability":"buffered"}}]}).to_string();
+        for op in ["schema_preview", "schema_apply"] {
+            assert_eq!(
+                call(&f, &format!("/v1/{op}"), &f.admin, json!({"source":source}))
+                    .await
+                    .0,
+                StatusCode::BAD_REQUEST
+            );
+        }
+        for (token, expected) in [
+            ("", StatusCode::UNAUTHORIZED),
+            (f.read.as_str(), StatusCode::OK),
+        ] {
+            let request = Request::builder()
+                .uri("/v1/metrics")
+                .header("host", "127.0.0.1:18081")
+                .header("authorization", format!("Bearer {token}"))
+                .body(Body::empty())
+                .unwrap();
+            let response = f.app.clone().oneshot(request).await.unwrap();
+            assert_eq!(response.status(), expected);
+            let body = to_bytes(response.into_body(), 65536).await.unwrap();
+            let text = String::from_utf8(body.to_vec()).unwrap();
+            assert!(!text.contains(&f.admin));
+            assert!(!text.contains(&f.read));
+            if expected == StatusCode::OK {
+                assert!(text.contains("chronograph_graph_nodes 1\n"));
+                assert!(text.contains("chronograph_fsync_required 1\n"));
+            }
+        }
+        let mut lock = f.state.graph.write().unwrap();
+        lock.sync().unwrap();
+        assert_eq!(
+            readiness(&f.state).unwrap_err().0,
+            StatusCode::SERVICE_UNAVAILABLE
+        );
+        drop(lock);
+        assert!(readiness(&f.state).is_ok());
     }
     #[tokio::test]
     async fn schema_scope_settings_structured_writes_and_concurrent_apply() {

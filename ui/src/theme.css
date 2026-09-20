@@ -1706,3 +1706,50 @@ html {
     margin-left: 0;
   }
 }
+
+/* Documentation keeps deployment selection shareable in the URL. */
+.docs-edition-switch {
+  display: grid;
+  gap: 6px;
+  margin: 16px 0 10px;
+}
+.docs-edition-switch a {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  text-decoration: none;
+}
+.docs-edition-switch a[aria-current="true"] {
+  background: #183d30;
+  color: #f5f8ed;
+  border-color: #183d30;
+}
+.docs-edition-note {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #52655c;
+  margin: 0 0 18px;
+}
+.docs-context {
+  display: grid;
+  gap: 7px;
+  padding: 18px 20px;
+  margin: 0 0 28px;
+  border: 1px solid #c7d7cc;
+  border-left: 3px solid #285e45;
+  border-radius: 6px;
+  background: #f1f6ed;
+  font-size: 13px;
+}
+.docs-context span {
+  line-height: 1.6;
+}
+@media (max-width: 900px) {
+  .docs-edition-switch {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .docs-edition-note {
+    margin-bottom: 12px;
+  }
+}

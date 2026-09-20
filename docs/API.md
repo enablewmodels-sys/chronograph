@@ -1,10 +1,16 @@
-# HTTP API — Community 0.4 alpha
+# HTTP API — Managed and Community 0.4 alpha
 
 Use the [language SDKs](SDK.md) for authenticated clients and [platform recipes](INTEGRATIONS.md) for BCI, robotics, world-model and quantum producers. The [generated OpenAPI 3.1 contract](https://github.com/enablewmodels-sys/chronograph/blob/main/sdk/schema/openapi.json) shares request definitions with MCP.
 
-The service and built UI share one origin. Default: `http://127.0.0.1:8080`.
+For Managed, prefix the paths below with `/p/PROJECT_ID` and use a project API
+key. Existing SDKs use the host origin and route by key. Account login and vault
+APIs are separate Managed interfaces; see [Managed connections](HOSTED.md).
+For self-hosting, use [isolated Community](ISOLATED.md).
+
+The Community service and built UI share one origin. Default: `http://127.0.0.1:8080`.
 All `/v1` and `/mcp` requests require `Authorization: Bearer <token>`.
-There are no browser sessions, cookies, CSRF tokens or login/password endpoints.
+The Community engine has no browser account sessions or login/password endpoints.
+Managed console sessions use secure cookies at its account gateway.
 The console retains its bearer token only in memory and disconnects on reload.
 
 Host must match `CHRONOGRAPH_ORIGIN`; any supplied Origin must also match exactly.
@@ -33,7 +39,8 @@ defaulting to zero. Open end is `"9223372036854775807"`.
 | Method / path | JSON input | Result |
 |---|---|---|
 | GET `/v1/info` | — | Version, edition, current scope, limits, MCP URL |
-| GET or POST `/v1/stats` | `{}` for POST | Counts, log bytes, revision, default durability |
+| GET or POST `/v1/stats` | `{}` for POST | Counts, log bytes, revision, effective durability, `require_fsync`, `writer_healthy` |
+| GET `/v1/metrics` | — | Authenticated Prometheus text; see [monitoring](PRODUCTION.md) |
 | POST `/v1/edges` | `{"edges":[{"src":"1","dst":"2","kind":1,"valid_from":"1000000"}],"durability":"fsync"}` | Input-order IDs, revision, durability |
 | POST `/v1/nodes` | `{"id":"1","durability":"fsync"}` | Register an isolated identity; repeated registration is a no-op |
 | POST `/v1/invalidate` | `{"id":"0","t":"2000000","durability":"fsync"}` | Shorten a stored version without deleting history |
@@ -58,7 +65,8 @@ Compatibility names within `/v1`: `add_edges`/`ingest_edges` → `edges`,
 `add_node` → `nodes`, `invalidate_edge` → `invalidate`, `sample_neighbors` →
 `sample`. `/v1/query` also accepts `mode: as_of|between|history|neighbors|sample`;
 its legacy single-node sample form uses `node`, `k`, `strategy`, `seed` and `limit`.
-Old `/api/*` cookie/password endpoints return 404.
+Old Community `/api/*` cookie/password endpoints return 404. Managed provides its
+separate account routes under `/api/auth`; do not send graph API keys to them.
 
 ## Branches and bounded intervals
 
@@ -79,7 +87,9 @@ restart from page one. Cursors are not authorization credentials. Pagination is
 revision checked, not a retained transaction across HTTP calls. Queries default
 to the schema setting (initially 100); as-of t defaults to `"0"`. Between requires `start < end`.
 
-Mutations use the schema durability setting, initially **buffered**. Set `"durability":"fsync"` for acknowledgement
+With `CHRONOGRAPH_REQUIRE_FSYNC=true`, all service writes require fsync; explicit
+buffered writes and settings downgrades return 400. Managed and the Compose recipe
+enable this floor. Otherwise mutations use the schema setting, initially **buffered**. Set `"durability":"fsync"` for acknowledgement
 after disk synchronization. Responses label the actual policy and revision.
 `sync` and `backup` always synchronize. The console explicitly sends fsync for
 writes. Buffered acknowledgements can be lost before a sync. A timeout or I/O
@@ -109,7 +119,7 @@ Application errors use `{"error":{"code":"CONFLICT","message":"…"}}`.
 409 stale cursor or conflict, 413 body too large, 429 rate limited, 503 unavailable,
 500 internal failure. 429 and 503 include `Retry-After: 60`. Unsupported methods
 can return the router's 405 response. Health endpoints are public but validate Host:
-`/healthz` checks liveness; `/readyz` attempts the graph read lock and can return 503
+`/healthz` checks liveness; `/readyz` checks writer health and the graph read lock, and can return 503
 while writes are active. Neither checks free space or full journal integrity.
 
 ## Schema management
