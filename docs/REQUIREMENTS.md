@@ -15,10 +15,11 @@ The table below describes the current **alpha.3 development checkout**. Its mult
 | Community service | Scoped expiring tokens, bounded API, HTTP MCP, native stdio bridge, local backups | One workspace per process; public TLS and official MCP client verified on the pilot; interactive agent-app checks remain separate |
 | Schema and connectors | Visual designer, checksum migrations, 36 presets, 18 connector descriptors, typed assets, durable ingestion/checkpoint transactions | See connector-specific limits; descriptors do not imply every native format is decoded |
 | Language SDKs and agent | Python, TypeScript/JavaScript, Java, C++, Go, Dart, C# transports; Q# Python host; durable Python spool and optional adapters | Source packages; physical hardware/QPUs and Windows remain unverified. See [SDK coverage](SDK.md) |
+| Operational checks | Authenticated Prometheus metrics, writer readiness, enforced fsync option, read-only deployment probe | Host capacity, restore drills and off-host backup remain operator duties; see [production operations](PRODUCTION.md) |
 | Browser console | Temporal queries, branches, schemas, connectors, access and operations; desktop/mobile tests | Public static demo is synthetic and read only |
 | Packaging | Source, Apple Silicon native bundle, Python wheel, checksums, license and third-party inventory | Unsigned/not notarized; inspect CI before assuming Linux/container support |
 | Public website | Static landing, full docs and synthetic demo; Vercel configuration | Owner imports and deploys repository in Vercel |
-| Managed preview | Public TLS, GitHub/invited email accounts, MFA, project databases and roles, API/MCP routing, encrypted secrets, fsync defaults and scheduled local backups | Shared-host process isolation; email delivery, billing, automated off-host recovery, HA and SLA absent; see [hosted limits](HOSTED.md) |
+| Managed preview | Public TLS, GitHub/invited email accounts, MFA, project databases and roles, API/MCP routing, encrypted secrets, enforced fsync, protected metrics, graceful shutdown and scheduled local backups | Shared-host process isolation; email delivery, billing, automated off-host recovery, HA and SLA absent; see [hosted limits](HOSTED.md) |
 
 ## Evidence and compatibility
 

@@ -2,6 +2,10 @@
 
 Get the [Community source](https://github.com/enablewmodels-sys/chronograph) or [versioned alpha downloads](https://github.com/enablewmodels-sys/chronograph/releases/tag/v0.4.0-alpha.2). Check the assets list for available targets. Registry packages are not published. Read [licensing](LICENSING.md) before redistributing or offering a service.
 
+Using the hosted service? Follow [Managed setup](HOSTED.md); no server installation
+is required. For your own infrastructure, follow [isolated Community](ISOLATED.md)
+and [production operations](PRODUCTION.md). The commands below install Community.
+
 ## Build from source
 
 Install Rust 1.93 or later and Node 20.19 or later. From the workspace root:

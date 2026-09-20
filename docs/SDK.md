@@ -4,6 +4,19 @@ The Community repository contains Python, TypeScript/JavaScript, Java, C++, Go, 
 
 These are **alpha.3 source packages on `main`**, not packages published to npm, PyPI, Maven Central, NuGet or pub.dev. The alpha.2 release downloads predate the new clients and five new connector descriptors. Build the current checkout for the complete catalog. Existing `/v1` operations remain compatible with alpha.2.
 
+## Managed and isolated connections
+
+These clients work with both [Managed](HOSTED.md) and [isolated Community](ISOLATED.md).
+Use the Managed HTTPS **origin** as the SDK base URL and a scoped project key; the
+gateway routes requests to that key’s project. For Community, use your server
+origin and a workspace key. Local development may use loopback HTTP. SDKs do not
+log in with GitHub or an email password, and graph keys cannot read Managed vault
+secrets. Keep SDK credentials in trusted backend processes or private agent
+environments, never public browser/mobile bundles.
+
+Managed enforces fsync, so do not pass `durability: "buffered"`. The request and
+response formats below are shared; see [production operations](PRODUCTION.md).
+
 ## Choose a client
 
 | Language | Requirements and source directory | Included facilities |

@@ -154,3 +154,36 @@ the three-archive limit, plus tests for failed-capture rollback and interrupted
 rotation recovery. After the final release restart, data, checkpoints, token
 revocation and fsync defaults persisted; a newly rotated archive was downloaded
 off-host and restored successfully into a separate workspace.
+
+
+## Dual deployment documentation and operational hardening — September 20, 2026
+
+Managed and isolated Community now have separate quickstarts and an edition
+selector across 31 documentation chapters. Desktop and mobile browser checks
+verified edition switching, shared-page navigation, reloads, direct links and
+page width on the live site. The expanded Community suite exercised each scenario
+twice; one SSH-tunneled documentation fetch exceeded five seconds, then passed on
+its repeated run and two focused reruns with a 15-second network allowance.
+
+Core tests passed (30 tests plus two doctests; one subprocess-only fixture remains
+intentionally ignored). All 22 server tests and strict core/server Clippy passed.
+REST/MCP, schema, all 36 connector presets, process-kill recovery and independent
+backup restoration passed against the candidate native engine. Eight private
+Managed suites cover identity, MFA, vault separation, real project databases,
+fsync enforcement, routed metrics, shutdown draining and failed-project recovery.
+Four probe tests cover insecure credential files, redirects, stale backups and
+unhealthy/non-durable responses. These are implementation checks, not certification.
+
+Live checks confirmed authenticated metrics, anonymous rejection, writer health
+and enforced fsync. The existing graph retained its 33 versions and revision 33.
+A new graph archive restored independently with those counts, and the encrypted
+account snapshot passed authentication and SQLite integrity checks. A five-minute
+host-local monitor checks authentication, durability, disk space and completed
+backup freshness; it has no external alert destination. Encrypted recovery material
+was copied outside the instance manually.
+
+Thirty serial as-of queries over warm public HTTPS measured p50 **176.36 ms**,
+p95 **209.06 ms**, maximum **221.96 ms** from the operator laptop. This is a tiny
+33-version fixture and includes network latency; it establishes neither throughput,
+production sizing nor an SLA. Automated off-host recovery, external alerts and
+email delivery remain unconfigured; see [production boundaries](PRODUCTION.md).

@@ -97,19 +97,23 @@ Preview and apply both inspect affected main and active-branch histories when co
 
 ## Database settings
 
-The **Settings** form generates `set_settings` migrations:
+The **Settings** form generates `set_settings` migrations. These apply to the
+selected Managed project or the connected isolated Community workspace. Managed
+and servers with `CHRONOGRAPH_REQUIRE_FSYNC=true` reject migrations that select
+buffered durability. The operator floor takes precedence over catalog/request
+options; the effective policy appears in Operations and `/v1/info`.
 
 | Setting | Default | Effect |
 | --- | --- | --- |
 | `name` | `My graph` | Workspace name, 1–80 bytes, exposed in catalog and `/v1/info`. |
 | `description` | empty | Workspace description, up to 2000 bytes. |
-| `default_durability` | `buffered` | `buffered` or `fsync` for service graph writes that omit durability. Explicit request options take precedence. Console writes explicitly choose fsync. |
+| `default_durability` | `buffered` | `buffered` or `fsync` for service graph writes that omit durability. Explicit request options take precedence unless the operator enforces fsync. Console writes explicitly choose fsync. |
 | `default_query_limit` | `100` | Default page size, 1–1000, for query/as_of/between/history/neighbors. Explicit limits take precedence. Sampling keeps its own bounds. |
 | `strict_relations` | `false` | Require defined kinds for service edge ingestion and merges. Enabling requires every kind in main and active branches to be defined. |
 
 Known property layouts are validated for service writes even when `strict_relations` is false. Strict mode additionally rejects undefined kinds. These checks belong to HTTP/MCP; direct embedded Rust writers and offline connectors bypass them. They must produce compatible bytes. Server file ownership prevents a second engine writer from concurrently opening the same running workspace, but offline embedded changes are possible.
 
-Host binding, TLS, origin, storage locations, worker limits and token administration are not migration settings. See [deployment](DEPLOYMENT.md), [security](SECURITY.md) and Agent access for those controls.
+Host binding, TLS, origin, storage locations, worker limits and token administration are not migration settings. See [deployment](DEPLOYMENT.md), [security](SECURITY.md) and Connections & API keys for those controls.
 
 ## HTTP and MCP
 

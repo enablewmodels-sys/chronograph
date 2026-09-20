@@ -2,7 +2,14 @@
 
 Chronograph exposes the tools below over authenticated MCP Streamable HTTP at `/mcp`. The official Rust SDK (`rmcp` 3.2.0) handles protocol negotiation and transport. A native Rust binary exposes the same tools over stdio through the official SDK. Start the service before connecting a client.
 
-Create a token in **Agent access**. Choose read-only for exploration and ingest only for agents that should mutate this workspace. Tokens expire after your selected duration and can be revoked immediately. Store the token in a client environment or secret manager; never commit it to a repository. There is no OAuth authorization server in this MVP. There are no browser login cookies.
+For [Managed](HOSTED.md), use the project endpoint shown in **Connections & API keys**:
+`https://YOUR_HOST/p/PROJECT_ID/mcp`. For [isolated Community](ISOLATED.md), use
+your server origin followed by `/mcp`. The examples below use a local Community
+server; replace the URL with the exact endpoint for your deployment.
+
+Create a token in **Connections & API keys**. Choose read-only for exploration and ingest only for agents that should mutate this workspace. Tokens expire after your selected duration and can be revoked immediately. Store the token in a client environment or secret manager; never commit it to a repository. MCP requires a scoped API key; Managed GitHub account login is separate. Managed
+console cookies do not authenticate agent clients, and the engine does not provide
+an MCP OAuth authorization server.
 
 ## Codex
 
@@ -97,7 +104,9 @@ starts the native bridge; new installations should use the binary directly.
 
 Graph read/write tools accept optional `fork` to select a branch. Edge IDs are local to that selection. Input edges accept optional `valid_to` for atomic bounded intervals. A merge returns node/edge remappings without rewriting opaque payloads; preview first and inspect conflicts. See [durable branches](BRANCHES.md).
 
-Writes default to buffered. Set `durability: "fsync"` on ingestion/invalidation
+Writes use the effective deployment policy. Managed and the production Compose
+recipe enforce fsync; buffered requests are rejected. Other Community deployments
+use the catalog default, initially buffered. Set `durability: "fsync"` on writes
 or call `sync`; read the returned acknowledgement policy. The console selects
 fsync explicitly. A stale pagination cursor returns a conflict, including when
 the graph changes between MCP calls.
