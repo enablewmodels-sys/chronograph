@@ -15,7 +15,9 @@ import { StreamableHTTPClientTransport } from "../ui/node_modules/@modelcontextp
 
 let server = await startServer({ port: 18087 }),
   restored,
-  mcp;
+  mcp,
+  tensorBatch,
+  decisionBatch;
 const checks = [],
   receipts = [],
   batches = [];
@@ -151,6 +153,8 @@ try {
         sequence: "0",
         records: [record],
       };
+      if (d.id === "jepa" && preset === "i-jepa") tensorBatch = batch;
+      if (d.id === "jev" && preset === "decisions-v1") decisionBatch = batch;
       assert.equal(
         (await reader.request("/v1/connector_ingest", batch)).status,
         403,
@@ -207,10 +211,12 @@ try {
   pass(
     `${receipts.length} registry presets: migration → ingest → exact source export → retry/conflict`,
   );
+  assert.ok(tensorBatch, "The JEPA fixture must exercise required tensor assets");
+  assert.ok(decisionBatch, "The Jev fixture must exercise decision validation");
   const invalid = {
-    ...batches[0],
+    ...tensorBatch,
     sequence: "1",
-    records: [{ ...batches[0].records[0], assets: {} }],
+    records: [{ ...tensorBatch.records[0], assets: {} }],
   };
   assert.equal(
     (await api.request("/v1/connector_ingest", invalid)).status,
@@ -219,23 +225,41 @@ try {
   assert.equal(
     (
       await api.json("/v1/connector_checkpoint", {
-        instance: batches[0].instance,
+        instance: tensorBatch.instance,
         partition: "fixture",
       })
     ).checkpoint.sequence,
     "0",
   );
   const unknownAsset = {
-    ...batches[0],
+    ...tensorBatch,
     sequence: "1",
     records: [
-      { ...batches[0].records[0], assets: { latent: "00".repeat(16) } },
+      { ...tensorBatch.records[0], assets: { latent: "00".repeat(16) } },
     ],
   };
   assert.equal(
     (await api.request("/v1/connector_ingest", unknownAsset)).status,
     400,
   );
+  const invalidDecision = structuredClone(decisionBatch);
+  invalidDecision.sequence = "1";
+  invalidDecision.records[0].fields.answers.review.noul = 1.5;
+  assert.equal(
+    (await api.request("/v1/connector_ingest", invalidDecision)).status,
+    400,
+  );
+  for (const batch of [tensorBatch, decisionBatch]) {
+    assert.equal(
+      (
+        await api.json("/v1/connector_checkpoint", {
+          instance: batch.instance,
+          partition: batch.partition,
+        })
+      ).checkpoint.sequence,
+      "0",
+    );
+  }
   pass("invalid records and missing assets cannot advance checkpoints");
   mcp = new Client({ name: "connector-test", version: "1" });
   await mcp.connect(
