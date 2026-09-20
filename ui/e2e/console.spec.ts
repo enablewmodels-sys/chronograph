@@ -90,7 +90,15 @@ test("connect, explore, write, manage tokens, backup and disconnect", async ({
     .filter({ hasText: "browser read token" });
   await expect(tokenRow).toHaveCount(1);
   page.once("dialog", (dialog) => dialog.accept());
+  const revokeRequest = page.waitForRequest(
+    (r) => r.method() === "DELETE" && r.url().includes("/v1/tokens/"),
+  );
   await tokenRow.getByRole("button", { name: "Revoke" }).click();
+  // Managed cookie-authenticated mutations require this CSRF boundary header,
+  // including DELETE requests without a JSON body.
+  expect((await revokeRequest).headers()["content-type"]).toBe(
+    "application/json",
+  );
   await expect(tokenRow).toHaveCount(0);
   await page.getByRole("link", { name: "Operations", exact: true }).click();
   await page

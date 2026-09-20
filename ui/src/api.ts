@@ -86,7 +86,9 @@ export async function request(
     method,
     credentials: managedSite ? "same-origin" : "omit",
     headers: {
-      ...(data !== undefined ? { "Content-Type": "application/json" } : {}),
+      ...(!["GET", "HEAD"].includes(method)
+        ? { "Content-Type": "application/json" }
+        : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(managedSite ? projectHeaders() : {}),
     },

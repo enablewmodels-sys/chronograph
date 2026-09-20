@@ -99,6 +99,22 @@ REST operations and request schemas are in [API](API.md) and
 decimal strings. Public REST and MCP operation shapes match the Community engine;
 Managed adds identity, project routing and project administration.
 
+## Request limits and retries
+
+The gateway accepts 32 simultaneous requests, counting uploads and streaming
+responses. Bodies are limited to 16 KiB for authentication, 512 KiB for account
+operations, and 4 MiB for graph/MCP requests. The native operation limits still
+apply. API and account routes share a 180-request/minute client-IP budget;
+clients behind one NAT share that budget. Each project also allows 600 validated
+API requests/minute. Secret-reader keys allow 60 reads/minute. Invalid graph keys
+are checked before charging the project budget or recording project API events.
+
+Respect `Retry-After` on 429 and 503 responses; use capped exponential backoff with
+jitter. Do not automatically retry an ambiguous write unless the operation is
+idempotent. Connector ingestion receipts and migration IDs/checksums support safe
+retries; node/edge/fork creation has different semantics. Keep a separate read key
+for monitoring. An API key's expiry and revocation are checked on every request.
+
 ## MCP for AI agents
 
 Copy the exact `/p/PROJECT_ID/mcp` endpoint from **Connections & API keys**. The

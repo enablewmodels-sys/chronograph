@@ -302,7 +302,7 @@ export default function ManagedLogin({
               private invitation from your administrator. Automated email
               recovery will be available when email delivery is connected.
             </p>
-            <Link to="/documentation/HOSTED#account-recovery">
+            <Link to="/documentation/HOSTED#accounts-and-project-permissions">
               Account recovery options
             </Link>
           </details>

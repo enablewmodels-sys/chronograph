@@ -46,7 +46,8 @@ hashes cannot be converted into new secrets. Rotate into a separate v2 auth stor
 Exact Host and optional Origin checks apply to every request, including health.
 Forwarded host headers are ignored. Remote configured origins require HTTPS.
 The native bridge also rejects remote plaintext and redirects. The documented
-Caddy deployment terminates TLS; its deployed behavior is still PENDING.
+Caddy deployment terminates TLS. The hosted deployment has been checked over
+public HTTPS; an isolated operator must verify their own proxy and firewall.
 
 Headers include restrictive CSP, no-store, nosniff, DENY framing, no-referrer,
 disabled camera/microphone/geolocation, and HSTS for HTTPS origins. UI Markdown
@@ -54,8 +55,9 @@ never enables raw HTML. Input/output limits and the 8-worker/32-waiter admission
 queue bound service work. HTTP request bodies are limited while streaming.
 
 Logs omit bearer values and request bodies. Internal errors can contain local
-paths. The journal records mutations, not authenticated actor identities; there
-is no actor audit trail yet. Do not enable credential logging at the proxy.
+paths. The journal records mutations, not authenticated actor identities; Community has no authenticated
+actor audit trail. Managed adds project API and administrative audit events in
+its separate control plane. Do not enable credential logging at the proxy.
 
 ## Files, backup and recovery
 

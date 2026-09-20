@@ -1,6 +1,6 @@
 # Verification
 
-Current release checks are under `bench/reports/v0.4.0-alpha.2/`. Connector implementation evidence is retained under `bench/reports/v0.4.0-alpha.1/`; earlier engine and domain-adapter measurements are under `bench/reports/v0.3.0/`. Historical measurements do not establish new-version latency. The [release status](REQUIREMENTS.md) tracks remaining limits.
+Current release checks are under `bench/reports/v0.4.0-alpha.3/` and the artifacts of the [Verify workflow](https://github.com/enablewmodels-sys/chronograph/actions/workflows/ci.yml). Older alpha.2 checks are historical. Connector implementation evidence is retained under `bench/reports/v0.4.0-alpha.1/`; earlier engine and domain-adapter measurements are under `bench/reports/v0.3.0/`. Historical measurements do not establish new-version latency. The [release status](REQUIREMENTS.md) tracks remaining limits.
 
 ## Reproduce
 
@@ -81,7 +81,7 @@ and missed performance targets are documented in [benchmark results](BENCHMARKS.
 `CHRONOGRAPH_REPORT_PHASE=phase-5 node scripts/protocol-test.mjs` exercises branch permissions, exact IDs, bounded validity, scoped cursors, merge previews/remappings/retries/conflicts, native MCP calls, downloaded backup restoration, and SIGKILL/restart of parent plus branch state. Reports are phase-specific so the earlier checkpoint evidence remains unchanged. Those semantics are now also exercised by the final repeated browser journeys.
 
 
-## Final Community gates
+## Historical v0.3.0 Community gates
 
 - Whole workspace: 51 passing tests, zero failures; one subprocess helper is ignored
   directly and invoked by its parent crash test. Build, Clippy with denied warnings,
