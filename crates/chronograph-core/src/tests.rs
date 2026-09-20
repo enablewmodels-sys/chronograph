@@ -914,6 +914,33 @@ fn every_truncated_branch_operation_recovers_atomically() {
 }
 
 #[test]
+fn journal_drop_releases_lock_even_with_an_inherited_handle() {
+    for failed in [false, true] {
+        let f = TestFile::new();
+        let mut graph = Graph::open(&f.0).unwrap();
+        add(&mut graph, input(1, 2, 0));
+        graph.sync().unwrap();
+        // A concurrent process spawn temporarily inherits the same open file
+        // description until exec closes its CLOEXEC descriptors. A duplicate
+        // reproduces that lifetime deterministically without scheduling a fork.
+        let inherited = graph.journal.duplicate_file_for_test();
+        if failed {
+            graph.journal.fault_after = Some(1);
+            assert!(graph.add_edges(&[input(1, 2, 100)]).is_err());
+        }
+        drop(graph);
+        let reopened = Graph::open(&f.0).expect("the journal owner released its lock");
+        assert_eq!(reopened.history().len(), 1);
+        assert!(matches!(Graph::open(&f.0), Err(Error::Locked)));
+        drop(inherited);
+        // Closing the old duplicate must not release the new owner's lock.
+        assert!(matches!(Graph::open(&f.0), Err(Error::Locked)));
+        reopened.close().unwrap();
+        assert_eq!(Graph::open(&f.0).unwrap().history().len(), 1);
+    }
+}
+
+#[test]
 fn failed_merge_sync_has_atomic_recoverable_result() {
     let f = TestFile::new();
     let mut g = Graph::open_with_options(

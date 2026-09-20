@@ -1,6 +1,7 @@
 use std::{
     fs::{File, OpenOptions as FileOptions, TryLockError},
-    io::{BufWriter, Write},
+    io::{self, BufWriter, IoSlice, Write},
+    ops::Deref,
     path::Path,
 };
 
@@ -50,7 +51,7 @@ pub(crate) enum Record {
 }
 
 pub(crate) struct Journal {
-    writer: BufWriter<File>,
+    writer: BufWriter<LockedFile>,
     scratch: Vec<u8>,
     options: OpenOptions,
     pub offset: u64,
@@ -69,9 +70,43 @@ pub(crate) fn corrupt(offset: u64, reason: impl Into<String>) -> Error {
     }
 }
 
-fn lock(file: &File) -> Result<()> {
+// An OS process spawn can briefly retain a duplicate of a journal descriptor.
+// Explicitly release ownership after BufWriter has finished flushing/dropping,
+// instead of waiting for every inherited descriptor to close. Putting this guard
+// inside BufWriter prevents any buffered writes from happening after unlock.
+struct LockedFile(File);
+
+impl Deref for LockedFile {
+    type Target = File;
+    fn deref(&self) -> &File {
+        &self.0
+    }
+}
+
+impl Write for LockedFile {
+    fn write(&mut self, bytes: &[u8]) -> io::Result<usize> {
+        self.0.write(bytes)
+    }
+    fn write_all(&mut self, bytes: &[u8]) -> io::Result<()> {
+        self.0.write_all(bytes)
+    }
+    fn write_vectored(&mut self, buffers: &[IoSlice<'_>]) -> io::Result<usize> {
+        self.0.write_vectored(buffers)
+    }
+    fn flush(&mut self) -> io::Result<()> {
+        self.0.flush()
+    }
+}
+
+impl Drop for LockedFile {
+    fn drop(&mut self) {
+        let _ = self.0.unlock();
+    }
+}
+
+fn lock(file: File) -> Result<LockedFile> {
     match file.try_lock() {
-        Ok(()) => Ok(()),
+        Ok(()) => Ok(LockedFile(file)),
         Err(TryLockError::WouldBlock) => Err(Error::Locked),
         Err(TryLockError::Error(error)) => Err(error.into()),
     }
@@ -149,17 +184,23 @@ fn replay_bytes(
 }
 
 impl Journal {
+    #[cfg(test)]
+    pub fn duplicate_file_for_test(&self) -> File {
+        self.writer.get_ref().try_clone().unwrap()
+    }
+
     pub fn open(
         path: &Path,
         options: OpenOptions,
         replay: impl FnMut(Record, u64) -> Result<()>,
     ) -> Result<Self> {
-        let mut file = FileOptions::new()
-            .read(true)
-            .append(true)
-            .create(true)
-            .open(path)?;
-        lock(&file)?;
+        let mut file = lock(
+            FileOptions::new()
+                .read(true)
+                .append(true)
+                .create(true)
+                .open(path)?,
+        )?;
         let original_len = file.metadata()?.len();
         let mut valid_len = HEADER_LEN as u64;
         let mut recovered_tail_bytes = 0;
@@ -167,7 +208,7 @@ impl Journal {
             // SAFETY: this handle owns the advisory lock for the complete mapping lifetime.
             // We never write or truncate while mapped, expose no mapped references, and
             // require callers not to modify this file outside the locking protocol.
-            let mmap = unsafe { memmap2::MmapOptions::new().map(&file)? };
+            let mmap = unsafe { memmap2::MmapOptions::new().map(&*file)? };
             valid_len = replay_bytes(&mmap, FORMAT_VERSION, true, replay)? as u64;
             drop(mmap);
             if valid_len < original_len {
@@ -277,20 +318,20 @@ pub(crate) fn migrate_v2(source: &Path, destination: &Path) -> Result<GraphStats
 }
 
 fn migrate(source: &Path, destination: &Path, version: u32) -> Result<GraphStats> {
-    let input = File::open(source)?;
-    lock(&input)?;
+    let input = lock(File::open(source)?)?;
     if input.metadata()?.len() < HEADER_LEN as u64 {
         return Err(corrupt(0, "incomplete migration source"));
     }
     // SAFETY: the source remains exclusively locked and read-only until the mapping
     // is dropped. Destination writes use a distinct, newly created file.
-    let map = unsafe { memmap2::MmapOptions::new().map(&input)? };
-    let out = FileOptions::new()
-        .write(true)
-        .read(true)
-        .create_new(true)
-        .open(destination)?;
-    lock(&out)?;
+    let map = unsafe { memmap2::MmapOptions::new().map(&*input)? };
+    let out = lock(
+        FileOptions::new()
+            .write(true)
+            .read(true)
+            .create_new(true)
+            .open(destination)?,
+    )?;
     let mut writer = BufWriter::new(out);
     let result = (|| {
         writer.write_all(&header(FORMAT_VERSION))?;
