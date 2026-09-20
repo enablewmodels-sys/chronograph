@@ -18,7 +18,7 @@ The table below describes the current **alpha.3 development checkout**. Its mult
 | Browser console | Temporal queries, branches, schemas, connectors, access and operations; desktop/mobile tests | Public static demo is synthetic and read only |
 | Packaging | Source, Apple Silicon native bundle, Python wheel, checksums, license and third-party inventory | Unsigned/not notarized; inspect CI before assuming Linux/container support |
 | Public website | Static landing, full docs and synthetic demo; Vercel configuration | Owner imports and deploys repository in Vercel |
-| Managed alpha | One hosted workspace, public TLS, restricted systemd service, fsync defaults, scheduled local archives and verified independent restore | Self-service accounts, teams, billing, automatic off-host recovery, multi-tenancy and SLA not delivered; see [hosted limits](HOSTED.md) |
+| Managed preview | Public TLS, GitHub/invited email accounts, MFA, project databases and roles, API/MCP routing, encrypted secrets, fsync defaults and scheduled local backups | Shared-host process isolation; email delivery, billing, automated off-host recovery, HA and SLA absent; see [hosted limits](HOSTED.md) |
 
 ## Evidence and compatibility
 

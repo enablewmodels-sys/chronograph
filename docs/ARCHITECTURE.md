@@ -1,6 +1,6 @@
 # Architecture
 
-Chronograph Community is an embedded temporal graph engine with an optional authenticated service, dark browser console and native MCP bridge. The engine has no networking or authentication dependency. Managed is a planned separate system, still behind the agreed review gate.
+Chronograph Community is an embedded temporal graph engine with an optional authenticated service, browser console and native MCP bridge. The engine has no networking or authentication dependency. Managed wraps the same engine in a separate private identity and project control plane. The first diagram describes Community; the deployed Managed boundary is below.
 
 ![Chronograph Community architecture](architecture.svg)
 
@@ -56,7 +56,7 @@ A fork captures only versions active at its creation time, with their ends froze
 
 Parent revision and global operation revision are separate. A merge requires an unchanged parent revision and rejects touched relationships with pre-existing future observations/finite expirations. Preview validates without mutation; actual merge validates again, writes one atomic prepared record, returns new ID mappings and closes the fork. Payloads and sidecars are never rewritten by the engine. Closed metadata and merge results survive restart, and discarded deltas are never merged. [Branch contract](BRANCHES.md).
 
-## Service and authentication
+## Community service and authentication
 
 Axum serves built UI assets, docs, `/v1` and `/mcp` on one origin. Middleware checks exact Host and any supplied Origin, bounded bodies, a current bearer credential and its workspace-wide read/ingest/admin scope. Remote origins require HTTPS at the reverse proxy. No cookie/session/password/CSRF flow is present. Forwarded Host is not trusted, and the strict CSP allows same-origin assets without inline scripts.
 
@@ -80,7 +80,7 @@ Structured rows are immutable Arrow sidecars with content addresses and full che
 
 ## Console and backup
 
-React/Vite produce static assets with self-hosted typography and locally generated hero artwork. The light landing page labels benchmark checkpoints and planned Managed capabilities. The dark console selects a parent or branch, inspects a native SVG graph and exact table values, manages credentials and local backups, and links to supported connector workflows. A graph preview displays at most 40 nodes/80 edges from a bounded result page. Synthetic preview is separately labeled, read only and makes no graph API calls.
+React/Vite produce static assets with self-hosted typography and locally generated hero artwork. Build configuration selects the Community or Managed landing and console. The console selects a parent or branch, inspects a native SVG graph and exact table values, manages credentials and local backups, and links to supported connector workflows. Managed adds accounts, projects, teams and a secret vault. A graph preview displays at most 40 nodes/80 edges from a bounded result page. Synthetic preview is separately labeled, read only and makes no graph API calls.
 
 A backup holds the graph write lock, synchronizes the journal and captures its journal, disposable parent index snapshot and regular connector sidecars in a checksummed archive. Credentials are excluded. Restore uses a new staging directory, rejects unsafe entries/checksum/size/replay mismatches, and publishes only into an absent or empty destination. Branch journal records restore active deltas and closed lifecycle results. Local recovery tests do not prove Managed off-host restoration.
 
@@ -88,4 +88,41 @@ A backup holds the graph write lock, synchronizes the journal and captures its j
 
 One Community service owns one local journal and its volume. The intended container deployment runs as a non-root user with separate persistent graph and credential volumes, behind Caddy with only proxy ports exposed. The final release report records whether container and TLS tests actually ran. Horizontal replicas opening the same journal, shared-engine multi-tenancy and rolling multiwriter upgrades are unsupported.
 
-Managed planning calls for a separate private control plane, GitHub accounts/teams, isolated workspace containers/volumes, S3-compatible scheduled backups and Stripe sandbox billing. None of that control-plane or billing code has been implemented before the review gate. [Edition plan](EDITIONS.md).
+## Deployed Managed preview
+
+```mermaid
+flowchart TB
+  HUMAN[Browser: GitHub or invited email + MFA] -->|HTTPS and secure session cookie| TLS[Caddy TLS proxy]
+  APP[Backend / SDK / AI agent] -->|HTTPS and scoped API key| TLS
+  READER[Trusted secret consumer] -->|Separate secret-reader key| TLS
+  TLS --> GATE[Private Node control plane: origin, session, role and rate checks]
+  GATE --> ID[(SQLite: users, MFA, sessions, projects, memberships and key routes)]
+  GATE --> VAULT[(Encrypted project secrets and HMAC audit chain)]
+  GATE -->|Current human role becomes a private bridge credential| ROUTE[Project router]
+  GATE -->|Machine credential checked by selected engine| ROUTE
+  ROUTE --> PRIMARY[Primary Rust engine: loopback 8080]
+  ROUTE --> PROJECT[Per-project Rust engines: loopback 18100+]
+  PRIMARY --> OLD[(Existing journal, catalog, assets and auth)]
+  PROJECT --> NEW[(Separate journal, catalog, assets and auth per project)]
+  OLD --> BACKUP[Six-hour graph snapshots]
+  NEW --> BACKUP
+  ID --> SNAP[Encrypted identity and configuration snapshots]
+  VAULT --> SNAP
+  BACKUP --> LOCAL[(Local backup storage)]
+  SNAP --> LOCAL
+  LOCAL -->|Operator-created encrypted recovery bundle| OFFHOST[Off-host operator copy]
+```
+
+Browser sessions require MFA and current project membership. Machine API keys and
+MCP requests bypass browser sessions and retain native read/ingest/admin scopes.
+Secret-reader credentials are separate from graph keys and cannot access MCP.
+New projects start with fsync durability. Schema changes retain the engine's
+preview/checksum/revision checks and survive process restart.
+
+Each project has a separate Rust process and data directory, but newly provisioned
+engines share one Unix service identity and host. This is application/process
+isolation, not dedicated tenant containers or VMs. Secrets are encrypted; graph
+journals are not application-encrypted. Identity and graph snapshots are not one
+cross-database transaction. Automated off-host backup, replication, billing and
+an uptime SLA are absent. See [Managed operations and limits](HOSTED.md) and
+[edition boundaries](EDITIONS.md).

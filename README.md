@@ -13,7 +13,9 @@ This checkout is a **Community alpha**, **source-available under PolyForm Perime
 Modification and noncompeting commercial use are allowed; offering a competing product is restricted, including free competing products. See [licensing](docs/LICENSING.md).
 
 [Source repository](https://github.com/enablewmodels-sys/chronograph) · [Download the alpha](https://github.com/enablewmodels-sys/chronograph/releases/tag/v0.4.0-alpha.2).
-An invitation-only [hosted alpha](docs/HOSTED.md) is available with operator-issued tokens. Self-service accounts and billing are not implemented. See [release status](docs/REQUIREMENTS.md),
+[Managed hosting](docs/HOSTED.md) is available as a launch preview with GitHub signup,
+invited email accounts, MFA, private project databases, scoped API keys and an
+encrypted secret vault. Billing and automated email delivery are not configured. See [release status](docs/REQUIREMENTS.md),
 [known limits](docs/LIMITATIONS.md) and [edition boundaries](docs/EDITIONS.md).
 
 To host the Community landing, documentation and read-only demo on Vercel, import this repository with its root directory unchanged. [Vercel setup](docs/WEBSITE.md). The Rust database runs separately on your own machine or server.
@@ -173,9 +175,10 @@ services at one journal. Format-1 migration creates a separate destination and
 preserves the source. Existing password/SHA credentials require fresh scoped tokens.
 
 Future Community work is driven by measured workloads: compact history and indexes,
-broader adapter schemas and stronger platform coverage. Managed planning adds
-isolated hosted workspaces, GitHub teams, off-host recovery and Stripe billing
-in a separate private platform. Those features are not part of this candidate.
+broader adapter schemas and stronger platform coverage. The separate private Managed
+control plane adds accounts, project roles, database provisioning and secrets.
+Automated off-host recovery, dedicated tenant isolation and billing remain future
+work; see the [current hosting boundaries](docs/HOSTED.md#hosting-and-recovery-boundaries).
 
 [Contribute](CONTRIBUTING.md) · [Security reporting](SECURITY.md) · [Changelog](CHANGELOG.md)
 
