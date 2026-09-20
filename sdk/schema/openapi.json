@@ -3075,6 +3075,19 @@
     "connectors": [
       {
         "contract_version": 1,
+        "description": "Store Jev Choice, Score and Noul decisions with probabilities, input fingerprints and model provenance. Inference runs in your producer using a separate TypeSafe API key.",
+        "family": "Decision models",
+        "id": "jev",
+        "name": "TypeSafe Jev",
+        "native_import": "python_typescript_adapter",
+        "presets": [
+          "decisions-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://docs.typesafe.ai/api"
+      },
+      {
+        "contract_version": 1,
         "description": "Store output tensors, masks, actions and checkpoint provenance from your model process.",
         "family": "JEPA",
         "id": "jepa",

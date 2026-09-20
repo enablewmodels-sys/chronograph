@@ -39,3 +39,8 @@ Public-browser QA passed two full rounds each at 1440×1000 and 390×844: banner
 docs/download, token connection, Jev migration selectors, reload logout, no
 credential in browser storage and no console/runtime errors. Browser plugin was
 unavailable; headed Playwright provided screenshots and interaction checks.
+
+Final checks also passed restart persistence and four live backup rotations at
+capacity. The private rotation helper passed failed-capture rollback and
+interrupted-run recovery fixtures. A final rotated archive was downloaded
+off-host and restored again. The temporary restore listener was stopped.

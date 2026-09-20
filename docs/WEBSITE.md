@@ -53,3 +53,13 @@ the `Build unsigned Community candidates` workflow; inspect each target's smoke
 result before attaching its archive to a release. Publish versioned alpha tags
 and include checksum files, source, license and upstream notices. Do not overwrite
 an older release's artifacts. The website provisions no database or billing account.
+
+## GitHub Pages
+
+The repository includes `.github/workflows/pages.yml`, which builds the public
+site with base path `/chronograph/` and deploys it through GitHub Actions. A
+repository owner should choose **Settings → Pages → Build and deployment →
+Source: GitHub Actions**. This avoids the redundant legacy Jekyll job, which can
+fail while interpreting code examples as Liquid. The current push-capable GitHub
+identity cannot change repository Pages settings. The EC2 hosted alpha has its
+own deployment and hostname.

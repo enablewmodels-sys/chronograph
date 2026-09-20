@@ -148,3 +148,9 @@ Public-browser QA passed two full rounds each at 1440×1000 and 390×844: banner
 docs/download, token connection, Jev migration selectors, reload logout, no
 credential in browser storage and no console/runtime errors. Browser plugin was
 unavailable; headed Playwright provided screenshots and interaction checks.
+
+The private hosted backup job additionally passed four consecutive captures at
+the three-archive limit, plus tests for failed-capture rollback and interrupted
+rotation recovery. After the final release restart, data, checkpoints, token
+revocation and fsync defaults persisted; a newly rotated archive was downloaded
+off-host and restored successfully into a separate workspace.

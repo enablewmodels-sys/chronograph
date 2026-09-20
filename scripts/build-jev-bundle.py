@@ -5,7 +5,8 @@ import hashlib
 import json
 import zipfile
 root = Path(__file__).resolve().parents[1]
-files = [root/'LICENSE',root/'NOTICE',root/'docs/JEV.md']
+files = [root/'LICENSE',root/'NOTICE',root/'docs/JEV.md',root/'sdk/schema/openapi.json',
+         root/'.binder/postBuild',root/'.binder/requirements.txt']
 for folder,patterns in {
     'examples/jev':['*.json','*.py','*.mjs','*.md','*.txt','*.ipynb'],
     'sdk/python':['pyproject.toml','README.md','LICENSE','NOTICE'],
@@ -23,7 +24,7 @@ with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED) as z:
         data=p.read_bytes()
         if b'-----BEGIN PRIVATE KEY' in data or b'-----BEGIN RSA PRIVATE KEY' in data: raise ValueError('Secret in bundle')
         info=zipfile.ZipInfo(p.relative_to(root).as_posix(),date_time=(2026,9,20,0,0,0))
-        info.compress_type=zipfile.ZIP_DEFLATED; info.external_attr=0o100644 << 16
+        info.compress_type=zipfile.ZIP_DEFLATED; info.external_attr=(0o100755 if p.name=='postBuild' else 0o100644) << 16
         z.writestr(info,data)
 notebook=output/'jev-decision-history.ipynb'
 notebook.write_bytes((root/'examples/jev/jev-decision-history.ipynb').read_bytes())
