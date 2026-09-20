@@ -1,5 +1,9 @@
 # Quickstart
 
+Using the hosted service? Start with the [Managed quickstart](HOSTED.md) for
+GitHub/email login, projects, API keys and secrets. The instructions below are
+for self-hosting Community.
+
 Chronograph Community runs embedded in Rust or as a single-workspace service with
 a console and MCP. The service remains a preview pending the release gates.
 

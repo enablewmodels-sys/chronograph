@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useCallback,
 } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -28,6 +29,9 @@ import {
   ArrowLeft,
   GitBranch,
   Plug,
+  ShieldCheck,
+  Users,
+  LockKeyhole,
 } from "lucide-react";
 import "@fontsource-variable/manrope";
 import "./style.css";
@@ -38,6 +42,14 @@ import { api, setToken, useDemo, demoConnection, type Connection } from "./api";
 import { Busy, Field, Logo, SubmitForm, useAction } from "./shared";
 import Landing from "./Landing";
 import { managedSite, publicSite } from "./site";
+import {
+  managedApi,
+  setManagedProject,
+  type ManagedSession,
+} from "./managed-api";
+import ManagedLogin, { ActivateAccount } from "./ManagedLogin";
+import ManagedProjects, { JoinProject } from "./ManagedProjects";
+import "./managed.css";
 import { BranchPicker, WorkspaceProvider } from "./workspace";
 const Explorer = lazy(() => import("./Explorer"));
 const Overview = lazy(() => import("./Overview"));
@@ -48,10 +60,20 @@ const Operations = lazy(() => import("./Operations"));
 const Documentation = lazy(() => import("./Documentation"));
 const Branches = lazy(() => import("./Branches"));
 const Connectors = lazy(() => import("./Connectors"));
+const ManagedSecurity = lazy(() => import("./ManagedSecurity"));
+const ManagedTeam = lazy(() => import("./ManagedTeam"));
+const ManagedSecrets = lazy(() => import("./ManagedSecrets"));
 const AuthContext = createContext<{
   connection: Connection | null;
   update: (s: Connection | null) => void;
-}>({ connection: null, update: () => {} });
+  managed: ManagedSession | null;
+  refreshManaged: () => Promise<void>;
+}>({
+  connection: null,
+  update: () => {},
+  managed: null,
+  refreshManaged: async () => {},
+});
 export const useAuth = () => useContext(AuthContext);
 function App() {
   const { pathname } = useLocation();
@@ -61,9 +83,46 @@ function App() {
   const [connection, setConnection] = useState<Connection | null>(
     publicSite ? demoConnection : null,
   );
+  const [managed, setManaged] = useState<ManagedSession | null>(null);
+  const [loadingAccount, setLoadingAccount] = useState(managedSite);
+  const refreshManaged = useCallback(async () => {
+    setManagedProject("");
+    const next = await managedApi<ManagedSession>("/managed/session");
+    setManagedProject(next.project?.id || "");
+    if (
+      next.user &&
+      !next.user.needsMfa &&
+      next.user.twoFactorEnabled &&
+      !next.user.needsActivation &&
+      next.project
+    ) {
+      try {
+        const connected = await api<Connection>("/v1/info");
+        setConnection(connected);
+        setManaged(next);
+      } catch (error) {
+        setConnection(null);
+        setManaged(next);
+        throw error;
+      }
+    } else {
+      setConnection(null);
+      setManaged(next);
+    }
+  }, []);
+  useEffect(() => {
+    if (managedSite)
+      void refreshManaged()
+        .catch(() => setManaged(null))
+        .finally(() => setLoadingAccount(false));
+  }, [refreshManaged]);
   const update = (s: Connection | null) => {
     setConnection(s);
     if (!s) setToken("");
+    if (!s && managedSite) {
+      setManaged(null);
+      setManagedProject("");
+    }
   };
   useEffect(() => {
     const expire = () => update(null);
@@ -73,7 +132,9 @@ function App() {
     };
   }, []);
   return (
-    <AuthContext.Provider value={{ connection, update }}>
+    <AuthContext.Provider
+      value={{ connection, update, managed, refreshManaged }}
+    >
       <a className="skip" href="#main">
         Skip to content
       </a>
@@ -89,7 +150,15 @@ function App() {
           <Route
             path="/login"
             element={
-              connection ? (
+              managedSite ? (
+                loadingAccount ? (
+                  <p className="loading" role="status">
+                    Checking your account…
+                  </p>
+                ) : (
+                  <ManagedLogin session={managed} refresh={refreshManaged} />
+                )
+              ) : connection ? (
                 <Navigate to="/app" replace />
               ) : publicSite ? (
                 <Navigate to="/" replace />
@@ -99,10 +168,67 @@ function App() {
             }
           />
           <Route path="/documentation/*" element={<Documentation />} />
+          {managedSite && (
+            <>
+              <Route path="/activate" element={<ActivateAccount />} />
+              <Route
+                path="/join"
+                element={<JoinProject refresh={refreshManaged} />}
+              />
+              <Route
+                path="/projects"
+                element={
+                  loadingAccount ? (
+                    <p className="loading">Loading projects…</p>
+                  ) : managed?.user &&
+                    !managed.user.needsMfa &&
+                    managed.user.twoFactorEnabled ? (
+                    <ManagedProjects
+                      session={managed}
+                      refresh={refreshManaged}
+                    />
+                  ) : (
+                    <Navigate to="/login" replace />
+                  )
+                }
+              />
+              <Route
+                path="/account/security"
+                element={
+                  managed?.user && !managed.user.needsMfa ? (
+                    <div className="standalone-security">
+                      <Logo />
+                      <Link to="/projects">Back to projects</Link>
+                      <ManagedSecurity />
+                    </div>
+                  ) : (
+                    <Navigate to="/login" replace />
+                  )
+                }
+              />
+            </>
+          )}
           <Route
             path="/app/*"
             element={
-              connection ? <Console /> : <Navigate to="/login" replace />
+              loadingAccount ? (
+                <p className="loading" role="status">
+                  Loading workspace…
+                </p>
+              ) : connection ? (
+                <Console key={connection.project?.id || "community"} />
+              ) : (
+                <Navigate
+                  to={
+                    managed?.user &&
+                    !managed.user.needsMfa &&
+                    managed.user.twoFactorEnabled
+                      ? "/projects"
+                      : "/login"
+                  }
+                  replace
+                />
+              )
             }
           />
           <Route
@@ -196,11 +322,22 @@ const navigation = [
   { path: "schema", title: "Schema & migrations", icon: Settings2 },
   { path: "write", title: "Write data", icon: Database },
   { path: "connectors", title: "Connectors", icon: Plug },
-  { path: "access", title: "Agent access", icon: KeyRound },
+  {
+    path: "access",
+    title: managedSite ? "Connections & API keys" : "Agent access",
+    icon: KeyRound,
+  },
   { path: "operations", title: "Operations", icon: Settings2 },
+  ...(managedSite
+    ? [
+        { path: "team", title: "Team & audit", icon: Users },
+        { path: "secrets", title: "Secrets", icon: LockKeyhole },
+        { path: "security", title: "Account security", icon: ShieldCheck },
+      ]
+    : []),
 ];
 function Console() {
-  const { update, connection } = useAuth(),
+  const { update, connection, managed, refreshManaged } = useAuth(),
     action = useAction(),
     navigate = useNavigate();
   return (
@@ -211,7 +348,7 @@ function Console() {
             <div>
               <Logo />
               <span className="sidebar-caption">
-                {managedSite ? "Managed alpha console" : "Community console"}
+                {managedSite ? "Managed console" : "Community console"}
               </span>
             </div>
             <nav aria-label="Console navigation">
@@ -223,8 +360,9 @@ function Console() {
                 )
                 .filter(
                   (n) =>
-                    !["access", "operations"].includes(n.path) ||
-                    connection?.credential.scope === "admin",
+                    !["access", "operations", "team", "secrets"].includes(
+                      n.path,
+                    ) || connection?.credential.scope === "admin",
                 )
                 .map(({ path, title, icon: Icon }) => (
                   <NavLink key={title} end={!path} to={`/app/${path}`}>
@@ -234,13 +372,26 @@ function Console() {
                 ))}
             </nav>
             <div className="sidebar-bottom">
-              <Link to="/documentation/QUICKSTART">
+              {managedSite && (
+                <Link to="/projects">
+                  <Database size={22} />
+                  All projects
+                </Link>
+              )}
+              <Link
+                to={
+                  managedSite
+                    ? "/documentation/HOSTED"
+                    : "/documentation/QUICKSTART"
+                }
+              >
                 <BookOpen size={22} /> Documentation
               </Link>
               <button
                 className="ghost"
                 onClick={() =>
                   void action.run(async () => {
+                    if (managedSite) await managedApi("/api/auth/sign-out", {});
                     if (!publicSite) update(null);
                     navigate(publicSite ? "/" : "/login");
                   })
@@ -248,26 +399,81 @@ function Console() {
                 disabled={action.busy}
               >
                 <LogOut size={22} />{" "}
-                {publicSite ? "Exit preview" : "Disconnect"}
+                {publicSite
+                  ? "Exit preview"
+                  : managedSite
+                    ? "Sign out"
+                    : "Disconnect"}
               </button>
               {action.feedback}
             </div>
           </aside>
           <div className="workspace">
             <div className="workspace-top">
-              <span>
-                Workspace <span className="slash">/</span> Temporal graph
-              </span>
+              {managedSite ? (
+                <select
+                  className="project-picker"
+                  aria-label="Active project"
+                  value={connection?.project?.id || ""}
+                  onChange={(e) =>
+                    void action.run(async () => {
+                      setManagedProject("");
+                      await managedApi("/managed/projects/select", {
+                        projectId: e.target.value,
+                      });
+                      await refreshManaged();
+                      navigate("/app");
+                    })
+                  }
+                >
+                  {managed?.projects.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span>
+                  Workspace <span className="slash">/</span> Temporal graph
+                </span>
+              )}
               <BranchPicker />
               <span className="status">
                 <i />{" "}
                 {connection?.edition === "synthetic"
                   ? "Synthetic preview · no backend"
-                  : `${connection?.credential.scope} token connected`}
+                  : managedSite
+                    ? `${connection?.account?.name} · ${connection?.account?.role}`
+                    : `${connection?.credential.scope} token connected`}
               </span>
             </div>
             <main id="main">
               <Routes>
+                {managedSite && (
+                  <>
+                    <Route path="security" element={<ManagedSecurity />} />
+                    <Route
+                      path="team"
+                      element={
+                        connection?.credential.scope === "admin" ? (
+                          <ManagedTeam />
+                        ) : (
+                          <Navigate to="/app" replace />
+                        )
+                      }
+                    />
+                    <Route
+                      path="secrets"
+                      element={
+                        connection?.credential.scope === "admin" ? (
+                          <ManagedSecrets />
+                        ) : (
+                          <Navigate to="/app" replace />
+                        )
+                      }
+                    />
+                  </>
+                )}
                 <Route index element={<Overview />} />
                 <Route path="explorer" element={<Explorer />} />
                 <Route path="schema" element={<Schema />} />

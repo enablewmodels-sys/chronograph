@@ -82,7 +82,7 @@ export default function Schema() {
   const [editing, setEditing] = useState(false);
   const [search, setSearch] = useState("");
   const [settings, setSettings] = useState<Settings | null>(null);
-  const draftKey = `chronograph-schema-draft:${connection?.credential.id}`;
+  const draftKey = `chronograph-schema-draft:${connection?.project?.id || "community"}:${connection?.credential.id}`;
   const [source, setSource] = useState(() => {
     try {
       return sessionStorage.getItem(draftKey) || template();

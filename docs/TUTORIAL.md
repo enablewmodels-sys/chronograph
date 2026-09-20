@@ -4,7 +4,20 @@ This small example records an agent's relative position to an object. It then ac
 
 The question is precise: **after accepting all observations, which relative-position version is active at 2.75 seconds?**
 
-## Run it
+## Try the temporal model in Managed
+
+Create a [Managed project](HOSTED.md), open its console and load the synthetic
+sample into the empty graph. In **Temporal explorer**, query at `2000000`
+microseconds, then `-1`, to compare an observed scene with its empty earlier state.
+Use **Write data** to add your own relationship and **Schema & migrations** to name
+its relation and map its properties. Changes are persisted in that project.
+Switch the graph preview to **Tree layout** to inspect its displayed hierarchy.
+API keys and MCP clients query the same database; see [Managed connections](HOSTED.md#api-keys-and-endpoints).
+
+The embedded example below is a separate, smaller fixture demonstrating delayed
+observations and exact interval boundaries. It does not write to your hosted project.
+
+## Run it locally
 
 With Rust 1.93 or newer installed, run this from the source checkout's root:
 

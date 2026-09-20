@@ -3,8 +3,9 @@ import { Link, NavLink, useParams } from "react-router-dom";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Logo } from "./shared";
-import { publicPath, publicSite } from "./site";
+import { publicPath, publicSite, managedSite } from "./site";
 const docs = [
+  ...(managedSite ? [["HOSTED", "Managed quickstart"]] : []),
   ["QUICKSTART", "Quickstart"],
   ["TUTORIAL", "Temporal model"],
   ["BRANCHES", "Durable branches"],
@@ -12,7 +13,7 @@ const docs = [
   ["SDK", "Language SDKs"],
   ["INTEGRATIONS", "Platform integration recipes"],
   ["JEV", "TypeSafe Jev & examples"],
-  ["HOSTED", "Hosted alpha"],
+  ...(!managedSite ? [["HOSTED", "Managed hosting"]] : []),
   ["SCHEMA", "Schema & migrations"],
   ["CONNECTOR_PLATFORM", "Connector platform"],
   ["UPGRADE_0_4", "Upgrade to 0.4"],
@@ -51,7 +52,9 @@ function slug(node: ReactNode) {
 }
 export default function Documentation() {
   const params = useParams(),
-    doc = params["*"]?.replace(/\/+$/, "") || "QUICKSTART";
+    doc =
+      params["*"]?.replace(/\/+$/, "") ||
+      (managedSite ? "HOSTED" : "QUICKSTART");
   const [text, setText] = useState(""),
     [error, setError] = useState("");
   useEffect(() => {
@@ -134,7 +137,9 @@ export default function Documentation() {
       </nav>
       <div className="docs-layout">
         <aside>
-          <h2>Community documentation</h2>
+          <h2>
+            {managedSite ? "Managed documentation" : "Community documentation"}
+          </h2>
           <nav aria-label="Documentation">
             {docs.map(([id, title]) => (
               <NavLink key={id} to={`/documentation/${id}`}>

@@ -15,7 +15,8 @@ export function GraphView({
 }) {
   const marker = useId().replace(/[^a-zA-Z0-9_-]/g, ""),
     [local, setLocal] = useState<GraphSelection | null>(null),
-    [zoom, setZoom] = useState(1);
+    [zoom, setZoom] = useState(1),
+    [layout, setLayout] = useState("network");
   const chosen = selection === undefined ? local : selection;
   const choose = (value: GraphSelection | null) => {
     setLocal(value);
@@ -32,7 +33,7 @@ export function GraphView({
     [475, 365],
     [670, 385],
   ];
-  const positions = new Map(
+  let positions = new Map(
     nodes.map((n, i) => [
       n,
       nodes.length <= 8
@@ -43,6 +44,47 @@ export function GraphView({
           ],
     ]),
   );
+  let height = 450;
+  if (layout === "tree") {
+    const included = new Set(nodes);
+    const links = edges.filter(
+      (e) => included.has(e.src) && included.has(e.dst),
+    );
+    const children = new Map<string, string[]>();
+    for (const edge of links)
+      children.set(edge.src, [...(children.get(edge.src) || []), edge.dst]);
+    const destinations = new Set(links.map((e) => e.dst));
+    const levels = new Map<string, number>();
+    const roots = [...nodes.filter((n) => !destinations.has(n)), ...nodes];
+    for (const root of roots) {
+      if (levels.has(root)) continue;
+      levels.set(root, 0);
+      const queue = [root];
+      for (let index = 0; index < queue.length; index++) {
+        const parent = queue[index];
+        for (const child of children.get(parent) || []) {
+          if (levels.has(child)) continue;
+          levels.set(child, levels.get(parent)! + 1);
+          queue.push(child);
+        }
+      }
+    }
+    const depth = Math.max(0, ...levels.values());
+    height = Math.max(450, (depth + 1) * 85 + 80);
+    positions = new Map(
+      nodes.map((n) => {
+        const level = levels.get(n)!;
+        const row = nodes.filter((id) => levels.get(id) === level);
+        return [
+          n,
+          [
+            45 + ((row.indexOf(n) + 1) * 670) / (row.length + 1),
+            65 + (level * (height - 130)) / Math.max(1, depth),
+          ],
+        ];
+      }),
+    );
+  }
   const visible = edges
     .filter((e) => positions.has(e.src) && positions.has(e.dst))
     .slice(0, 80);
@@ -57,7 +99,7 @@ export function GraphView({
       </div>
     );
   return (
-    <div className="graph-view">
+    <div className={`graph-view ${layout === "tree" ? "tree-layout" : ""}`}>
       <div className="graph-tools">
         <span className="scope-badge">
           {illustration
@@ -65,6 +107,19 @@ export function GraphView({
             : `${nodes.length} nodes · ${visible.length} edges`}
         </span>
         <div>
+          {!illustration && (
+            <select
+              aria-label="Graph layout"
+              value={layout}
+              onChange={(e) => {
+                setLayout(e.target.value);
+                setZoom(1);
+              }}
+            >
+              <option value="network">Graph layout</option>
+              <option value="tree">Tree layout</option>
+            </select>
+          )}
           <button
             className="ghost"
             aria-label="Zoom out graph"
@@ -94,12 +149,13 @@ export function GraphView({
         </div>
       </div>
       <svg
-        viewBox={`${380 - 380 / zoom} ${225 - 225 / zoom} ${760 / zoom} ${450 / zoom}`}
+        viewBox={`${380 - 380 / zoom} ${height / 2 - height / 2 / zoom} ${760 / zoom} ${height / zoom}`}
+        height={height}
         role="img"
         aria-label={
           illustration
             ? "Illustrative temporal graph"
-            : `Graph preview: ${nodes.length} nodes and ${visible.length} relationships`
+            : `${layout === "tree" ? "Tree" : "Graph"} preview: ${nodes.length} nodes and ${visible.length} relationships`
         }
       >
         <defs>

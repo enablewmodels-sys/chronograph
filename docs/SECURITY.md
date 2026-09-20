@@ -1,5 +1,9 @@
 # Community security model
 
+For hosted accounts, MFA, project permissions, API keys and the encrypted vault,
+see [Managed security and access](HOSTED.md#accounts-and-project-permissions).
+This document describes the native engine boundary used by Community and Managed.
+
 Community is a single-workspace service with workspace-wide bearer scopes. The
 current service is a preview, not an audited production security boundary.
 Managed accounts, OAuth, teams and billing belong in the separate control plane.

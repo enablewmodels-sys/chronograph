@@ -5,24 +5,29 @@ under **PolyForm Perimeter 1.0.0**. You can modify it and use it commercially fo
 noncompeting purposes. Offering a competing product, including a free one, is
 restricted. See [licensing](LICENSING.md) for the full boundary.
 
-| Capability | Community alpha | Hosted alpha / planned expansion |
+| Capability | Community alpha | Managed launch preview |
 | --- | --- | --- |
 | Embedded Rust engine, history and durable branches | Included | Same underlying engine |
-| Scoped tokens, HTTP and native MCP | Included | Hosted HTTPS workspace endpoint |
-| Browser console, migration editor, connector presets | Included | Hosted console |
+| Scoped tokens, HTTP and native MCP | Included | Project HTTPS endpoints and scoped API keys |
+| Browser console, migration editor, connector presets | Included | Hosted console and private projects |
 | Typed assets, checkpointed ingestion and language SDKs | Included | Same transport over HTTPS |
-| Consistent backup and restore | Local tools | Scheduled local archives; remote automation planned |
-| Infrastructure | Operated by you | Isolated hosted workspace and storage |
-| Accounts and teams | Workspace-wide token scopes | Operator-issued tokens; accounts/team roles planned |
+| Consistent backup and restore | Local tools | Scheduled graph and encrypted account/configuration snapshots |
+| Infrastructure | Operated by you | Separate databases and project processes on a shared host |
+| Accounts and teams | Workspace-wide token scopes | GitHub, invited email accounts, MFA, project roles and sessions |
+| Provider secrets | Use your own secret store | Encrypted project vault with separate reader keys |
 | Billing | No license fee for permitted use; infrastructure costs apply | Subscription pricing not announced |
 | Reliability | Alpha with documented limits | No service commitment available yet |
 
-Community requires no cloud account or license server. An invitation-only
-[hosted alpha](HOSTED.md) runs the same engine on a dedicated single-workspace
-service. Its private operator deployment configuration is not included in this
-public repository. Self-service accounts, tenant provisioning and billing remain
-unimplemented; there is no subscription or uptime guarantee. The static Community
-website demo still uses synthetic data.
+Community requires no cloud account or license server. The [Managed service](HOSTED.md)
+adds a private account and project control plane around the same Rust engine.
+GitHub signup is available; new email accounts are platform-operator issued while
+email delivery is pending. Source for the private backend and operator deployment
+configuration is not part of this public Community repository.
+
+Managed currently uses one host with bounded capacity. It has no billing, row-level
+policies, organization SSO, automated off-host recovery, HA, or uptime guarantee.
+Its application/process isolation is not a claim of independently audited tenant
+security. The static Community website demo still uses synthetic data.
 
 Start with [installation](INSTALL.md), [release status](REQUIREMENTS.md) and
 [security](SECURITY.md). Build noncompeting applications on Community today;

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "./api";
 import { useAuth } from "./main";
+import { managedSite } from "./site";
 import {
   Busy,
   Code,
@@ -55,7 +57,51 @@ export default function Access() {
         );
   return (
     <>
-      <Head title="Connect your agents." text="Scoped access. One protocol." />
+      <Head
+        title={
+          managedSite
+            ? "Connect your applications and agents."
+            : "Connect your agents."
+        }
+        text={
+          managedSite
+            ? "Project endpoints, expiring API keys and MCP. Keep credentials in your backend or agent’s secret store."
+            : "Scoped access. One protocol."
+        }
+      />
+      {managedSite && (
+        <section className="panel form-panel">
+          <h2>Project endpoints</h2>
+          <div className="managed-two-column">
+            <div>
+              <h3>API base URL</h3>
+              <Code text={connection?.api_url || ""} />
+              <h3>MCP endpoint</h3>
+              <Code text={url} />
+            </div>
+            <div>
+              <h3>Make your first request</h3>
+              <Code
+                text={`curl '${connection?.api_url}/v1/info' \\\n  -H "Authorization: Bearer $CHRONOGRAPH_TOKEN"`}
+              />
+              <p className="small">
+                Create a read key below to verify the connection. Select read +
+                write for ingestion or admin for migrations.{" "}
+                <Link to="/app/security">Verify your identity</Link> before
+                issuing or revoking keys.
+              </p>
+              <p className="small">
+                For SDKs, use <code>{window.location.origin}</code> as the base
+                URL. Your API key selects its project automatically. Browser
+                apps should call your own backend; keep keys and secret-reader
+                credentials on your server.
+              </p>
+              <DocLink to="HOSTED">Managed API and secret storage</DocLink>
+              <DocLink to="SDK">Python, TypeScript and other SDKs</DocLink>
+            </div>
+          </div>
+        </section>
+      )}
       <div className="agent-layout">
         <section>
           <div role="tablist" aria-label="MCP client" className="tabs">
@@ -115,7 +161,7 @@ export default function Access() {
       </div>
       <section className="panel form-panel">
         <div className="section-head">
-          <h2>Access tokens</h2>
+          <h2>{managedSite ? "Project API keys" : "Access tokens"}</h2>
           <span className="small muted">Tokens are shown once.</span>
         </div>
         <SubmitForm

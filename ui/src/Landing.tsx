@@ -123,13 +123,23 @@ export default function Landing() {
         <Logo />
         <div className="nav-links">
           <a href="#product">Product</a>
-          <a href="#community">Community</a>
-          <a href="#managed">Managed</a>
-          <Link to="/documentation/QUICKSTART">Docs</Link>
+          <a href={managedSite ? "#connectors" : "#community"}>
+            {managedSite ? "Use cases" : "Community"}
+          </a>
+          <a href="#managed">{managedSite ? "Platform" : "Managed"}</a>
+          <Link
+            to={
+              managedSite
+                ? "/documentation/HOSTED"
+                : "/documentation/QUICKSTART"
+            }
+          >
+            Docs
+          </Link>
         </div>
         {managedSite ? (
           <Link className="button primary" to="/login">
-            Open workspace <ArrowUpRight size={16} />
+            Sign in <ArrowUpRight size={16} />
           </Link>
         ) : (
           <a className="button primary" href="#quickstart">
@@ -141,8 +151,9 @@ export default function Landing() {
         <section className="hero" id="product">
           <div className="hero-copy">
             <p className="eyebrow">
-              Temporal graph database · Rust ·{" "}
-              {managedSite ? "Managed alpha" : "Community 0.4 alpha"}
+              {managedSite
+                ? "Managed temporal graph database"
+                : "Temporal graph database · Rust · Community 0.4 alpha"}
             </p>
             <h1>
               Build worlds
@@ -150,34 +161,43 @@ export default function Landing() {
               that remember.
             </h1>
             <p>
-              An embedded temporal graph database in Rust. Replay relationships,
-              explore alternate futures, and{" "}
               {managedSite
-                ? "connect to your hosted workspace."
-                : "keep your data local."}
+                ? "The memory layer for models that observe, decide and act. Store observations, relationships and decisions over time. Query any moment, explore another future, and connect your agents."
+                : "An embedded temporal graph database in Rust. Replay relationships, explore alternate futures, and keep your data local."}
             </p>
             <div className="hero-actions">
               {managedSite ? (
-                <Link className="button primary" to="/login">
-                  Connect your workspace <ArrowRight size={18} />
+                <Link className="button primary" to="/login?provider=github">
+                  Start with GitHub <ArrowRight size={18} />
                 </Link>
               ) : (
                 <a className="button primary" href="#quickstart">
                   Start locally <ArrowRight size={18} />
                 </a>
               )}
-              <Link className="button outline" to="/app">
-                {publicSite ? "Explore the demo" : "Explore the console"}
+              <Link
+                className="button outline"
+                to={managedSite ? "/documentation/JEV" : "/app"}
+              >
+                {managedSite
+                  ? "See a working example"
+                  : publicSite
+                    ? "Explore the demo"
+                    : "Explore the console"}
               </Link>
             </div>
             <div className="hero-proof">
               <span>
                 <Check size={14} />
-                PolyForm Perimeter 1.0.0
+                {managedSite
+                  ? "GitHub & email sign-in"
+                  : "PolyForm Perimeter 1.0.0"}
               </span>
               <span>
                 <Check size={14} />
-                Embedded & self-hosted
+                {managedSite
+                  ? "Private projects · HTTP & MCP"
+                  : "Embedded & self-hosted"}
               </span>
             </div>
           </div>
@@ -236,11 +256,13 @@ export default function Landing() {
             <div className="landing-code">
               <span className="code-label">
                 <Terminal size={15} />
-                THE RUST API
+                {managedSite ? "FROM YOUR APPLICATION" : "THE RUST API"}
               </span>
               <Code
                 text={
-                  "let fork = graph.fork(2_000_000)?;\n\ngraph.add_edges_to_fork(fork, &observations)?;\nlet future = graph.fork_view(fork, 3_000_000)?;\nlet snapshot = future.export_arrow()?;\n\nlet changes = graph.preview_merge(fork)?;\nlet committed = graph.merge(fork)?;\ngraph.sync()?;"
+                  managedSite
+                    ? 'const response = await fetch(\n  `${process.env.CHRONOGRAPH_URL}/v1/as_of`,\n  {\n    method: "POST",\n    headers: {\n      "Content-Type": "application/json",\n      Authorization: `Bearer ${process.env.CHRONOGRAPH_TOKEN}`\n    },\n    body: JSON.stringify({ t: "1700000000000000" })\n  }\n);\nconst history = await response.json();'
+                    : "let fork = graph.fork(2_000_000)?;\n\ngraph.add_edges_to_fork(fork, &observations)?;\nlet future = graph.fork_view(fork, 3_000_000)?;\nlet snapshot = future.export_arrow()?;\n\nlet changes = graph.preview_merge(fork)?;\nlet committed = graph.merge(fork)?;\ngraph.sync()?;"
                 }
               />
               <Link className="text-link" to="/documentation/BRANCHES">
@@ -281,6 +303,25 @@ export default function Landing() {
             </p>
           </div>
           <div className="domain-list">
+            {managedSite && (
+              <Link to="/documentation/JEV" className="domain-row">
+                <div className="domain-art worldmodel">
+                  <GitBranch size={54} strokeWidth={1.2} />
+                </div>
+                <div>
+                  <span className="eyebrow">
+                    TypeSafe Jev · Python & TypeScript
+                  </span>
+                  <h3>Decision models</h3>
+                  <p>
+                    Keep every decision with its probabilities, input
+                    fingerprint and model version. Inspect how answers change
+                    over time.
+                  </p>
+                </div>
+                <ArrowUpRight size={23} />
+              </Link>
+            )}
             {domains.map((d) => (
               <Link
                 key={d.id}
@@ -306,74 +347,110 @@ export default function Landing() {
         </section>
         <section className="landing-section editions-section" id="community">
           <div className="section-intro">
-            <p className="eyebrow">Own the foundation</p>
+            <p className="eyebrow">
+              {managedSite
+                ? "From model output to managed memory"
+                : "Own the foundation"}
+            </p>
             <h2>
-              Community at the core.
+              {managedSite ? "Your data. Your team." : "Community at the core."}
               <br />
-              Managed when it is ready.
+              {managedSite
+                ? "One connected workspace."
+                : "Managed when it is ready."}
             </h2>
             <p>
-              The Community edition contains the temporal engine, durable
-              branches, console, scoped authentication and MCP. Run it inside
-              your application or operate the service yourself.
+              {managedSite
+                ? "Create an isolated project. Define your relationships with reviewed migrations. Invite collaborators and give each application only the access it needs."
+                : "The Community edition contains the temporal engine, durable branches, console, scoped authentication and MCP. Run it inside your application or operate the service yourself."}
             </p>
           </div>
           <div className="edition-grid">
             <article className="edition community-edition">
               <span className="scope-badge">
-                COMMUNITY · SOURCE-AVAILABLE ALPHA
+                {managedSite
+                  ? "MANAGED PROJECTS"
+                  : "COMMUNITY · SOURCE-AVAILABLE ALPHA"}
               </span>
               <h3>
-                Your graph.
+                {managedSite ? "From first migration" : "Your graph."}
                 <br />
-                Your infrastructure.
+                {managedSite ? "to model history." : "Your infrastructure."}
               </h3>
               <p>
-                PolyForm Perimeter 1.0.0. No account required for the embedded
-                engine. Self-host the console and service with scoped
-                credentials.
+                {managedSite
+                  ? "Build and inspect temporal graphs in your browser. Each project has its own database, credentials, migrations and team."
+                  : "PolyForm Perimeter 1.0.0. No account required for the embedded engine. Self-host the console and service with scoped credentials."}
               </p>
               <ul>
-                {[
-                  "Temporal Rust engine and durable branches",
-                  "HTTP, native MCP bridge and browser console",
-                  "BCI, robotics, world-model and quantum adapters",
-                  "Local consistent backups and restore tools",
-                ].map((s) => (
+                {(managedSite
+                  ? [
+                      "GitHub and email login with authenticator MFA",
+                      "Project provisioning and team roles",
+                      "Migration editor with 36 connector presets",
+                      "Graph history, durable branches and exports",
+                    ]
+                  : [
+                      "Temporal Rust engine and durable branches",
+                      "HTTP, native MCP bridge and browser console",
+                      "BCI, robotics, world-model and quantum adapters",
+                      "Local consistent backups and restore tools",
+                    ]
+                ).map((s) => (
                   <li key={s}>
                     <Check size={16} />
                     {s}
                   </li>
                 ))}
               </ul>
-              <Link className="button primary" to="/documentation/QUICKSTART">
-                Run Community <ArrowRight size={17} />
+              <Link
+                className="button primary"
+                to={
+                  managedSite
+                    ? "/login?provider=github"
+                    : "/documentation/QUICKSTART"
+                }
+              >
+                {managedSite ? "Create your first project" : "Run Community"}{" "}
+                <ArrowRight size={17} />
               </Link>
               <p className="small muted">
-                Modification and noncompeting commercial use allowed. Competing
-                products are restricted. Read the license before redistributing.
+                {managedSite
+                  ? "Start with GitHub. Email accounts use a private invitation while automated email delivery is being connected."
+                  : "Modification and noncompeting commercial use allowed. Competing products are restricted. Read the license before redistributing."}
               </p>
             </article>
             <article className="edition managed-edition" id="managed">
               <span className="scope-badge">
-                MANAGED · INVITATION-ONLY ALPHA
+                {managedSite
+                  ? "APPLICATIONS & AGENTS"
+                  : "MANAGED · INVITATION-ONLY ALPHA"}
               </span>
               <h3>
-                A hosted home
+                {managedSite ? "Your stack," : "A hosted home"}
                 <br />
-                for your workspace.
+                {managedSite ? "with a shared memory." : "for your workspace."}
               </h3>
               <p>
-                Your temporal graph, available over HTTPS. Connect the console,
-                your SDK or an MCP client with a scoped workspace token.
+                {managedSite
+                  ? "Connect Codex, Cursor, Claude and your own backends to a project endpoint. Store provider secrets separately from graph credentials."
+                  : "Your temporal graph, available over HTTPS. Connect the console, your SDK or an MCP client with a scoped workspace token."}
               </p>
               <ul>
-                {[
-                  "Hosted database, console and migration editor",
-                  "Scoped API credentials and MCP endpoint",
-                  "Scheduled local backups and restore tools",
-                  "Dedicated single-workspace service",
-                ].map((s) => (
+                {(managedSite
+                  ? [
+                      "Project API URLs and expiring application keys",
+                      "MCP setup for Codex, Cursor and Claude",
+                      "Encrypted secrets with separate reader keys",
+                      "Project audit events and revocable sessions",
+                    ]
+                  : [
+                      "Hosted database, console and migration editor",
+                      "Scoped API credentials and MCP endpoint",
+                      "Scheduled local backups and restore tools",
+                      "Dedicated single-workspace service",
+                    ]
+                ).map((s) => (
                   <li key={s}>
                     <Check size={16} />
                     {s}
@@ -381,11 +458,15 @@ export default function Landing() {
                 ))}
               </ul>
               <Link className="button outline" to="/documentation/HOSTED">
-                Hosted setup & limits <ArrowUpRight size={17} />
+                {managedSite
+                  ? "Explore the managed platform"
+                  : "Hosted setup & limits"}{" "}
+                <ArrowUpRight size={17} />
               </Link>
               <p className="small muted">
-                Operator-issued access. Self-service signup, teams, billing and
-                an uptime SLA are not available.
+                {managedSite
+                  ? "Launch preview with bounded host capacity. Model inference runs in your application; hardware compatibility and availability SLAs are not implied."
+                  : "Operator-issued access. Self-service signup, teams, billing and an uptime SLA are not available."}
               </p>
             </article>
           </div>
@@ -440,18 +521,26 @@ export default function Landing() {
           <div>
             <p className="eyebrow">Start with one moment</p>
             <h2>
-              A world you can
+              {managedSite ? "Give your next model" : "A world you can"}
               <br />
-              run on your machine.
+              {managedSite ? "a memory that lasts." : "run on your machine."}
             </h2>
             <p>
-              From this source checkout, run the hundred-future example. It
-              creates a new dataset, checks every restored state, and merges the
-              best future.
+              {managedSite
+                ? "Sign in, create a project, and connect your first application. Keep observations, decisions, and their history together from the first request."
+                : "From this source checkout, run the hundred-future example. It creates a new dataset, checks every restored state, and merges the best future."}
             </p>
             <div className="hero-actions">
-              <Link className="button primary" to="/documentation/QUICKSTART">
-                Read the quickstart <ArrowRight size={17} />
+              <Link
+                className="button primary"
+                to={
+                  managedSite
+                    ? "/login?provider=github"
+                    : "/documentation/QUICKSTART"
+                }
+              >
+                {managedSite ? "Start with GitHub" : "Read the quickstart"}{" "}
+                <ArrowRight size={17} />
               </Link>
               <Link className="text-link" to="/app">
                 Open console <ArrowUpRight size={16} />
@@ -461,16 +550,21 @@ export default function Landing() {
           <div>
             <span className="code-label">
               <Terminal size={15} />
-              FROM A SOURCE CHECKOUT · RUST 1.93+
+              {managedSite
+                ? "YOUR PROJECT · HTTPS API + MCP"
+                : "FROM A SOURCE CHECKOUT · RUST 1.93+"}
             </span>
             <Code
               text={
-                "cargo run --locked --release \\\n  -p chronograph-conn-worldmodel \\\n  --example fork_demo -- ./fork-demo"
+                managedSite
+                  ? `curl '${window.location.origin}/v1/info' \\\n  -H "Authorization: Bearer $CHRONOGRAPH_TOKEN"`
+                  : "cargo run --locked --release \\\n  -p chronograph-conn-worldmodel \\\n  --example fork_demo -- ./fork-demo"
               }
             />
             <p className="small">
-              The output directory must be new. For an existing v1 database, use
-              the separate migration path in the docs.
+              {managedSite
+                ? "Create a scoped API key in Connections & API keys. Your key routes requests to its project. Keep it in your server environment."
+                : "The output directory must be new. For an existing v1 database, use the separate migration path in the docs."}
             </p>
           </div>
         </section>
@@ -479,11 +573,23 @@ export default function Landing() {
         <div>
           <Logo />
           <p>Temporal data for a world in motion.</p>
-          <span>Community 0.4 alpha · Service preview</span>
+          <span>
+            {managedSite
+              ? "Chronograph Managed · Launch preview"
+              : "Community 0.4 alpha · Service preview"}
+          </span>
         </div>
         <div>
           <span>BUILD</span>
-          <Link to="/documentation/QUICKSTART">Quickstart</Link>
+          <Link
+            to={
+              managedSite
+                ? "/documentation/HOSTED"
+                : "/documentation/QUICKSTART"
+            }
+          >
+            Quickstart
+          </Link>
           <Link to="/documentation/BRANCHES">Branches</Link>
           <Link to="/documentation/MCP">MCP integrations</Link>
         </div>
@@ -505,6 +611,9 @@ export default function Landing() {
             Download alpha
           </a>
           <Link to="/documentation/BENCHMARKS">Benchmarks</Link>
+          <a href="/brand/chronograph-logo.png" download>
+            Download the logo
+          </a>
         </div>
       </footer>
     </div>

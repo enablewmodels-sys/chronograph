@@ -1,4 +1,9 @@
-import { publicSite } from "./site";
+import { managedSite, publicSite } from "./site";
+import {
+  projectHeaders,
+  type ManagedUser,
+  type ManagedProject,
+} from "./managed-api";
 
 export interface Edge {
   id: string;
@@ -25,9 +30,12 @@ export interface Stats {
 }
 export interface Connection {
   credential: { id: string; scope: "read" | "ingest" | "admin" };
-  edition: "community" | "synthetic";
+  edition: "community" | "managed" | "synthetic";
   mcp_url: string;
   uptime_seconds: number;
+  account?: ManagedUser;
+  project?: ManagedProject;
+  api_url?: string;
 }
 export interface QueryResult {
   edges: Edge[];
@@ -73,10 +81,11 @@ export async function request(
     throw new Error("The public demo cannot call a database API.");
   const response = await fetch(path, {
     method,
-    credentials: "omit",
+    credentials: managedSite ? "same-origin" : "omit",
     headers: {
       ...(data !== undefined ? { "Content-Type": "application/json" } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(managedSite ? projectHeaders() : {}),
     },
     ...(data !== undefined ? { body: JSON.stringify(data) } : {}),
   });
