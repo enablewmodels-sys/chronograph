@@ -211,7 +211,10 @@ try {
   pass(
     `${receipts.length} registry presets: migration → ingest → exact source export → retry/conflict`,
   );
-  assert.ok(tensorBatch, "The JEPA fixture must exercise required tensor assets");
+  assert.ok(
+    tensorBatch,
+    "The JEPA fixture must exercise required tensor assets",
+  );
   assert.ok(decisionBatch, "The Jev fixture must exercise decision validation");
   const invalid = {
     ...tensorBatch,

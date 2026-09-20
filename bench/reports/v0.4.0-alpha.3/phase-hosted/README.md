@@ -44,3 +44,9 @@ Final checks also passed restart persistence and four live backup rotations at
 capacity. The private rotation helper passed failed-capture rollback and
 interrupted-run recovery fixtures. A final rotated archive was downloaded
 off-host and restored again. The temporary restore listener was stopped.
+
+The complete connector platform test also passed against an isolated workspace
+on the ARM64 host: all 36 presets, asset validation, exact record export,
+idempotent retries, invalid Jev probability rejection without checkpoint advance,
+MCP discovery, SIGKILL recovery and independent backup restoration. The missing
+tensor test selects JEPA explicitly rather than depending on catalog order.
