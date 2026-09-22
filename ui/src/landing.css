@@ -256,7 +256,7 @@
 .world-controls {
   max-width: 360px;
   margin: 0 auto;
-  padding-top: 0;
+  padding-top: 28px;
   position: relative;
   z-index: 5;
 }
@@ -828,4 +828,10 @@
     black 90%,
     transparent
   );
+}
+
+@media (max-width: 760px) {
+  .world-controls {
+    padding-top: 8px;
+  }
 }
