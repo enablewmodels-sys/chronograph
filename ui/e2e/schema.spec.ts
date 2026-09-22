@@ -1,6 +1,26 @@
 import { test, expect, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+async function navigate(page: Page, name: string) {
+  const menu = page.getByRole("button", {
+    name: "Open navigation",
+    exact: true,
+  });
+  if (await menu.isVisible()) await menu.click();
+  await page
+    .getByRole("navigation", { name: "Console navigation" })
+    .getByRole("link", { name, exact: true })
+    .click();
+}
+async function disconnect(page: Page) {
+  const menu = page.getByRole("button", {
+    name: "Open navigation",
+    exact: true,
+  });
+  if (await menu.isVisible()) await menu.click();
+  await page.locator(".sidebar:visible .account-menu summary").click();
+  await page.getByRole("button", { name: "Disconnect", exact: true }).click();
+}
 const config = async () =>
   JSON.parse(await readFile(resolve("../.work/e2e-config.json"), "utf8")) as {
     token: string;
@@ -12,11 +32,9 @@ async function connect(page: Page, token?: string) {
   await page.getByLabel("API token", { exact: true }).fill(token || c.token);
   await page.getByRole("button", { name: "Connect workspace" }).click();
   await expect(page).toHaveURL(/\/app$/);
-  await page
-    .getByRole("link", { name: "Schema & migrations", exact: true })
-    .click();
+  await navigate(page, "Schema & migrations");
   await expect(
-    page.getByRole("heading", { name: "Give your graph a language." }),
+    page.getByRole("heading", { name: "Schema & migrations" }),
   ).toBeVisible();
 }
 async function applyDraft(page: Page) {
@@ -69,7 +87,7 @@ test("visual schema, imported migration, typed write, settings and history", asy
     .click();
   await expect(
     page.getByRole("textbox", { name: "Migration JSON", exact: true }),
-  ).toHaveValue(new RegExp(name));
+  ).toHaveText(new RegExp(name));
   await applyDraft(page);
   await page.getByRole("tab", { name: /^Relations/ }).click();
   await page.getByLabel("Find a relation").fill(name);
@@ -79,7 +97,7 @@ test("visual schema, imported migration, typed write, settings and history", asy
     path: `/tmp/chronograph-schema-relations-${info.project.name}-${info.repeatEachIndex}.png`,
     fullPage: true,
   });
-  await page.getByRole("link", { name: "Write data", exact: true }).click();
+  await navigate(page, "Write data");
   await page
     .getByRole("combobox", { name: "Schema relation", exact: true })
     .selectOption(String(kind));
@@ -109,9 +127,7 @@ test("visual schema, imported migration, typed write, settings and history", asy
     sequence: "18446744073709551615",
   });
   expect(queried.edges[0].relation).toBe(name);
-  await page
-    .getByRole("link", { name: "Schema & migrations", exact: true })
-    .click();
+  await navigate(page, "Schema & migrations");
   await page.getByRole("tab", { name: /^Migrations/ }).click();
   const migration = {
     version: 1,
@@ -133,8 +149,9 @@ test("visual schema, imported migration, typed write, settings and history", asy
     });
   await expect(
     page.getByRole("textbox", { name: "Migration JSON", exact: true }),
-  ).toHaveValue(JSON.stringify(migration, null, 2));
+  ).toHaveText(JSON.stringify(migration, null, 2), { useInnerText: true });
   await applyDraft(page);
+  await page.locator(".schema-history > summary").click();
   await expect(
     page.locator(".schema-history-item").filter({ hasText: migration.name }),
   ).toBeVisible();
@@ -206,7 +223,7 @@ test("invalid files, stale previews, draft preservation and read-only access", a
   await expect(
     page.getByRole("button", { name: "Apply migration", exact: true }),
   ).toHaveCount(0);
-  await expect(editor).toHaveValue('{"not a migration":true}');
+  await expect(editor).toHaveText('{"not a migration":true}');
   const c = await config(),
     headers = { Authorization: `Bearer ${c.token}` };
   const suffix = `${info.project.name}_${info.repeatEachIndex}`;
@@ -257,42 +274,41 @@ test("invalid files, stale previews, draft preservation and read-only access", a
   await expect(page.getByRole("alert")).toContainText(
     "Schema changed since preview",
   );
-  await expect(editor).toHaveValue(source);
+  await expect(editor).toHaveText(source);
   await page
     .getByRole("button", { name: "Refresh schema", exact: true })
     .click();
   await expect(
     page.getByRole("button", { name: "Apply migration", exact: true }),
   ).toBeDisabled();
+  await page.locator(".schema-history > summary").click();
   await page
     .locator(".schema-history-item")
     .filter({ hasText: "Concurrent migration" })
     .first()
     .click();
-  await expect(editor).toHaveAttribute("readonly", "");
+  await expect(editor).toHaveAttribute("contenteditable", "false");
   await page
     .getByRole("button", { name: "Back to draft", exact: true })
     .click();
-  await expect(editor).toHaveValue(source);
-  await page.getByRole("link", { name: "Overview", exact: true }).click();
-  await page
-    .getByRole("link", { name: "Schema & migrations", exact: true })
-    .click();
+  await expect(editor).toHaveText(source);
+  await navigate(page, "Overview");
+  await navigate(page, "Schema & migrations");
   await page.getByRole("tab", { name: /^Migrations/ }).click();
-  await expect(editor).toHaveValue(source);
+  await expect(editor).toHaveText(source);
   const reader = await (
     await page.request.post(c.url + "/v1/tokens", {
       headers,
       data: { name: `schema_reader_${suffix}`, scope: "read", days: 1 },
     })
   ).json();
-  await page.getByRole("button", { name: "Disconnect", exact: true }).click();
+  await disconnect(page);
   await connect(page, reader.token);
   await expect(
     page.getByRole("button", { name: "New relation", exact: true }),
   ).toBeDisabled();
   await page.getByRole("tab", { name: /^Migrations/ }).click();
-  await expect(editor).toHaveAttribute("readonly", "");
+  await expect(editor).toHaveAttribute("contenteditable", "false");
   await expect(
     page.getByLabel("Import migration file", { exact: true }),
   ).toBeDisabled();
@@ -371,7 +387,7 @@ test("ordered multi-file plan, baseline export and reviewed rollback", async ({
     name: "Migration JSON",
     exact: true,
   });
-  await expect(editor).toHaveValue(/migrations/);
+  await expect(editor).toHaveText(/migrations/);
   await page
     .getByRole("button", { name: "Preview migration", exact: true })
     .click();
@@ -406,6 +422,7 @@ test("ordered multi-file plan, baseline export and reviewed rollback", async ({
   expect(await readFile((await download.path())!, "utf8")).toContain(
     `plan_relation_${suffix.replaceAll("-", "_")}`,
   );
+  await page.locator(".schema-history > summary").click();
   await page
     .getByLabel("Restore definitions from revision", { exact: false })
     .selectOption(String(before.revision));
@@ -425,7 +442,7 @@ test("ordered multi-file plan, baseline export and reviewed rollback", async ({
       ).json()
     ).revision,
   ).toBe(after.revision);
-  await expect(editor).toHaveValue(/drop_relation/);
+  await expect(editor).toHaveText(/drop_relation/);
   await applyDraft(page);
   const final = await (
     await page.request.post(c.url + "/v1/schema", { headers, data: {} })

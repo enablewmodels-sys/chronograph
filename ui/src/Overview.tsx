@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, RefreshCw } from "lucide-react";
 import { useAuth } from "./main";
+import { publicPath } from "./site";
 import { graph, bytes, type Stats } from "./api";
 import { Busy, DocLink, Head, useAction } from "./shared";
 export default function Overview() {
@@ -15,7 +16,7 @@ export default function Overview() {
   return (
     <>
       <Head
-        title="Your world, remembered."
+        title="Overview"
         text="A persistent workspace for relationships and their history."
       >
         <button
@@ -45,14 +46,16 @@ export default function Overview() {
       </div>
       {stats?.nodes === "0" ? (
         <section className="welcome-panel">
-          <div className="orbit-art" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
+          <img
+            className="overview-world"
+            src={publicPath("/images/world/t0.webp")}
+            width="1200"
+            height="800"
+            alt="Illustrative robot world"
+          />
           <div>
-            <p className="mono">An empty graph. An open possibility.</p>
-            <h2>Start with a world in motion.</h2>
+            <p className="mono">Your project is ready.</p>
+            <h2>Explore a sample world.</h2>
             <p>
               Load a small, synthetic scene: 8 nodes and 40 relationship
               versions across five moments. Explore how a robot’s view changes
@@ -80,7 +83,7 @@ export default function Overview() {
           <section className="welcome-panel">
             <div>
               <p className="mono">Every relationship has a timeline.</p>
-              <h2>Explore the state of your world.</h2>
+              <h2>Explore your graph.</h2>
               <p>
                 Move between a point in time, an interval, and the full
                 relationship history. Sample a local neighborhood for your next

@@ -1,8 +1,14 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Github, LockKeyhole, ShieldCheck } from "lucide-react";
+import { publicPath } from "./site";
 import { Busy, Field, Logo, SubmitForm, useAction } from "./shared";
-import { githubSignIn, managedApi, type ManagedSession } from "./managed-api";
+import {
+  socialSignIn,
+  managedApi,
+  type ManagedSession,
+  type SocialProvider,
+} from "./managed-api";
 
 export function AccountFrame({ children }: { children: ReactNode }) {
   return (
@@ -33,6 +39,13 @@ export function AccountFrame({ children }: { children: ReactNode }) {
             </span>
           </div>
           <Link to="/documentation/HOSTED">Explore Chronograph Managed</Link>
+          <img
+            className="account-world"
+            src={publicPath("/images/world/t1.webp")}
+            width="1200"
+            height="800"
+            alt="A recorded moment in an illustrative world"
+          />
         </section>
         <section className="account-form-panel">{children}</section>
       </div>
@@ -56,26 +69,32 @@ export default function ManagedLogin({
   const [code, setCode] = useState("");
   const [challenge, setChallenge] = useState(false);
   const [recovery, setRecovery] = useState(false);
-  const [config, setConfig] = useState<{ github: boolean } | null>(null);
+  const [config, setConfig] = useState<{
+    github: boolean;
+    google: boolean;
+  } | null>(null);
   const [enrollment, setEnrollment] = useState<{
     qrDataUrl: string;
     totpURI: string;
     backupCodes: string[];
   } | null>(null);
   const [saved, setSaved] = useState(false);
-  const githubStarted = useRef(false);
+  const socialStarted = useRef(false);
   useEffect(() => {
     void action.run(async () => {
-      const c = await managedApi<{ github: boolean }>("/managed/config");
+      const c = await managedApi<{ github: boolean; google: boolean }>(
+        "/managed/config",
+      );
       setConfig(c);
+      const provider = new URLSearchParams(location.search).get("provider");
       if (
-        new URLSearchParams(location.search).get("provider") === "github" &&
-        c.github &&
-        !githubStarted.current &&
+        (provider === "github" || provider === "google") &&
+        c[provider] &&
+        !socialStarted.current &&
         !session?.user
       ) {
-        githubStarted.current = true;
-        await githubSignIn();
+        socialStarted.current = true;
+        await socialSignIn(provider);
       }
     });
   }, []);
@@ -242,20 +261,26 @@ export default function ManagedLogin({
       ) : (
         <>
           <h2>Welcome to Chronograph.</h2>
-          <p>Sign in to your projects or create an account with GitHub.</p>
+          <p>Sign in to your projects.</p>
           {new URLSearchParams(location.search).has("error") && (
             <div className="notice error" role="alert">
-              GitHub sign-in could not be completed. Use a verified GitHub email
-              and try again.
+              Sign-in could not be completed. Use a verified provider email and
+              try again.
             </div>
           )}
-          <button
-            className="github-signin"
-            disabled={!config?.github || action.busy}
-            onClick={() => void action.run(githubSignIn)}
-          >
-            <Github size={20} /> Continue with GitHub
-          </button>
+          {(["google", "github"] as SocialProvider[])
+            .filter((provider) => config?.[provider])
+            .map((provider) => (
+              <button
+                key={provider}
+                className={provider + "-signin"}
+                disabled={action.busy}
+                onClick={() => void action.run(() => socialSignIn(provider))}
+              >
+                {provider === "github" ? <Github size={19} /> : <GoogleMark />}
+                Continue with {provider === "google" ? "Google" : "GitHub"}
+              </button>
+            ))}
           <div className="form-divider">
             <span>or sign in with email</span>
           </div>
@@ -298,9 +323,10 @@ export default function ManagedLogin({
           <details className="account-details">
             <summary>New here or forgot your password?</summary>
             <p>
-              Use GitHub to create an account. Email accounts start with a
-              private invitation from your administrator. Automated email
-              recovery will be available when email delivery is connected.
+              Use an available sign-in provider to create an account. Email
+              accounts start with a private invitation from your administrator.
+              Automated email recovery will be available when email delivery is
+              connected.
             </p>
             <Link to="/documentation/HOSTED#accounts-and-project-permissions">
               Account recovery options
@@ -423,5 +449,28 @@ export function ActivateAccount() {
       )}
       {action.feedback}
     </AccountFrame>
+  );
+}
+
+function GoogleMark() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="#4285F4"
+        d="M21.6 12.23c0-.71-.06-1.39-.18-2.05H12v3.88h5.38a4.6 4.6 0 0 1-2 3.02v2.51h3.24c1.89-1.74 2.98-4.31 2.98-7.36Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 22c2.7 0 4.96-.9 6.62-2.41l-3.24-2.51c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H3.07v2.59A10 10 0 0 0 12 22Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M6.41 13.92a6 6 0 0 1 0-3.84V7.49H3.07a10 10 0 0 0 0 9.02l3.34-2.59Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.96c1.47 0 2.79.5 3.83 1.5l2.88-2.88A9.61 9.61 0 0 0 12 2a10 10 0 0 0-8.93 5.49l3.34 2.59A6 6 0 0 1 12 5.96Z"
+      />
+    </svg>
   );
 }

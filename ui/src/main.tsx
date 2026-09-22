@@ -32,14 +32,15 @@ import {
   ShieldCheck,
   Users,
   LockKeyhole,
+  Menu,
+  ChevronDown,
 } from "lucide-react";
 import "@fontsource-variable/manrope";
 import "./style.css";
-import "./theme.css";
 import "./schema.css";
 import { SchemaProvider } from "./schema-store";
 import { api, setToken, useDemo, demoConnection, type Connection } from "./api";
-import { Busy, Field, Logo, SubmitForm, useAction } from "./shared";
+import { Busy, Field, Logo, SubmitForm, useAction, Drawer } from "./shared";
 import Landing from "./Landing";
 import { managedSite, publicSite } from "./site";
 import {
@@ -47,9 +48,16 @@ import {
   setManagedProject,
   type ManagedSession,
 } from "./managed-api";
-import ManagedLogin, { ActivateAccount } from "./ManagedLogin";
-import ManagedProjects, { JoinProject } from "./ManagedProjects";
+const ManagedLogin = lazy(() => import("./ManagedLogin"));
+const ActivateAccount = lazy(() =>
+  import("./ManagedLogin").then((m) => ({ default: m.ActivateAccount })),
+);
+const ManagedProjects = lazy(() => import("./ManagedProjects"));
+const JoinProject = lazy(() =>
+  import("./ManagedProjects").then((m) => ({ default: m.JoinProject })),
+);
 import "./managed.css";
+import "./theme.css";
 import { BranchPicker, WorkspaceProvider } from "./workspace";
 const Explorer = lazy(() => import("./Explorer"));
 const Overview = lazy(() => import("./Overview"));
@@ -317,14 +325,14 @@ function Login() {
 }
 const navigation = [
   { path: "", title: "Overview", icon: Home },
-  { path: "explorer", title: "Temporal explorer", icon: Network },
+  { path: "explorer", title: "Explorer", icon: Network },
   { path: "branches", title: "Branches", icon: GitBranch },
   { path: "schema", title: "Schema & migrations", icon: Settings2 },
   { path: "write", title: "Write data", icon: Database },
   { path: "connectors", title: "Connectors", icon: Plug },
   {
     path: "access",
-    title: managedSite ? "Connections & API keys" : "Agent access",
+    title: "Connections & keys",
     icon: KeyRound,
   },
   { path: "operations", title: "Operations", icon: Settings2 },
@@ -340,76 +348,113 @@ function Console() {
   const { update, connection, managed, refreshManaged } = useAuth(),
     action = useAction(),
     navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const sidebar = (
+    <>
+      <div>
+        <Logo />
+      </div>
+      <nav aria-label="Console navigation" onClick={() => setMobileOpen(false)}>
+        {[
+          ["Workspace", ["", "explorer", "branches"]],
+          ["Build", ["schema", "write", "connectors"]],
+          ["Manage", ["access", "secrets", "team", "operations"]],
+        ].map(([label, paths]) => {
+          const items = navigation
+            .filter((n) => paths.includes(n.path))
+            .filter(
+              (n) =>
+                n.path !== "write" || connection?.credential.scope !== "read",
+            )
+            .filter(
+              (n) =>
+                !["access", "operations", "team", "secrets"].includes(n.path) ||
+                connection?.credential.scope === "admin",
+            );
+          return items.length ? (
+            <div key={String(label)}>
+              <div className="nav-section">{label}</div>
+              {items.map(({ path, title, icon: Icon }) => (
+                <NavLink key={path} end={!path} to={`/app/${path}`}>
+                  <Icon size={17} strokeWidth={1.6} />
+                  {title}
+                </NavLink>
+              ))}
+            </div>
+          ) : null;
+        })}
+      </nav>
+      <div className="sidebar-bottom">
+        {managedSite && (
+          <Link to="/projects">
+            <Database size={17} />
+            All projects
+          </Link>
+        )}
+        <Link
+          to={managedSite ? "/documentation/HOSTED" : "/documentation/ISOLATED"}
+        >
+          <BookOpen size={17} />
+          Documentation
+        </Link>
+        <details className="account-menu">
+          <summary>
+            <ShieldCheck size={17} />
+            Account
+            <ChevronDown size={13} />
+          </summary>
+          <div>
+            {managedSite && (
+              <Link to="/app/security" onClick={() => setMobileOpen(false)}>
+                Account security
+              </Link>
+            )}
+            <button
+              className="ghost"
+              disabled={action.busy}
+              onClick={() =>
+                void action.run(async () => {
+                  if (managedSite) await managedApi("/api/auth/sign-out", {});
+                  if (!publicSite) update(null);
+                  navigate(publicSite ? "/" : "/login");
+                })
+              }
+            >
+              <LogOut size={16} />
+              {publicSite
+                ? "Exit preview"
+                : managedSite
+                  ? "Sign out"
+                  : "Disconnect"}
+            </button>
+          </div>
+        </details>
+        {action.feedback}
+      </div>
+    </>
+  );
   return (
     <SchemaProvider synthetic={connection?.edition === "synthetic"}>
       <WorkspaceProvider synthetic={connection?.edition === "synthetic"}>
         <div className="console">
-          <aside className="sidebar">
-            <div>
-              <Logo />
-              <span className="sidebar-caption">
-                {managedSite ? "Managed console" : "Community console"}
-              </span>
-            </div>
-            <nav aria-label="Console navigation">
-              {navigation
-                .filter(
-                  (n) =>
-                    n.path !== "write" ||
-                    connection?.credential.scope !== "read",
-                )
-                .filter(
-                  (n) =>
-                    !["access", "operations", "team", "secrets"].includes(
-                      n.path,
-                    ) || connection?.credential.scope === "admin",
-                )
-                .map(({ path, title, icon: Icon }) => (
-                  <NavLink key={title} end={!path} to={`/app/${path}`}>
-                    <Icon size={22} strokeWidth={1.7} />
-                    {title}
-                  </NavLink>
-                ))}
-            </nav>
-            <div className="sidebar-bottom">
-              {managedSite && (
-                <Link to="/projects">
-                  <Database size={22} />
-                  All projects
-                </Link>
-              )}
-              <Link
-                to={
-                  managedSite
-                    ? "/documentation/HOSTED"
-                    : "/documentation/QUICKSTART"
-                }
-              >
-                <BookOpen size={22} /> Documentation
-              </Link>
-              <button
-                className="ghost"
-                onClick={() =>
-                  void action.run(async () => {
-                    if (managedSite) await managedApi("/api/auth/sign-out", {});
-                    if (!publicSite) update(null);
-                    navigate(publicSite ? "/" : "/login");
-                  })
-                }
-                disabled={action.busy}
-              >
-                <LogOut size={22} />{" "}
-                {publicSite
-                  ? "Exit preview"
-                  : managedSite
-                    ? "Sign out"
-                    : "Disconnect"}
-              </button>
-              {action.feedback}
-            </div>
-          </aside>
+          <aside className="sidebar">{sidebar}</aside>
+          <Drawer
+            open={mobileOpen}
+            onClose={() => setMobileOpen(false)}
+            title="Workspace"
+            className="mobile-navigation"
+          >
+            <aside className="sidebar">{sidebar}</aside>
+          </Drawer>
           <div className="workspace">
             <div className="workspace-top">
+              <button
+                className="ghost mobile-menu-button"
+                aria-label="Open navigation"
+                onClick={() => setMobileOpen(true)}
+              >
+                <Menu size={20} />
+              </button>
               {managedSite ? (
                 <select
                   className="project-picker"
@@ -438,6 +483,14 @@ function Console() {
                 </span>
               )}
               <BranchPicker />
+              {connection?.credential.scope === "admin" && (
+                <Link
+                  className="button outline connect-action"
+                  to="/app/access"
+                >
+                  Connect
+                </Link>
+              )}
               <span className="status">
                 <i />{" "}
                 {connection?.edition === "synthetic"

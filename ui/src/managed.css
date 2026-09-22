@@ -1,8 +1,8 @@
 .account-page {
   min-height: 100vh;
-  background: #f8fbf8;
+  background: var(--canvas);
   padding: 30px 5vw;
-  color: #14291d;
+  color: var(--ink);
 }
 .account-top,
 .account-footer,
@@ -16,7 +16,7 @@
 .account-footer,
 .account-story > a {
   font-size: 13px;
-  color: #53655b;
+  color: var(--muted);
 }
 .account-top > a {
   display: flex;
@@ -41,7 +41,7 @@
   font-size: 19px;
   line-height: 1.65;
   max-width: 390px;
-  color: #607066;
+  color: var(--muted);
 }
 .account-promise {
   display: flex;
@@ -53,10 +53,10 @@
 }
 .account-form-panel {
   padding: 38px;
-  background: white;
-  border: 1px solid #dfe8e0;
+  background: var(--surface);
+  border: 1px solid var(--rule);
   border-radius: 14px;
-  box-shadow: 0 12px 50px #0a301206;
+  box-shadow: 0 12px 50px #00000018;
 }
 .account-form-panel h2 {
   font-size: 27px;
@@ -65,7 +65,7 @@
   margin: 0 0 12px;
 }
 .account-form-panel > p {
-  color: #627268;
+  color: var(--muted);
   font-size: 14px;
   line-height: 1.7;
 }
@@ -86,15 +86,15 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  background: #14291d;
+  background: var(--surface-hover);
   color: #fff;
-  border-color: #14291d;
+  border-color: var(--rule);
 }
 .form-divider {
   position: relative;
   text-align: center;
   margin: 26px 0;
-  color: #849188;
+  color: var(--muted);
   font-size: 12px;
 }
 .form-divider:before {
@@ -103,23 +103,23 @@
   top: 50%;
   left: 0;
   right: 0;
-  border-top: 1px solid #e3eae4;
+  border-top: 1px solid var(--rule);
 }
 .form-divider span {
   position: relative;
-  background: #fff;
+  background: var(--surface);
   padding: 0 12px;
 }
 .account-details {
   margin: 20px 0;
   font-size: 12px;
   line-height: 1.7;
-  color: #526458;
+  color: var(--muted);
 }
 .account-details summary {
   cursor: pointer;
   font-weight: 650;
-  color: #264b36;
+  color: var(--ink);
 }
 .account-details code.secret-text {
   display: block;
@@ -128,7 +128,7 @@
 }
 .account-terms {
   font-size: 11px !important;
-  border-top: 1px solid #edf1ed;
+  border-top: 1px solid var(--rule);
   padding-top: 20px;
   margin-top: 24px;
 }
@@ -136,8 +136,8 @@
   display: inline-flex;
   padding: 13px;
   border-radius: 12px;
-  background: #eaf4ed;
-  color: #245d3d;
+  background: var(--surface-hover);
+  color: var(--accent-soft);
   margin-bottom: 20px;
 }
 .auth-qr {
@@ -150,7 +150,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 5px;
-  background: #f7faf7;
+  background: var(--surface);
   padding: 12px;
   margin: 12px 0;
   overflow-wrap: anywhere;
@@ -167,7 +167,7 @@
   flex-shrink: 0;
 }
 .account-email {
-  background: #f3f7f3;
+  background: var(--surface);
   padding: 12px;
   border-radius: 6px;
   overflow-wrap: anywhere;
@@ -194,7 +194,7 @@
   margin: 0 0 16px;
 }
 .projects-heading p {
-  color: #647367;
+  color: var(--muted);
   line-height: 1.7;
 }
 .project-list {
@@ -207,8 +207,8 @@
   gap: 22px;
   padding: 24px;
   text-align: left;
-  border: 1px solid #dbe7df;
-  background: #fff;
+  border: 1px solid var(--rule);
+  background: var(--surface);
   border-radius: 10px;
   align-items: center;
   width: 100%;
@@ -226,11 +226,11 @@
 }
 .project-row small {
   font-size: 12px;
-  color: #768179;
+  color: var(--muted);
 }
 .project-row:hover {
-  background: #f5faf6;
-  border-color: #8bae96;
+  background: var(--surface-hover);
+  border-color: var(--accent);
 }
 .new-project {
   max-width: 650px;
@@ -252,7 +252,7 @@
   max-width: 200px;
   font-size: 13px;
   padding: 8px 12px;
-  border-color: #dce6dd;
+  border-color: var(--rule);
 }
 .managed-two-column {
   display: grid;
@@ -293,7 +293,7 @@
   align-items: center;
   gap: 18px;
   padding: 22px 0;
-  border-top: 1px solid #e7ece7;
+  border-top: 1px solid var(--rule);
 }
 .device-row > div {
   flex: 1;
@@ -308,11 +308,11 @@
 .device-row span {
   font-size: 12px;
   overflow-wrap: anywhere;
-  color: #6c776e;
+  color: var(--muted);
 }
 .device-row small {
   font-size: 11px;
-  color: #88928b;
+  color: var(--muted);
 }
 .member-invite {
   display: flex;
@@ -332,15 +332,15 @@
   font-size: 12px;
 }
 .managed-table th {
-  color: #768277;
+  color: var(--muted);
   font-size: 11px;
   font-weight: 600;
   padding: 15px 12px;
-  border-bottom: 1px solid #dde6dd;
+  border-bottom: 1px solid var(--rule);
 }
 .managed-table td {
   padding: 16px 12px;
-  border-bottom: 1px solid #edf1ed;
+  border-bottom: 1px solid var(--rule);
   vertical-align: middle;
 }
 .managed-table td strong,
@@ -350,7 +350,7 @@
 }
 .managed-table td span {
   font-size: 11px;
-  color: #7a887e;
+  color: var(--muted);
 }
 .managed-table select {
   min-width: 100px;
@@ -495,22 +495,22 @@
 .graph-view.tree-layout .graph-tools {
   position: sticky;
   top: 0;
-  background: #f8fbf8;
+  background: var(--canvas);
   z-index: 1;
 }
 .console .project-picker,
 .console .managed-table select,
 .console .graph-tools select {
   color: var(--ink);
-  background: #101b14;
-  border: 1px solid #455347;
+  background: var(--surface);
+  border: 1px solid var(--rule);
   border-radius: 4px;
   padding: 9px 12px;
 }
 .console .managed-table button,
 .console .device-row button {
   background: transparent;
-  border: 1px solid #4b5b4f;
+  border: 1px solid var(--rule);
   color: var(--ink);
 }
 .console .graph-view.tree-layout .graph-tools {

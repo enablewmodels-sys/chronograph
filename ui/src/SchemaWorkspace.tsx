@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, lazy, Suspense } from "react";
 import {
   ArrowRight,
   Braces,
@@ -14,7 +14,7 @@ import {
 import { Link } from "react-router-dom";
 import { graph } from "./api";
 import { useAuth } from "./main";
-import { Busy, Field, Head, SubmitForm, useAction } from "./shared";
+import { Busy, Field, Head, SubmitForm, useAction, Drawer } from "./shared";
 import {
   migrationSource,
   migrationSources,
@@ -29,6 +29,8 @@ import {
 } from "./schema-store";
 import "./schema.css";
 import ConnectorPresets from "./ConnectorPresets";
+import type { EditorHandle } from "./MigrationEditor";
+const MigrationEditor = lazy(() => import("./MigrationEditor"));
 
 type Preview = {
   id?: string;
@@ -102,8 +104,9 @@ export default function Schema() {
   const [preview, setPreview] = useState<Preview | null>(null);
   const [previewSource, setPreviewSource] = useState("");
   const [viewing, setViewing] = useState("");
+  const [presetsOpen, setPresetsOpen] = useState(false);
   const [rollbackRevision, setRollbackRevision] = useState("0");
-  const editor = useRef<HTMLTextAreaElement>(null);
+  const editor = useRef<EditorHandle | null>(null);
   const savedDraft = useRef(source);
   useEffect(() => {
     if (catalog)
@@ -195,7 +198,7 @@ export default function Schema() {
   return (
     <>
       <Head
-        title="Give your graph a language."
+        title="Schema & migrations"
         text="Define relationships, map their properties and evolve your workspace through migrations."
       >
         <button
@@ -749,296 +752,335 @@ export default function Schema() {
                     >
                       <Download size={15} /> Export
                     </button>
-                  </div>
-                </div>
-                <p>
-                  Import ordered JSON files, paste a migration bundle, or use
-                  the relation and settings forms. All pending files commit
-                  together. Each migration is recorded once by ID and checksum.
-                </p>
-                {!viewing && (
-                  <ConnectorPresets
-                    onGenerate={changeSource}
-                    disabled={!admin || action.busy}
-                  />
-                )}
-                {viewing && (
-                  <div className="notice">
-                    Applied source is immutable.{" "}
-                    <button
-                      className="text-link"
-                      disabled={!admin}
-                      onClick={() => changeSource(savedDraft.current)}
-                    >
-                      Back to draft
-                    </button>{" "}
-                    ·{" "}
-                    <button
-                      className="text-link"
-                      disabled={!admin}
-                      onClick={() =>
-                        void action.run(async () => {
-                          const value = JSON.parse(source);
-                          changeSource(
-                            migrationSource(
-                              value.operations,
-                              `Amend ${value.name}`,
-                              [value.id],
-                            ),
-                          );
-                        })
-                      }
-                    >
-                      Copy to a new migration
-                    </button>
-                  </div>
-                )}
-                <Field label="Migration JSON">
-                  <textarea
-                    ref={editor}
-                    className="mono schema-code"
-                    rows={Math.max(
-                      12,
-                      Math.min(24, source.split("\n").length + 1),
-                    )}
-                    spellCheck={false}
-                    readOnly={!admin || !!viewing}
-                    disabled={action.busy}
-                    value={source}
-                    onChange={(e) => changeSource(e.target.value)}
-                  />
-                </Field>
-                <div className="schema-editor-footer">
-                  <span className="small muted">
-                    {source.split("\n").length} lines ·{" "}
-                    {(new TextEncoder().encode(source).length / 1024).toFixed(
-                      1,
-                    )}{" "}
-                    KiB · 1 MiB plan limit · 256 KiB per migration
-                  </span>
-                  <button
-                    className="outline"
-                    disabled={synthetic || action.busy || !source || !!viewing}
-                    onClick={() =>
-                      void action.run(async () => {
-                        setPreview(null);
-                        const sources = migrationSources(source);
-                        const result = await graph<Preview>(
-                          sources.length === 1
-                            ? "schema_preview"
-                            : "schema_plan",
-                          sources.length === 1
-                            ? { source: sources[0] }
-                            : { sources },
-                        );
-                        setPreview(result);
-                        setPreviewSource(source);
-                      })
-                    }
-                  >
-                    <Busy busy={action.busy}>Preview migration</Busy>
-                  </button>
-                </div>
-                {preview && (
-                  <section
-                    className="schema-preview"
-                    aria-label="Migration preview"
-                  >
-                    <div className="schema-card-head">
-                      <h3>
-                        <Check size={18} />{" "}
-                        {preview.already_applied
-                          ? "Already applied"
-                          : "Ready for review"}
-                      </h3>
-                      <span className="scope-badge">
-                        Revision {preview.expected_revision} →{" "}
-                        {preview.schema_revision ??
-                          preview.expected_revision +
-                            (preview.already_applied ? 0 : 1)}
-                      </span>
-                    </div>
-                    {preview.migrations && (
-                      <ol aria-label="Ordered migration plan">
-                        {preview.migrations.map((m) => (
-                          <li key={m.id}>
-                            <strong>{m.name}</strong> ·{" "}
-                            {m.already_applied ? "Already applied" : "Pending"}
-                            <div className="small muted">
-                              {m.id}
-                              {m.requires.length > 0 &&
-                                ` · requires ${m.requires.join(", ")}`}
-                            </div>
-                          </li>
-                        ))}
-                      </ol>
-                    )}
-                    {changes.length ? (
-                      <ul>
-                        {changes.map((c) => (
-                          <li key={c}>{c}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p>No catalog changes.</p>
-                    )}
-                    <details>
-                      <summary>Compare complete definitions</summary>
-                      <div className="schema-diff">
-                        <div>
-                          <h4>Before</h4>
-                          <pre>{JSON.stringify(preview.before, null, 2)}</pre>
-                        </div>
-                        <div>
-                          <h4>After</h4>
-                          <pre>{JSON.stringify(preview.after, null, 2)}</pre>
-                        </div>
-                      </div>
-                    </details>
-                    <p className="small muted">{preview.warnings.join(" ")}</p>
-                    <p className="small mono schema-checksum">
-                      SHA-256 {preview.checksum}
-                    </p>
-                    {!previewValid && (
-                      <p className="notice">
-                        The schema or draft changed. Refresh and preview again.
-                      </p>
-                    )}
-                    <button
-                      className="primary"
-                      disabled={
-                        !admin ||
-                        action.busy ||
-                        !previewValid ||
-                        preview.already_applied
-                      }
-                      onClick={() =>
-                        void action.run(async () => {
-                          const sources = migrationSources(source);
-                          await graph(
-                            sources.length === 1
-                              ? "schema_apply"
-                              : "schema_apply_plan",
-                            {
-                              ...(sources.length === 1
-                                ? { source: sources[0] }
-                                : { sources }),
-                              checksum: preview.checksum,
-                              expected_revision: preview.expected_revision,
-                            },
-                          );
-                          setSource(sources[sources.length - 1]);
-                          setViewing(
-                            preview.migrations?.[preview.migrations.length - 1]
-                              ?.id ||
-                              preview.id ||
-                              "applied",
-                          );
-                          setPreview(null);
-                          await refresh();
-                        }, "Migration applied and synchronized to disk.")
-                      }
-                    >
-                      <GitCommitHorizontal size={17} /> Apply migration
-                    </button>
-                  </section>
-                )}
-              </section>
-              <aside className="panel schema-history">
-                <div className="schema-card-head">
-                  <h2>Migration history</h2>
-                  <span>{catalog.history.length}</span>
-                </div>
-                <p className="small muted">
-                  Applied in this workspace. Choose an entry to inspect or
-                  export its original file.
-                </p>
-                {admin && catalog.history.length > 0 && (
-                  <div className="schema-rollback">
-                    <Field
-                      label="Restore definitions from revision"
-                      hint="Creates a new migration for review. Data and history remain intact; unsafe changes are rejected."
-                    >
-                      <select
-                        value={rollbackRevision}
-                        disabled={action.busy}
-                        onChange={(e) => setRollbackRevision(e.target.value)}
+                    {!viewing && (
+                      <button
+                        className="outline"
+                        disabled={!admin || action.busy}
+                        onClick={() => setPresetsOpen(true)}
                       >
-                        <option value="0">0 · Empty schema</option>
-                        {[...catalog.history]
-                          .reverse()
-                          .filter((h) => h.revision < catalog.revision)
-                          .map((h) => (
-                            <option key={h.id} value={h.revision}>
-                              {h.revision} · {h.name}
-                            </option>
-                          ))}
-                      </select>
+                        Presets
+                      </button>
+                    )}
+                  </div>
+                </div>
+                {!viewing && (
+                  <Drawer
+                    open={presetsOpen}
+                    onClose={() => setPresetsOpen(false)}
+                    title="Model & connector presets"
+                  >
+                    <ConnectorPresets
+                      onGenerate={(value) => {
+                        changeSource(value);
+                        setPresetsOpen(false);
+                      }}
+                      disabled={!admin || action.busy}
+                    />
+                  </Drawer>
+                )}
+                <div
+                  className={`migration-workbench ${preview ? "has-preview" : ""}`}
+                >
+                  <div className="migration-source">
+                    {viewing && (
+                      <div className="notice">
+                        Applied source is immutable.{" "}
+                        <button
+                          className="text-link"
+                          disabled={!admin}
+                          onClick={() => changeSource(savedDraft.current)}
+                        >
+                          Back to draft
+                        </button>{" "}
+                        ·{" "}
+                        <button
+                          className="text-link"
+                          disabled={!admin}
+                          onClick={() =>
+                            void action.run(async () => {
+                              const value = JSON.parse(source);
+                              changeSource(
+                                migrationSource(
+                                  value.operations,
+                                  `Amend ${value.name}`,
+                                  [value.id],
+                                ),
+                              );
+                            })
+                          }
+                        >
+                          Copy to a new migration
+                        </button>
+                      </div>
+                    )}
+                    <Field label="Migration JSON">
+                      <Suspense
+                        fallback={<p className="loading">Loading editor…</p>}
+                      >
+                        <MigrationEditor
+                          value={source}
+                          onChange={changeSource}
+                          readOnly={!admin || !!viewing}
+                          disabled={action.busy}
+                          editorRef={editor}
+                        />
+                      </Suspense>
                     </Field>
+                    <div className="schema-editor-footer">
+                      <span className="small muted">
+                        {source.split("\n").length} lines ·{" "}
+                        {(
+                          new TextEncoder().encode(source).length / 1024
+                        ).toFixed(1)}{" "}
+                        KiB · 1 MiB plan limit · 256 KiB per migration
+                      </span>
+                      <button
+                        className="outline"
+                        disabled={
+                          synthetic || action.busy || !source || !!viewing
+                        }
+                        onClick={() =>
+                          void action.run(async () => {
+                            setPreview(null);
+                            const sources = migrationSources(source);
+                            const result = await graph<Preview>(
+                              sources.length === 1
+                                ? "schema_preview"
+                                : "schema_plan",
+                              sources.length === 1
+                                ? { source: sources[0] }
+                                : { sources },
+                            );
+                            setPreview(result);
+                            setPreviewSource(source);
+                          })
+                        }
+                      >
+                        <Busy busy={action.busy}>Preview migration</Busy>
+                      </button>
+                    </div>
+                  </div>
+                  {preview && (
+                    <section
+                      className="schema-preview"
+                      aria-label="Migration preview"
+                    >
+                      <div className="schema-card-head">
+                        <h3>
+                          <Check size={18} />{" "}
+                          {preview.already_applied
+                            ? "Already applied"
+                            : "Ready for review"}
+                        </h3>
+                        <span className="scope-badge">
+                          Revision {preview.expected_revision} →{" "}
+                          {preview.schema_revision ??
+                            preview.expected_revision +
+                              (preview.already_applied ? 0 : 1)}
+                        </span>
+                      </div>
+                      <button
+                        className="ghost"
+                        onClick={() => {
+                          setPreview(null);
+                          editor.current?.focus();
+                        }}
+                      >
+                        Back to editing
+                      </button>
+                      {preview.migrations && (
+                        <ol aria-label="Ordered migration plan">
+                          {preview.migrations.map((m) => (
+                            <li key={m.id}>
+                              <strong>{m.name}</strong> ·{" "}
+                              {m.already_applied
+                                ? "Already applied"
+                                : "Pending"}
+                              <div className="small muted">
+                                {m.id}
+                                {m.requires.length > 0 &&
+                                  ` · requires ${m.requires.join(", ")}`}
+                              </div>
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                      {changes.length ? (
+                        <ul>
+                          {changes.map((c) => (
+                            <li key={c}>{c}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>No catalog changes.</p>
+                      )}
+                      <details>
+                        <summary>Compare complete definitions</summary>
+                        <div className="schema-diff">
+                          <div>
+                            <h4>Before</h4>
+                            <pre>{JSON.stringify(preview.before, null, 2)}</pre>
+                          </div>
+                          <div>
+                            <h4>After</h4>
+                            <pre>{JSON.stringify(preview.after, null, 2)}</pre>
+                          </div>
+                        </div>
+                      </details>
+                      <p className="small muted">
+                        {preview.warnings.join(" ")}
+                      </p>
+                      <p className="small mono schema-checksum">
+                        SHA-256 {preview.checksum}
+                      </p>
+                      {!previewValid && (
+                        <p className="notice">
+                          The schema or draft changed. Refresh and preview
+                          again.
+                        </p>
+                      )}
+                      <button
+                        className="primary"
+                        disabled={
+                          !admin ||
+                          action.busy ||
+                          !previewValid ||
+                          preview.already_applied
+                        }
+                        onClick={() =>
+                          void action.run(async () => {
+                            const sources = migrationSources(source);
+                            await graph(
+                              sources.length === 1
+                                ? "schema_apply"
+                                : "schema_apply_plan",
+                              {
+                                ...(sources.length === 1
+                                  ? { source: sources[0] }
+                                  : { sources }),
+                                checksum: preview.checksum,
+                                expected_revision: preview.expected_revision,
+                              },
+                            );
+                            setSource(sources[sources.length - 1]);
+                            setViewing(
+                              preview.migrations?.[
+                                preview.migrations.length - 1
+                              ]?.id ||
+                                preview.id ||
+                                "applied",
+                            );
+                            setPreview(null);
+                            await refresh();
+                          }, "Migration applied and synchronized to disk.")
+                        }
+                      >
+                        <GitCommitHorizontal size={17} /> Apply migration
+                      </button>
+                    </section>
+                  )}
+                </div>
+              </section>
+              <details className="panel schema-history">
+                <summary>Migration history · {catalog.history.length}</summary>
+                <div className="schema-history-content">
+                  <div className="schema-card-head">
+                    <h2>Migration history</h2>
+                    <span>{catalog.history.length}</span>
+                  </div>
+                  <p className="small muted">
+                    Applied in this workspace. Choose an entry to inspect or
+                    export its original file.
+                  </p>
+                  {admin && catalog.history.length > 0 && (
+                    <div className="schema-rollback">
+                      <Field
+                        label="Restore definitions from revision"
+                        hint="Creates a new migration for review. Data and history remain intact; unsafe changes are rejected."
+                      >
+                        <select
+                          value={rollbackRevision}
+                          disabled={action.busy}
+                          onChange={(e) => setRollbackRevision(e.target.value)}
+                        >
+                          <option value="0">0 · Empty schema</option>
+                          {[...catalog.history]
+                            .reverse()
+                            .filter((h) => h.revision < catalog.revision)
+                            .map((h) => (
+                              <option key={h.id} value={h.revision}>
+                                {h.revision} · {h.name}
+                              </option>
+                            ))}
+                        </select>
+                      </Field>
+                      <button
+                        className="outline"
+                        disabled={action.busy}
+                        onClick={() =>
+                          void action.run(async () => {
+                            const identity = JSON.parse(
+                              migrationSource(
+                                [],
+                                `Restore schema revision ${rollbackRevision}`,
+                              ),
+                            );
+                            const result = await graph<{ sources: string[] }>(
+                              "schema_rollback",
+                              {
+                                id: identity.id,
+                                name: identity.name,
+                                target_revision: Number(rollbackRevision),
+                              },
+                            );
+                            changeSource(migrationBundle(result.sources));
+                            editor.current?.focus();
+                          }, "Rollback drafted. Preview and review before applying.")
+                        }
+                      >
+                        Prepare rollback
+                      </button>
+                    </div>
+                  )}
+                  {!catalog.history.length && (
+                    <div className="schema-history-empty">
+                      <GitCommitHorizontal size={24} />
+                      <p>Your first migration starts the history.</p>
+                    </div>
+                  )}
+                  {catalog.history.map((h) => (
                     <button
-                      className="outline"
+                      className={`schema-history-item ${viewing === h.id ? "selected" : ""}`}
+                      key={h.id}
                       disabled={action.busy}
                       onClick={() =>
                         void action.run(async () => {
-                          const identity = JSON.parse(
-                            migrationSource(
-                              [],
-                              `Restore schema revision ${rollbackRevision}`,
-                            ),
+                          const result = await graph<{ source: string }>(
+                            "schema_migration",
+                            { id: h.id },
                           );
-                          const result = await graph<{ sources: string[] }>(
-                            "schema_rollback",
-                            {
-                              id: identity.id,
-                              name: identity.name,
-                              target_revision: Number(rollbackRevision),
-                            },
-                          );
-                          changeSource(migrationBundle(result.sources));
-                          editor.current?.focus();
-                        }, "Rollback drafted. Preview and review before applying.")
+                          setSource(result.source);
+                          setViewing(h.id);
+                          setPreview(null);
+                        })
                       }
                     >
-                      Prepare rollback
+                      <span className="schema-history-number">
+                        {h.revision}
+                      </span>
+                      <span>
+                        <strong>{h.name}</strong>
+                        <small>{h.id}</small>
+                        <small>
+                          {new Date(h.applied_at * 1000).toLocaleString()} ·{" "}
+                          {h.operations} operations
+                        </small>
+                      </span>
+                      <Check size={14} />
                     </button>
-                  </div>
-                )}
-                {!catalog.history.length && (
-                  <div className="schema-history-empty">
-                    <GitCommitHorizontal size={24} />
-                    <p>Your first migration starts the history.</p>
-                  </div>
-                )}
-                {catalog.history.map((h) => (
-                  <button
-                    className={`schema-history-item ${viewing === h.id ? "selected" : ""}`}
-                    key={h.id}
-                    disabled={action.busy}
-                    onClick={() =>
-                      void action.run(async () => {
-                        const result = await graph<{ source: string }>(
-                          "schema_migration",
-                          { id: h.id },
-                        );
-                        setSource(result.source);
-                        setViewing(h.id);
-                        setPreview(null);
-                      })
-                    }
-                  >
-                    <span className="schema-history-number">{h.revision}</span>
-                    <span>
-                      <strong>{h.name}</strong>
-                      <small>{h.id}</small>
-                      <small>
-                        {new Date(h.applied_at * 1000).toLocaleString()} ·{" "}
-                        {h.operations} operations
-                      </small>
-                    </span>
-                    <Check size={14} />
-                  </button>
-                ))}
-              </aside>
+                  ))}
+                </div>
+              </details>
             </div>
           )}
           {tab === "Settings" && settings && (

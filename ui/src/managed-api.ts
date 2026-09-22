@@ -52,14 +52,20 @@ export async function managedApi<T>(path: string, body?: unknown): Promise<T> {
   }
   return value;
 }
-export async function githubSignIn() {
+export type SocialProvider = "github" | "google";
+export async function socialSignIn(provider: SocialProvider) {
   const result = await managedApi<{ url: string }>("/api/auth/sign-in/social", {
-    provider: "github",
+    provider,
     callbackURL: window.location.origin + "/login",
-    errorCallbackURL: window.location.origin + "/login?error=github",
+    errorCallbackURL: window.location.origin + "/login?error=" + provider,
   });
   const target = new URL(result.url);
-  if (target.origin !== "https://github.com")
+  const expected =
+    provider === "google"
+      ? "https://accounts.google.com"
+      : "https://github.com";
+  if (target.origin !== expected || target.username || target.password)
     throw new Error("Unexpected sign-in destination.");
   window.location.assign(target.href);
 }
+export const githubSignIn = () => socialSignIn("github");

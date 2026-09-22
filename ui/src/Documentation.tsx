@@ -188,11 +188,30 @@ export default function Documentation() {
               : "Run Community on infrastructure you control."}
           </p>
           <nav aria-label="Documentation">
-            {docs.map(([id, title]) => (
-              <NavLink key={id} to={docUrl(id)}>
-                {title}
-              </NavLink>
-            ))}
+            {[
+              ["Get started", docs.slice(0, 5)],
+              ["Build", docs.slice(5, 12)],
+              ["Integrations", docs.slice(12, 18)],
+              ["Operate & reference", docs.slice(18)],
+            ].map(([label, entries]) => {
+              const links = entries as string[][];
+              return (
+                <details
+                  className="docs-group"
+                  key={String(label)}
+                  open={
+                    links.some(([id]) => id === doc) || label === "Get started"
+                  }
+                >
+                  <summary>{String(label)}</summary>
+                  {links.map(([id, title]) => (
+                    <NavLink key={id} to={docUrl(id)}>
+                      {title}
+                    </NavLink>
+                  ))}
+                </details>
+              );
+            })}
           </nav>
           <Link to="/">← Back to home</Link>
         </aside>

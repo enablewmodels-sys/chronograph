@@ -9,11 +9,11 @@ for durability, monitoring and recovery responsibilities.
 
 ## Start a project
 
-1. Choose **Start with GitHub**, or open a private email invitation from the
+1. Choose **Start with GitHub**, **Continue with Google** when your host has configured it, or open a private email invitation from the
    platform operator. Email/password signup and automated password recovery await
    email delivery configuration; an email address alone does not create an account.
 2. Set up an authenticator app. Save the one-time recovery codes privately, then
-   verify a code. GitHub login also requires this second factor.
+   verify a code. GitHub and Google login also require this second factor.
 3. Open **Projects**, name your project, and create it. Each project has its own
    Rust process, journal, schema catalog, assets, credentials, and members.
 4. In **Schema & migrations**, choose a connector preset or upload a JSON
@@ -47,10 +47,10 @@ revokes all account sessions. Recovery codes are one-use; a lost authenticator
 and lost recovery codes require operator-assisted identity verification.
 
 Project invitations are private, single-use links bound to an existing account.
-Ask collaborators to sign up with GitHub before inviting them. Until email delivery
+Ask collaborators to sign up with a configured provider (GitHub or Google) before inviting them. Until email delivery
 is connected, only the platform operator can create a new email/password account. Share them
 through your own trusted channel. Pending invitations can be reissued or revoked
-under **Team**. Email accounts cannot automatically link to GitHub until their
+under **Team**. Email accounts cannot automatically link to an OAuth provider until their
 local email has been independently verified. Project administrators cannot reset another person's global
 account password. No automated email is sent until a delivery service is connected.
 
@@ -192,3 +192,16 @@ independent security review and off-host recovery drill before sensitive BCI dat
 
 The nip.io hostname follows the current public IP. An EC2 stop/start can change
 that IP; use a stable address and owned domain for a permanent customer endpoint.
+
+### Google sign-in
+
+Google is an optional Managed identity provider. Community/isolated instances
+continue to use scoped API credentials. A Managed host shows **Continue with
+Google** only after its operator configures a Google OAuth web client. No Google
+Drive, Gmail, or other data permissions are requested: only identity, email and
+profile. Each new session still requires Chronograph MFA.
+
+Google email addresses must be verified. Existing accounts with unverified local
+email cannot be linked implicitly. Workspace access is determined by project
+membership, not by the Google email domain. Until email delivery is connected,
+email account setup and recovery use administrator-issued private links.

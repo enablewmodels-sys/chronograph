@@ -1,3 +1,4 @@
+import { Tabs } from "./shared";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "./api";
@@ -11,6 +12,8 @@ import {
   Head,
   SubmitForm,
   useAction,
+  Drawer,
+  Disclosure,
 } from "./shared";
 interface Token {
   id: string;
@@ -28,6 +31,8 @@ export default function Access() {
     [scope, setScope] = useState("read"),
     [days, setDays] = useState(30),
     [secret, setSecret] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [method, setMethod] = useState("API");
   const refresh = async () =>
     setTokens((await api<{ tokens: Token[] }>("/v1/tokens")).tokens);
   useEffect(() => {
@@ -58,31 +63,33 @@ export default function Access() {
   return (
     <>
       <Head
-        title={
-          managedSite
-            ? "Connect your applications and agents."
-            : "Connect your agents."
-        }
+        title="Connections & keys"
         text={
           managedSite
             ? "Project endpoints, expiring API keys and MCP. Keep credentials in your backend or agent’s secret store."
             : "Scoped access. One protocol."
         }
       />
-      {managedSite && (
+      <Tabs
+        label="Connection method"
+        options={["API", "SDK", "MCP"]}
+        value={method}
+        onChange={setMethod}
+      />
+      {method === "API" && (
         <section className="panel form-panel">
           <h2>Project endpoints</h2>
           <div className="managed-two-column">
             <div>
               <h3>API base URL</h3>
-              <Code text={connection?.api_url || ""} />
+              <Code text={connection?.api_url || window.location.origin} />
               <h3>MCP endpoint</h3>
               <Code text={url} />
             </div>
             <div>
               <h3>Make your first request</h3>
               <Code
-                text={`curl '${connection?.api_url}/v1/info' \\\n  -H "Authorization: Bearer $CHRONOGRAPH_TOKEN"`}
+                text={`curl '${connection?.api_url || window.location.origin}/v1/info' \\\n  -H "Authorization: Bearer $CHRONOGRAPH_TOKEN"`}
               />
               <p className="small">
                 Create a read key below to verify the connection. Select read +
@@ -102,131 +109,163 @@ export default function Access() {
           </div>
         </section>
       )}
-      <div className="agent-layout">
-        <section>
-          <div role="tablist" aria-label="MCP client" className="tabs">
-            {["Codex", "Cursor", "Claude"].map((c) => (
-              <button
-                key={c}
-                role="tab"
-                aria-selected={client === c}
-                onClick={() => setClient(c)}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-          <div className="panel form-panel">
-            <h2>MCP configuration</h2>
-            <p>
-              {client === "Codex"
-                ? "Add to your trusted project’s .codex/config.toml."
-                : client === "Cursor"
-                  ? "Add to .cursor/mcp.json in your project."
-                  : "Add to .mcp.json for Claude Code. Claude Desktop can use the documented stdio bridge."}
-            </p>
-            <Code text={config} />
-            <p className="small">
-              Provide CHRONOGRAPH_TOKEN in the client’s environment and restart
-              the client. The server uses Streamable HTTP with bearer
-              authentication.
-            </p>
-            <DocLink to="MCP">Client setup and verification</DocLink>
-          </div>
+      {method === "SDK" && (
+        <section className="panel form-panel">
+          <h2>Application SDKs</h2>
+          <p>Keep your API key on the server. The key selects its project.</p>
+          <Code
+            text={`from chronograph_connectors import Client\n\nclient = Client("${window.location.origin}", token)\nstate = client.call("as_of", {"t": "2000000"})`}
+          />
+          <DocLink to="SDK">Installation and language guides</DocLink>
         </section>
-        <aside className="access-note">
-          <span className="mono">Access model</span>
-          <h2>
-            Only the scope
-            <br />
-            you grant.
-          </h2>
-          <dl>
-            <div>
-              <dt>Read only</dt>
-              <dd>Stats, history, time queries and neighborhood sampling.</dd>
+      )}
+      {method === "MCP" && (
+        <div className="agent-layout">
+          <section>
+            <Tabs
+              label="MCP client"
+              options={["Codex", "Cursor", "Claude"]}
+              value={client}
+              onChange={setClient}
+            />
+            <div className="panel form-panel">
+              <h2>MCP configuration</h2>
+              <p>
+                {client === "Codex"
+                  ? "Add to your trusted project’s .codex/config.toml."
+                  : client === "Cursor"
+                    ? "Add to .cursor/mcp.json in your project."
+                    : "Add to .mcp.json for Claude Code. Claude Desktop can use the documented stdio bridge."}
+              </p>
+              <Code text={config} />
+              <p className="small">
+                Provide CHRONOGRAPH_TOKEN in the client’s environment and
+                restart the client. The server uses Streamable HTTP with bearer
+                authentication.
+              </p>
+              <DocLink to="MCP">Client setup and verification</DocLink>
             </div>
-            <div>
-              <dt>Read + write</dt>
-              <dd>
-                Also register nodes, insert versions, invalidate and sync.
-              </dd>
-            </div>
-            <div>
-              <dt>Admin</dt>
-              <dd>Admin tokens manage credentials and backups.</dd>
-            </div>
-          </dl>
-        </aside>
-      </div>
+          </section>
+          <Disclosure title="Permissions and scopes">
+            <aside className="access-note">
+              <span className="mono">Access model</span>
+              <h2>
+                Only the scope
+                <br />
+                you grant.
+              </h2>
+              <dl>
+                <div>
+                  <dt>Read only</dt>
+                  <dd>
+                    Stats, history, time queries and neighborhood sampling.
+                  </dd>
+                </div>
+                <div>
+                  <dt>Read + write</dt>
+                  <dd>
+                    Also register nodes, insert versions, invalidate and sync.
+                  </dd>
+                </div>
+                <div>
+                  <dt>Admin</dt>
+                  <dd>Admin tokens manage credentials and backups.</dd>
+                </div>
+              </dl>
+            </aside>
+          </Disclosure>
+        </div>
+      )}
       <section className="panel form-panel">
         <div className="section-head">
           <h2>{managedSite ? "Project API keys" : "Access tokens"}</h2>
-          <span className="small muted">Tokens are shown once.</span>
-        </div>
-        <SubmitForm
-          className="token-form"
-          onSubmit={() =>
-            void action.run(async () => {
-              const created = await api<{ token: string }>(
-                "/v1/tokens",
-                "POST",
-                { name, scope, days },
-              );
-              setSecret(created.token);
-              setName("");
-              await refresh();
-            }, "Token created. Store it securely before leaving this page.")
-          }
-        >
-          <Field label="Token name">
-            <input
-              placeholder="Research assistant"
-              required
-              maxLength={80}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Field>
-          <Field label="Scope">
-            <select value={scope} onChange={(e) => setScope(e.target.value)}>
-              <option value="read">Read only</option>
-              <option value="ingest">Read + ingest</option>
-              <option value="admin">Admin</option>
-            </select>
-          </Field>
-          <Field label="Expiry">
-            <select
-              value={days}
-              onChange={(e) => setDays(Number(e.target.value))}
-            >
-              {[1, 7, 30, 90, 365].map((d) => (
-                <option key={d} value={d}>
-                  {d} days
-                </option>
-              ))}
-            </select>
-          </Field>
-          <button className="primary" disabled={action.busy}>
-            <Busy busy={action.busy}>Create token</Busy>
+          <button className="primary" onClick={() => setCreating(true)}>
+            New API key
           </button>
-        </SubmitForm>
-        {action.feedback}
-        {secret && (
-          <div className="secret-panel">
-            <div className="section-head">
-              <strong>Copy your token now</strong>
-              <button className="ghost" onClick={() => setSecret("")}>
-                Dismiss secret
-              </button>
+        </div>
+        <Drawer
+          open={creating}
+          onClose={() => {
+            setCreating(false);
+            setSecret("");
+          }}
+          title="Create API key"
+        >
+          <p className="small">
+            Choose the narrowest scope your application needs. The key is shown
+            once.
+          </p>
+          <SubmitForm
+            className="token-form"
+            onSubmit={() =>
+              void action.run(async () => {
+                const created = await api<{ token: string }>(
+                  "/v1/tokens",
+                  "POST",
+                  { name, scope, days },
+                );
+                setSecret(created.token);
+                setName("");
+                await refresh();
+              }, "Token created. Store it securely before leaving this page.")
+            }
+          >
+            <Field label="Token name">
+              <input
+                placeholder="Research assistant"
+                required
+                maxLength={80}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </Field>
+            <Field label="Scope">
+              <select value={scope} onChange={(e) => setScope(e.target.value)}>
+                <option value="read">Read only</option>
+                <option value="ingest">Read + ingest</option>
+                <option value="admin">Admin</option>
+              </select>
+            </Field>
+            <Field label="Expiry">
+              <select
+                value={days}
+                onChange={(e) => setDays(Number(e.target.value))}
+              >
+                {[1, 7, 30, 90, 365].map((d) => (
+                  <option key={d} value={d}>
+                    {d} days
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <button className="primary" disabled={action.busy}>
+              <Busy busy={action.busy}>Create token</Busy>
+            </button>
+          </SubmitForm>
+          {action.feedback}
+          {secret && (
+            <div className="secret-panel">
+              <div className="section-head">
+                <strong>Copy your token now</strong>
+                <button
+                  className="ghost"
+                  onClick={() => {
+                    setSecret("");
+                    setCreating(false);
+                  }}
+                >
+                  Dismiss secret
+                </button>
+              </div>
+              <Code text={secret} />
+              <p className="small">
+                Keep this in your client’s secret storage. It cannot be
+                retrieved later.
+              </p>
             </div>
-            <Code text={secret} />
-            <p className="small">
-              Keep this in your client’s secret storage. It cannot be retrieved
-              later.
-            </p>
-          </div>
-        )}
+          )}
+        </Drawer>
+        {!creating && action.feedback}
         <div className="table-scroll">
           <table className="token-table">
             <thead>

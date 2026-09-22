@@ -25,7 +25,7 @@ export default function Operations() {
   return (
     <>
       <Head
-        title="Keep memory dependable."
+        title="Operations"
         text="Durability, recovery and workspace security."
       />
       {action.feedback}

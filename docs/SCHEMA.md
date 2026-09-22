@@ -18,6 +18,18 @@ Read and ingest tokens can inspect definitions, preview files and encode propert
 
 Endpoint labels describe intended use. Core node IDs have no stored type tags, so labels do **not** enforce endpoint membership, foreign keys, cardinality or node properties. Schema is shared by main and every branch; it is not versioned with graph valid time and does not fork with graph branches.
 
+## Console editor
+
+Open **Schema & migrations → Migrations**. The JSON editor provides line numbers,
+syntax highlighting, JSON diagnostics, undo/redo and bracket matching. Tab moves
+focus out of the editor, so keyboard users can reach the preview controls.
+**Presets** opens the model/connector generator. **Preview migration** opens a
+review panel beside the source (below it on smaller screens); **Back to editing**
+dismisses the preview without losing the draft. **Migration history** expands the
+applied records and rollback controls. Client-side JSON hints supplement server
+validation; they do not authorize an apply. Revision/checksum checks and atomic
+multi-file semantics apply to both deployment editions.
+
 ## Migration files
 
 Use the included `examples/migrations/20260910_observations.json` as a starting point. Use **Import files** to select one or more JSON files (sorted by filename), edit them directly, or generate them from the forms. A single object, an ordered array of migrations, or a `{ "migrations": [...] }` bundle is accepted by the editor and CLI. Files are processed in the browser and sent as text for validation. The server never accepts a filesystem path from a migration.

@@ -189,9 +189,9 @@
   color: var(--muted);
 }
 .schema-bytes .used {
-  background: #def78e14;
+  background: var(--accent-bg);
   color: var(--citron);
-  border-color: #def78e50;
+  border-color: var(--rule);
 }
 .schema-migrations {
   display: grid;
@@ -253,8 +253,8 @@
   line-height: 1.7;
   tab-size: 2;
   resize: vertical;
-  background: #0c130f;
-  color: #dcf3b9;
+  background: var(--canvas);
+  color: var(--ink);
   min-height: 330px;
 }
 .schema-editor-footer {
@@ -296,7 +296,7 @@
   max-height: 400px;
   overflow: auto;
   padding: 12px;
-  background: #0c130f;
+  background: var(--canvas);
 }
 .schema-diff h4 {
   color: var(--muted);
@@ -480,7 +480,7 @@
 .connector-presets {
   padding: 20px;
   margin: 20px 0;
-  border: 1px solid var(--border, #30343c);
+  border: 1px solid var(--border, var(--rule));
   border-radius: 12px;
 }
 .connector-presets fieldset {
@@ -513,7 +513,7 @@
   max-height: 440px;
   overflow: auto;
   padding: 16px;
-  background: var(--bg, #101318);
+  background: var(--bg, var(--surface));
   border-radius: 8px;
 }
 @media (max-width: 600px) {

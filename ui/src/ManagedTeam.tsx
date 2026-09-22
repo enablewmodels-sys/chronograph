@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "./main";
-import { Busy, Code, Field, Head, SubmitForm, useAction } from "./shared";
+import {
+  Busy,
+  Code,
+  Field,
+  Head,
+  SubmitForm,
+  useAction,
+  Drawer,
+} from "./shared";
 import { managedApi } from "./managed-api";
 interface Member {
   id: string;
@@ -37,6 +45,7 @@ export default function ManagedTeam() {
       email: string;
       expiresAt: number;
     } | null>(null);
+  const [inviting, setInviting] = useState(false);
   const allowedRoles =
     connection?.account?.role === "owner"
       ? ["viewer", "editor", "admin", "owner"]
@@ -82,70 +91,90 @@ export default function ManagedTeam() {
       </p>
       {tab === "team" ? (
         <>
-          <section className="panel form-panel">
-            <h2>Invite a collaborator</h2>
-            <p>
-              Ask collaborators to sign up with GitHub first. New email accounts
-              need a platform operator invitation until email delivery is
-              connected. Each invitation is bound to one account and this
-              project.
-            </p>
-            <SubmitForm
-              className="member-invite"
-              onSubmit={() =>
-                void action.run(async () => {
-                  setInvite(
-                    await managedApi("/managed/invites", { email, name, role }),
-                  );
-                  setEmail("");
-                  setName("");
-                  await loadMembers();
-                })
-              }
-            >
-              <Field label="Name">
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  maxLength={80}
-                />
-              </Field>
-              <Field label="Email">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  maxLength={254}
-                />
-              </Field>
-              <Field label="Project role">
-                <select value={role} onChange={(e) => setRole(e.target.value)}>
-                  {allowedRoles.map((r) => (
-                    <option key={r}>{r}</option>
-                  ))}
-                </select>
-              </Field>
-              <button className="primary" disabled={action.busy}>
-                <Busy busy={action.busy}>Create invitation</Busy>
-              </button>
-            </SubmitForm>
-            {invite && (
-              <div className="notice">
-                <strong>Private invitation for {invite.email}</strong>
-                <p>
-                  Share this directly with your collaborator. Email delivery is
-                  not connected yet. Expires{" "}
-                  {new Date(invite.expiresAt).toLocaleString()}.
-                </p>
-                <Code text={invite.url} />
-                <button onClick={() => setInvite(null)}>
-                  Dismiss private link
+          <button className="primary" onClick={() => setInviting(true)}>
+            Invite collaborator
+          </button>
+          <Drawer
+            open={inviting}
+            onClose={() => {
+              setInviting(false);
+              setInvite(null);
+            }}
+            title="Invite a collaborator"
+          >
+            <section className="panel form-panel">
+              <h2>Invite a collaborator</h2>
+              <p>
+                Ask collaborators to sign up with an available identity provider
+                first. New email accounts need a platform operator invitation
+                until email delivery is connected. Each invitation is bound to
+                one account and this project.
+              </p>
+              <SubmitForm
+                className="member-invite"
+                onSubmit={() =>
+                  void action.run(async () => {
+                    setInvite(
+                      await managedApi("/managed/invites", {
+                        email,
+                        name,
+                        role,
+                      }),
+                    );
+                    setEmail("");
+                    setName("");
+                    await loadMembers();
+                  })
+                }
+              >
+                <Field label="Name">
+                  <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    maxLength={80}
+                  />
+                </Field>
+                <Field label="Email">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    maxLength={254}
+                  />
+                </Field>
+                <Field label="Project role">
+                  <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                  >
+                    {allowedRoles.map((r) => (
+                      <option key={r}>{r}</option>
+                    ))}
+                  </select>
+                </Field>
+                <button className="primary" disabled={action.busy}>
+                  <Busy busy={action.busy}>Create invitation</Busy>
                 </button>
-              </div>
-            )}
-          </section>
+              </SubmitForm>
+              {invite && (
+                <div className="notice">
+                  <strong>Private invitation for {invite.email}</strong>
+                  <p>
+                    Share this directly with your collaborator. Email delivery
+                    is not connected yet. Expires{" "}
+                    {new Date(invite.expiresAt).toLocaleString()}.
+                  </p>
+                  <Code text={invite.url} />
+                  <button onClick={() => setInvite(null)}>
+                    Dismiss private link
+                  </button>
+                </div>
+              )}
+            </section>
+            {action.feedback}
+          </Drawer>
           <section className="panel form-panel">
             <h2>Project members</h2>
             <div className="table-scroll">

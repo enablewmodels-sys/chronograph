@@ -1,5 +1,19 @@
-import { useRef, useState, type ReactNode, type FormEvent } from "react";
-import { ArrowUpRight, Check, Copy, LoaderCircle } from "lucide-react";
+import {
+  useRef,
+  useState,
+  useEffect,
+  useId,
+  type ReactNode,
+  type FormEvent,
+} from "react";
+import {
+  ArrowUpRight,
+  Check,
+  Copy,
+  LoaderCircle,
+  CircleHelp,
+  X,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 export function Logo() {
   return (
@@ -12,6 +26,53 @@ export function Logo() {
       </svg>
       <span>chronograph</span>
     </Link>
+  );
+}
+export function Tabs({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="tabs" role="tablist" aria-label={label}>
+      {options.map((name, index) => (
+        <button
+          key={name}
+          role="tab"
+          aria-selected={value === name}
+          tabIndex={value === name ? 0 : -1}
+          onClick={() => onChange(name)}
+          onKeyDown={(event) => {
+            if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key))
+              return;
+            event.preventDefault();
+            const next =
+              event.key === "Home"
+                ? 0
+                : event.key === "End"
+                  ? options.length - 1
+                  : (index +
+                      (event.key === "ArrowRight" ? 1 : -1) +
+                      options.length) %
+                    options.length;
+            onChange(options[next]);
+            (
+              event.currentTarget.parentElement?.children[
+                next
+              ] as HTMLButtonElement
+            )?.focus();
+          }}
+        >
+          {name}
+        </button>
+      ))}
+    </div>
   );
 }
 export function useAction() {
@@ -96,9 +157,16 @@ export function Head({
 }) {
   return (
     <header className="page-head">
-      <div>
+      <div className="page-heading">
         <h1>{title}</h1>
-        <p>{text}</p>
+        {text && (
+          <details className="page-help">
+            <summary aria-label={`Help with ${title}`}>
+              <CircleHelp size={17} />
+            </summary>
+            <p>{text}</p>
+          </details>
+        )}
       </div>
       {children}
     </header>
@@ -160,5 +228,77 @@ export function DocLink({ to, children }: { to: string; children: ReactNode }) {
       {children}
       <ArrowUpRight size={16} />
     </Link>
+  );
+}
+
+export function Drawer({
+  open,
+  onClose,
+  title,
+  children,
+  className = "",
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const heading = useId();
+  const close = useRef(onClose);
+  close.current = onClose;
+  useEffect(() => {
+    if (!open || !dialog.current) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    dialog.current.showModal();
+    document.body.style.overflow = "hidden";
+    return () => {
+      dialog.current?.close();
+      document.body.style.overflow = overflow;
+      previous?.focus();
+    };
+  }, [open]);
+  if (!open) return null;
+  return (
+    <dialog
+      ref={dialog}
+      className={`drawer ${className}`}
+      aria-labelledby={heading}
+      onCancel={(e) => {
+        e.preventDefault();
+        close.current();
+      }}
+    >
+      <header className="drawer-header">
+        <h2 id={heading}>{title}</h2>
+        <button
+          type="button"
+          className="ghost"
+          aria-label={`Close ${title}`}
+          onClick={() => close.current()}
+        >
+          <X size={18} />
+        </button>
+      </header>
+      <div className="drawer-body">{children}</div>
+    </dialog>
+  );
+}
+export function Disclosure({
+  title,
+  children,
+  open = false,
+}: {
+  title: string;
+  children: ReactNode;
+  open?: boolean;
+}) {
+  return (
+    <details className="disclosure" open={open || undefined}>
+      <summary>{title}</summary>
+      <div className="disclosure-body">{children}</div>
+    </details>
   );
 }

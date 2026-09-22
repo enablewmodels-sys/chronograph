@@ -1,6 +1,26 @@
 import { test, expect, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+async function navigate(page: Page, name: string) {
+  const menu = page.getByRole("button", {
+    name: "Open navigation",
+    exact: true,
+  });
+  if (await menu.isVisible()) await menu.click();
+  await page
+    .getByRole("navigation", { name: "Console navigation" })
+    .getByRole("link", { name, exact: true })
+    .click();
+}
+async function disconnect(page: Page) {
+  const menu = page.getByRole("button", {
+    name: "Open navigation",
+    exact: true,
+  });
+  if (await menu.isVisible()) await menu.click();
+  await page.locator(".sidebar:visible .account-menu summary").click();
+  await page.getByRole("button", { name: "Disconnect", exact: true }).click();
+}
 const config = async () =>
   JSON.parse(await readFile(resolve("../.work/e2e-config.json"), "utf8")) as {
     token: string;
@@ -23,9 +43,7 @@ test("connect, explore, write, manage tokens, backup and disconnect", async ({
   });
   await connect(page);
   await expect(page).toHaveTitle(/Chronograph/);
-  await expect(
-    page.getByRole("heading", { name: "Your world, remembered." }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
   const c = await config();
   const auth = { Authorization: `Bearer ${c.token}` };
   const stats = await (
@@ -37,9 +55,7 @@ test("connect, explore, write, manage tokens, backup and disconnect", async ({
       page.getByRole("link", { name: "Open temporal explorer" }),
     ).toBeVisible();
   }
-  await page
-    .getByRole("link", { name: "Temporal explorer", exact: true })
-    .click();
+  await navigate(page, "Explorer");
   await expect(
     page.getByRole("heading", { name: "Explore any moment." }),
   ).toBeVisible();
@@ -62,10 +78,7 @@ test("connect, explore, write, manage tokens, backup and disconnect", async ({
   const arrowDownload = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export Arrow", exact: true }).click();
   expect((await arrowDownload).suggestedFilename()).toContain(".arrow");
-  await page
-    .getByRole("link", { name: "Write data", exact: true })
-    .first()
-    .click();
+  await navigate(page, "Write data");
   const node = String(
     BigInt(Date.now()) * 1000n + BigInt(testInfo.repeatEachIndex),
   );
@@ -78,7 +91,8 @@ test("connect, explore, write, manage tokens, backup and disconnect", async ({
   await expect(page.locator(".response pre")).toContainText(
     '"durability": "fsync"',
   );
-  await page.getByRole("link", { name: "Agent access", exact: true }).click();
+  await navigate(page, "Connections & keys");
+  await page.getByRole("button", { name: "New API key", exact: true }).click();
   await page
     .getByLabel("Token name", { exact: true })
     .fill("browser read token");
@@ -100,7 +114,7 @@ test("connect, explore, write, manage tokens, backup and disconnect", async ({
     "application/json",
   );
   await expect(tokenRow).toHaveCount(0);
-  await page.getByRole("link", { name: "Operations", exact: true }).click();
+  await navigate(page, "Operations");
   await page
     .getByRole("button", { name: "Create backup", exact: true })
     .click();
@@ -125,7 +139,7 @@ test("connect, explore, write, manage tokens, backup and disconnect", async ({
   await page.reload();
   await expect(page).toHaveURL(/\/login$/);
   await connect(page);
-  await page.getByRole("button", { name: "Disconnect", exact: true }).click();
+  await disconnect(page);
   await expect(page).toHaveURL(/\/login$/);
   expect(errors).toEqual([]);
 });
@@ -146,9 +160,7 @@ test("synthetic preview works without backend calls and is read only", async ({
   await expect(
     page.getByRole("link", { name: "Write data", exact: true }),
   ).toHaveCount(1); // Overview documentation link; no privileged sidebar item.
-  await page
-    .getByRole("link", { name: "Temporal explorer", exact: true })
-    .click();
+  await navigate(page, "Explorer");
   await expect(page.locator("tbody tr")).toHaveCount(8);
   await page.getByLabel("Timestamp (µs)", { exact: true }).fill("-1");
   await page.getByRole("button", { name: "Run query" }).click();
@@ -184,7 +196,7 @@ test("durable branches: write in isolation, inspect, preview, merge and reject s
   };
   if ((await post("stats")).nodes === "0")
     await post("load_demo", { durability: "fsync" });
-  await page.getByRole("link", { name: "Branches", exact: true }).click();
+  await navigate(page, "Branches");
   const name = `UI future ${testInfo.project.name} ${testInfo.repeatEachIndex} ${Date.now()}`;
   const create = async (label: string) => {
     await page
@@ -233,9 +245,7 @@ test("durable branches: write in isolation, inspect, preview, merge and reject s
   expect((await post("contains_node", { id: node, fork: id })).exists).toBe(
     true,
   );
-  await page
-    .getByRole("link", { name: "Temporal explorer", exact: true })
-    .click();
+  await navigate(page, "Explorer");
   await page.getByLabel("Timestamp (µs)", { exact: true }).fill("5500000");
   await page.getByRole("button", { name: "Run query", exact: true }).click();
   await page
@@ -268,7 +278,7 @@ test("durable branches: write in isolation, inspect, preview, merge and reject s
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(page.viewportSize()!.width + 1);
-  await page.getByRole("link", { name: "Branches", exact: true }).click();
+  await navigate(page, "Branches");
   await page
     .locator(".branch-table")
     .getByRole("button", { name, exact: true })
@@ -328,7 +338,7 @@ test("durable branches: write in isolation, inspect, preview, merge and reject s
   await page.reload();
   await expect(page).toHaveURL(/\/login$/);
   await connect(page);
-  await page.getByRole("link", { name: "Branches", exact: true }).click();
+  await navigate(page, "Branches");
   await expect(
     page
       .locator(".branch-table tbody tr")
@@ -350,50 +360,49 @@ test("landing artwork, documentation and connector navigation render at this vie
       exact: true,
     }),
   ).toBeVisible();
-  const hero = page.getByAltText(
-    "A forest terrain preserved across glass time slices, with connected brass nodes",
-  );
+  const hero = page.locator(".world-plane.is-current img");
   await expect(hero).toBeVisible();
   await expect
     .poll(() => hero.evaluate((img) => (img as HTMLImageElement).naturalWidth))
-    .toBeGreaterThan(1000);
+    .toBe(1200);
+  await page
+    .getByRole("button", { name: "Expand timeline", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Focus this moment", exact: true }),
+  ).toHaveAttribute("aria-expanded", "true");
+  const range = page.getByRole("slider", { name: "World timeline" });
+  await range.focus();
+  await page.keyboard.press("Home");
+  await expect(range).toHaveValue("0");
+  await page.keyboard.press("End");
+  await expect(range).toHaveValue("2");
   await page.screenshot({
-    path: `/tmp/chronograph-landing-hero-${testInfo.project.name}-${testInfo.repeatEachIndex}.png`,
+    path: `/tmp/chronograph-navy-${testInfo.project.name}-${testInfo.repeatEachIndex}.png`,
+    fullPage: true,
   });
-  for (const [name, selector] of [
-    ["branch", ".branching-section"],
-    ["connectors", ".domains-section"],
-    ["editions", ".editions-section"],
-    ["benchmarks", ".benchmarks-section"],
-    ["quickstart", ".quickstart-section"],
-  ]) {
-    await page.locator(selector).screenshot({
-      path: `/tmp/chronograph-landing-${name}-${testInfo.project.name}-${testInfo.repeatEachIndex}.png`,
-    });
-  }
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(page.viewportSize()!.width + 1);
-  await expect(page.locator("#managed")).toContainText(
-    "MANAGED · LAUNCH PREVIEW",
+  await expect(page.locator(".integration-banner")).toContainText(
+    "TypeSafe Jev, with a memory.",
   );
-  await expect(page.locator("#managed")).toContainText(
-    "MFA, project roles and encrypted secrets",
-  );
+  await page.getByRole("tab", { name: "Decision models", exact: true }).click();
+  await expect(page.getByRole("tabpanel")).toContainText("TypeSafe Jev");
+  await page
+    .getByRole("tab", { name: "Decision models", exact: true })
+    .press("ArrowRight");
+  await expect(
+    page.getByRole("tab", { name: "World models", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await page
-    .locator(".quickstart-section")
+    .locator(".connection-example")
     .getByRole("button", { name: "Copy configuration" })
     .click();
-  const copiedCommand = await page.evaluate(() =>
-    navigator.clipboard.readText(),
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toContain(
+    "$CHRONOGRAPH_URL/v1/info",
   );
-  expect(copiedCommand).toContain("--example fork_demo -- ./fork-demo");
-  expect(copiedCommand).not.toContain("\\n");
-  await page.getByRole("link", { name: "Editions", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { name: "Community and Managed", exact: true }),
-  ).toBeVisible();
   await page.goto("/documentation/connectors/worldmodel#durable-fork-rollouts");
   await expect(
     page.getByRole("heading", { name: "Durable fork rollouts", exact: true }),
@@ -452,7 +461,7 @@ test("landing artwork, documentation and connector navigation render at this vie
     ).toBeLessThanOrEqual(page.viewportSize()!.width + 1);
   }
   await connect(page);
-  await page.getByRole("link", { name: "Connectors", exact: true }).click();
+  await navigate(page, "Connectors");
   await expect(page.locator(".connector-detail")).toHaveCount(4);
   await page
     .locator(".connector-detail")
@@ -461,4 +470,36 @@ test("landing artwork, documentation and connector navigation render at this vie
     .click();
   await expect(page.locator(".prose h1")).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+test("world timeline supports reduced motion, keyboard selection and pause without database calls", async ({
+  page,
+}) => {
+  let calls = 0;
+  await page.route("**/v1/**", (route) => {
+    calls++;
+    return route.abort();
+  });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const scene = page.locator(".world-timeline");
+  await expect(scene).toHaveAttribute("data-playing", "false");
+  await page.getByRole("button", { name: "Toggle world history" }).click();
+  await expect(scene).toHaveClass(/is-expanded/);
+  const slider = page.getByRole("slider", { name: "World timeline" });
+  await slider.focus();
+  await page.keyboard.press("Home");
+  await expect(slider).toHaveAttribute("aria-valuetext", "t0: Object observed");
+  await page.keyboard.press("ArrowRight");
+  await expect(slider).toHaveAttribute("aria-valuetext", "t1: Action recorded");
+  await page
+    .getByRole("button", { name: "Focus this moment", exact: true })
+    .click();
+  await expect(scene).toHaveClass(/is-focused/);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.getByRole("button", { name: "Replay world animation" }).click();
+  await expect(scene).toHaveAttribute("data-playing", "true");
+  await page.getByRole("button", { name: "Pause world animation" }).click();
+  await expect(scene).toHaveAttribute("data-playing", "false");
+  expect(calls).toBe(0);
 });

@@ -13,7 +13,14 @@
     "format:check": "prettier --check src e2e *.ts *.json ../scripts/*.mjs"
   },
   "dependencies": {
+    "@codemirror/commands": "6.11.1",
+    "@codemirror/lang-json": "6.0.2",
+    "@codemirror/language": "6.12.4",
+    "@codemirror/lint": "6.9.7",
+    "@codemirror/state": "6.7.6",
+    "@codemirror/view": "6.43.13",
     "@fontsource-variable/manrope": "^5.2.0",
+    "@lezer/highlight": "1.2.3",
     "lucide-react": "^0.577.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

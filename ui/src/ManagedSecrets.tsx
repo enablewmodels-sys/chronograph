@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "./main";
-import { Busy, Code, Field, Head, SubmitForm, useAction } from "./shared";
+import {
+  Busy,
+  Code,
+  Field,
+  Head,
+  SubmitForm,
+  useAction,
+  Drawer,
+  Disclosure,
+} from "./shared";
 import { managedApi } from "./managed-api";
 interface Secret {
   name: string;
@@ -23,6 +32,8 @@ export default function ManagedSecrets() {
     [keyName, setKeyName] = useState(""),
     [days, setDays] = useState(30),
     [issued, setIssued] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [creatingKey, setCreatingKey] = useState(false);
   const load = async () => {
     const r = await managedApi<{ secrets: Secret[]; keys: ReaderKey[] }>(
       "/managed/secrets",
@@ -36,7 +47,7 @@ export default function ManagedSecrets() {
   return (
     <>
       <Head
-        title="Secrets stay server-side."
+        title="Secrets"
         text="Store provider credentials for your trusted applications. Separate reader keys keep secret access distinct from graph access."
       />
       <p className="small muted">
@@ -44,7 +55,19 @@ export default function ManagedSecrets() {
         <Link to="/app/security">Account security</Link>. Values are encrypted,
         never shown in the list, and never included in audit events.
       </p>
-      <div className="managed-two-column">
+      <div className="section-head">
+        <button className="primary" onClick={() => setCreating(true)}>
+          Add or rotate secret
+        </button>
+      </div>
+      <Drawer
+        open={creating}
+        onClose={() => {
+          setCreating(false);
+          setValue("");
+        }}
+        title="Add or rotate a secret"
+      >
         <section className="panel form-panel">
           <h2>Add or rotate a secret</h2>
           <SubmitForm
@@ -82,6 +105,9 @@ export default function ManagedSecrets() {
             </button>
           </SubmitForm>
         </section>
+        {action.feedback}
+      </Drawer>
+      <Disclosure title="Read secrets from your backend">
         <section className="panel form-panel">
           <h2>Read from your backend</h2>
           <p>
@@ -96,7 +122,7 @@ export default function ManagedSecrets() {
             Chronograph does not run model inference.
           </p>
         </section>
-      </div>
+      </Disclosure>
       <section className="panel form-panel">
         <h2>Project secrets</h2>
         <div className="table-scroll">
@@ -150,51 +176,77 @@ export default function ManagedSecrets() {
         )}
       </section>
       <section className="panel form-panel">
-        <h2>Secret-reader keys</h2>
-        <SubmitForm
-          className="member-invite"
-          onSubmit={() =>
-            void action.run(async () => {
-              const r = await managedApi<{ token: string }>(
-                "/managed/secrets/keys",
-                { name: keyName, days },
-              );
-              setIssued(r.token);
-              setKeyName("");
-              await load();
-            })
-          }
-        >
-          <Field label="Key name">
-            <input
-              value={keyName}
-              onChange={(e) => setKeyName(e.target.value)}
-              required
-              maxLength={80}
-              placeholder="robotics-backend"
-            />
-          </Field>
-          <Field label="Expires in days">
-            <input
-              type="number"
-              min={1}
-              max={90}
-              value={days}
-              onChange={(e) => setDays(Number(e.target.value))}
-              required
-            />
-          </Field>
-          <button disabled={action.busy}>
-            <Busy busy={action.busy}>Create reader key</Busy>
+        <div className="section-head">
+          <h2>Secret-reader keys</h2>
+          <button className="outline" onClick={() => setCreatingKey(true)}>
+            New reader key
           </button>
-        </SubmitForm>
-        {issued && (
-          <div className="notice">
-            <strong>Copy this key now. It will not be shown again.</strong>
-            <Code text={issued} />
-            <button onClick={() => setIssued("")}>I saved it</button>
-          </div>
-        )}
+        </div>
+        <Drawer
+          open={creatingKey}
+          onClose={() => {
+            setCreatingKey(false);
+            setIssued("");
+          }}
+          title="Create secret-reader key"
+        >
+          <p className="small">
+            This key can read project secrets. Keep it only in a trusted
+            backend.
+          </p>
+          <SubmitForm
+            className="member-invite"
+            onSubmit={() =>
+              void action.run(async () => {
+                const r = await managedApi<{ token: string }>(
+                  "/managed/secrets/keys",
+                  { name: keyName, days },
+                );
+                setIssued(r.token);
+                setKeyName("");
+                await load();
+              })
+            }
+          >
+            <Field label="Key name">
+              <input
+                value={keyName}
+                onChange={(e) => setKeyName(e.target.value)}
+                required
+                maxLength={80}
+                placeholder="robotics-backend"
+              />
+            </Field>
+            <Field label="Expires in days">
+              <input
+                type="number"
+                min={1}
+                max={90}
+                value={days}
+                onChange={(e) => setDays(Number(e.target.value))}
+                required
+              />
+            </Field>
+            <button disabled={action.busy}>
+              <Busy busy={action.busy}>Create reader key</Busy>
+            </button>
+          </SubmitForm>
+          {issued && (
+            <div className="notice">
+              <strong>Copy this key now. It will not be shown again.</strong>
+              <Code text={issued} />
+              <button
+                onClick={() => {
+                  setIssued("");
+                  setCreatingKey(false);
+                }}
+              >
+                I saved it
+              </button>
+            </div>
+          )}
+          {action.feedback}
+        </Drawer>
         <div className="table-scroll">
           <table className="managed-table">
             <thead>

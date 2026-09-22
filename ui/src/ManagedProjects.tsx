@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Database, Plus, ShieldCheck } from "lucide-react";
-import { Busy, Field, Logo, SubmitForm, useAction } from "./shared";
+import { ArrowRight, Database, Plus } from "lucide-react";
+import { Busy, Field, Logo, SubmitForm, useAction, Drawer } from "./shared";
 import {
   managedApi,
   setManagedProject,
@@ -17,6 +17,7 @@ export default function ManagedProjects({
   const action = useAction(),
     navigate = useNavigate(),
     [name, setName] = useState("");
+  const [creating, setCreating] = useState(false);
   const select = async (id: string) => {
     setManagedProject("");
     await managedApi("/managed/projects/select", { projectId: id });
@@ -50,7 +51,10 @@ export default function ManagedProjects({
             Each project has its own graph, migrations, credentials, and team.
           </p>
         </div>
-        <ShieldCheck size={40} strokeWidth={1.2} />
+        <button className="primary" onClick={() => setCreating(true)}>
+          <Plus size={17} />
+          New project
+        </button>
       </div>
       <div className="project-list">
         {session.projects.map((p) => (
@@ -78,46 +82,52 @@ export default function ManagedProjects({
           </p>
         )}
       </div>
-      <section className="panel form-panel new-project">
-        <h2>
-          <Plus size={20} /> Create a project
-        </h2>
-        <p>
-          Start with an empty temporal graph. Apply a connector preset or write
-          your own migration in the console.
-        </p>
-        <SubmitForm
-          onSubmit={() =>
-            void action.run(async () => {
-              setManagedProject("");
-              const result = await managedApi<{ project: { id: string } }>(
-                "/managed/projects",
-                { name },
-              );
-              setName("");
-              await select(result.project.id);
-            })
-          }
-        >
-          <Field label="Project name">
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              maxLength={60}
-              placeholder="robot-memory"
-              required
-            />
-          </Field>
-          <button className="primary" disabled={action.busy}>
-            <Busy busy={action.busy}>Create project</Busy>
-          </button>
-        </SubmitForm>
-        <p className="small muted">
-          Launch preview: up to two projects per account, subject to host
-          capacity. Your graph stays private to your project’s members.
-        </p>
-        {action.feedback}
-      </section>
+      <Drawer
+        open={creating}
+        onClose={() => setCreating(false)}
+        title="Create a project"
+      >
+        <section className="panel form-panel new-project">
+          <h2>
+            <Plus size={20} /> Create a project
+          </h2>
+          <p>
+            Start with an empty temporal graph. Apply a connector preset or
+            write your own migration in the console.
+          </p>
+          <SubmitForm
+            onSubmit={() =>
+              void action.run(async () => {
+                setManagedProject("");
+                const result = await managedApi<{ project: { id: string } }>(
+                  "/managed/projects",
+                  { name },
+                );
+                setName("");
+                await select(result.project.id);
+              })
+            }
+          >
+            <Field label="Project name">
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={60}
+                placeholder="robot-memory"
+                required
+              />
+            </Field>
+            <button className="primary" disabled={action.busy}>
+              <Busy busy={action.busy}>Create project</Busy>
+            </button>
+          </SubmitForm>
+          <p className="small muted">
+            Launch preview: up to two projects per account, subject to host
+            capacity. Your graph stays private to your project’s members.
+          </p>
+          {action.feedback}
+        </section>
+      </Drawer>
     </main>
   );
 }
