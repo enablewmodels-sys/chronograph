@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Github, LockKeyhole, ShieldCheck } from "lucide-react";
 import { publicPath } from "./site";
 import { Busy, Field, Logo, SubmitForm, useAction } from "./shared";
+import { PolicyLinks } from "./SiteFooter";
 import {
   socialSignIn,
   managedApi,
@@ -51,7 +52,8 @@ export function AccountFrame({ children }: { children: ReactNode }) {
         <section className="account-form-panel">{children}</section>
       </div>
       <footer className="account-footer">
-        ChronoDB Managed <span>Temporal memory for models that act.</span>
+        <span>ChronoDB Managed</span>
+        <PolicyLinks />
       </footer>
     </main>
   );
@@ -391,8 +393,8 @@ export default function ManagedLogin({
       )}
       <p className="account-terms">
         By continuing, you agree to the{" "}
-        <Link to="/documentation/HOSTED">Managed preview terms and limits</Link>
-        .
+        <Link to="/terms">Terms of service</Link> and acknowledge the{" "}
+        <Link to="/privacy">Privacy policy</Link>.
       </p>
     </AccountFrame>
   );

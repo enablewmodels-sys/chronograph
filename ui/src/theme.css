@@ -700,6 +700,16 @@ tbody tr:hover,
 .account-switch a {
   color: #afccff;
   font-weight: 650;
+  margin-inline-start: 5px;
+}
+.account-top .logo {
+  font-size: 20px;
+  color: var(--ink);
+  gap: 10px;
+}
+.account-top .logo svg {
+  width: 29px;
+  height: 29px;
 }
 .form-divider {
   margin: 22px 0;

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Database, Plus } from "lucide-react";
 import { Busy, Field, Logo, SubmitForm, useAction, Drawer } from "./shared";
+import { PolicyLinks } from "./SiteFooter";
 import {
   managedApi,
   setManagedProject,
@@ -128,6 +129,7 @@ export default function ManagedProjects({
           {action.feedback}
         </section>
       </Drawer>
+      <PolicyLinks />
     </main>
   );
 }

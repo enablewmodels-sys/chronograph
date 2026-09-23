@@ -61,6 +61,8 @@ const JoinProject = lazy(() =>
 );
 import "./managed.css";
 import "./theme.css";
+import { PolicyLinks } from "./SiteFooter";
+const LegalPage = lazy(() => import("./LegalPage"));
 import { BranchPicker, WorkspaceProvider } from "./workspace";
 const Explorer = lazy(() => import("./Explorer"));
 const Overview = lazy(() => import("./Overview"));
@@ -179,6 +181,20 @@ function App() {
             }
           />
           <Route path="/documentation/*" element={<Documentation />} />
+          {[
+            "privacy",
+            "terms",
+            "data-protection",
+            "security",
+            "subprocessors",
+            "cookies",
+            "acceptable-use",
+            "legal",
+            "support",
+            "status",
+          ].map((path) => (
+            <Route key={path} path={`/${path}`} element={<LegalPage />} />
+          ))}
           {managedSite && (
             <>
               <Route path="/activate" element={<ActivateAccount />} />
@@ -585,6 +601,11 @@ function Console() {
                 <Route path="*" element={<Navigate to="/app" replace />} />
               </Routes>
             </main>
+            {managedSite && (
+              <footer className="workspace-footer">
+                <PolicyLinks />
+              </footer>
+            )}
           </div>
         </div>
       </WorkspaceProvider>

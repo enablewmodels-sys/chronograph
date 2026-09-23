@@ -1,0 +1,117 @@
+.site-footer,
+.landing .site-footer {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 52px 0 24px;
+  border-top: 1px solid var(--rule);
+  display: grid;
+  font-family: inherit;
+  grid-template-columns: minmax(220px, 1.6fr) repeat(3, minmax(120px, 1fr));
+  gap: 38px;
+}
+.footer-brand .logo {
+  font-size: 22px;
+}
+.footer-brand .logo svg {
+  display: none;
+}
+.footer-brand p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 14px 0 22px;
+  line-height: 1.7;
+}
+.footer-brand small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.site-footer > nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 13px;
+}
+.site-footer > nav h2 {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 650;
+  margin: 2px 0 8px;
+}
+.site-footer > nav a {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.site-footer a:hover {
+  color: var(--ink);
+}
+.footer-bottom {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-top: 1px solid var(--rule);
+  padding-top: 22px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.policy-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 22px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.policy-links a:hover {
+  color: var(--ink);
+}
+.workspace-footer {
+  padding: 18px 30px 28px;
+  margin-top: auto;
+}
+.projects-page > .policy-links {
+  margin-top: 70px;
+  padding-top: 22px;
+  border-top: 1px solid var(--rule);
+}
+@media (max-width: 760px) {
+  .site-footer,
+  .landing .site-footer {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 30px 15px;
+    padding-top: 35px;
+  }
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+  .footer-brand p {
+    margin: 10px 0;
+  }
+  .site-footer > nav a {
+    font-size: 11px;
+  }
+  .footer-bottom {
+    line-height: 1.8;
+  }
+  .policy-links {
+    gap: 16px;
+    font-size: 11px;
+  }
+  .account-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .workspace-footer {
+    padding: 18px 20px 25px;
+  }
+}
+@media (max-width: 360px) {
+  .site-footer,
+  .landing .site-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

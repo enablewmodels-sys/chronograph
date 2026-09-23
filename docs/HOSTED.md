@@ -35,6 +35,12 @@ These are launch limits, not automatically scaling subscriptions.
 
 ## Accounts and project permissions
 
+Service information is available in the footer: [Terms](https://chronodb.co/terms),
+[Privacy](https://chronodb.co/privacy), [Data protection](https://chronodb.co/data-protection),
+[Security](https://chronodb.co/security), [Providers](https://chronodb.co/subprocessors),
+[Support](https://chronodb.co/support) and [Status](https://chronodb.co/status).
+These policies cover the hosted service; the Community software licence remains separate.
+
 | Role | Graph access | Migrations and backups | Keys, secrets and members |
 | --- | --- | --- | --- |
 | Viewer | Read | Inspect schema | None |

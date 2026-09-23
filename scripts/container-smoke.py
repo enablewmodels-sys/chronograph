@@ -42,7 +42,9 @@ def ready():
     raise RuntimeError('Container did not become healthy')
 
 try:
-    docker('info', '--format', '{{.ServerVersion}}', timeout=8)
+    # Image extraction can leave the CI daemon busy; use the same bounded
+    # timeout as other Docker operations instead of failing after eight seconds.
+    docker('info', '--format', '{{.ServerVersion}}')
     for volume in volumes: docker('volume', 'create', volume)
     docker('run', '--name', name + '-bootstrap', '--network', 'none',
            '--mount', 'type=volume,src=' + volumes[1] + ',dst=/config', args.image,

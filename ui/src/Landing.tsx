@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowRight, ArrowUpRight, Github } from "lucide-react";
 import { Link } from "react-router-dom";
+import SiteFooter from "./SiteFooter";
 import { Code, Logo, Tabs } from "./shared";
 import { managedSite, publicPath, publicSite } from "./site";
 import WorldTimeline, { worldFrames } from "./WorldTimeline";
@@ -280,7 +281,7 @@ export default function Landing() {
                 Or run Community yourself.
               </p>
               {managedSite ? (
-                <Link className="button primary" to="/login">
+                <Link className="button primary" to="/signup">
                   Create your account
                   <ArrowRight size={16} />
                 </Link>
@@ -297,15 +298,7 @@ export default function Landing() {
           </div>
         </section>
       </main>
-      <footer className="public-footer">
-        <Logo />
-        <div>
-          <Link to={`/documentation/${doc}`}>Docs</Link>
-          <a href="https://github.com/enablewmodels-sys/chronograph">GitHub</a>
-          <Link to="/documentation/LICENSING">License</Link>
-          <Link to="/documentation/LIMITATIONS">Release status</Link>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

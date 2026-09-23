@@ -4,6 +4,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Logo } from "./shared";
 import { publicPath, publicSite, managedSite } from "./site";
+import SiteFooter from "./SiteFooter";
 const docs = [
   ["HOSTED", "Managed quickstart"],
   ["ISOLATED", "Self-hosted quickstart"],
@@ -273,6 +274,7 @@ export default function Documentation() {
           )}
         </main>
       </div>
+      <SiteFooter />
     </div>
   );
 }
