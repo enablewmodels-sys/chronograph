@@ -22,6 +22,12 @@ export interface ManagedSession {
   project: ManagedProject | null;
   projects: ManagedProject[];
 }
+export interface ManagedAuthConfig {
+  github: boolean;
+  google: boolean;
+  emailSignup: boolean;
+  passwordReset: boolean;
+}
 let project = "";
 export function setManagedProject(id: string) {
   project = id;
@@ -57,7 +63,7 @@ export async function socialSignIn(provider: SocialProvider) {
   const result = await managedApi<{ url: string }>("/api/auth/sign-in/social", {
     provider,
     callbackURL: window.location.origin + "/login",
-    errorCallbackURL: window.location.origin + "/login?error=" + provider,
+    errorCallbackURL: window.location.origin + "/login",
   });
   const target = new URL(result.url);
   const expected =

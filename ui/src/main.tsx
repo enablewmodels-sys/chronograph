@@ -52,6 +52,9 @@ const ManagedLogin = lazy(() => import("./ManagedLogin"));
 const ActivateAccount = lazy(() =>
   import("./ManagedLogin").then((m) => ({ default: m.ActivateAccount })),
 );
+const ForgotPassword = lazy(() =>
+  import("./ManagedLogin").then((m) => ({ default: m.ForgotPassword })),
+);
 const ManagedProjects = lazy(() => import("./ManagedProjects"));
 const JoinProject = lazy(() =>
   import("./ManagedProjects").then((m) => ({ default: m.JoinProject })),
@@ -179,6 +182,23 @@ function App() {
           {managedSite && (
             <>
               <Route path="/activate" element={<ActivateAccount />} />
+              <Route path="/reset-password" element={<ActivateAccount />} />
+              <Route path="/verify-email" element={<ActivateAccount />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route
+                path="/signup"
+                element={
+                  loadingAccount ? (
+                    <p className="loading">Checking your account…</p>
+                  ) : (
+                    <ManagedLogin
+                      key="signup"
+                      session={managed}
+                      refresh={refreshManaged}
+                    />
+                  )
+                }
+              />
               <Route
                 path="/join"
                 element={<JoinProject refresh={refreshManaged} />}

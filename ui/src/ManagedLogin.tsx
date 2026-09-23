@@ -8,6 +8,7 @@ import {
   managedApi,
   type ManagedSession,
   type SocialProvider,
+  type ManagedAuthConfig,
 } from "./managed-api";
 
 export function AccountFrame({ children }: { children: ReactNode }) {
@@ -69,10 +70,10 @@ export default function ManagedLogin({
   const [code, setCode] = useState("");
   const [challenge, setChallenge] = useState(false);
   const [recovery, setRecovery] = useState(false);
-  const [config, setConfig] = useState<{
-    github: boolean;
-    google: boolean;
-  } | null>(null);
+  const [name, setName] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
+  const signup = location.pathname === "/signup";
+  const [config, setConfig] = useState<ManagedAuthConfig | null>(null);
   const [enrollment, setEnrollment] = useState<{
     qrDataUrl: string;
     totpURI: string;
@@ -82,9 +83,7 @@ export default function ManagedLogin({
   const socialStarted = useRef(false);
   useEffect(() => {
     void action.run(async () => {
-      const c = await managedApi<{ github: boolean; google: boolean }>(
-        "/managed/config",
-      );
+      const c = await managedApi<ManagedAuthConfig>("/managed/config");
       setConfig(c);
       const provider = new URLSearchParams(location.search).get("provider");
       if (
@@ -260,12 +259,19 @@ export default function ManagedLogin({
         </>
       ) : (
         <>
-          <h2>Welcome to ChronoDB.</h2>
-          <p>Sign in to your projects.</p>
+          <h2>{signup ? "Create your account." : "Sign in to ChronoDB."}</h2>
+          <p>
+            {signup
+              ? "One account for your projects and models."
+              : "Welcome back. Your projects are waiting."}
+          </p>
           {new URLSearchParams(location.search).has("error") && (
             <div className="notice error" role="alert">
-              Sign-in could not be completed. Use a verified provider email and
-              try again.
+              {new URLSearchParams(location.search)
+                .getAll("error")
+                .includes("account_not_linked")
+                ? "This email belongs to an existing account. Sign in with its password or use Forgot password to verify ownership, then try this provider again."
+                : "Sign-in could not be completed. Try again with a verified Google or GitHub email, or sign in with your password."}
             </div>
           )}
           {(["google", "github"] as SocialProvider[])
@@ -282,56 +288,91 @@ export default function ManagedLogin({
               </button>
             ))}
           <div className="form-divider">
-            <span>or sign in with email</span>
+            <span>
+              {signup
+                ? "or create an account with email"
+                : "or sign in with email"}
+            </span>
           </div>
-          <SubmitForm
-            onSubmit={() =>
-              void action.run(async () => {
-                const result = await managedApi<{
-                  twoFactorRedirect?: boolean;
-                }>("/api/auth/sign-in/email", { email, password });
-                setPassword("");
-                if (result.twoFactorRedirect) setChallenge(true);
-                else await refresh();
-              })
-            }
-          >
-            <Field label="Email address">
-              <input
-                type="email"
-                autoComplete="username"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                maxLength={254}
-              />
-            </Field>
-            <Field label="Password">
-              <input
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                maxLength={128}
-              />
-            </Field>
-            <button className="primary" disabled={action.busy}>
-              <Busy busy={action.busy}>Sign in</Busy>
-            </button>
-          </SubmitForm>
-          <details className="account-details">
-            <summary>New here or forgot your password?</summary>
-            <p>
-              Use an available sign-in provider to create an account. Email
-              accounts start with a private invitation from your administrator.
-              Automated email recovery will be available when email delivery is
-              connected.
+          {signup && emailSent ? (
+            <div className="notice" role="status">
+              Check your inbox. If this address is eligible, you’ll receive a
+              private link to finish setup. The link expires in one hour.
+            </div>
+          ) : signup && config && !config.emailSignup ? (
+            <p className="small">
+              Create your account with Google or GitHub. Email registration is
+              awaiting email delivery setup.
             </p>
-            <Link to="/documentation/HOSTED#accounts-and-project-permissions">
-              Account recovery options
+          ) : (
+            <SubmitForm
+              onSubmit={() =>
+                void action.run(async () => {
+                  if (signup) {
+                    await managedApi("/managed/auth/register", { email, name });
+                    setEmailSent(true);
+                    return;
+                  }
+                  const result = await managedApi<{
+                    twoFactorRedirect?: boolean;
+                  }>("/api/auth/sign-in/email", { email, password });
+                  setPassword("");
+                  if (result.twoFactorRedirect) setChallenge(true);
+                  else await refresh();
+                })
+              }
+            >
+              {signup && (
+                <Field label="Full name">
+                  <input
+                    autoComplete="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    maxLength={80}
+                  />
+                </Field>
+              )}
+              <Field label="Email address">
+                <input
+                  type="email"
+                  autoComplete="username"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  maxLength={254}
+                />
+              </Field>
+              {!signup && (
+                <Field label="Password">
+                  <input
+                    type="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    maxLength={128}
+                  />
+                </Field>
+              )}
+              {!signup && (
+                <Link className="forgot-password" to="/forgot-password">
+                  Forgot password?
+                </Link>
+              )}
+              <button className="primary" disabled={action.busy || !config}>
+                <Busy busy={action.busy}>
+                  {signup ? "Continue with email" : "Sign in"}
+                </Busy>
+              </button>
+            </SubmitForm>
+          )}
+          <p className="account-switch">
+            {signup ? "Already have an account? " : "New to ChronoDB? "}
+            <Link to={signup ? "/login" : "/signup"}>
+              {signup ? "Sign in" : "Create an account"}
             </Link>
-          </details>
+          </p>
         </>
       )}
       {action.feedback}
@@ -359,6 +400,9 @@ export default function ManagedLogin({
 
 export function ActivateAccount() {
   const action = useAction();
+  const location = useLocation();
+  const registration = location.pathname === "/verify-email";
+  const reset = location.pathname === "/reset-password";
   const token = useRef(
     new URLSearchParams(window.location.hash.slice(1)).get("token") || "",
   );
@@ -372,17 +416,28 @@ export function ActivateAccount() {
     window.history.replaceState(null, "", window.location.pathname);
     void action.run(async () =>
       setInvite(
-        await managedApi("/managed/invitation", { token: token.current }),
+        await managedApi(
+          registration ? "/managed/auth/registration" : "/managed/invitation",
+          { token: token.current },
+        ),
       ),
     );
   }, []);
   return (
     <AccountFrame>
-      <h2>{done ? "Your account is ready." : "Make yourself at home."}</h2>
+      <h2>
+        {done
+          ? reset
+            ? "Password updated."
+            : "Your account is ready."
+          : reset
+            ? "Reset your password."
+            : "Create your password."}
+      </h2>
       {done ? (
         <>
           <p>
-            Your password is set. Sign in, then add an authenticator to protect
+            Sign in with your new password. Your authenticator still protects
             your account.
           </p>
           <Link className="button primary" to="/login">
@@ -403,10 +458,14 @@ export function ActivateAccount() {
                   void action.run(async () => {
                     if (password !== confirm)
                       throw new Error("The passwords do not match.");
-                    await managedApi("/api/auth/reset-password", {
-                      token: token.current,
-                      newPassword: password,
-                    });
+                    await managedApi(
+                      registration
+                        ? "/managed/auth/complete-registration"
+                        : "/api/auth/reset-password",
+                      registration
+                        ? { token: token.current, password }
+                        : { token: token.current, newPassword: password },
+                    );
                     token.current = "";
                     setPassword("");
                     setConfirm("");
@@ -440,7 +499,9 @@ export function ActivateAccount() {
                   />
                 </Field>
                 <button className="primary" disabled={action.busy}>
-                  <Busy busy={action.busy}>Create password</Busy>
+                  <Busy busy={action.busy}>
+                    {reset ? "Reset password" : "Create password"}
+                  </Busy>
                 </button>
               </SubmitForm>
             </>
@@ -448,6 +509,72 @@ export function ActivateAccount() {
         </>
       )}
       {action.feedback}
+      {!done && (
+        <Link className="text-link" to={reset ? "/forgot-password" : "/signup"}>
+          Request a new link
+        </Link>
+      )}
+    </AccountFrame>
+  );
+}
+
+export function ForgotPassword() {
+  const action = useAction();
+  const [config, setConfig] = useState<ManagedAuthConfig | null>(null);
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+  useEffect(() => {
+    void action.run(async () =>
+      setConfig(await managedApi<ManagedAuthConfig>("/managed/config")),
+    );
+  }, []);
+  return (
+    <AccountFrame>
+      <span className="account-symbol">
+        <LockKeyhole size={24} />
+      </span>
+      <h2>{sent ? "Check your inbox." : "Forgot your password?"}</h2>
+      <p>
+        {sent
+          ? "If this address is eligible, a reset link will arrive shortly. Check your spam folder too. The link expires in one hour."
+          : "Enter your account email to receive a private reset link."}
+      </p>
+      {config && !config.passwordReset ? (
+        <div className="notice" role="status">
+          Email recovery is awaiting email delivery setup. You can sign in with
+          your linked Google or GitHub account, or ask the platform
+          administrator for a private recovery link.
+        </div>
+      ) : (
+        !sent && (
+          <SubmitForm
+            onSubmit={() =>
+              void action.run(async () => {
+                await managedApi("/managed/auth/request-reset", { email });
+                setSent(true);
+              })
+            }
+          >
+            <Field label="Email address">
+              <input
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                maxLength={254}
+                required
+              />
+            </Field>
+            <button className="primary" disabled={action.busy || !config}>
+              <Busy busy={action.busy}>Send reset link</Busy>
+            </button>
+          </SubmitForm>
+        )
+      )}
+      {action.feedback}
+      <Link className="text-link" to="/login">
+        <ArrowLeft size={16} /> Back to sign in
+      </Link>
     </AccountFrame>
   );
 }

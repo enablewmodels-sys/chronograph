@@ -16,9 +16,10 @@ are unchanged.
 
 ## Start a project
 
-1. Choose **Start with GitHub**, **Continue with Google** when your host has configured it, or open a private email invitation from the
-   platform operator. Email/password signup and automated password recovery await
-   email delivery configuration; an email address alone does not create an account.
+1. Open **Sign in** or **Create an account**. Choose **Continue with GitHub** or
+   **Continue with Google** when configured. Email registration sends a one-use
+   verification link before creating an account; it becomes available when the
+   operator connects email delivery. Private operator invitations also work.
 2. Set up an authenticator app. Save the one-time recovery codes privately, then
    verify a code. GitHub and Google login also require this second factor.
 3. Open **Projects**, name your project, and create it. Each project has its own
@@ -54,12 +55,35 @@ revokes all account sessions. Recovery codes are one-use; a lost authenticator
 and lost recovery codes require operator-assisted identity verification.
 
 Project invitations are private, single-use links bound to an existing account.
-Ask collaborators to sign up with a configured provider (GitHub or Google) before inviting them. Until email delivery
-is connected, only the platform operator can create a new email/password account. Share them
-through your own trusted channel. Pending invitations can be reissued or revoked
-under **Team**. Email accounts cannot automatically link to an OAuth provider until their
-local email has been independently verified. Project administrators cannot reset another person's global
-account password. No automated email is sent until a delivery service is connected.
+Ask collaborators to create their account before inviting them. Share project
+invitations through a trusted channel; pending invitations can be reissued or
+revoked under **Team**. Project administrators cannot reset another person's
+global account password.
+
+### Sign-in, account linking and password recovery
+
+The [sign-in page](https://chronodb.co/login) has separate Google, GitHub and
+email/password choices. Both social providers must prove ownership of a verified
+email. An existing, established email account must have independently verified
+its local email before another provider can link to it.
+
+An unclaimed operator invitation is different: a verified provider can claim
+that placeholder account, retain its invited project role, and enroll MFA. The
+claim removes its temporary password, previous sessions and old setup links.
+It does not merge established identities or bypass MFA. Revoked invitations and
+suspended accounts remain blocked.
+
+Use [Forgot password](https://chronodb.co/forgot-password) to request a private,
+one-use email link. Links expire after one hour. Completing a reset revokes all
+account sessions and preserves the authenticator and recovery codes. The request
+response does not reveal whether an email has an account. Requests are limited
+per address and client IP; a newer reset request invalidates older reset links.
+
+Email registration and recovery require a configured delivery service. When it
+is unavailable, the UI explains the limitation and offers existing provider
+sign-in or an operator-issued recovery link. It never claims to send an email
+without delivery configured. A password reset cannot replace a lost MFA device:
+use a saved recovery code or contact the platform operator for identity checks.
 
 ## API keys and endpoints
 
@@ -208,7 +232,8 @@ Google** only after its operator configures a Google OAuth web client. No Google
 Drive, Gmail, or other data permissions are requested: only identity, email and
 profile. Each new session still requires ChronoDB MFA.
 
-Google email addresses must be verified. Existing accounts with unverified local
-email cannot be linked implicitly. Workspace access is determined by project
-membership, not by the Google email domain. Until email delivery is connected,
-email account setup and recovery use administrator-issued private links.
+Google email addresses must be verified. Established accounts with unverified
+local email cannot be linked implicitly; unclaimed operator invitations follow
+the secure claiming flow described above. Workspace access is determined by
+project membership, not by the Google email domain. The authorized callback is
+`https://chronodb.co/api/auth/callback/google`.

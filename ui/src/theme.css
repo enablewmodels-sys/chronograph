@@ -687,6 +687,20 @@ tbody tr:hover,
 .google-signin svg {
   flex-shrink: 0;
 }
+.forgot-password {
+  justify-self: end;
+  font-size: 13px;
+  padding: 2px 0 6px;
+}
+.account-form-panel .account-switch {
+  margin: 24px 0 0;
+  text-align: center;
+  font-size: 13px;
+}
+.account-switch a {
+  color: #afccff;
+  font-weight: 650;
+}
 .form-divider {
   margin: 22px 0;
   font-size: 11px;
