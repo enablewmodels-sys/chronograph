@@ -1,6 +1,6 @@
 # Platform integration recipes
 
-Chronograph stores temporal relationships and immutable binary assets. Producers own acquisition, model inference, simulators and quantum execution. Connector presets describe validated ingestion contracts; selecting a preset does not install a driver, load a checkpoint or authenticate to an upstream cloud service.
+ChronoDB stores temporal relationships and immutable binary assets. Producers own acquisition, model inference, simulators and quantum execution. Connector presets describe validated ingestion contracts; selecting a preset does not install a driver, load a checkpoint or authenticate to an upstream cloud service.
 
 Use the [SDK guide](SDK.md) to connect and [schema migrations](SCHEMA.md) to configure a binding. The live catalog supplies 36 presets across 18 connectors. Raw HTTP and MCP consumers can implement any of these contracts without Python.
 

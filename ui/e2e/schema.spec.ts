@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 async function navigate(page: Page, name: string) {
+  await expect(page.locator(".workspace-top")).toBeVisible();
   const menu = page.getByRole("button", {
     name: "Open navigation",
     exact: true,
@@ -13,6 +14,7 @@ async function navigate(page: Page, name: string) {
     .click();
 }
 async function disconnect(page: Page) {
+  await expect(page.locator(".workspace-top")).toBeVisible();
   const menu = page.getByRole("button", {
     name: "Open navigation",
     exact: true,

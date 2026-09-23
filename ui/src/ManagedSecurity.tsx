@@ -129,7 +129,7 @@ export default function ManagedSecurity() {
           ) : (
             <p>
               You sign in with GitHub. Your GitHub account manages your primary
-              credentials; Chronograph also requires your authenticator.
+              credentials; ChronoDB also requires your authenticator.
             </p>
           )}
         </section>

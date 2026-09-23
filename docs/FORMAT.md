@@ -1,4 +1,4 @@
-# Chronograph log format v3
+# ChronoDB log format v3
 
 All integer fields use little-endian encoding. There is no native Rust struct
 casting, pointer serialization, architecture-dependent `usize`, or zero-copy

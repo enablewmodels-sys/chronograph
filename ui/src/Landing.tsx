@@ -4,11 +4,15 @@ import { Link } from "react-router-dom";
 import { Code, Logo, Tabs } from "./shared";
 import { managedSite, publicPath, publicSite } from "./site";
 import WorldTimeline, { worldFrames } from "./WorldTimeline";
+import CinematicScene, { HistorySequence } from "./CinematicScene";
 import "./landing.css";
 
 const domains = [
   {
     name: "Decision models",
+    image: "t2",
+    alt: "Illustrative recorded outcome of a robot placing an object",
+    kind: "decision",
     title: "TypeSafe Jev",
     text: "Keep decisions, probabilities and model history.",
     doc: "JEV",
@@ -18,6 +22,9 @@ const domains = [
   },
   {
     name: "World models",
+    image: "world",
+    alt: "Illustrative autonomous rover in a reconstructed warehouse",
+    kind: "world",
     title: "A world, with a history.",
     text: "Keep states, observations and their relationships through time.",
     doc: "connectors/worldmodel",
@@ -27,6 +34,9 @@ const domains = [
   },
   {
     name: "Physical AI",
+    image: "pointcloud",
+    alt: "Illustrative point-cloud reconstruction of a robot and its world",
+    kind: "physical",
     title: "Physical AI",
     text: "Keep observations, actions and their relationships over time.",
     doc: "connectors/robotics",
@@ -36,6 +46,9 @@ const domains = [
   },
   {
     name: "BCI",
+    image: "bci",
+    alt: "Illustrative non-invasive EEG acquisition equipment in a research laboratory",
+    kind: "bci",
     title: "Signals, in context.",
     text: "Connect channel samples, acquisition time and experimental events.",
     doc: "connectors/bci",
@@ -45,6 +58,9 @@ const domains = [
   },
   {
     name: "Quantum",
+    image: "quantum",
+    alt: "Illustrative cryogenic apparatus for recording quantum experiment history",
+    kind: "quantum",
     title: "Track the experiment.",
     text: "Record circuit relationships and changing calibrations.",
     doc: "connectors/quantum",
@@ -59,10 +75,10 @@ const snippets: Record<string, string> = {
   TypeScript:
     'import { Client } from "@chronograph-community/sdk";\n\nconst client = new Client(url, token);\nconst state = await client.call("as_of", { t: "2000000" });',
   HTTP: 'curl "$CHRONOGRAPH_URL/v1/info" \\\n  -H "Authorization: Bearer $CHRONOGRAPH_TOKEN"',
-  MCP: '[mcp_servers.chronograph]\nurl = "https://your-workspace/p/PROJECT_ID/mcp"\nbearer_token_env_var = "CHRONOGRAPH_TOKEN"',
+  MCP: '[mcp_servers.chronograph]\nurl = "https://chronodb.co/p/PROJECT_ID/mcp"\nbearer_token_env_var = "CHRONOGRAPH_TOKEN"',
 };
 export default function Landing() {
-  const [domain, setDomain] = useState(2);
+  const [domain, setDomain] = useState(1);
   const [language, setLanguage] = useState("HTTP");
   const current = domains[domain];
   const doc = managedSite ? "HOSTED" : "ISOLATED";
@@ -158,24 +174,7 @@ export default function Landing() {
               Explore temporal memory <ArrowRight size={15} />
             </Link>
           </div>
-          <div className="history-frames">
-            <span className="example-caption">Example data</span>
-            {worldFrames.map((frame) => (
-              <figure key={frame.time}>
-                <img
-                  src={publicPath(`/images/world/${frame.time}.webp`)}
-                  width="1200"
-                  height="800"
-                  loading="lazy"
-                  alt={frame.label}
-                />
-                <figcaption>
-                  <span>{frame.time}</span>
-                  {frame.label}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
+          <HistorySequence frames={worldFrames} />
         </section>
         <section className="model-section landing-section" id="use-cases">
           <h2>Memory for the models you build.</h2>
@@ -239,19 +238,17 @@ export default function Landing() {
                 </a>
               )}
             </div>
-            <div className="model-image">
-              <img
-                src={publicPath("/images/world/pointcloud.webp")}
-                width="1200"
-                height="800"
-                loading="lazy"
-                alt="Illustrative point-cloud reconstruction of a robot and its world"
-              />
+            <CinematicScene
+              key={current.kind}
+              image={current.image}
+              alt={current.alt}
+              kind={current.kind}
+            >
               <div className="model-data">
                 <span>{current.detail}</span>
                 <code>{current.fields.join("  ·  ")}</code>
               </div>
-            </div>
+            </CinematicScene>
           </div>
         </section>
         <section className="developer-section landing-section" id="platform">

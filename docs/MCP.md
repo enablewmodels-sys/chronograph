@@ -1,6 +1,6 @@
 # Agent integrations
 
-Chronograph exposes the tools below over authenticated MCP Streamable HTTP at `/mcp`. The official Rust SDK (`rmcp` 3.2.0) handles protocol negotiation and transport. A native Rust binary exposes the same tools over stdio through the official SDK. Start the service before connecting a client.
+ChronoDB exposes the tools below over authenticated MCP Streamable HTTP at `/mcp`. The official Rust SDK (`rmcp` 3.2.0) handles protocol negotiation and transport. A native Rust binary exposes the same tools over stdio through the official SDK. Start the service before connecting a client.
 
 For [Managed](HOSTED.md), use the project endpoint shown in **Connections & API keys**:
 `https://YOUR_HOST/p/PROJECT_ID/mcp`. For [isolated Community](ISOLATED.md), use
@@ -111,7 +111,7 @@ or call `sync`; read the returned acknowledgement policy. The console selects
 fsync explicitly. A stale pagination cursor returns a conflict, including when
 the graph changes between MCP calls.
 
-Ask the client: “Use Chronograph stats, then query at timestamp `2000000` with limit 20. Report whether more pages exist.” For an ingest token, explicitly request the desired graph mutation. Tool annotations describe read-only, destructive and idempotent behavior; the server enforces scopes independently of the model’s decisions.
+Ask the client: “Use ChronoDB stats, then query at timestamp `2000000` with limit 20. Report whether more pages exist.” For an ingest token, explicitly request the desired graph mutation. Tool annotations describe read-only, destructive and idempotent behavior; the server enforces scopes independently of the model’s decisions.
 
 All tool IDs and microsecond timestamps are decimal strings. Check `next_cursor` before claiming a query is complete. A token grants workspace-wide scope, not row-level filtering. Do not automatically retry an ambiguous insertion. See [API semantics](API.md).
 

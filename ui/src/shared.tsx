@@ -17,14 +17,14 @@ import {
 import { Link } from "react-router-dom";
 export function Logo() {
   return (
-    <Link className="logo" to="/" aria-label="Chronograph home">
+    <Link className="logo" to="/" aria-label="ChronoDB home">
       <svg viewBox="0 0 40 40" aria-hidden="true">
         <path d="m9 25 12-17 11 24-23-7" />
         <circle cx="9" cy="25" r="4" />
         <circle cx="21" cy="8" r="4" />
         <circle cx="32" cy="32" r="4" />
       </svg>
-      <span>chronograph</span>
+      <span>chronodb.co</span>
     </Link>
   );
 }

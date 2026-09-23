@@ -5,7 +5,7 @@ GitHub/email login, projects, API keys and secrets. The instructions below are
 for local Community development. Use the [isolated deployment guide](ISOLATED.md)
 and [production operations](PRODUCTION.md) for an independently operated service.
 
-Chronograph Community runs embedded in Rust or as a single-workspace service with
+ChronoDB Community runs embedded in Rust or as a single-workspace service with
 a console and MCP. The service remains a preview pending the release gates.
 
 ## Start locally

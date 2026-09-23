@@ -2,7 +2,7 @@
 
 Both Managed and isolated Community deployments include **Schema & migrations** at `/app/schema`. In Managed, select the project first: its catalog, history, API keys and data stay isolated from other projects. Define named relationship kinds, map typed properties into their payloads, import migration files and keep an applied history. Visual edits generate the same migration format accepted by HTTP and MCP.
 
-This is a service-level catalog for Chronograph's temporal graph, not a SQL or PostgreSQL engine. A migration changes definitions and service settings; it never executes code, rewrites edge payloads, deletes temporal history, or changes the journal format.
+This is a service-level catalog for ChronoDB's temporal graph, not a SQL or PostgreSQL engine. A migration changes definitions and service settings; it never executes code, rewrites edge payloads, deletes temporal history, or changes the journal format.
 
 ## First relation
 

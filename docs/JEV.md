@@ -1,28 +1,28 @@
 # TypeSafe Jev: decisions with a history
 
-Chronograph's `jev` / `decisions-v1` connector stores TypeSafe Jev's **Choice,
+ChronoDB's `jev` / `decisions-v1` connector stores TypeSafe Jev's **Choice,
 Score and Noul** answers as temporal relationships. It preserves the returned
 model identifier, requested model, probabilities, confidence where supplied,
 usage, source IDs and event timestamp. Jev inference runs in your application;
 the graph does not load Jev weights or call TypeSafe on your behalf.
 
-[Download the example bundle](https://chronograph.13.57.235.204.nip.io/downloads/chronograph-jev-examples.zip) ·
-[Download the notebook](https://chronograph.13.57.235.204.nip.io/downloads/jev-decision-history.ipynb) ·
+[Download the example bundle](https://chronodb.co/downloads/chronograph-jev-examples.zip) ·
+[Download the notebook](https://chronodb.co/downloads/jev-decision-history.ipynb) ·
 [Open the fixture notebook in Binder](https://mybinder.org/v2/gh/enablewmodels-sys/chronograph/main?labpath=examples%2Fjev%2Fjev-decision-history.ipynb)
 
 The bundle includes both SDKs, Python and JavaScript examples, a TypeScript
 binding, notebook, synthetic request/response fixtures, setup instructions,
 license and notices. Binder runs a synthetic example without API credentials;
-its availability is operated by mybinder.org, not Chronograph.
+its availability is operated by mybinder.org, not ChronoDB.
 
 ## What is supported
 
 | Surface | Behavior |
 | --- | --- |
 | Python | `chronograph_connectors.jev.jev_decision` accepts JSON or an official Python SDK response |
-| TypeScript / JavaScript | `jevDecision` exported by the Chronograph SDK accepts TypeSafe's JSON result |
+| TypeScript / JavaScript | `jevDecision` exported by the ChronoDB SDK accepts TypeSafe's JSON result |
 | Migration editor | Family **Decision models**, connector **TypeSafe Jev**, preset **decisions-v1** |
-| Other languages | Send the same normalized JSON through any Chronograph SDK's `connector_ingest` call |
+| Other languages | Send the same normalized JSON through any ChronoDB SDK's `connector_ingest` call |
 | Attachments | Explicitly upload raw request and response as content-addressed opaque JSON assets |
 | Inference | Optional call through TypeSafe's official Python or Node SDK, using your provider key |
 
@@ -133,4 +133,4 @@ A TypeSafe key was not supplied for a paid live inference test.
 Sources: [API contract](https://docs.typesafe.ai/api),
 [official SDKs](https://docs.typesafe.ai/sdk),
 [September 15 launch](https://typesafe.ai/blog/introducing-system-one-models-and-jev).
-Chronograph's adapter is independently maintained; no TypeSafe partnership is implied.
+ChronoDB's adapter is independently maintained; no TypeSafe partnership is implied.

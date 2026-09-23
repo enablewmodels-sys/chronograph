@@ -1,4 +1,4 @@
-# Self-hosted and isolated Chronograph
+# Self-hosted and isolated ChronoDB
 
 Run the Community engine on infrastructure you control. In this guide, **isolated**
 means a separately operated database with its own process, storage, credentials

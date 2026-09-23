@@ -61,7 +61,7 @@ Format 2 readers must understand every journal tag in the file, including branch
 
 ## Remove
 
-Stop the service with SIGINT/SIGTERM and disconnect any MCP clients. Remove the binaries and built UI from the installation directory, and remove only the Chronograph MCP entry you added to your client configuration. This does not erase graph data or credentials. Archive or delete those directories separately only when you intend to remove that workspace. Token secrets in your client environment or secret manager must also be removed separately.
+Stop the service with SIGINT/SIGTERM and disconnect any MCP clients. Remove the binaries and built UI from the installation directory, and remove only the ChronoDB MCP entry you added to your client configuration. This does not erase graph data or credentials. Archive or delete those directories separately only when you intend to remove that workspace. Token secrets in your client environment or secret manager must also be removed separately.
 
 ## Native alpha bundle
 

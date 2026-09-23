@@ -38,7 +38,7 @@ export function AccountFrame({ children }: { children: ReactNode }) {
               An authenticator protects your account.
             </span>
           </div>
-          <Link to="/documentation/HOSTED">Explore Chronograph Managed</Link>
+          <Link to="/documentation/HOSTED">Explore ChronoDB Managed</Link>
           <img
             className="account-world"
             src={publicPath("/images/world/t1.webp")}
@@ -50,7 +50,7 @@ export function AccountFrame({ children }: { children: ReactNode }) {
         <section className="account-form-panel">{children}</section>
       </div>
       <footer className="account-footer">
-        Chronograph Managed <span>Temporal memory for models that act.</span>
+        ChronoDB Managed <span>Temporal memory for models that act.</span>
       </footer>
     </main>
   );
@@ -260,7 +260,7 @@ export default function ManagedLogin({
         </>
       ) : (
         <>
-          <h2>Welcome to Chronograph.</h2>
+          <h2>Welcome to ChronoDB.</h2>
           <p>Sign in to your projects.</p>
           {new URLSearchParams(location.search).has("error") && (
             <div className="notice error" role="alert">
@@ -392,7 +392,7 @@ export function ActivateAccount() {
       ) : (
         <>
           <p>
-            Set a password for your Chronograph account. This private link works
+            Set a password for your ChronoDB account. This private link works
             once.
           </p>
           {invite && (

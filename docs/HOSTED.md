@@ -1,11 +1,18 @@
-# Chronograph Managed
+# ChronoDB Managed
 
-[Open Chronograph](https://chronograph.13.57.235.204.nip.io). Managed adds accounts,
+[Open ChronoDB](https://chronodb.co). Managed adds accounts,
 project provisioning, team roles, an encrypted secret vault, and project routing
 around the Rust temporal graph engine. This deployment is a **launch preview**,
 with bounded capacity and no availability SLA. Running your own infrastructure?
 Use the [self-hosted / isolated guide](ISOLATED.md). See [production operations](PRODUCTION.md)
 for durability, monitoring and recovery responsibilities.
+
+The canonical Managed origin is **https://chronodb.co**. The old nip.io address
+and `www.chronodb.co` redirect here. Update backend SDK base URLs and agent MCP
+endpoints to this origin; existing project IDs, API keys, migrations and data
+remain valid. Browser accounts sign in again on the new domain. Existing SDK
+imports, `chronograph-*` binary names and `CHRONOGRAPH_*` environment variables
+are unchanged.
 
 ## Start a project
 
@@ -65,7 +72,7 @@ read access and grant write access only when the workflow needs it.
 Use the exact project API base URL shown in the console:
 
 ```sh
-export CHRONOGRAPH_URL='https://YOUR_HOST/p/YOUR_PROJECT_ID'
+export CHRONOGRAPH_URL='https://chronodb.co/p/YOUR_PROJECT_ID'
 # Supply CHRONOGRAPH_TOKEN through your secret manager or private environment.
 curl "$CHRONOGRAPH_URL/v1/info" \
   -H "Authorization: Bearer $CHRONOGRAPH_TOKEN"
@@ -85,7 +92,7 @@ const response = await fetch(`${process.env.CHRONOGRAPH_URL}/v1/as_of`, {
   },
   body: JSON.stringify({ t: "1000000", limit: 100 }),
 });
-if (!response.ok) throw new Error(`Chronograph returned ${response.status}`);
+if (!response.ok) throw new Error(`ChronoDB returned ${response.status}`);
 const graph = await response.json();
 ```
 
@@ -122,7 +129,7 @@ console includes configuration for Codex, Cursor and Claude Code. For Codex:
 
 ```toml
 [mcp_servers.chronograph]
-url = "https://YOUR_HOST/p/YOUR_PROJECT_ID/mcp"
+url = "https://chronodb.co/p/YOUR_PROJECT_ID/mcp"
 bearer_token_env_var = "CHRONOGRAPH_TOKEN"
 tool_timeout_sec = 60
 ```
@@ -146,7 +153,7 @@ project. They cannot authenticate graph or MCP requests. Graph API keys cannot
 read the vault. A project supports up to 100 secrets and 20 active reader keys.
 
 ```sh
-curl 'https://YOUR_HOST/p/YOUR_PROJECT_ID/secrets/TYPESAFE_API_KEY' \
+curl 'https://chronodb.co/p/YOUR_PROJECT_ID/secrets/TYPESAFE_API_KEY' \
   -H "Authorization: Bearer $CHRONOGRAPH_SECRET_READER_KEY"
 ```
 
@@ -199,7 +206,7 @@ Google is an optional Managed identity provider. Community/isolated instances
 continue to use scoped API credentials. A Managed host shows **Continue with
 Google** only after its operator configures a Google OAuth web client. No Google
 Drive, Gmail, or other data permissions are requested: only identity, email and
-profile. Each new session still requires Chronograph MFA.
+profile. Each new session still requires ChronoDB MFA.
 
 Google email addresses must be verified. Existing accounts with unverified local
 email cannot be linked implicitly. Workspace access is determined by project

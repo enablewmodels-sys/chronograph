@@ -119,7 +119,7 @@ export default function ManagedSecrets() {
           />
           <p className="small">
             Connector producers use the returned secret to call their provider.
-            Chronograph does not run model inference.
+            ChronoDB does not run model inference.
           </p>
         </section>
       </Disclosure>

@@ -1,8 +1,8 @@
 # Architecture
 
-Chronograph Community is an embedded temporal graph engine with an optional authenticated service, browser console and native MCP bridge. The engine has no networking or authentication dependency. Managed wraps the same engine in a separate private identity and project control plane. The first diagram describes Community; the deployed Managed boundary is below.
+ChronoDB Community is an embedded temporal graph engine with an optional authenticated service, browser console and native MCP bridge. The engine has no networking or authentication dependency. Managed wraps the same engine in a separate private identity and project control plane. The first diagram describes Community; the deployed Managed boundary is below.
 
-![Chronograph Community architecture](architecture.svg)
+![ChronoDB Community architecture](architecture.svg)
 
 ## Diagram source
 

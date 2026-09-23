@@ -1,6 +1,6 @@
 # Production operations and readiness
 
-Chronograph currently ships as **0.4.0-alpha.3**. The Managed site is a launch
+ChronoDB currently ships as **0.4.0-alpha.3**. The Managed site is a launch
 preview, and Community is a single-owner database. Passing the checks below is
 evidence for a specific deployment, not an availability SLA, independent security
 audit or guarantee that an arbitrary workload fits in memory.

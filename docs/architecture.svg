@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1120" height="850" viewBox="0 0 1120 850" role="img" aria-labelledby="title desc">
-  <title id="title">Chronograph Community architecture</title>
+  <title id="title">ChronoDB Community architecture</title>
   <desc id="desc">Browser and MCP clients use the scoped HTTP service. Embedded Rust applications and connectors use the engine directly. One owner commits parent and branch mutations to a locked journal; private credentials remain outside the graph volume.</desc>
   <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#61786a"/></marker></defs>
   <rect width="1120" height="850" rx="12" fill="#f6f7f0"/>
   <g font-family="Arial, sans-serif" fill="#18271f">
-    <text x="40" y="48" font-size="28" font-weight="700">Chronograph Community</text>
+    <text x="40" y="48" font-size="28" font-weight="700">ChronoDB Community</text>
     <text x="40" y="75" font-size="15" fill="#53685c">One workspace. An embedded engine, with optional HTTP, console and MCP.</text>
     <g fill="#e6eddf" stroke="#a8b9aa">
       <rect x="40" y="105" width="290" height="88" rx="6"/>

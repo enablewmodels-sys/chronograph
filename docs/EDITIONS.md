@@ -1,6 +1,6 @@
 # Community and Managed
 
-Chronograph Community is a self-hosted, source-available temporal graph database
+ChronoDB Community is a self-hosted, source-available temporal graph database
 under **PolyForm Perimeter 1.0.0**. You can modify it and use it commercially for
 noncompeting purposes. Offering a competing product, including a free one, is
 restricted. See [licensing](LICENSING.md) for the full boundary.

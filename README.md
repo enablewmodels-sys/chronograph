@@ -1,4 +1,8 @@
-# Chronograph
+# ChronoDB
+
+Managed is available at **[chronodb.co](https://chronodb.co)**. ChronoDB was
+previously named Chronograph; existing `chronograph-*` binaries, package names,
+environment variables and SDK imports remain supported without changes.
 
 **An embedded temporal graph database in Rust. Replay a world, branch its future,
 and carry the selected history forward.**

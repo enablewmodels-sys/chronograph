@@ -389,6 +389,99 @@
   flex: 1;
   min-width: 0;
   margin: 0;
+  transition: flex 650ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.history-cinema {
+  min-width: 0;
+  perspective: 1100px;
+}
+.history-cinema figure {
+  animation: history-arrive 1100ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-play-state: paused;
+}
+.history-cinema figure:nth-of-type(2) {
+  animation-delay: 140ms;
+}
+.history-cinema figure:nth-of-type(3) {
+  animation-delay: 280ms;
+}
+.history-cinema[data-playing="true"] figure,
+.history-cinema[data-playing="true"] .history-track span {
+  animation-play-state: running;
+}
+.history-frames.has-selection figure {
+  flex: 0.65;
+}
+.history-frames.has-selection figure.selected {
+  flex: 2.4;
+}
+.history-moment {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--bg);
+  cursor: pointer;
+}
+.history-moment[aria-pressed="true"] {
+  border-color: #769bd4;
+}
+.history-moment img {
+  transition: transform 700ms;
+}
+.history-moment:hover img {
+  transform: scale(1.045);
+}
+.history-focus {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 22px 8px 10px;
+  font-size: 10px;
+  color: var(--text);
+  background: linear-gradient(transparent, #081321e8);
+  opacity: 0;
+  transition: opacity 220ms;
+}
+.history-moment:hover .history-focus,
+.history-moment:focus-visible .history-focus,
+.history-moment[aria-pressed="true"] .history-focus {
+  opacity: 1;
+}
+.history-track {
+  height: 1px;
+  background: var(--rule);
+  margin-top: 13px;
+  overflow: hidden;
+}
+.history-track span {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: #84afe6;
+  transform-origin: left;
+  animation: history-trace 3.5s ease-out both;
+  animation-play-state: paused;
+}
+@keyframes history-arrive {
+  from {
+    transform: translateY(22px) rotateY(-9deg);
+  }
+  to {
+    transform: translateY(0) rotateY(0);
+  }
+}
+@keyframes history-trace {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 .history-frames img {
   display: block;
@@ -460,6 +553,107 @@
   max-height: 300px;
   object-fit: cover;
   border-radius: 3px;
+}
+.scene-viewport {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3 / 2;
+  background: #081321;
+  border-radius: 3px;
+}
+.scene-camera {
+  height: 100%;
+  animation: scene-camera 4.8s cubic-bezier(0.2, 0.5, 0.2, 1) both;
+  animation-play-state: paused;
+}
+.scene-camera img {
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+}
+.scene-scan {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -8%;
+  width: 8%;
+  pointer-events: none;
+  border-right: 1px solid #b6d6f455;
+  background: linear-gradient(90deg, transparent, #b6d6f40c);
+  animation: scene-scan 4.8s ease-in-out both;
+  animation-play-state: paused;
+}
+.cinematic-scene[data-playing="true"] .scene-camera,
+.cinematic-scene[data-playing="true"] .scene-scan {
+  animation-play-state: running;
+}
+.scene-caption {
+  position: absolute;
+  top: 14px;
+  left: 15px;
+  color: #dae5f3;
+  background: #081321b8;
+  padding: 5px 7px;
+  font-size: 10px;
+  border-radius: 2px;
+}
+.scene-motion {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: var(--text);
+  background: #081321b8;
+  border: 1px solid #95adcd65;
+  border-radius: 50%;
+}
+.scene-motion:hover {
+  background: #182b45;
+}
+@keyframes scene-camera {
+  from {
+    transform: scale(1.1) translateX(-1%);
+  }
+  to {
+    transform: scale(1) translateX(0);
+  }
+}
+@keyframes scene-scan {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  80%,
+  100% {
+    transform: translateX(1450%);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene-camera,
+  .scene-scan,
+  .history-cinema figure,
+  .history-track span {
+    animation: none;
+  }
+  .scene-scan {
+    display: none;
+  }
+  .history-frames figure,
+  .history-moment img,
+  .history-focus {
+    transition: none;
+  }
+  .history-moment:hover img {
+    transform: none;
+  }
 }
 .model-data {
   display: grid;

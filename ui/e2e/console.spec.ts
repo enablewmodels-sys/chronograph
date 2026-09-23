@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 async function navigate(page: Page, name: string) {
+  await expect(page.locator(".workspace-top")).toBeVisible();
   const menu = page.getByRole("button", {
     name: "Open navigation",
     exact: true,
@@ -13,6 +14,7 @@ async function navigate(page: Page, name: string) {
     .click();
 }
 async function disconnect(page: Page) {
+  await expect(page.locator(".workspace-top")).toBeVisible();
   const menu = page.getByRole("button", {
     name: "Open navigation",
     exact: true,
@@ -42,7 +44,7 @@ test("connect, explore, write, manage tokens, backup and disconnect", async ({
     if (m.type() === "error") errors.push(m.text());
   });
   await connect(page);
-  await expect(page).toHaveTitle(/Chronograph/);
+  await expect(page).toHaveTitle(/ChronoDB/);
   await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
   const c = await config();
   const auth = { Authorization: `Bearer ${c.token}` };
@@ -395,6 +397,36 @@ test("landing artwork, documentation and connector navigation render at this vie
   await expect(
     page.getByRole("tab", { name: "World models", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
+  for (const [name, scene] of [
+    ["World models", "world"],
+    ["BCI", "bci"],
+    ["Quantum", "quantum"],
+  ]) {
+    await page.getByRole("tab", { name, exact: true }).click();
+    const cinema = page.locator(`[data-scene="${scene}"]`);
+    await expect(cinema).toBeVisible();
+    await expect
+      .poll(() =>
+        cinema
+          .locator("img")
+          .evaluate((image) => (image as HTMLImageElement).naturalWidth),
+      )
+      .toBeGreaterThan(0);
+    await cinema.getByRole("button", { name: "Pause cinematic scene" }).click();
+    await expect(cinema).toHaveAttribute("data-playing", "false");
+    await cinema
+      .getByRole("button", { name: "Resume cinematic scene" })
+      .click();
+    await expect(cinema).toHaveAttribute("data-playing", "true");
+  }
+  const moment = page.getByRole("button", {
+    name: "Inspect t1: Action recorded",
+    exact: true,
+  });
+  await moment.click();
+  await expect(moment).toHaveAttribute("aria-pressed", "true");
+  await moment.click();
+  await expect(moment).toHaveAttribute("aria-pressed", "false");
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await page
     .locator(".connection-example")
@@ -448,7 +480,7 @@ test("landing artwork, documentation and connector navigation render at this vie
     await expect(page.locator(".prose h1")).toHaveCount(1);
     await expect(page.getByRole("alert")).toHaveCount(0);
     if (doc === "ARCHITECTURE") {
-      const diagram = page.getByAltText("Chronograph Community architecture");
+      const diagram = page.getByAltText("ChronoDB Community architecture");
       await expect
         .poll(() =>
           diagram.evaluate((img) => (img as HTMLImageElement).naturalWidth),

@@ -687,7 +687,7 @@ export default function Schema() {
                 <div className="schema-editor-head">
                   <div>
                     <span className="eyebrow">
-                      CHRONOGRAPH JSON · V1 / V2 / V3
+                      CHRONODB JSON · V1 / V2 / V3
                     </span>
                     <h2>
                       {viewing ? "Applied migration" : "Migration editor"}
