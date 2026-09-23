@@ -1167,6 +1167,35 @@ tbody tr:hover,
   }
 }
 @media (max-width: 600px) {
+  .documentation .public-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    height: auto;
+    min-height: 0;
+    gap: 14px 10px;
+    padding: 22px 0;
+  }
+  .documentation .public-nav .logo {
+    font-size: 18px;
+    gap: 7px;
+  }
+  .documentation .public-nav .logo svg {
+    width: 25px;
+    height: 25px;
+  }
+  .documentation .public-nav .nav-links {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    justify-content: flex-start;
+    gap: 24px;
+  }
+  .documentation .public-nav .button {
+    min-height: 44px;
+    padding: 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
   .workspace main {
     padding: 24px 16px 45px;
   }
