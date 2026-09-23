@@ -15,6 +15,8 @@ const docs = [
   ["API", "HTTP API"],
   ["SDK", "Language SDKs"],
   ["INTEGRATIONS", "Platform integration recipes"],
+  ["DECISION_MODELS", "Jev & Laya overview"],
+  ["LAYA", "Laya local inference & examples"],
   ["JEV", "TypeSafe Jev & examples"],
   ["SCHEMA", "Schema & migrations"],
   ["CONNECTOR_PLATFORM", "Connector platform"],

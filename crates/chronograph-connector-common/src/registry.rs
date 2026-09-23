@@ -32,6 +32,15 @@ pub static DEFINITIONS: &[Definition] = &[
         "https://docs.typesafe.ai/api"
     ),
     definition!(
+        "laya",
+        "Decision models",
+        "Convai Laya",
+        ["decisions-v1"],
+        "python_typescript_adapter",
+        "Store locally produced Laya Choice, Score and Noul decisions, checkpoint and routing provenance. Run the Laya runtime in your own environment; no weights or inference run in the database.",
+        "https://github.com/NandhaKishorM/laya"
+    ),
+    definition!(
         "jepa",
         "JEPA",
         "JEPA outputs",

@@ -18,7 +18,7 @@ def _json(value):
     return json.loads(json.dumps(value, allow_nan=False, ensure_ascii=False))
 
 
-def validate_answers(answers):
+def validate_answers(answers, *, rounded=False):
     if not isinstance(answers, dict) or not 1 <= len(answers) <= 64:
         raise ValueError("Jev requires 1–64 named answers")
     for name, answer in answers.items():
@@ -34,7 +34,7 @@ def validate_answers(answers):
         probs = answer.get("probabilities")
         if (not isinstance(probs, dict) or not 1 <= len(probs) <= 255
                 or any(not isinstance(k, str) or not 1 <= len(k.encode()) <= 256 or not _prob(p) for k, p in probs.items())
-                or abs(sum(probs.values()) - 1) > 0.001 or not _prob(answer.get("confidence"))):
+                or abs(sum(probs.values()) - 1) > (max(0.001, len(probs) * 0.00005 + 1e-9) if rounded else 0.001) or not _prob(answer.get("confidence"))):
             raise ValueError("Jev probabilities must sum to one and confidence must be in [0,1]")
         if kind == "choice":
             if not isinstance(answer.get("choice"), str) or answer["choice"] not in probs:
@@ -48,7 +48,7 @@ def validate_answers(answers):
                 raise ValueError("Score requires matching numeric legend and a value within its range")
 
 
-def jev_decision(response, *, request, src, dst, timestamp_us, mode, client=None, attach_inputs=False, episode=None):
+def _decision_record(response, *, request, src, dst, timestamp_us, mode, provider, rounded=False, client=None, attach_inputs=False, episode=None):
     """Normalize an official SDK response; optional request/response assets are explicit.
 
     mode is mandatory: 'live' for an actual provider response, 'fixture' for samples.
@@ -65,11 +65,14 @@ def jev_decision(response, *, request, src, dst, timestamp_us, mode, client=None
     if mode not in ("live", "fixture"):
         raise ValueError("Set mode explicitly to live or fixture")
     questions, answers = request.get("questions"), response.get("answers")
-    validate_answers(answers)
+    validate_answers(answers, rounded=rounded)
     if (not isinstance(questions, dict) or set(questions) != set(answers)
             or any(not isinstance(questions[k], dict) or questions[k].get("type") != a["type"] for k, a in answers.items())
             or "state" not in request):
         raise ValueError("Every answer must match a supplied question and type")
+    for value, lo, hi in ((src, 0, 2**64 - 1), (dst, 0, 2**64 - 1), (timestamp_us, -2**63, 2**63 - 2)):
+        if isinstance(value, bool) or not isinstance(value, (int, str)) or not lo <= int(value) <= hi:
+            raise ValueError("Use exact integer IDs and microsecond timestamps")
     data = json.dumps(request, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode()
     if len(data) > 1024 * 1024:
         raise ValueError("Example request exceeds 1 MiB; preprocess or split your state")
@@ -78,11 +81,15 @@ def jev_decision(response, *, request, src, dst, timestamp_us, mode, client=None
         if client is None:
             raise ValueError("A Chronograph client is required for attachment uploads")
         for name, raw in (("request", data), ("response", json.dumps(response, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode())):
-            assets[name] = client.asset(raw, kind="opaque", encoding="json", provenance={"provider": "typesafe", "mode": mode})
-    for value, lo, hi in ((src, 0, 2**64 - 1), (dst, 0, 2**64 - 1), (timestamp_us, -2**63, 2**63 - 2)):
-        if isinstance(value, bool) or not isinstance(value, (int, str)) or not lo <= int(value) <= hi:
-            raise ValueError("Use exact integer IDs and microsecond timestamps")
+            assets[name] = client.asset(raw, kind="opaque", encoding="json", provenance={"provider": provider, "mode": mode})
     return {"src": str(src), "dst": str(dst), "timestamp_us": str(timestamp_us), "episode": episode,
-            "assets": assets, "fields": {"provider": "typesafe", "model": model, "requested_model": requested,
+            "assets": assets, "fields": {"provider": provider, "model": model, "requested_model": requested,
             "input_sha256": hashlib.sha256(data).hexdigest(), "answers": answers, "mode": mode,
             "usage": response.get("usage", {})}}
+
+
+def jev_decision(response, *, request, src, dst, timestamp_us, mode, client=None, attach_inputs=False, episode=None):
+    """Normalize a TypeSafe result; mode='live' or 'fixture' is mandatory."""
+    return _decision_record(response, provider="typesafe", request=request, src=src, dst=dst,
+                            timestamp_us=timestamp_us, mode=mode, client=client,
+                            attach_inputs=attach_inputs, episode=episode)

@@ -2,7 +2,7 @@
 
 ChronoDB stores temporal relationships and immutable binary assets. Producers own acquisition, model inference, simulators and quantum execution. Connector presets describe validated ingestion contracts; selecting a preset does not install a driver, load a checkpoint or authenticate to an upstream cloud service.
 
-Use the [SDK guide](SDK.md) to connect and [schema migrations](SCHEMA.md) to configure a binding. The live catalog supplies 36 presets across 18 connectors. Raw HTTP and MCP consumers can implement any of these contracts without Python.
+Use the [SDK guide](SDK.md) to connect and [schema migrations](SCHEMA.md) to configure a binding. The live catalog supplies 37 presets across 19 connectors. Raw HTTP and MCP consumers can implement any of these contracts without Python.
 
 ## Support matrix
 
@@ -119,3 +119,11 @@ Use the [Jev integration guide](JEV.md) for Python/TypeScript decision bindings,
 Choice/Score/Noul validation, an explicit input-attachment option and runnable
 examples. The migration dropdown exposes `jev` / `decisions-v1` under Decision
 models. JEPA tensor integrations are separate.
+
+## Convai Laya
+
+Use `laya` / `decisions-v1` for typed decisions from the local Laya runtime or
+its authenticated HTTP service. Python `laya_decision` and TypeScript
+`layaDecision` preserve answers, checkpoint and routing metadata; the Rust
+service validates the stored contract. See [Laya examples](LAYA.md) and the
+[Jev & Laya overview](DECISION_MODELS.md). No inference runs inside ChronoDB.

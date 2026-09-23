@@ -123,3 +123,10 @@ This is a Community alpha, not a completed managed release. Hosted invitations/a
 ## Additional alpha.3 producers
 
 The catalog now includes BrainFlow signal chunks, Q# source/results, portable quantum counts/observables, named model tensors and physical-AI transitions. These entries appear automatically in the migration dropdowns. See [platform recipes and verification boundaries](INTEGRATIONS.md) and the [multi-language clients](SDK.md). The alpha.2 binary release does not include these additions.
+
+## Decision-model producers
+
+[Jev and Laya](DECISION_MODELS.md) have separate Decision models entries in the
+migration dropdown. Use `jev` for TypeSafe output and `laya` for Convai output;
+both use `decisions-v1`. [Laya](LAYA.md) also preserves checkpoint and routing
+metadata from your own inference runtime. Inference remains outside the database.

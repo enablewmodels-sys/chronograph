@@ -466,3 +466,50 @@ test("ordered multi-file plan, baseline export and reviewed rollback", async ({
     fullPage: true,
   });
 });
+
+test("Laya and Jev appear in decision presets and Laya migration applies", async ({
+  page,
+}, info) => {
+  await connect(page);
+  await page.getByRole("tab", { name: /^Migrations/ }).click();
+  await page.getByRole("button", { name: "Presets", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Family", exact: true })
+    .selectOption("Decision models");
+  const model = page.getByRole("combobox", {
+    name: "Connector / model",
+    exact: true,
+  });
+  await expect(model).toContainText("TypeSafe Jev");
+  await expect(model).toContainText("Convai Laya");
+  await model.selectOption("laya");
+  await expect(
+    page.getByRole("combobox", { name: "Version / preset", exact: true }),
+  ).toHaveValue("decisions-v1");
+  const mobile = info.project.name.startsWith("mobile");
+  const name = `laya_${mobile ? "m" : "d"}_${info.repeatEachIndex}`;
+  await page.getByLabel("Instance name", { exact: true }).fill(name);
+  await page
+    .getByLabel("Relation kind", { exact: true })
+    .fill(String(46000 + (mobile ? 100 : 0) + info.repeatEachIndex));
+  await page
+    .getByRole("button", { name: "Generate connector migration", exact: true })
+    .click();
+  await expect(
+    page.getByRole("textbox", { name: "Migration JSON", exact: true }),
+  ).toContainText('"connector": "laya"');
+  await applyDraft(page);
+  const c = await config();
+  const schema = await (
+    await page.request.post(c.url + "/v1/schema", {
+      headers: { Authorization: `Bearer ${c.token}` },
+      data: {},
+    })
+  ).json();
+  expect(
+    schema.connectors.some(
+      (binding: { id: string; connector: string }) =>
+        binding.id === name && binding.connector === "laya",
+    ),
+  ).toBe(true);
+});

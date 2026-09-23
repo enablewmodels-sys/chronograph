@@ -6,6 +6,7 @@ Chronograph server. These functions produce the normalized v1 transport contract
 import json
 from pathlib import Path
 from .jev import jev_decision
+from .laya import laya_decision
 
 
 def _json(value):

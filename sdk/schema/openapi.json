@@ -3390,6 +3390,19 @@
       },
       {
         "contract_version": 1,
+        "description": "Store locally produced Laya Choice, Score and Noul decisions, checkpoint and routing provenance. Run the Laya runtime in your own environment; no weights or inference run in the database.",
+        "family": "Decision models",
+        "id": "laya",
+        "name": "Convai Laya",
+        "native_import": "python_typescript_adapter",
+        "presets": [
+          "decisions-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://github.com/NandhaKishorM/laya"
+      },
+      {
+        "contract_version": 1,
         "description": "Store output tensors, masks, actions and checkpoint provenance from your model process.",
         "family": "JEPA",
         "id": "jepa",

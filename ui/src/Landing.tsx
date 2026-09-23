@@ -14,9 +14,9 @@ const domains = [
     image: "t2",
     alt: "Illustrative recorded outcome of a robot placing an object",
     kind: "decision",
-    title: "TypeSafe Jev",
+    title: "Jev & Laya",
     text: "Keep decisions, probabilities and model history.",
-    doc: "JEV",
+    doc: "DECISION_MODELS",
     label: "Get the examples",
     detail: "Decision → probability → outcome",
     fields: ["decision", "probability", "observed_at"],
@@ -86,12 +86,12 @@ export default function Landing() {
   return (
     <div className="landing cinematic-landing">
       <div className="integration-banner">
-        <span className="integration-tag">NEW INTEGRATION</span>
+        <span className="integration-tag">NEW INTEGRATIONS</span>
         <span>
-          <strong>TypeSafe Jev, with a memory.</strong> Keep decisions,
+          <strong>Jev & Laya, with a memory.</strong> Keep decisions,
           probabilities and model history.
         </span>
-        <Link to="/documentation/JEV">
+        <Link to="/documentation/DECISION_MODELS">
           Get the examples <ArrowRight size={14} />
         </Link>
       </div>
@@ -232,7 +232,9 @@ export default function Landing() {
               {domain === 0 && (
                 <a
                   className="model-download"
-                  href={publicPath("/downloads/chronograph-jev-examples.zip")}
+                  href={publicPath(
+                    "/downloads/chronograph-decision-examples.zip",
+                  )}
                   download
                 >
                   Download Python & TypeScript examples

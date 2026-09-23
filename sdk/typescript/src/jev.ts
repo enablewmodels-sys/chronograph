@@ -9,7 +9,7 @@ export interface JevRequest { model: string; state: Json; questions: Record<stri
 const encoder = new TextEncoder();
 const prob = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= 1;
 const object = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v);
-function validateAnswers(answers: unknown): asserts answers is Record<string, JevAnswer> {
+function validateAnswers(answers: unknown, rounded = false): asserts answers is Record<string, JevAnswer> {
   if (!object(answers) || !Object.keys(answers).length || Object.keys(answers).length > 64) throw new TypeError("Expected 1–64 Jev answers");
   for (const [name, a] of Object.entries(answers)) {
     if (!name || encoder.encode(name).length > 128 || !object(a)) throw new TypeError("Invalid Jev answer");
@@ -18,7 +18,7 @@ function validateAnswers(answers: unknown): asserts answers is Record<string, Je
     const p = a.probabilities;
     if (!object(p) || !Object.keys(p).length || Object.keys(p).length > 255 || !prob(a.confidence)
       || Object.entries(p).some(([k, n]) => !k || encoder.encode(k).length > 256 || !prob(n))
-      || Math.abs(Object.values(p).reduce<number>((n, v) => n + Number(v), 0) - 1) > 0.001) throw new TypeError("Invalid Jev probability distribution");
+      || Math.abs(Object.values(p).reduce<number>((n, v) => n + Number(v), 0) - 1) > (rounded ? Math.max(0.001, Object.keys(p).length * 0.00005 + 1e-9) : 0.001)) throw new TypeError("Invalid Jev probability distribution");
     if (a.type === "choice") {
       if (typeof a.choice !== "string" || !Object.hasOwn(p, a.choice)) throw new TypeError("Invalid Jev choice");
     } else {
@@ -33,12 +33,12 @@ function validateAnswers(answers: unknown): asserts answers is Record<string, Je
 }
 
 /** Normalize TypeSafe's JSON response. No inference, retries or provider keys here. */
-export async function jevDecision(response: JevResponse, options: {
+export async function decisionRecord(response: JevResponse, provider: "typesafe" | "convai", options: {
   request: JevRequest; src: string; dst: string; timestampUs: string; mode: "live" | "fixture";
   client?: Client; attachInputs?: boolean; episode?: string;
 }): Promise<RecordV1> {
   const { request, src, dst, timestampUs, mode, client, attachInputs = false, episode } = options;
-  validateAnswers(response.answers);
+  validateAnswers(response.answers, provider === "convai");
   if ([request.model, response.model].some(m => typeof m !== "string" || !m || encoder.encode(m).length > 128)
     || !["live", "fixture"].includes(mode) || !object(request.questions) || request.state === undefined
     || Object.keys(request.questions).length !== Object.keys(response.answers).length
@@ -56,11 +56,18 @@ export async function jevDecision(response: JevResponse, options: {
   if (attachInputs) {
     if (!client) throw new TypeError("Attachment uploads require a Chronograph client");
     for (const [name, bytes] of [["request", data], ["response", encoder.encode(strictStringify(response))]] as const) {
-      assets[name] = await client.uploadAsset(bytes, { version: 1, kind: "opaque", encoding: "json", provenance: { provider: "typesafe", mode } });
+      assets[name] = await client.uploadAsset(bytes, { version: 1, kind: "opaque", encoding: "json", provenance: { provider, mode } });
     }
   }
   return { src, dst, timestamp_us: timestampUs, ...(episode ? { episode } : {}), assets,
-    fields: { provider: "typesafe", model: response.model, requested_model: request.model, mode,
+    fields: { provider, model: response.model, requested_model: request.model, mode,
       input_sha256: Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, "0")).join(""),
       answers: response.answers as unknown as ObjectValue, usage: response.usage ?? {} } };
+}
+
+
+export type DecisionOptions = Parameters<typeof decisionRecord>[2];
+/** Normalize TypeSafe Jev output; existing callers retain their original contract. */
+export async function jevDecision(response: JevResponse, options: DecisionOptions): Promise<RecordV1> {
+  return decisionRecord(response, "typesafe", options);
 }

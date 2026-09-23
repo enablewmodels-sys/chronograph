@@ -9,3 +9,8 @@ Compatibility fixtures use MNE 1.13.0, Qiskit 2.5.2, Cirq 1.6.1, PyTorch 2.11.0 
 This SDK is source-available under PolyForm Perimeter 1.0.0. Read [LICENSE](LICENSE) and preserve [NOTICE](NOTICE). Modification and noncompeting commercial use are permitted; competing products, including free ones, are restricted. Optional dependencies retain their own licenses.
 
 See the [polyglot SDK guide](../../docs/SDK.md) and [new integration recipes](../../docs/INTEGRATIONS.md) for BrainFlow, LSL, named model outputs, decoded ROS media, Q# and portable quantum results. The alpha.3 Python source preserves the earlier Client/Spool interfaces and adds `request`, `info`, `ingest`, `pages` and structured error codes.
+
+[Jev & Laya decision-model adapters](../../docs/DECISION_MODELS.md) preserve typed
+answers and model provenance. See [Laya](../../docs/LAYA.md) for local/HTTP runtime
+setup and [Jev](../../docs/JEV.md) for the TypeSafe integration. Neither adapter
+loads models or calls a provider implicitly. Raw JSON attachments are opt-in.

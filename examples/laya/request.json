@@ -1,0 +1,32 @@
+{
+  "model": "auto",
+  "state": {
+    "episode": "warehouse-replay-001",
+    "observation": "A recorded warehouse robot encounter: the aisle is blocked by a pallet. The destination is behind it and an alternative aisle is available.",
+    "purpose": "Offline replay annotation for a human reviewer; no robot actuation."
+  },
+  "questions": {
+    "route": {
+      "type": "choice",
+      "instructions": "Which replay annotation best describes the next plan to review?",
+      "criteria": {
+        "alternate_aisle": "Review the alternative aisle",
+        "wait": "Wait for the obstruction to clear",
+        "inspect": "Request more context"
+      }
+    },
+    "obstructed": {
+      "type": "noul",
+      "instructions": "Is the currently planned aisle obstructed?"
+    },
+    "review_priority": {
+      "type": "score",
+      "instructions": "How much reviewer attention does this event need?",
+      "criteria": [
+        "Routine",
+        "Review soon",
+        "Review before the next trial"
+      ]
+    }
+  }
+}

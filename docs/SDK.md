@@ -159,3 +159,10 @@ records, with optional raw JSON attachments. See [Jev examples](JEV.md).
 Every SDK's generic operation call can use `schema_plan` with `{ "sources": ["JSON file contents", "next file contents"] }`. Keep the files in dependency order. After reviewing the returned before/after definitions, call `schema_apply_plan` with the same sources, `checksum` and `expected_revision`. Only an admin API key can apply the plan. Pending files commit atomically; applied files with the same checksum are skipped.
 
 The same calls work at a Community origin or a Managed base URL ending in `/p/PROJECT_ID`. `schema_export` produces a portable definition baseline, and `schema_rollback` drafts a compensation for explicit review. See the [migration guide](SCHEMA.md) for formats, examples, limits and compatibility. These calls change the service catalog; they do not execute arbitrary transformation code or rewrite historical payloads.
+
+## Laya decision binding
+
+Python exports `chronograph_connectors.laya.laya_decision`; TypeScript exports
+`layaDecision` with `LayaResponse` and `LayaOptions` types. Both retain Laya typed
+answers, checkpoint/routing metadata and optional raw JSON attachments. Inference
+runs in your producer. See [Laya setup](LAYA.md) and [Jev & Laya](DECISION_MODELS.md).

@@ -387,10 +387,10 @@ test("landing artwork, documentation and connector navigation render at this vie
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(page.viewportSize()!.width + 1);
   await expect(page.locator(".integration-banner")).toContainText(
-    "TypeSafe Jev, with a memory.",
+    "Jev & Laya, with a memory.",
   );
   await page.getByRole("tab", { name: "Decision models", exact: true }).click();
-  await expect(page.getByRole("tabpanel")).toContainText("TypeSafe Jev");
+  await expect(page.getByRole("tabpanel")).toContainText("Jev & Laya");
   await page
     .getByRole("tab", { name: "Decision models", exact: true })
     .press("ArrowRight");

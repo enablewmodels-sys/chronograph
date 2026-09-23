@@ -46,6 +46,7 @@ jobs:
       - run: npm --prefix examples/jev ci --ignore-scripts
       - run: PYTHONPATH=sdk/python python3 scripts/jev-sdk-test.py
       - run: node examples/jev/test-provider.mjs
+      - run: node scripts/laya-test.mjs
       - run: node scripts/sdk/conformance.mjs
       - run: node scripts/sdk/adapters.mjs
       - uses: actions/upload-artifact@v4

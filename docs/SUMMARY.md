@@ -13,6 +13,8 @@
 - [HTTP API](API.md)
 - [Language SDKs](SDK.md)
 - [Platform integration recipes](INTEGRATIONS.md)
+- [Decision models: Jev & Laya](DECISION_MODELS.md)
+- [Laya local inference & examples](LAYA.md)
 - [TypeSafe Jev](JEV.md)
 - [Agent integrations](MCP.md)
 - [BCI and LSL](connectors/bci.md)

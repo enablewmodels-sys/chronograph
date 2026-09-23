@@ -13,11 +13,11 @@ an optional single-workspace service with a browser console and scoped MCP tools
 Domain adapters connect BCI streams, robotics recordings and world-model episodes;
 quantum circuit/calibration support is exploratory.
 
-This checkout is a **Community alpha**, **source-available under PolyForm Perimeter 1.0.0**. The new [connector platform](docs/CONNECTOR_PLATFORM.md) adds 36 migration presets, typed assets and durable ingestion receipts. Existing format-2 workspaces require an [explicit upgrade to a separate destination](docs/UPGRADE_0_4.md).
+This checkout is a **Community alpha**, **source-available under PolyForm Perimeter 1.0.0**. The new [connector platform](docs/CONNECTOR_PLATFORM.md) adds 37 migration presets, typed assets and durable ingestion receipts. Existing format-2 workspaces require an [explicit upgrade to a separate destination](docs/UPGRADE_0_4.md).
 Modification and noncompeting commercial use are allowed; offering a competing product is restricted, including free competing products. See [licensing](docs/LICENSING.md).
 
 [Source repository](https://github.com/enablewmodels-sys/chronograph) · [Download the alpha](https://github.com/enablewmodels-sys/chronograph/releases/tag/v0.4.0-alpha.2).
-[Managed hosting](docs/HOSTED.md) is available as a launch preview with GitHub signup,
+[Managed hosting](docs/HOSTED.md) is available as a launch preview with Google and GitHub signup,
 invited email accounts, MFA, private project databases, scoped API keys and an
 encrypted secret vault. Billing and automated email delivery are not configured. See [release status](docs/REQUIREMENTS.md),
 [known limits](docs/LIMITATIONS.md) and [edition boundaries](docs/EDITIONS.md).
@@ -27,6 +27,13 @@ To host the Community landing, documentation and read-only demo on Vercel, impor
 ## Language SDKs
 
 [Python, TypeScript/JavaScript, Java, C++, Go, Dart and C#](docs/SDK.md) share the authenticated API. [Q# uses a Python host bridge](docs/INTEGRATIONS.md); Rust applications can embed the engine directly. The SDK guide covers source installation, retry semantics and tested platform adapters. New SDK sources are on `main`; the linked alpha.2 release predates this expansion.
+
+## Decision models
+
+[Jev & Laya](docs/DECISION_MODELS.md) bindings preserve typed decisions and model
+provenance, with Python/TypeScript examples and opt-in JSON attachments.
+[Laya](docs/LAYA.md) runs in your environment; [Jev](docs/JEV.md) uses TypeSafe.
+Both connectors are available from the schema editor and through every SDK.
 
 ## Start locally
 

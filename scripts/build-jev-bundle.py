@@ -5,9 +5,10 @@ import hashlib
 import json
 import zipfile
 root = Path(__file__).resolve().parents[1]
-files = [root/'LICENSE',root/'NOTICE',root/'docs/JEV.md',root/'sdk/schema/openapi.json',
+files = [root/'LICENSE',root/'NOTICE',root/'docs/JEV.md',root/'docs/LAYA.md',root/'docs/DECISION_MODELS.md',root/'sdk/schema/openapi.json',
          root/'.binder/postBuild',root/'.binder/requirements.txt']
 for folder,patterns in {
+    'examples/laya':['*.json','*.py','*.mjs','*.md','*.txt','*.ipynb'],
     'examples/jev':['*.json','*.py','*.mjs','*.md','*.txt','*.ipynb'],
     'sdk/python':['pyproject.toml','README.md','LICENSE','NOTICE'],
     'sdk/python/chronograph_connectors':['*.py'],
@@ -28,6 +29,10 @@ with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED) as z:
         z.writestr(info,data)
 notebook=output/'jev-decision-history.ipynb'
 notebook.write_bytes((root/'examples/jev/jev-decision-history.ipynb').read_bytes())
-manifest={p.name:{'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size} for p in (archive,notebook)}
+combined=output/'chronograph-decision-examples.zip'
+combined.write_bytes(archive.read_bytes())
+laya_notebook=output/'laya-decision-history.ipynb'
+laya_notebook.write_bytes((root/'examples/laya/laya-decision-history.ipynb').read_bytes())
+manifest={p.name:{'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size} for p in (archive,notebook,combined,laya_notebook)}
 (output/'jev-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 print(json.dumps(manifest))

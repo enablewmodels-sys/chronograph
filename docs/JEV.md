@@ -1,5 +1,8 @@
 # TypeSafe Jev: decisions with a history
 
+Also using local inference? See the [Jev & Laya guide](DECISION_MODELS.md)
+and [Laya connector](LAYA.md).
+
 ChronoDB's `jev` / `decisions-v1` connector stores TypeSafe Jev's **Choice,
 Score and Noul** answers as temporal relationships. It preserves the returned
 model identifier, requested model, probabilities, confidence where supplied,

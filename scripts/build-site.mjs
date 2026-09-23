@@ -52,6 +52,16 @@ for (const filename of ["LICENSE", "NOTICE"])
 const entry = await readFile(path.join(output, "index.html"));
 const routes = [
   "login",
+  "privacy",
+  "terms",
+  "data-protection",
+  "security",
+  "subprocessors",
+  "cookies",
+  "acceptable-use",
+  "legal",
+  "support",
+  "status",
   "documentation",
   "app",
   ...[

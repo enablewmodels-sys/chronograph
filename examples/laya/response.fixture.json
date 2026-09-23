@@ -1,0 +1,52 @@
+{
+  "model": "laya-rl-agent",
+  "answers": {
+    "route": {
+      "type": "choice",
+      "choice": "alternate_aisle",
+      "probabilities": {
+        "alternate_aisle": 0.75,
+        "wait": 0.1,
+        "inspect": 0.15
+      },
+      "confidence": 0.55,
+      "action": {
+        "act_probability": 0.97
+      }
+    },
+    "obstructed": {
+      "type": "noul",
+      "noul": 0.98,
+      "action": {
+        "act_probability": 0.97
+      }
+    },
+    "review_priority": {
+      "type": "score",
+      "score": 1.3,
+      "legend": {
+        "0": "Routine",
+        "1": "Review soon",
+        "2": "Review before the next trial"
+      },
+      "probabilities": {
+        "0": 0.1,
+        "1": 0.5,
+        "2": 0.4
+      },
+      "confidence": 0.4,
+      "action": {
+        "act_probability": 0.97
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0
+  },
+  "routing": {
+    "model": "english",
+    "repo": "convaiinnovations/laya",
+    "reason": "Synthetic routing fixture; no inference was run"
+  }
+}

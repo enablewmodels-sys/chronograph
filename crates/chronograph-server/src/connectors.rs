@@ -138,8 +138,13 @@ fn validate_record(
             .is_some_and(|m| m.kind == "tensor")
     };
     match b.connector.as_str() {
-        "jev" => {
-            if field("provider") != "typesafe"
+        "jev" | "laya" => {
+            let laya = b.connector == "laya";
+            if field("provider") != if laya { "convai" } else { "typesafe" }
+                || (laya
+                    && field("checkpoint")
+                        .as_str()
+                        .is_none_or(|s| s.is_empty() || s.len() > 256))
                 || field("model")
                     .as_str()
                     .is_none_or(|s| s.is_empty() || s.len() > 128)
@@ -153,10 +158,10 @@ fn validate_record(
                             .bytes()
                             .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
                 })
-                || !valid_jev_answers(field("answers"))
+                || !valid_decision_answers(field("answers"), laya)
             {
                 return Err(ApiError::bad(
-                    "Jev requires model provenance, live/fixture mode, input_sha256 and valid typed answers",
+                    "Decision records require model provenance, live/fixture mode, input_sha256 and valid typed answers",
                 ));
             }
         }
@@ -302,7 +307,7 @@ fn probability(value: &Value) -> bool {
         .is_some_and(|n| n.is_finite() && (0.0..=1.0).contains(&n))
 }
 
-fn valid_jev_answers(value: &Value) -> bool {
+fn valid_decision_answers(value: &Value, rounded: bool) -> bool {
     let Some(answers) = value.as_object() else {
         return false;
     };
@@ -325,7 +330,11 @@ fn valid_jev_answers(value: &Value) -> bool {
                             .iter()
                             .any(|(k, p)| k.is_empty() || k.len() > 256 || !probability(p))
                         || (probs.values().filter_map(Value::as_f64).sum::<f64>() - 1.0).abs()
-                            > 0.001
+                            > if rounded {
+                                0.001_f64.max(probs.len() as f64 * 0.00005 + 1e-9)
+                            } else {
+                                0.001
+                            }
                     {
                         return false;
                     }
@@ -602,7 +611,7 @@ mod domain_tests {
         let good = json!({"route":{"type":"choice","choice":"wait","probabilities":{"wait":0.7,"inspect":0.3},"confidence":0.4},
             "review":{"type":"noul","noul":0.95},
             "priority":{"type":"score","score":0.5,"legend":{"0":"low","1":{"label":"high"}},"probabilities":{"0":0.5,"1":0.5},"confidence":0.1}});
-        assert!(valid_jev_answers(&good));
+        assert!(valid_decision_answers(&good, false));
         for (name, key, value) in [
             ("route", "choice", json!("missing")),
             ("route", "confidence", json!(1.1)),
@@ -612,9 +621,31 @@ mod domain_tests {
         ] {
             let mut bad = good.clone();
             bad[name][key] = value;
-            assert!(!valid_jev_answers(&bad));
+            assert!(!valid_decision_answers(&bad, false));
         }
-        assert!(!valid_jev_answers(&json!({})));
+        assert!(!valid_decision_answers(&json!({}), false));
+    }
+
+    #[test]
+    fn laya_provenance_and_rounding_are_distinct_from_jev() {
+        let probabilities: serde_json::Map<String, Value> =
+            (0..64).map(|i| (i.to_string(), json!(0.0156))).collect();
+        let answers = json!({"route":{"type":"choice","choice":"0",
+            "probabilities":probabilities,"confidence":0.01,"action":{"act_probability":1.0}}});
+        assert!(valid_decision_answers(&answers, true));
+        assert!(!valid_decision_answers(&answers, false));
+        let mut fields = json!({"provider":"convai","model":"laya-rl-agent",
+            "requested_model":"auto","checkpoint":"convaiinnovations/laya",
+            "mode":"fixture","input_sha256":"a".repeat(64),"answers":answers});
+        let b = binding("laya", "decisions-v1");
+        assert!(validate_record(&record(fields.clone(), json!({})), &b, &BTreeMap::new()).is_ok());
+        fields["checkpoint"] = json!("");
+        assert!(validate_record(&record(fields.clone(), json!({})), &b, &BTreeMap::new()).is_err());
+        fields["checkpoint"] = json!("convaiinnovations/laya");
+        fields["provider"] = json!("typesafe");
+        assert!(validate_record(&record(fields.clone(), json!({})), &b, &BTreeMap::new()).is_err());
+        fields["answers"]["route"]["probabilities"]["0"] = json!(0.5);
+        assert!(!valid_decision_answers(&fields["answers"], true));
     }
 
     fn binding(connector: &str, preset: &str) -> Binding {

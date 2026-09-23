@@ -1,3 +1,5 @@
+export { layaDecision } from "./laya.js";
+export type { LayaAnswer, LayaResponse, LayaOptions } from "./laya.js";
 export { jevDecision } from "./jev.js";
 export type { JevAnswer, JevResponse, JevRequest } from "./jev.js";
 export type Json =
