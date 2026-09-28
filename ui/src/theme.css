@@ -958,6 +958,8 @@ tbody tr:hover,
   padding: 7px 10px;
   border-radius: 4px;
   color: var(--muted);
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .docs-layout aside nav a.active {
   color: var(--ink);
