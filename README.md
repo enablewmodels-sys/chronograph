@@ -13,7 +13,7 @@ an optional single-workspace service with a browser console and scoped MCP tools
 Domain adapters connect BCI streams, robotics recordings and world-model episodes;
 quantum circuit/calibration support is exploratory.
 
-This checkout is a **Community alpha**, **source-available under PolyForm Perimeter 1.0.0**. The new [connector platform](docs/CONNECTOR_PLATFORM.md) adds 37 migration presets, typed assets and durable ingestion receipts. Existing format-2 workspaces require an [explicit upgrade to a separate destination](docs/UPGRADE_0_4.md).
+This checkout is a **Community alpha**, **source-available under PolyForm Perimeter 1.0.0**. The new [connector platform](docs/CONNECTOR_PLATFORM.md) adds 38 migration presets, typed assets and durable ingestion receipts. Existing format-2 workspaces require an [explicit upgrade to a separate destination](docs/UPGRADE_0_4.md).
 Modification and noncompeting commercial use are allowed; offering a competing product is restricted, including free competing products. See [licensing](docs/LICENSING.md).
 
 [Source repository](https://github.com/enablewmodels-sys/chronograph) · [Download the alpha](https://github.com/enablewmodels-sys/chronograph/releases/tag/v0.4.0-alpha.2).
@@ -27,6 +27,15 @@ To host the Community landing, documentation and read-only demo on Vercel, impor
 ## Language SDKs
 
 [Python, TypeScript/JavaScript, Java, C++, Go, Dart and C#](docs/SDK.md) share the authenticated API. [Q# uses a Python host bridge](docs/INTEGRATIONS.md); Rust applications can embed the engine directly. The SDK guide covers source installation, retry semantics and tested platform adapters. New SDK sources are on `main`; the linked alpha.2 release predates this expansion.
+
+## BCI research
+
+[Record, replay and build EEG decoders](docs/BCI.md) with a durable local agent,
+BrainFlow/LSL/file ingestion, waveform review, frozen datasets and actual CPU
+training. Try the [synthetic workspace](https://chronodb.co/bci). Raw sample values,
+source timestamps and gaps remain traceable. Hosted training requires separately
+configured compute; the local workflow is available now. Physical boards still
+need qualification on your own setup.
 
 ## Decision models
 

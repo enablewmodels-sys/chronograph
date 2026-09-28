@@ -187,3 +187,25 @@ p95 **209.06 ms**, maximum **221.96 ms** from the operator laptop. This is a tin
 33-version fixture and includes network latency; it establishes neither throughput,
 production sizing nor an SLA. Automated off-host recovery, external alerts and
 email delivery remain unconfigured; see [production boundaries](PRODUCTION.md).
+
+
+## BCI research acceptance
+
+Use disposable databases and synthetic/pseudonymous data. Install Python fixture
+requirements from `scripts/sdk/requirements.txt`, build the native debug service,
+and run `PYTHONPATH=sdk/python python3 scripts/bci-test.py` and
+`PYTHONPATH=sdk/python python3 scripts/bci-acquisition-test.py`. These test the
+actual local service, immutable records, read/ingest scopes, source snapshots,
+CSP/LDA training and artifact inference, exact exports, FIF annotations,
+BrainVision derivative creation, forced restart, BrainFlow's synthetic board and
+LSL loopback timestamps. They do not establish physical-board compatibility,
+clinical suitability or real-subject model accuracy.
+
+`PYTHONPATH=sdk/python python3 scripts/bci-soak.py` runs a real one-hour producer at
+64 channels × 1 kHz, simulates a ten-minute transport outage, checks all sample
+indices after draining, measures ingestion and window-read percentiles, then kills
+and reopens the server. Output defaults to `/tmp/chronodb-bci-soak-report.json`.
+Shorter `--seconds` runs are smoke tests and must not be presented as a full soak.
+Specify a report path on durable local storage if needed. The default test uses
+local HTTP and a debug binary; those numbers do not represent hosted WAN/TLS
+latency. No raw participant recordings are included in these tests.

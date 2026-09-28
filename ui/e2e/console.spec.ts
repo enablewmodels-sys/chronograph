@@ -358,7 +358,7 @@ test("landing artwork, documentation and connector navigation render at this vie
   await page.goto("/");
   await expect(
     page.getByRole("heading", {
-      name: "Build worlds that remember.",
+      name: "The database for teams building alternatives to Neuralink.",
       exact: true,
     }),
   ).toBeVisible();
@@ -451,6 +451,8 @@ test("landing artwork, documentation and connector navigation render at this vie
   ).toBeVisible();
   const docs = [
     "HOSTED",
+    "BCI",
+    "BCI_TRAINING",
     "ISOLATED",
     "PRODUCTION",
     "QUICKSTART",

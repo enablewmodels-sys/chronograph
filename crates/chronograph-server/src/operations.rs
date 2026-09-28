@@ -268,6 +268,7 @@ pub async fn execute(state: Shared, op: String, mut args: Value) -> AppResult<Va
     tokio::task::spawn_blocking(move || {
         let _permit = permit;
         let began = std::time::Instant::now();
+        if op.starts_with("bci_") { return crate::bci::execute(&state, &op, args); }
         if matches!(op.as_str(), "asset_put" | "asset_compose" | "asset_get" | "connector_ingest" | "connector_checkpoint" | "connector_record") {
             return crate::connectors::execute(&state, &op, args);
         }

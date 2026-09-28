@@ -138,6 +138,7 @@ fn validate_record(
             .is_some_and(|m| m.kind == "tensor")
     };
     match b.connector.as_str() {
+        "bci" => crate::bci::validate(r, b, assets)?,
         "jev" | "laya" => {
             let laya = b.connector == "laya";
             if field("provider") != if laya { "convai" } else { "typesafe" }
@@ -579,6 +580,13 @@ pub fn execute(state: &Shared, op: &str, args: Value) -> AppResult<Value> {
             let already = g
                 .checkpoint(&q.instance, &q.partition)
                 .is_some_and(|old| old.cursor == cursor);
+            // Hold the graph lock while checking session invariants and publishing.
+            // Identical checkpoint retries bypass immutable-record conflict checks.
+            if b.connector == "bci" && !already {
+                let mut index = state.bci.lock().map_err(ApiError::internal)?;
+                index.refresh(&g, s.snapshot()?, &state.data)?;
+                index.validate_batch(&b, &q.records, &store)?;
+            }
             let result = g.ingest(cursor, &edges)?;
             Ok(json!({"receipt":receipt(&result),"already_applied":already}))
         }

@@ -1,3 +1,5 @@
+export { BCIClient } from "./bci.js";
+export type { BCIRecord } from "./bci.js";
 export { layaDecision } from "./laya.js";
 export type { LayaAnswer, LayaResponse, LayaOptions } from "./laya.js";
 export { jevDecision } from "./jev.js";

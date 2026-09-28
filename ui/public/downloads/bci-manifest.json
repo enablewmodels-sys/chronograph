@@ -1,0 +1,10 @@
+{
+  "chronodb-bci-examples.zip": {
+    "sha256": "5e6f68efc75416e91515f17261188820a73080ed3aed6da12f1170f10da0a570",
+    "bytes": 58497
+  },
+  "eeg-research.ipynb": {
+    "sha256": "f2e0fcbd39618a7b0ccf2d8051244380de519ca6a1a44a7ef7fa5425fb9bb106",
+    "bytes": 2110
+  }
+}

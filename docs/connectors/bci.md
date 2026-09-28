@@ -1,3 +1,6 @@
+> For the complete recording, replay, dataset and decoder workflow, see the new
+> [BCI research workspace](../BCI.md). The low-level adapters below remain supported.
+
 # BCI and neural streams
 
 `chronograph-conn-bci` ingests complete float32 channel frames through the public engine API. This is an acquisition adapter; it does not decode intentions or provide a device-specific control loop.

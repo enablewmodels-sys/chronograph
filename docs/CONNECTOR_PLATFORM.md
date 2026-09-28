@@ -12,14 +12,16 @@ The server checks both catalog definitions and stored main/active-branch kinds. 
 
 ## What the presets mean
 
-The registry contains 36 normalized presets across 18 connectors. Retrieve the authoritative catalog through `POST /v1/connector_catalog` or the MCP tool with the same name.
+The registry contains 38 normalized presets across 20 connectors. Retrieve the authoritative catalog through `POST /v1/connector_catalog` or the MCP tool with the same name.
 
 | Connector | Presets | Local integration boundary |
 |---|---|---|
 | JEPA | I-JEPA, V-JEPA 1, 2, 2-AC, 2.1, JEPA-WMs | Python NumPy/PyTorch output adapter; latent tensors and explicit checkpoint provenance. No weights or inference are loaded. |
 | H-JEPA | hierarchical-v1 | Generic coarse-to-fine latent levels with parent node IDs and horizons. No single upstream H-JEPA implementation is assumed. |
 | Gymnasium, Minari | transition-v1, episode-v1 | Multimodal observation tensors, structured actions, reward and separate termination/truncation flags. The existing Minari CLI remains limited to its documented complete-state codec. |
-| LSL | signal, marker, gap | Normalized signal tensors, string markers and explicit loss records; existing optional Rust LSL acquisition remains separate. Automatic reconnect integration with the new spool is still pending. |
+| BCI research | research-v1 | [Recording/replay workspace](BCI.md), durable offline signals, events, immutable datasets and CPU decoder lineage. |
+| Jev / Laya | decisions-v1 | [Decision model bindings](DECISION_MODELS.md); typed decisions and explicit model provenance. |
+| LSL | signal, marker, gap | Normalized signal tensors, string markers and explicit loss records; existing optional Rust LSL acquisition remains separate. The dedicated `bci/research-v1` acquisition agent adds resumable capture and reconnect handling. |
 | MNE | eeg-v1 | Python local EDF/BDF/FIF reader, chunked MNE Raw access. Requires optional MNE. Configure channels and SI units explicitly. |
 | LeRobot | v3-records, v2.1-records | Adapter consumes an already opened official dataset, including decoded image tensors. Native v2.1 conversion and MP4 shard export are not implemented by this transport. |
 | ROS 2 / MCAP | JointState, Image, CompressedImage, Imu, Odometry, TF | Normalized message records. Existing Rust bag decoding supports JointState; the other native message decoders remain pending. |

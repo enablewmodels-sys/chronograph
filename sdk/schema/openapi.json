@@ -912,6 +912,381 @@
         "x-required-scope": "admin"
       }
     },
+    "/v1/bci_manifest": {
+      "post": {
+        "description": "Freeze recording cutoffs and source hashes for a reproducible dataset. No data is changed; publish the returned manifest as a dataset record.",
+        "operationId": "bci_manifest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "cutoffs": {
+                    "additionalProperties": {
+                      "description": "Exact u64 ID as a decimal string",
+                      "pattern": "^[0-9]+$",
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "instance": {
+                    "type": "string"
+                  },
+                  "sessions": {
+                    "items": {
+                      "description": "Exact u64 ID as a decimal string",
+                      "pattern": "^[0-9]+$",
+                      "type": "string"
+                    },
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "stream": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "instance",
+                  "sessions",
+                  "stream"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/bci_records": {
+      "post": {
+        "description": "Read original BCI records after an append cursor. cursor remains usable while new recordings arrive; continue while has_more. Empty pages can advance the cursor.",
+        "operationId": "bci_records",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "after": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "instance": {
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "record_type": {
+                    "type": "string"
+                  },
+                  "session": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "stream": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "instance",
+                  "session"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/bci_session": {
+      "post": {
+        "description": "Read immutable BCI session and stream metadata.",
+        "operationId": "bci_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "instance": {
+                    "type": "string"
+                  },
+                  "session": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "instance",
+                  "session"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/bci_sessions": {
+      "post": {
+        "description": "List BCI research sessions. Read scope; bounded pages.",
+        "operationId": "bci_sessions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "after": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "instance": {
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
+    "/v1/bci_window": {
+      "post": {
+        "description": "Read a display-only min/max waveform envelope plus coverage and events, at most 60 seconds, 16 channels and 64 MiB decoded. Original samples remain in assets.",
+        "operationId": "bci_window",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "channels": {
+                    "items": {
+                      "maximum": 511,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "maxItems": 16,
+                    "type": "array"
+                  },
+                  "end": {
+                    "description": "Exact i64 microseconds as a decimal string",
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  },
+                  "instance": {
+                    "type": "string"
+                  },
+                  "points": {
+                    "maximum": 2048,
+                    "minimum": 16,
+                    "type": "integer"
+                  },
+                  "session": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "start": {
+                    "description": "Exact i64 microseconds as a decimal string",
+                    "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  },
+                  "stream": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "instance",
+                  "session",
+                  "stream",
+                  "start",
+                  "end"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
     "/v1/between": {
       "post": {
         "description": "Read versions overlapping [start,end). Superseded empty intervals are excluded.",
@@ -3375,6 +3750,19 @@
   ],
   "x-connector-catalog": {
     "connectors": [
+      {
+        "contract_version": 1,
+        "description": "Recording sessions, exact signal chunks, events, gaps, clock measurements, immutable datasets and decoder runs. Acquisition and inference run in external workers; physical devices require separate validation.",
+        "family": "BCI",
+        "id": "bci",
+        "name": "BCI research workspace",
+        "native_import": "python_bci_agent",
+        "presets": [
+          "research-v1"
+        ],
+        "transport": "normalized_records_v1",
+        "upstream": "https://chronodb.co/documentation/BCI"
+      },
       {
         "contract_version": 1,
         "description": "Store Jev Choice, Score and Noul decisions with probabilities, input fingerprints and model provenance. Inference runs in your producer using a separate TypeSafe API key.",

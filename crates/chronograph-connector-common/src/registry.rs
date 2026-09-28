@@ -23,6 +23,15 @@ macro_rules! definition {
 }
 pub static DEFINITIONS: &[Definition] = &[
     definition!(
+        "bci",
+        "BCI",
+        "BCI research workspace",
+        ["research-v1"],
+        "python_bci_agent",
+        "Recording sessions, exact signal chunks, events, gaps, clock measurements, immutable datasets and decoder runs. Acquisition and inference run in external workers; physical devices require separate validation.",
+        "https://chronodb.co/documentation/BCI"
+    ),
+    definition!(
         "jev",
         "Decision models",
         "TypeSafe Jev",

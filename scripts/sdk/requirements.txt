@@ -5,3 +5,10 @@ pylsl==1.18.2
 qdk==1.32.3
 openapi-spec-validator==0.7.2
 typesafe-sdk==0.7.0
+
+# EEG baseline and explicit derivative export fixtures.
+scipy==1.18.1
+mne==1.13.0
+scikit-learn==1.9.1
+mne-bids==0.19.0
+pybv==0.7.6

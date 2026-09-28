@@ -148,6 +148,20 @@ try {
           answers: { review: { type: "noul", noul: 0.75 } },
         },
       };
+      if (d.id === "bci") {
+        record.dst = record.src;
+        Object.assign(record.fields, {
+          type: "session",
+          session_id: record.src,
+          clock_domain: binding.clock_domain,
+          name: "BCI fixture",
+          study: "test",
+          participant: "synthetic",
+          source: "synthetic",
+          device: "fixture",
+          driver: "fixture-v1",
+        });
+      }
       if (d.id === "model-output") delete record.assets.source;
       const batch = {
         instance: id,

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, ArrowUpRight, Github } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import SiteFooter from "./SiteFooter";
 import { Code, Logo, Tabs } from "./shared";
@@ -7,6 +7,7 @@ import { managedSite, publicPath, publicSite } from "./site";
 import WorldTimeline, { worldFrames } from "./WorldTimeline";
 import CinematicScene, { HistorySequence } from "./CinematicScene";
 import "./landing.css";
+import "./bci.css";
 
 const domains = [
   {
@@ -52,7 +53,7 @@ const domains = [
     kind: "bci",
     title: "Signals, in context.",
     text: "Connect channel samples, acquisition time and experimental events.",
-    doc: "connectors/bci",
+    doc: "BCI",
     label: "Explore BCI examples",
     detail: "Channel → sample → event",
     fields: ["channel", "sample", "acquisition_time"],
@@ -99,6 +100,7 @@ export default function Landing() {
         <Logo />
         <div>
           <a href="#product">Product</a>
+          <Link to="/bci">BCI</Link>
           <a href="#use-cases">Use cases</a>
           <Link to={`/documentation/${doc}`}>Docs</Link>
           {managedSite ? (
@@ -113,7 +115,7 @@ export default function Landing() {
         </div>
       </nav>
       <main id="main">
-        <section className="hero" id="product">
+        <section className="hero bci-hero" id="product">
           <img
             className="hero-ambient"
             fetchPriority="high"
@@ -124,34 +126,25 @@ export default function Landing() {
             aria-hidden="true"
           />
           <div className="hero-copy">
-            <h1>
-              Build worlds
-              <br />
-              that remember.
-            </h1>
+            <h1>The database for teams building alternatives to Neuralink.</h1>
             <p>
-              A temporal graph database for models that observe, decide and act.
+              Capture EEG, replay experiments and trace decoder decisions—all in
+              one workspace.
             </p>
             <div className="hero-actions">
-              {managedSite ? (
-                <Link className="button primary" to="/login?provider=github">
-                  <Github size={19} />
-                  Start with GitHub
-                </Link>
-              ) : (
-                <Link className="button primary" to="/documentation/ISOLATED">
-                  Start locally <ArrowRight size={16} />
-                </Link>
-              )}
-              <a className="demo-link" href="#world-demo">
-                Explore the demo <ArrowRight size={16} />
-              </a>
-            </div>
-            {managedSite && (
-              <Link className="other-signin" to="/login">
-                More sign-in options
+              <Link className="button primary" to="/bci">
+                Explore a BCI session <ArrowRight size={16} />
               </Link>
-            )}
+              <Link
+                className="demo-link"
+                to={managedSite ? "/login" : "/documentation/ISOLATED"}
+              >
+                Create your workspace <ArrowRight size={16} />
+              </Link>
+            </div>
+            <p className="bci-independence">
+              Independent BCI infrastructure. Not affiliated with Neuralink.
+            </p>
           </div>
           <WorldTimeline />
         </section>

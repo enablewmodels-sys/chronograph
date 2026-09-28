@@ -11,7 +11,13 @@ license = "LicenseRef-PolyForm-Perimeter-1.0.0"
 license-files = ["LICENSE", "NOTICE"]
 dependencies = []
 
+[project.optional-dependencies]
+bci = ["numpy>=2.0,<3", "scipy>=1.14,<2", "mne>=1.13,<1.14", "scikit-learn>=1.7,<2"]
+bci-hardware = ["brainflow==5.22.2", "pylsl==1.18.2"]
+bci-bids = ["mne-bids>=0.19,<0.20", "pybv>=0.7,<0.8"]
+
 [project.scripts]
+chronograph-bci = "chronograph_connectors.bci_cli:entry"
 chronograph-agent = "chronograph_connectors.__main__:main"
 
 [tool.setuptools.packages.find]

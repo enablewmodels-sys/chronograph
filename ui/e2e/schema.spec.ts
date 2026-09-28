@@ -513,3 +513,45 @@ test("Laya and Jev appear in decision presets and Laya migration applies", async
     ),
   ).toBe(true);
 });
+
+test("BCI workspace navigation and reviewed recording migration", async ({
+  page,
+}, info) => {
+  await connect(page);
+  await navigate(page, "BCI workspace");
+  await expect(
+    page.getByRole("heading", { name: "BCI workspace", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Connect recording", exact: true })
+    .click();
+  const instance = `bci_${info.project.name.startsWith("mobile") ? "m" : "d"}_${info.repeatEachIndex}`;
+  await page.getByLabel("Instance", { exact: true }).fill(instance);
+  await page
+    .getByRole("button", { name: "Preview migration", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Apply reviewed migration" }),
+  ).toBeVisible();
+  const c = await config();
+  const schema = async () =>
+    (
+      await page.request.post(c.url + "/v1/schema", {
+        headers: { Authorization: `Bearer ${c.token}` },
+        data: {},
+      })
+    ).json();
+  expect(
+    (await schema()).connectors.some((b: { id: string }) => b.id === instance),
+  ).toBe(false);
+  await page.getByRole("button", { name: "Apply reviewed migration" }).click();
+  await expect(
+    page.getByText("Database configured. Start your local producer."),
+  ).toBeVisible();
+  expect(
+    (await schema()).connectors.some(
+      (b: { id: string; connector: string }) =>
+        b.id === instance && b.connector === "bci",
+    ),
+  ).toBe(true);
+});

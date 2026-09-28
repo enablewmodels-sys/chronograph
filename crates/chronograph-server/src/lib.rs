@@ -1,5 +1,6 @@
 pub mod auth;
 pub mod backup;
+mod bci;
 mod connectors;
 pub mod contract;
 mod mcp;
@@ -148,6 +149,7 @@ impl IntoResponse for ApiError {
 }
 pub struct AppState {
     graph: RwLock<Graph>,
+    bci: Mutex<bci::Index>,
     schema: RwLock<schema::Catalog>,
     auth: Mutex<auth::Auth>,
     pub data: PathBuf,
@@ -212,6 +214,7 @@ impl AppState {
         let authority = url[url::Position::BeforeHost..url::Position::AfterPort].to_owned();
         Ok(Arc::new(Self {
             graph: RwLock::new(graph),
+            bci: Mutex::new(bci::Index::default()),
             schema: RwLock::new(schema),
             auth: Mutex::new(auth),
             data,

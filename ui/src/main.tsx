@@ -19,6 +19,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import {
+  Activity,
   BookOpen,
   Database,
   Home,
@@ -64,6 +65,10 @@ import "./theme.css";
 import { PolicyLinks } from "./SiteFooter";
 const LegalPage = lazy(() => import("./LegalPage"));
 import { BranchPicker, WorkspaceProvider } from "./workspace";
+const BCI = lazy(() => import("./BCI"));
+const BCIPage = lazy(() =>
+  import("./BCI").then((m) => ({ default: m.BCIPage })),
+);
 const Explorer = lazy(() => import("./Explorer"));
 const Overview = lazy(() => import("./Overview"));
 const Schema = lazy(() => import("./SchemaWorkspace"));
@@ -160,6 +165,7 @@ function App() {
       >
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/bci" element={<BCIPage />} />
           <Route
             path="/login"
             element={
@@ -361,6 +367,7 @@ function Login() {
 }
 const navigation = [
   { path: "", title: "Overview", icon: Home },
+  { path: "bci", title: "BCI workspace", icon: Activity },
   { path: "explorer", title: "Explorer", icon: Network },
   { path: "branches", title: "Branches", icon: GitBranch },
   { path: "schema", title: "Schema & migrations", icon: Settings2 },
@@ -392,7 +399,7 @@ function Console() {
       </div>
       <nav aria-label="Console navigation" onClick={() => setMobileOpen(false)}>
         {[
-          ["Workspace", ["", "explorer", "branches"]],
+          ["Workspace", ["", "bci", "explorer", "branches"]],
           ["Build", ["schema", "write", "connectors"]],
           ["Manage", ["access", "secrets", "team", "operations"]],
         ].map(([label, paths]) => {
@@ -564,6 +571,7 @@ function Console() {
                   </>
                 )}
                 <Route index element={<Overview />} />
+                <Route path="bci" element={<BCI />} />
                 <Route path="explorer" element={<Explorer />} />
                 <Route path="schema" element={<Schema />} />
                 <Route path="branches" element={<Branches />} />

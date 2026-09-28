@@ -6,6 +6,8 @@ import { Logo } from "./shared";
 import { publicPath, publicSite, managedSite } from "./site";
 import SiteFooter from "./SiteFooter";
 const docs = [
+  ["BCI", "BCI workspace & acquisition"],
+  ["BCI_TRAINING", "BCI datasets & decoder workers"],
   ["HOSTED", "Managed quickstart"],
   ["ISOLATED", "Self-hosted quickstart"],
   ["PRODUCTION", "Production operations"],

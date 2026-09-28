@@ -48,6 +48,36 @@ pub fn definitions() -> Vec<Tool> {
             vec!["metadata", "chunks"],
         ),
         (
+            "bci_sessions",
+            "List BCI research sessions. Read scope; bounded pages.",
+            json!({"instance":{"type":"string"},"after":id,"limit":limit}),
+            vec![],
+        ),
+        (
+            "bci_session",
+            "Read immutable BCI session and stream metadata.",
+            json!({"instance":{"type":"string"},"session":id}),
+            vec!["instance", "session"],
+        ),
+        (
+            "bci_records",
+            "Read original BCI records after an append cursor. cursor remains usable while new recordings arrive; continue while has_more. Empty pages can advance the cursor.",
+            json!({"instance":{"type":"string"},"session":id,"stream":{"type":"string"},"record_type":{"type":"string"},"after":id,"limit":limit}),
+            vec!["instance", "session"],
+        ),
+        (
+            "bci_manifest",
+            "Freeze recording cutoffs and source hashes for a reproducible dataset. No data is changed; publish the returned manifest as a dataset record.",
+            json!({"instance":{"type":"string"},"sessions":{"type":"array","minItems":1,"maxItems":100,"items":id},"stream":{"type":"string"},"cutoffs":{"type":"object","additionalProperties":id}}),
+            vec!["instance", "sessions", "stream"],
+        ),
+        (
+            "bci_window",
+            "Read a display-only min/max waveform envelope plus coverage and events, at most 60 seconds, 16 channels and 64 MiB decoded. Original samples remain in assets.",
+            json!({"instance":{"type":"string"},"session":id,"stream":{"type":"string"},"start":integer,"end":integer,"channels":{"type":"array","maxItems":16,"items":{"type":"integer","minimum":0,"maximum":511}},"points":{"type":"integer","minimum":16,"maximum":2048}}),
+            vec!["instance", "session", "stream", "start", "end"],
+        ),
+        (
             "connector_catalog",
             "Read versioned connector families, presets and exact native/normalized capabilities.",
             json!({}),
