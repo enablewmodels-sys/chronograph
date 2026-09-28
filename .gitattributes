@@ -1,0 +1,2 @@
+# Shell fixtures also execute inside WSL after a native Windows checkout.
+*.sh text eol=lf

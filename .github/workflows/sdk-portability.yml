@@ -1,9 +1,9 @@
 name: SDK portability
 on:
   push:
-    paths: ['sdk/**', 'scripts/sdk/**', 'scripts/test-support.mjs', 'crates/**', 'Cargo.*', '.github/workflows/sdk-portability.yml']
+    paths: ['sdk/**', 'scripts/sdk/**', 'scripts/test-support.mjs', 'crates/**', 'Cargo.*', '.gitattributes', '.github/workflows/sdk-portability.yml']
   pull_request:
-    paths: ['sdk/**', 'scripts/sdk/**', 'scripts/test-support.mjs', 'crates/**', 'Cargo.*', '.github/workflows/sdk-portability.yml']
+    paths: ['sdk/**', 'scripts/sdk/**', 'scripts/test-support.mjs', 'crates/**', 'Cargo.*', '.gitattributes', '.github/workflows/sdk-portability.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -78,10 +78,11 @@ jobs:
           msystem: UCRT64
           install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-curl mingw-w64-ucrt-x86_64-pkgconf
       - uses: Vampire/setup-wsl@d1da7f2c0322a5ee4f24975344f67fc0f5baf364 # v7
+        timeout-minutes: 10
         with:
           distribution: Ubuntu-24.04
           wsl-version: 1
-          use-cache: false
+          use-cache: true
       - uses: actions/download-artifact@v4
         with:
           name: sdk-linux-fixture
