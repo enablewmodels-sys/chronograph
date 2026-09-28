@@ -10,6 +10,7 @@ export CHRONOGRAPH_AUTH="$ROOT/auth.json"
 export CHRONOGRAPH_DATA="$ROOT/data"
 export CHRONOGRAPH_BIND=127.0.0.1:18092
 export CHRONOGRAPH_ORIGIN=http://127.0.0.1:18092
+export CHRONOGRAPH_UI="$1/ui"
 "$ROOT/server" admin create-token 'Disposable Windows SDK fixture' admin 1 "$ROOT/admin.token" >/dev/null
 cp "$ROOT/admin.token" "$1/admin.token"
 "$ROOT/server" serve &
