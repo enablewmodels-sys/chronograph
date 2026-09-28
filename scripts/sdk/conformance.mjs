@@ -298,7 +298,7 @@ try {
       assert.equal(info.ok, true);
       assert.equal(
         JSON.parse(Buffer.from(info.value, "hex").toString()).edition,
-        fixture ? "managed" : "community",
+        fixture && fixture.kind !== "community" ? "managed" : "community",
       );
       checks.push("authenticated GET");
       const id = `sdk_${language}`;
