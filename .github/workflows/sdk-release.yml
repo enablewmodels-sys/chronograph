@@ -1,0 +1,41 @@
+name: SDK release provenance
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: npm --prefix sdk/typescript ci --ignore-scripts && npm --prefix sdk/typescript run build
+      - name: Rebuild the allowlisted kit and reject distribution drift
+        run: |
+          python3 scripts/build-sdk-bundle.py
+          git diff --exit-code -- ui/public/downloads/chronodb-sdk-kit.zip ui/public/downloads/sdk-manifest.json
+          mkdir -p .work/sdk-release
+          cp ui/public/downloads/chronodb-sdk-kit.zip ui/public/downloads/sdk-manifest.json .work/sdk-release/
+          cd .work/sdk-release
+          sha256sum chronodb-sdk-kit.zip sdk-manifest.json > SHA256SUMS
+      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        id: provenance
+        with:
+          subject-path: .work/sdk-release/chronodb-sdk-kit.zip
+          create-storage-record: false
+      - name: Include independently verifiable provenance
+        env:
+          BUNDLE_PATH: ${{ steps.provenance.outputs.bundle-path }}
+        run: cp "$BUNDLE_PATH" .work/sdk-release/attestation.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chronodb-sdk-release
+          path: .work/sdk-release/
+          include-hidden-files: true
+          if-no-files-found: error

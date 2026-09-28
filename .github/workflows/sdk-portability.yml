@@ -27,13 +27,13 @@ jobs:
         with: {node-version: 22}
       - uses: actions/setup-go@v5
         with: {go-version: '1.27.1', cache: false}
-      - run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev pkg-config
+      - run: sudo apt-get update && sudo apt-get install -y clang libcurl4-openssl-dev pkg-config
       - run: cargo build --locked -p chronograph-server --bin chronograph-server
       - run: python3 scripts/sdk/fetch-test-deps.py
       - run: |
           mkdir -p .work/sdk-tools
           (cd sdk/go && go build -race -o ../../.work/sdk-tools/go-conformance ./cmd/conformance)
-          c++ -std=c++17 -O1 -g -pthread -fsanitize=address,undefined -fno-omit-frame-pointer -Wall -Wextra -Werror -I sdk/cpp/include -I .work/sdk-tools/include $(pkg-config --cflags libcurl) scripts/sdk/conformance.cpp $(pkg-config --libs libcurl) -o .work/sdk-tools/cpp-conformance
+          clang++ -std=c++17 -O1 -g -pthread -fsanitize=address,undefined -fno-omit-frame-pointer -Wall -Wextra -Werror -I sdk/cpp/include -I .work/sdk-tools/include $(pkg-config --cflags libcurl) scripts/sdk/conformance.cpp $(pkg-config --libs libcurl) -o .work/sdk-tools/cpp-conformance
           node scripts/sdk/conformance.mjs
       - uses: actions/upload-artifact@v4
         with:
