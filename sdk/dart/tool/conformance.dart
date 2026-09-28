@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:chronograph/chronograph.dart';
 
 Future<void> main() async {
+  stdout.encoding = utf8;
   await for (final line
       in stdin.transform(utf8.decoder).transform(const LineSplitter())) {
     ChronographClient? client;

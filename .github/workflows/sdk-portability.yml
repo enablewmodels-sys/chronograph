@@ -1,0 +1,94 @@
+name: SDK portability
+on:
+  push:
+    paths: ['sdk/**', 'scripts/sdk/**', 'scripts/test-support.mjs', 'crates/**', 'Cargo.*', '.github/workflows/sdk-portability.yml']
+  pull_request:
+    paths: ['sdk/**', 'scripts/sdk/**', 'scripts/test-support.mjs', 'crates/**', 'Cargo.*', '.github/workflows/sdk-portability.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  linux-sanitizers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CHRONOGRAPH_TEST_PROFILE: target/debug
+      CARGO_BUILD_JOBS: 2
+      CARGO_PROFILE_DEV_DEBUG: 0
+      SDK_LANGUAGES: go,cpp
+      SDK_REPORT_NAME: linux-sanitizers
+      GORACE: halt_on_error=1
+      ASAN_OPTIONS: detect_leaks=1:abort_on_error=1
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.93.0
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - uses: actions/setup-go@v5
+        with: {go-version: '1.27.1', cache: false}
+      - run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev pkg-config
+      - run: cargo build --locked -p chronograph-server --bin chronograph-server
+      - run: python3 scripts/sdk/fetch-test-deps.py
+      - run: |
+          mkdir -p .work/sdk-tools
+          (cd sdk/go && go build -race -o ../../.work/sdk-tools/go-conformance ./cmd/conformance)
+          c++ -std=c++17 -O1 -g -pthread -fsanitize=address,undefined -fno-omit-frame-pointer -Wall -Wextra -Werror -I sdk/cpp/include -I .work/sdk-tools/include $(pkg-config --cflags libcurl) scripts/sdk/conformance.cpp $(pkg-config --libs libcurl) -o .work/sdk-tools/cpp-conformance
+          node scripts/sdk/conformance.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdk-linux-fixture
+          path: target/debug/chronograph-server
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdk-linux-sanitizer-evidence
+          path: .work/sdk-evidence/linux-sanitizers.json
+          include-hidden-files: true
+  windows:
+    needs: linux-sanitizers
+    runs-on: windows-2025
+    timeout-minutes: 30
+    env:
+      SDK_PYTHON: python
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-go@v5
+        with: {go-version: '1.27.1', cache: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: dart-lang/setup-dart@v1
+        with: {sdk: '3.11.5'}
+      - uses: actions/setup-dotnet@v4
+        with: {dotnet-version: '8.0.x'}
+      - uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e # v2
+        with:
+          msystem: UCRT64
+          install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-curl mingw-w64-ucrt-x86_64-pkgconf
+      - uses: Vampire/setup-wsl@d1da7f2c0322a5ee4f24975344f67fc0f5baf364 # v7
+        with:
+          distribution: Ubuntu-24.04
+          wsl-version: 1
+          use-cache: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: sdk-linux-fixture
+          path: .work/windows-fixture
+      - shell: pwsh
+        run: |
+          'C:/msys64/ucrt64/bin' | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          python scripts/sdk/fetch-test-deps.py
+      - shell: pwsh
+        run: ./scripts/sdk/build-windows.ps1
+      - shell: pwsh
+        run: ./scripts/sdk/test-windows.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdk-windows-evidence
+          path: .work/sdk-evidence/windows-conformance.json
+          include-hidden-files: true

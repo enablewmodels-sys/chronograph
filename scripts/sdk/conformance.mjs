@@ -11,10 +11,14 @@ import { once } from "node:events";
 import { startServer, client, root } from "../test-support.mjs";
 
 const tools = process.env.SDK_TOOLS || join(root, ".work/sdk-tools");
+const exe = process.platform === "win32" ? ".exe" : "";
+const reportName = process.env.SDK_REPORT_NAME;
+if (reportName && /[^a-z0-9-]/.test(reportName))
+  throw new Error("Invalid SDK report name");
 const commands = {
   python: [process.env.SDK_PYTHON || "python3", ["scripts/sdk/python.py"]],
   typescript: ["node", ["scripts/sdk/typescript.mjs"]],
-  go: [join(tools, "go-conformance"), []],
+  go: [join(tools, "go-conformance" + exe), []],
   java: [
     "java",
     [
@@ -23,8 +27,8 @@ const commands = {
       "Conformance",
     ],
   ],
-  cpp: [join(tools, "cpp-conformance"), []],
-  dart: [join(tools, "dart-conformance"), []],
+  cpp: [join(tools, "cpp-conformance" + exe), []],
+  dart: [join(tools, "dart-conformance" + exe), []],
   csharp: [
     process.env.DOTNET || "dotnet",
     [join(tools, "csharp-conformance/Conformance.dll")],
@@ -211,6 +215,7 @@ function driver(language) {
         "python",
       ),
       DOTNET_CLI_TELEMETRY_OPTOUT: "1",
+      PYTHONIOENCODING: "utf-8",
     },
     stdio: ["pipe", "pipe", "pipe"],
   });
@@ -241,7 +246,8 @@ function driver(language) {
   });
   return {
     ask: async (q) => {
-      if (fixture) await new Promise((r) => setTimeout(r, 90));
+      if (fixture && fixture.kind !== "community")
+        await new Promise((r) => setTimeout(r, 90));
       return new Promise((resolve, reject) => {
         waiting = {
           resolve,
@@ -579,18 +585,23 @@ await mkdir(join(root, ".work/sdk-evidence"), { recursive: true });
 await writeFile(
   join(
     root,
-    fixture
-      ? ".work/sdk-evidence/managed-conformance.json"
-      : process.env.SDK_SOURCE_ROOT
-        ? ".work/sdk-evidence/kit-conformance.json"
-        : ".work/sdk-evidence/conformance.json",
+    reportName
+      ? `.work/sdk-evidence/${reportName}.json`
+      : fixture
+        ? ".work/sdk-evidence/managed-conformance.json"
+        : process.env.SDK_SOURCE_ROOT
+          ? ".work/sdk-evidence/kit-conformance.json"
+          : ".work/sdk-evidence/conformance.json",
   ),
   JSON.stringify(
     {
       date: new Date().toISOString(),
-      transport: fixture
-        ? "real Managed gateway and isolated project engines plus controlled HTTP faults"
-        : "real Rust Community server plus controlled HTTP faults",
+      platform: process.platform,
+      architecture: process.arch,
+      transport:
+        fixture && fixture.kind !== "community"
+          ? "real Managed gateway and isolated project engines plus controlled HTTP faults"
+          : "real Rust Community server plus controlled HTTP faults",
       results,
     },
     null,

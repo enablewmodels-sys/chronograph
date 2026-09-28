@@ -1,5 +1,7 @@
 using System.Text.Json.Nodes;
 using Chronograph;
+Console.InputEncoding = new System.Text.UTF8Encoding(false);
+Console.OutputEncoding = new System.Text.UTF8Encoding(false);
 string? line;
 while ((line = Console.ReadLine()) is not null)
 {
