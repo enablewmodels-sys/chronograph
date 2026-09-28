@@ -4,11 +4,12 @@ Set-Location (Join-Path $PSScriptRoot '../..')
 $Fixture = Join-Path $PWD '.work/windows-fixture'
 $Token = Join-Path $Fixture 'admin.token'
 $Config = Join-Path $Fixture 'fixture.json'
-$LinuxRoot = (& wsl.exe -d Ubuntu-24.04 -- wslpath -a "$PWD").Trim()
+# --exec avoids a second shell parse that strips Windows path backslashes.
+$LinuxRoot = (& wsl.exe -d Ubuntu-24.04 --exec wslpath -a $PWD.Path).Trim()
 $env:SDK_PYTHON = 'python'
 $env:SDK_FIXTURE_CONFIG = $Config
 $env:SDK_REPORT_NAME = 'windows-conformance'
-$Process = Start-Process wsl.exe -ArgumentList @('-d','Ubuntu-24.04','--','bash',"$LinuxRoot/scripts/sdk/windows-fixture.sh","$LinuxRoot/.work/windows-fixture") -PassThru -RedirectStandardOutput "$Fixture/server.stdout" -RedirectStandardError "$Fixture/server.stderr"
+$Process = Start-Process wsl.exe -ArgumentList @('-d','Ubuntu-24.04','--exec','bash',"`"$LinuxRoot/scripts/sdk/windows-fixture.sh`"","`"$LinuxRoot/.work/windows-fixture`"") -PassThru -RedirectStandardOutput "$Fixture/server.stdout" -RedirectStandardError "$Fixture/server.stderr"
 try {
   $Ready = $false
   for ($Attempt = 0; $Attempt -lt 90; $Attempt++) {
@@ -21,6 +22,17 @@ try {
   if (-not $Ready) { throw 'WSL test fixture did not become ready.' }
   @{url='http://127.0.0.1:18092'; tokenFile=$Token; kind='community'} | ConvertTo-Json | Set-Content $Config
   node scripts/sdk/conformance.mjs
+} catch {
+  $Failure = $_
+  try {
+    $Detail = Get-Content "$Fixture/server.stderr" -Raw -ErrorAction Stop
+    if (Test-Path $Token) {
+      $Secret = (Get-Content $Token -Raw).Trim()
+      if ($Secret) { $Detail = $Detail.Replace($Secret, '[redacted]') }
+    }
+    if ($Detail) { Write-Host $Detail.Substring([Math]::Max(0, $Detail.Length - 4000)) }
+  } catch { Write-Host 'Fixture diagnostics unavailable.' }
+  throw $Failure
 } finally {
   # This distribution belongs exclusively to this disposable Actions job.
   & wsl.exe --terminate Ubuntu-24.04
