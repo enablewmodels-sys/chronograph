@@ -28,3 +28,28 @@ Source-available under [PolyForm Perimeter 1.0.0](LICENSE); preserve [NOTICE](NO
 answers and model provenance. See [Laya](../../docs/LAYA.md) for local/HTTP runtime
 setup and [Jev](../../docs/JEV.md) for the TypeSafe integration. Neither adapter
 loads models or calls a provider implicitly. Raw JSON attachments are opt-in.
+
+
+## BCI and binary data
+
+Use your isolated origin or `https://chronodb.co` and a scoped project key.
+Managed routes the origin to the key's project; `/p/PROJECT_ID` is not an SDK
+constructor URL. Record session `101` first using the [acquisition guide](https://chronodb.co/documentation/BCI).
+The following uses the `client` from the connection example above:
+
+```typescript
+import { BCIClient } from "@chronograph-community/sdk";
+const bci = new BCIClient(client, "bci_research");
+const window = await bci.window("101", "eeg", 0n, 1000000n, [0, 1]);
+for await (const row of bci.records("101", "signal")) console.log(row);
+```
+
+`uploadAsset(Uint8Array, metadata)` / `readAsset(id)` handle 1 byte–16 MiB of exact binary data.
+Chunk lengths, metadata and pagination progress are checked; malformed responses
+fail explicitly. Page iteration is incremental with a configurable 1–10,000 page
+budget. Stop consuming (or return false from a callback) to stop fetching.
+
+`bci_sessions`, `bci_session`, `bci_records`, `bci_window` and `bci_manifest` are
+shared API operations. All model connectors use the same normalized records,
+asset helpers and explicit ingest sequence. BrainFlow/LSL device acquisition and
+MNE/CSP training run in the Python acquisition service, not in this HTTP client.

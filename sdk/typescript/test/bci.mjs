@@ -43,5 +43,5 @@ test("a nonprogressing BCI cursor is rejected instead of looping", async () => {
   await assert.rejects(async () => {
     for await (const _ of bci.records("1")) {
     }
-  }, /did not advance/);
+  }, /Non-progressing/);
 });

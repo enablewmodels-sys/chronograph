@@ -1,4 +1,4 @@
-import { Client, type ObjectValue, type RecordV1 } from "./index.js";
+import { Client, type ObjectValue, type Json, type RecordV1 } from "./index.js";
 export interface BCIRecord extends RecordV1 {
   fields: ObjectValue & {
     type: string;
@@ -43,24 +43,27 @@ export class BCIClient {
     });
   }
   async *records(session: string, recordType = "", maxPages = 200) {
-    let after: string | undefined;
-    for (let page = 0; page < maxPages; page++) {
-      const result = await this.client.call("bci_records", {
+    for await (const page of Client.prototype.pages.call(
+      this.client,
+      "bci_records",
+      {
         instance: this.instance,
         session,
         record_type: recordType,
         limit: 500,
-        ...(after ? { after } : {}),
-      });
-      if (!Array.isArray(result.records))
-        throw new Error("Invalid BCI records response");
-      yield* result.records;
-      if (!result.has_more) return;
-      if (typeof result.cursor !== "string" || result.cursor === after)
-        throw new Error("BCI cursor did not advance");
-      after = result.cursor;
-    }
-    throw new RangeError("BCI page budget reached");
+      },
+      maxPages,
+    ))
+      yield* page.records as Json[];
+  }
+  async *allSessions(maxPages = 1000) {
+    for await (const page of Client.prototype.pages.call(
+      this.client,
+      "bci_sessions",
+      { instance: this.instance },
+      maxPages,
+    ))
+      yield* page.sessions as Json[];
   }
   manifest(sessions: string[], stream = "eeg") {
     return this.client.call("bci_manifest", {

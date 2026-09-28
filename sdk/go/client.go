@@ -13,6 +13,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 const MaxRequestBytes = 4 * 1024 * 1024
@@ -142,6 +143,9 @@ func (c *Client) Call(ctx context.Context, operation string, arguments Object) (
 	raw, err := c.Request(ctx, "/v1/"+operation, "POST", arguments)
 	if err != nil {
 		return nil, err
+	}
+	if !utf8.Valid(raw) {
+		return nil, &APIError{Status: 200, Code: "INVALID_JSON", Message: "invalid UTF-8"}
 	}
 	var result Object
 	decoder := json.NewDecoder(bytes.NewReader(raw))

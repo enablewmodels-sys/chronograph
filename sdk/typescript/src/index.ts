@@ -45,6 +45,19 @@ function finiteJson(value: unknown): void {
   if (value && typeof value === "object")
     for (const item of Object.values(value)) finiteJson(item);
 }
+function canonical(value: Json): string {
+  if (value && typeof value === "object" && !Array.isArray(value))
+    return (
+      "{" +
+      Object.keys(value)
+        .sort()
+        .map((k) => JSON.stringify(k) + ":" + canonical(value[k]))
+        .join(",") +
+      "}"
+    );
+  if (Array.isArray(value)) return "[" + value.map(canonical).join(",") + "]";
+  return JSON.stringify(value);
+}
 const hex = (data: Uint8Array) =>
   Array.from(data, (b) => b.toString(16).padStart(2, "0")).join("");
 export class Client {
@@ -199,35 +212,46 @@ export class Client {
   async uploadAsset(
     data: Uint8Array,
     metadata: AssetMetadata,
+    signal?: AbortSignal,
   ): Promise<string> {
     if (!data.length || data.length > 16 * CHUNK)
       throw new RangeError("Asset requires 1 byte to 16 MiB");
     const meta = metadata as unknown as ObjectValue;
-    if (data.length <= CHUNK)
-      return (
-        await this.call<{ asset: string }>("asset_put", {
-          metadata: meta,
-          data_hex: hex(data),
-        })
-      ).asset;
+    if (data.length <= CHUNK) {
+      const result = await this.call(
+        "asset_put",
+        { metadata: meta, data_hex: hex(data) },
+        signal,
+      );
+      if (typeof result.asset !== "string" || !result.asset)
+        throw new Error("Invalid asset response");
+      return result.asset;
+    }
     const chunks: string[] = [];
     for (let offset = 0; offset < data.length; offset += CHUNK)
       chunks.push(
-        await this.uploadAsset(data.subarray(offset, offset + CHUNK), {
-          version: 1,
-          kind: "opaque",
-          encoding: "chunk_v1",
-        }),
+        await this.uploadAsset(
+          data.subarray(offset, offset + CHUNK),
+          {
+            version: 1,
+            kind: "opaque",
+            encoding: "chunk_v1",
+          },
+          signal,
+        ),
       );
-    return (
-      await this.call<{ asset: string }>("asset_compose", {
-        metadata: meta,
-        chunks,
-      })
-    ).asset;
+    const result = await this.call(
+      "asset_compose",
+      { metadata: meta, chunks },
+      signal,
+    );
+    if (typeof result.asset !== "string" || !result.asset)
+      throw new Error("Invalid asset response");
+    return result.asset;
   }
   async readAsset(
     asset: string,
+    signal?: AbortSignal,
   ): Promise<{ metadata: AssetMetadata; data: Uint8Array }> {
     const chunks: Uint8Array[] = [];
     let offset = 0,
@@ -241,7 +265,7 @@ export class Client {
         next_offset: number | null;
         data_hex: string;
         metadata: AssetMetadata;
-      }>("asset_get", { asset, content: true, offset });
+      }>("asset_get", { asset, content: true, offset }, signal);
       if (
         result.asset !== asset ||
         result.offset !== offset ||
@@ -249,13 +273,20 @@ export class Client {
         result.bytes < 1 ||
         result.bytes > 16 * CHUNK ||
         (expected !== -1 && expected !== result.bytes) ||
-        !/^(?:[0-9a-fA-F]{2})+$/.test(result.data_hex) ||
-        result.data_hex.length > 2 * CHUNK
+        typeof result.data_hex !== "string" ||
+        !/^[0-9a-fA-F]+$/.test(result.data_hex) ||
+        result.data_hex.length % 2 !== 0 ||
+        result.data_hex.length > 2 * CHUNK ||
+        !result.metadata ||
+        typeof result.metadata !== "object" ||
+        Array.isArray(result.metadata) ||
+        !("next_offset" in result)
       )
         throw new Error("Invalid asset page");
       if (
         metadata &&
-        JSON.stringify(metadata) !== JSON.stringify(result.metadata)
+        canonical(metadata as unknown as Json) !==
+          canonical(result.metadata as unknown as Json)
       )
         throw new Error("Asset metadata changed between pages");
       expected = result.bytes;
@@ -298,23 +329,62 @@ export class Client {
     return this.call("connector_checkpoint", { instance, partition });
   }
   async *pages(
-    operation: "as_of" | "between" | "history" | "neighbors",
+    operation:
+      | "as_of"
+      | "between"
+      | "history"
+      | "neighbors"
+      | "bci_sessions"
+      | "bci_records",
     arguments_: ObjectValue = {},
     maxPages = 1000,
+    signal?: AbortSignal,
   ): AsyncGenerator<ObjectValue> {
-    if (!Number.isInteger(maxPages) || maxPages < 1)
-      throw new RangeError("Invalid page limit");
-    let args = { ...arguments_ };
-    const seen = new Set<string>();
+    if (
+      !Number.isInteger(maxPages) ||
+      maxPages < 1 ||
+      maxPages > 10000 ||
+      ![
+        "as_of",
+        "between",
+        "history",
+        "neighbors",
+        "bci_sessions",
+        "bci_records",
+      ].includes(operation)
+    )
+      throw new RangeError("Invalid pagination options");
+    const bci = operation.startsWith("bci_"),
+      key = bci ? "after" : "cursor";
+    const args = { ...arguments_ },
+      seen = new Set<string>();
+    if (typeof args[key] === "string") seen.add(args[key]);
     for (let i = 0; i < maxPages; i++) {
-      const result = await this.call(operation, args);
+      const result = await this.call(operation, args, signal);
+      const cursorKey = operation === "bci_records" ? "cursor" : "next_cursor";
+      if (!(cursorKey in result)) throw new Error("Missing pagination cursor");
+      const cursor = result[cursorKey];
+      let done = cursor === null;
+      if (operation === "bci_records") {
+        if (typeof result.has_more !== "boolean")
+          throw new Error("Invalid BCI page");
+        done = !result.has_more;
+      }
+      if (
+        bci &&
+        !Array.isArray(
+          result[operation === "bci_records" ? "records" : "sessions"],
+        )
+      )
+        throw new Error("Invalid BCI rows");
+      if (!done) {
+        if (typeof cursor !== "string" || !cursor || seen.has(cursor))
+          throw new Error("Non-progressing pagination cursor");
+        seen.add(cursor);
+        args[key] = cursor;
+      }
       yield result;
-      const cursor = result.next_cursor;
-      if (cursor === null) return;
-      if (typeof cursor !== "string" || seen.has(cursor))
-        throw new Error("Invalid pagination cursor");
-      seen.add(cursor);
-      args = { ...arguments_, cursor };
+      if (done) return;
     }
     throw new Error("Pagination limit reached");
   }

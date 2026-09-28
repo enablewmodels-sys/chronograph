@@ -80,19 +80,34 @@ class Client:
         return self.call("connector_ingest", {"instance":instance,"partition":partition,"sequence":str(sequence),"records":records})
 
     def pages(self, operation, arguments=None, *, max_pages=1000):
-        if operation not in ("as_of", "between", "history", "neighbors") or type(max_pages) is not int or max_pages < 1:
+        """Bounded incremental graph/BCI pages; closing the iterator stops reads."""
+        if operation not in ("as_of", "between", "history", "neighbors", "bci_sessions", "bci_records") or type(max_pages) is not int or not 1 <= max_pages <= 10000:
             raise ValueError("Invalid paginated operation or limit")
-        args, seen = dict(arguments or {}), set()
+        args = dict(arguments or {})
+        bci = operation.startswith("bci_")
+        key = "after" if bci else "cursor"
+        seen = {args[key]} if isinstance(args.get(key), str) else set()
         for _ in range(max_pages):
             result = self.call(operation, args)
+            cursor_key = "cursor" if operation == "bci_records" else "next_cursor"
+            if cursor_key not in result:
+                raise ValueError("Missing pagination cursor")
+            cursor = result[cursor_key]
+            done = cursor is None
+            if operation == "bci_records":
+                if type(result.get("has_more")) is not bool:
+                    raise ValueError("Invalid BCI page")
+                done = not result["has_more"]
+            if bci and not isinstance(result.get("records" if operation == "bci_records" else "sessions"), list):
+                raise ValueError("Invalid BCI rows")
+            if not done:
+                if not isinstance(cursor, str) or not cursor or cursor in seen:
+                    raise ValueError("Non-progressing pagination cursor")
+                seen.add(cursor)
+                args[key] = cursor
             yield result
-            cursor = result.get("next_cursor")
-            if cursor is None:
+            if done:
                 return
-            if not isinstance(cursor, str) or cursor in seen:
-                raise ValueError("Invalid pagination cursor")
-            seen.add(cursor)
-            args["cursor"] = cursor
         raise ValueError("Pagination limit reached")
 
     def asset(self, data, *, kind="tensor", encoding="raw_le", dtype="f32", shape=(), provenance=None):
@@ -102,11 +117,18 @@ class Client:
                     "dtype":dtype if kind=="tensor" else None,
                     "shape":list(shape) if kind=="tensor" else [], "provenance":provenance or {}}
         if len(data)<=1024*1024:
-            return self.call("asset_put", {"metadata":metadata,"data_hex":bytes(data).hex()})["asset"]
+            return self._asset_id(self.call("asset_put", {"metadata":metadata,"data_hex":bytes(data).hex()}))
         chunks=[]
         for offset in range(0,len(data),1024*1024):
             chunks.append(self.asset(data[offset:offset+1024*1024],kind="opaque",encoding="chunk_v1"))
-        return self.call("asset_compose", {"metadata":metadata,"chunks":chunks})["asset"]
+        return self._asset_id(self.call("asset_compose", {"metadata":metadata,"chunks":chunks}))
+
+    @staticmethod
+    def _asset_id(response):
+        value = response.get("asset")
+        if not isinstance(value, str) or not value:
+            raise ValueError("Invalid asset response")
+        return value
 
     def read_asset(self, asset):
         data, expected, metadata = bytearray(), None, None
@@ -117,7 +139,9 @@ class Client:
                     or type(size) is not int or not 1 <= size <= 16*1024*1024
                     or (expected is not None and expected != size)
                     or not isinstance(encoded, str) or len(encoded) > 2*1024*1024
-                    or not re.fullmatch(r"(?:[0-9a-fA-F]{2})+", encoded)):
+                    or len(encoded) % 2 or not re.fullmatch(r"[0-9a-fA-F]+", encoded)
+                    or not isinstance(result.get("metadata"), dict)
+                    or "next_offset" not in result):
                 raise ValueError("Invalid asset page")
             if metadata is not None and metadata != result["metadata"]:
                 raise ValueError("Asset metadata changed between pages")

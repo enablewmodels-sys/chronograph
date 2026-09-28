@@ -31,9 +31,18 @@ response formats below are shared; see [production operations](PRODUCTION.md).
 | Q# | QDK Python package, `sdk/qsharp` | Trusted local Bell program and Python host that persists simulated results through the Python client |
 | Rust | Rust 1.93+, `crates/chronograph-core` | Embedded engine and native connector crates; no HTTP boundary required |
 
-Java, C++, Go, Dart and C# expose `call`/`CallAsync` for every JSON operation and `request`/`RequestAsync` for GET/DELETE and binary endpoints. Their `ingest` and `checkpoint` helpers build normalized requests. Asset chunking, migration orchestration and pagination can be implemented with those operations; automatic high-level helpers for these are currently provided in Python and TypeScript only.
+Java, C++, Go, Dart and C# expose `call`/`CallAsync` for every JSON operation and `request`/`RequestAsync` for GET/DELETE and binary endpoints. Their `ingest` and `checkpoint` helpers build normalized requests. All seven HTTP clients now include bounded asset upload/download and incremental graph/BCI pagination. Each can preview/apply atomic migration plans through the same generic operations. BCI session, window and manifest helpers preserve IDs and microsecond times without floating-point conversion.
 
 Each directory has an installation example. [Browse SDK source and per-language guides](https://github.com/enablewmodels-sys/chronograph/tree/main/sdk).
+
+## Download the source kit
+
+[Download all SDKs](https://chronodb.co/downloads/chronodb-sdk-kit.zip) with
+[SHA-256 manifest](https://chronodb.co/downloads/sdk-manifest.json). Extract into a
+private working directory and follow the per-language README. The kit includes
+sources, TypeScript build output, the OpenAPI contract and BCI guides; it does not
+bundle credentials, scientific runtimes or device drivers. Packages remain source
+distributions rather than published registry releases.
 
 ## Install from this checkout
 
@@ -129,7 +138,7 @@ Swift, Kotlin, Julia, R, MATLAB and other producers can use HTTPS plus JSON or g
 
 ## Verification and contributing
 
-`scripts/sdk/conformance.mjs` drives each actual language client against a fresh Rust server. It checks scoped auth, migrations, Unicode, IDs above 2^53, binary tensors, durable retry/conflict, checkpoints, binary Arrow export and input rejection. A controlled HTTP fixture checks redirects, deadlines, response caps, malformed JSON, non-JSON gateway errors and Retry-After. Python/TypeScript also roundtrip a multi-chunk asset.
+`scripts/sdk/conformance.mjs` drives each actual language client against a fresh Rust server. It checks scoped auth, migrations, Unicode, IDs above 2^53, binary tensors, durable retry/conflict, checkpoints, binary Arrow export and input rejection. Controlled HTTP/TLS fixtures check redirect isolation, untrusted certificates, deadlines, response caps, malformed UTF-8/JSON, non-JSON gateway errors and Retry-After. Every language roundtrips a multi-chunk asset and exact floating-point bit patterns, rejects incomplete/inconsistent asset pages and cyclic cursors, applies atomic migration plans, and exercises BCI recordings plus all 38 connector presets. Quantum, model and hardware-specific fixtures remain explicit producer/runtime tests; a wire roundtrip is not a hardware certification.
 
 The `SDK conformance` GitHub workflow builds all seven clients and runs runtime adapter fixtures. Reproduce locally:
 
@@ -146,7 +155,7 @@ CHRONOGRAPH_TEST_PROFILE=target/debug node scripts/sdk/adapters.mjs
 
 Install Go, JDK, libcurl, a C++ compiler, Dart and .NET first. `GO`, `DOTNET`, `SDK_TOOLS`, `GSON_JAR`, `JSON_INCLUDE`, `SDK_PYTHON` and `SDK_LANGUAGES` let the scripts use isolated tools. Linux pylsl needs liblsl; the workflow pins and verifies the Ubuntu 24.04 package. LSL fixtures discover only a random local test source with the supplied loopback config.
 
-Local validation used Python 3.12/3.14, Node 20.20, Go 1.27.1, JDK 25 with Java 17 target, Apple Clang, Dart 3.11.5 and .NET SDK 8.0.425 on macOS ARM64. Windows has not been exercised. Synthetic device/local simulator tests do not certify physical devices, cross-host clock accuracy, clinical performance, model quality or QPU behavior.
+Local validation used Python 3.12/3.14, Node 20.20/22, Go 1.27.1, JDK 25 with Java 17 target, Apple Clang, Dart 3.11.5 and .NET SDK 8.0.425 on macOS ARM64. Windows has not been exercised. Synthetic device/local simulator tests do not certify physical devices, cross-host clock accuracy, clinical performance, model quality or QPU behavior.
 
 ## Jev decision binding
 
@@ -158,7 +167,7 @@ records, with optional raw JSON attachments. See [Jev examples](JEV.md).
 
 Every SDK's generic operation call can use `schema_plan` with `{ "sources": ["JSON file contents", "next file contents"] }`. Keep the files in dependency order. After reviewing the returned before/after definitions, call `schema_apply_plan` with the same sources, `checksum` and `expected_revision`. Only an admin API key can apply the plan. Pending files commit atomically; applied files with the same checksum are skipped.
 
-The same calls work at a Community origin or a Managed base URL ending in `/p/PROJECT_ID`. `schema_export` produces a portable definition baseline, and `schema_rollback` drafts a compensation for explicit review. See the [migration guide](SCHEMA.md) for formats, examples, limits and compatibility. These calls change the service catalog; they do not execute arbitrary transformation code or rewrite historical payloads.
+The same calls work at a Community origin or the Managed **origin**, such as `https://chronodb.co`. Scoped project keys select the Managed project automatically. SDK constructors intentionally reject path prefixes; use the `sdk_url` returned by `/v1/info`, rather than its project-prefixed `api_url`. `schema_export` produces a portable definition baseline, and `schema_rollback` drafts a compensation for explicit review. See the [migration guide](SCHEMA.md) for formats, examples, limits and compatibility. These calls change the service catalog; they do not execute arbitrary transformation code or rewrite historical payloads.
 
 ## Laya decision binding
 
@@ -166,3 +175,52 @@ Python exports `chronograph_connectors.laya.laya_decision`; TypeScript exports
 `layaDecision` with `LayaResponse` and `LayaOptions` types. Both retain Laya typed
 answers, checkpoint/routing metadata and optional raw JSON attachments. Inference
 runs in your producer. See [Laya setup](LAYA.md) and [Jev & Laya](DECISION_MODELS.md).
+
+
+## Shared data helpers
+
+| Language | Upload / read exact assets | Incremental graph and BCI pages | Recording access |
+| --- | --- | --- | --- |
+| Python | `asset`, `read_asset` | `pages` generator | `BCIClient` |
+| TypeScript / JavaScript | `uploadAsset`, `readAsset` | `pages` async generator | `BCIClient` |
+| Go | `UploadAsset`, `ReadAsset` | `Pages` callback; return false to stop | `BCISessions`, `BCISession`, `BCIWindow`, `BCIManifest` |
+| Java | `uploadAsset`, `readAsset` | `pages` predicate; return false to stop | `bciSessions`, `bciSession`, `bciWindow`, `bciManifest` |
+| C++ | `upload_asset`, `read_asset` | `pages` callback; return false to stop | `bci_sessions`, `bci_session`, `bci_window`, `bci_manifest` |
+| Dart | `uploadAsset`, `readAsset` | `pages` Stream; cancel/stop to stop reads | `bciSessions`, `bciSession`, `bciWindow`, `bciManifest` |
+| C# | `UploadAssetAsync`, `ReadAssetAsync` | `PagesAsync` async enumerable | `BCISessionsAsync`, `BCISessionAsync`, `BCIWindowAsync`, `BCIManifestAsync` |
+| Q# | Python host facilities above | Python host facilities above | Host-side only; quantum code never receives API credentials |
+
+Graph pages use `as_of`, `between`, `history` or `neighbors`; BCI pages use
+`bci_sessions` or `bci_records`. Page budgets are 1–10,000, and fetching stops when
+the consumer stops. Cursors are opaque strings. Missing, repeated or cyclic cursors
+fail explicitly. A page can be empty while more matching records remain; iterators
+continue safely. Responses are extensible JSON; consumers must tolerate added fields.
+Asset helpers allow 1 byte–16 MiB and verify page lengths, cursor progress and
+metadata consistency. Interrupted uploads may leave immutable unreferenced chunks;
+record ingestion is separately committed with its explicit partition/sequence.
+Read helpers are bounded, buffered transfers, not streaming arbitrary-size files.
+
+Use the [BCI acquisition agent](BCI.md) on the device machine. All clients can
+publish normalized `bci/research-v1` session/stream/signal/event records through
+`ingest` and exact binary assets through these helpers. They can replay windows,
+inspect datasets and retain externally trained decoder provenance. BrainFlow/LSL
+capture, MNE import/export and the built-in CSP/LDA training implementation remain
+Python facilities. Rust embedding provides the temporal engine; the BCI workspace
+contract is exposed by the Rust HTTP/MCP server, not a separate Rust HTTP SDK.
+
+## Next robustness milestones
+
+The current release establishes shared Community/Managed protocol behavior. Further
+work should be gated by evidence rather than labeling every runtime supported:
+
+1. Add Windows-native CI for Java/C++/Go/Dart/C#; the POSIX Python acquisition spool
+   remains Linux/macOS until locking and interruption behavior are implemented there.
+2. Run real-board acceptance with channel order, units, reference, clock drift,
+   reconnect behavior and recorded-file fixtures supplied by device owners.
+3. Add official BIDS validation and long-duration cross-host LSL clock tests.
+4. Publish signed, versioned registry packages after release provenance and package
+   ownership are configured. Pin a source commit until then.
+5. Add independently tested Swift/Kotlin/Julia/R/MATLAB clients only with their own
+   transport, cancellation, exact-integer and binary conformance runs.
+6. Scale recording storage and standalone training workers using measured workloads;
+   hosted CPU training is still disabled on the database machine.

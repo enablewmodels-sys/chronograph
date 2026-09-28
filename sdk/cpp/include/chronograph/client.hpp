@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <cmath>
 #include <memory>
+#include <functional>
+#include <set>
 #include <regex>
 #include <stdexcept>
 #include <string>
@@ -100,5 +102,53 @@ public:
   }
   json ingest(const std::string& instance,const std::string& partition,const std::string& sequence,const json& records) const { return call("connector_ingest",{{"instance",instance},{"partition",partition},{"sequence",sequence},{"records",records}}); }
   json checkpoint(const std::string& instance,const std::string& partition) const { return call("connector_checkpoint",{{"instance",instance},{"partition",partition}}); }
+  struct asset { json metadata; std::string data; };
+  static std::string encode_hex(const std::string& bytes) {const char* h="0123456789abcdef";std::string s;s.reserve(bytes.size()*2);for(unsigned char b:bytes){s+=h[b>>4];s+=h[b&15];}return s;}
+  std::string upload_asset(const std::string& bytes,const json& metadata) const {
+    constexpr std::size_t chunk=1024*1024;
+    if(bytes.empty() || bytes.size()>16*chunk)throw std::invalid_argument("Asset requires 1 byte to 16 MiB");
+    json result;
+    if(bytes.size()<=chunk)result=call("asset_put",{{"metadata",metadata},{"data_hex",encode_hex(bytes)}});
+    else {auto chunks=json::array();for(std::size_t offset=0;offset<bytes.size();offset+=chunk)chunks.push_back(upload_asset(bytes.substr(offset,chunk),{{"version",1},{"kind","opaque"},{"encoding","chunk_v1"}}));result=call("asset_compose",{{"metadata",metadata},{"chunks",chunks}});}
+    if(!result.contains("asset") || !result["asset"].is_string() || result["asset"].get<std::string>().empty())throw std::runtime_error("Invalid asset response");
+    return result["asset"].get<std::string>();
+  }
+  asset read_asset(const std::string& id) const {
+    constexpr std::size_t chunk=1024*1024;asset out;std::size_t expected=0;
+    for(int page=0;page<16;page++) {
+      auto r=call("asset_get",{{"asset",id},{"content",true},{"offset",out.data.size()}});
+      if(!r.contains("bytes") || !r["bytes"].is_number_unsigned() || !r.contains("offset") || !r["offset"].is_number_unsigned() || r.value("asset",std::string())!=id || r["offset"].get<std::size_t>()!=out.data.size() || !r.contains("metadata") || !r["metadata"].is_object() || !r.contains("data_hex") || !r["data_hex"].is_string())throw std::runtime_error("Invalid asset page");
+      auto size=r["bytes"].get<std::uint64_t>();auto encoded=r["data_hex"].get<std::string>();
+      if(size<1 || size>16*chunk || (expected && expected!=size) || encoded.empty() || encoded.size()>2*chunk || encoded.size()%2 || (!out.metadata.is_null() && out.metadata!=r["metadata"]))throw std::runtime_error("Invalid asset length/metadata");
+      expected=static_cast<std::size_t>(size);out.metadata=r["metadata"];
+      auto digit=[](char c)->int{if(c>='0'&&c<='9')return c-'0';if(c>='a'&&c<='f')return c-'a'+10;if(c>='A'&&c<='F')return c-'A'+10;throw std::runtime_error("Invalid asset hex");};
+      for(std::size_t i=0;i<encoded.size();i+=2)out.data+=static_cast<char>((digit(encoded[i])<<4)|digit(encoded[i+1]));
+      if(out.data.size()>expected || !r.contains("next_offset"))throw std::runtime_error("Invalid asset length/cursor");
+      if(r["next_offset"].is_null()){if(out.data.size()!=expected)throw std::runtime_error("Truncated asset");return out;}
+      if(!r["next_offset"].is_number_unsigned() || r["next_offset"].get<std::uint64_t>()!=out.data.size() || out.data.size()>=expected)throw std::runtime_error("Non-progressing asset cursor");
+    }
+    throw std::runtime_error("Asset page limit exceeded");
+  }
+  /// Visitor returns false to stop without fetching another page.
+  void pages(const std::string& op,json args,int max_pages,const std::function<bool(const json&)>& visit) const {
+    const std::set<std::string> allowed={"as_of","between","history","neighbors","bci_sessions","bci_records"};
+    if(max_pages<1 || max_pages>10000 || !allowed.count(op) || !args.is_object() || !visit)throw std::invalid_argument("Invalid pagination options");
+    bool bci=op.rfind("bci_",0)==0;std::string key=bci?"after":"cursor";std::set<std::string> seen;if(args.contains(key) && args[key].is_string())seen.insert(args[key]);
+    for(int page=0;page<max_pages;page++){
+      auto r=call(op,args);std::string cursor_key=op=="bci_records"?"cursor":"next_cursor";
+      if(!r.contains(cursor_key))throw std::runtime_error("Missing pagination cursor");
+      auto cursor=r[cursor_key];bool done=cursor.is_null();
+      if(op=="bci_records"){if(!r.contains("has_more") || !r["has_more"].is_boolean())throw std::runtime_error("Invalid BCI page");done=!r["has_more"].get<bool>();}
+      if(bci){std::string rows=op=="bci_records"?"records":"sessions";if(!r.contains(rows)||!r[rows].is_array())throw std::runtime_error("Invalid BCI rows");}
+      if(!done){if(!cursor.is_string() || cursor.get<std::string>().empty() || !seen.insert(cursor.get<std::string>()).second)throw std::runtime_error("Non-progressing pagination cursor");args[key]=cursor;}
+      if(!visit(r) || done)return;
+    }
+    throw std::runtime_error("Pagination limit reached");
+  }
+  json bci_sessions(const std::string& instance) const {return call("bci_sessions",{{"instance",instance}});}
+  json bci_session(const std::string& instance,const std::string& session) const {return call("bci_session",{{"instance",instance},{"session",session}});}
+  json bci_window(const std::string& instance,const std::string& session,const std::string& stream,const std::string& start,const std::string& end,const json& channels=json::array()) const {return call("bci_window",{{"instance",instance},{"session",session},{"stream",stream},{"start",start},{"end",end},{"channels",channels}});}
+  json bci_manifest(const std::string& instance,const json& sessions,const std::string& stream="eeg") const {return call("bci_manifest",{{"instance",instance},{"sessions",sessions},{"stream",stream}});}
+
 };
 } // namespace chronograph

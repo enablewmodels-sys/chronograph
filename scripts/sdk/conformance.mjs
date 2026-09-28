@@ -1,8 +1,11 @@
+import { catalogFixtures, extended } from "./extended.mjs";
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
+import { spawn, execFileSync } from "node:child_process";
 import { createInterface } from "node:readline";
 import { createServer } from "node:http";
-import { mkdir, writeFile } from "node:fs/promises";
+import { createServer as createTLS } from "node:https";
+import { tmpdir } from "node:os";
+import { mkdir, writeFile, readFile, mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { once } from "node:events";
 import { startServer, client, root } from "../test-support.mjs";
@@ -32,7 +35,26 @@ const languages = (
 ).split(",");
 for (const language of languages)
   assert(commands[language], `Unknown SDK ${language}`);
-const server = await startServer({ port: 18092 });
+const testPort = Number(process.env.SDK_TEST_PORT || 18092);
+assert(Number.isInteger(testPort) && testPort >= 1024 && testPort <= 65533);
+const faultURL = `http://127.0.0.1:${testPort + 1}`,
+  tlsURL = `https://127.0.0.1:${testPort + 2}`;
+let fixture;
+if (process.env.SDK_FIXTURE_CONFIG) {
+  fixture = JSON.parse(await readFile(process.env.SDK_FIXTURE_CONFIG, "utf8"));
+  const url = new URL(fixture.url);
+  assert(
+    ["127.0.0.1", "localhost", "[::1]"].includes(url.hostname),
+    "Conformance only writes to disposable loopback fixtures",
+  );
+}
+const server = fixture
+  ? {
+      url: fixture.url,
+      adminToken: (await readFile(fixture.tokenFile, "utf8")).trim(),
+      stop: async () => {},
+    }
+  : await startServer({ port: testPort });
 const admin = client(server);
 const readToken = (
   await admin.json("/v1/tokens", { name: "SDK reader", scope: "read", days: 1 })
@@ -45,10 +67,80 @@ const ingestToken = (
   })
 ).token;
 let redirected = 0;
-const faults = createServer((req, res) => {
-  req.resume();
+const faults = createServer(async (req, res) => {
+  const parts = [];
+  for await (const part of req) parts.push(part);
+  const body = parts.length ? JSON.parse(Buffer.concat(parts).toString()) : {};
+  if (req.url === "/v1/null") {
+    res.end("null");
+    return;
+  }
+  if (req.url === "/v1/array") {
+    res.end("[]");
+    return;
+  }
+  if (req.url === "/v1/trailing") {
+    res.end("{} {}");
+    return;
+  }
+  if (req.url === "/v1/nonfinite") {
+    res.end('{"v":NaN}');
+    return;
+  }
+  if (req.url === "/v1/utf") {
+    res.end(Buffer.from([123, 34, 118, 34, 58, 34, 255, 34, 125]));
+    return;
+  }
+  if (req.url === "/v1/asset_put") {
+    res.end('{"asset":123}');
+    return;
+  }
+  if (req.url === "/v1/asset_get") {
+    const mode = body.asset,
+      offset = body.offset;
+    const r = {
+      asset: mode,
+      bytes: 2,
+      offset,
+      data_hex: "00",
+      metadata: { version: 1, kind: "opaque" },
+      next_offset: offset + 1,
+    };
+    if (mode === "reorder") {
+      if (offset === 1) {
+        r.metadata = { kind: "opaque", version: 1 };
+        r.next_offset = null;
+      }
+    } else if (mode === "badhex") r.data_hex = "xz";
+    else if (mode === "missing") delete r.next_offset;
+    else if (mode === "truncated") r.next_offset = null;
+    else if (mode === "changed") {
+      if (offset === 1) {
+        r.metadata.kind = "tensor";
+        r.next_offset = null;
+      }
+    } else if (mode === "jump") r.next_offset = 7;
+    else if (mode === "badsize") r.bytes = "2";
+    else if (mode === "badmetadata") r.metadata = [];
+    res.end(JSON.stringify(r));
+    return;
+  }
+  if (req.url === "/v1/bci_records") {
+    let r = {
+      records: [],
+      has_more: true,
+      cursor: body.after === "A" ? "B" : "A",
+    };
+    if (body.session === "filtered" && body.after)
+      r = { records: [{ edge: "B" }], has_more: false, cursor: "B" };
+    if (body.session === "missing") delete r.cursor;
+    if (body.session === "badflag") r.has_more = 1;
+    if (body.session === "badrows") r.records = {};
+    res.end(JSON.stringify(r));
+    return;
+  }
   if (req.url === "/v1/redirect") {
-    res.writeHead(302, { Location: "http://127.0.0.1:18093/v1/leak" });
+    res.writeHead(302, { Location: faultURL + "/v1/leak" });
     res.end();
   } else if (req.url === "/v1/leak") {
     redirected++;
@@ -70,16 +162,54 @@ const faults = createServer((req, res) => {
     res.end("gateway is not JSON");
   }
 });
-faults.listen(18093, "127.0.0.1");
+faults.listen(testPort + 1, "127.0.0.1");
 await once(faults, "listening");
+const tlsRoot = await mkdtemp(join(tmpdir(), "chronograph-sdk-tls-"));
+execFileSync(
+  "openssl",
+  [
+    "req",
+    "-x509",
+    "-newkey",
+    "rsa:2048",
+    "-nodes",
+    "-keyout",
+    join(tlsRoot, "key.pem"),
+    "-out",
+    join(tlsRoot, "cert.pem"),
+    "-days",
+    "1",
+    "-subj",
+    "/CN=localhost",
+  ],
+  { stdio: "ignore" },
+);
+let tlsAuthenticated = 0;
+const tls = createTLS(
+  {
+    key: await readFile(join(tlsRoot, "key.pem")),
+    cert: await readFile(join(tlsRoot, "cert.pem")),
+  },
+  (req, res) => {
+    tlsAuthenticated++;
+    req.resume();
+    res.end("{}");
+  },
+);
+tls.listen(testPort + 2, "127.0.0.1");
+await once(tls, "listening");
 const results = [];
+const fixtures = await catalogFixtures(admin);
 function driver(language) {
   const [cmd, args] = commands[language];
   const child = spawn(cmd, args, {
     cwd: root,
     env: {
       ...process.env,
-      PYTHONPATH: join(root, "sdk/python"),
+      PYTHONPATH: join(
+        process.env.SDK_SOURCE_ROOT || join(root, "sdk"),
+        "python",
+      ),
       DOTNET_CLI_TELEMETRY_OPTOUT: "1",
     },
     stdio: ["pipe", "pipe", "pipe"],
@@ -106,8 +236,9 @@ function driver(language) {
     if (waiting) waiting.reject(Error(`${language}: driver exited: ${errors}`));
   });
   return {
-    ask: (q) =>
-      new Promise((resolve, reject) => {
+    ask: async (q) => {
+      if (fixture) await new Promise((r) => setTimeout(r, 90));
+      return new Promise((resolve, reject) => {
         waiting = {
           resolve,
           reject,
@@ -120,7 +251,8 @@ function driver(language) {
           JSON.stringify({ url: server.url, token: server.adminToken, ...q }) +
             "\n",
         );
-      }),
+      });
+    },
     close: async () => {
       child.stdin.end();
       if (child.exitCode === null) {
@@ -149,7 +281,7 @@ try {
       assert.equal(info.ok, true);
       assert.equal(
         JSON.parse(Buffer.from(info.value, "hex").toString()).edition,
-        "community",
+        fixture ? "managed" : "community",
       );
       checks.push("authenticated GET");
       const id = `sdk_${language}`;
@@ -273,6 +405,8 @@ try {
         assert.equal((await d.ask({ construct: true, url })).local, true);
       for (const q of [
         { op: "../tokens" },
+        { op: "stats\n" },
+        { path: "/v1/stats\n", method: "GET" },
         { path: "/v1/../../escape", method: "GET" },
         { construct: true, token: "bad\r\nheader" },
         { op: "stats", body: { data: "x".repeat(4 * 1024 * 1024) } },
@@ -280,7 +414,7 @@ try {
         assert.equal((await d.ask(q)).local, true);
       checks.push("origin, header, path and request size rejection");
       const fault = {
-        url: "http://127.0.0.1:18093",
+        url: faultURL,
         token: "synthetic-test-token",
       };
       assert.equal((await d.ask({ ...fault, op: "redirect" })).status, 302);
@@ -298,12 +432,94 @@ try {
       assert.equal(rate.status, 429);
       assert.equal(rate.code, "RATE_LIMITED");
       assert.equal(rate.retry, "60");
+      for (const op of ["null", "array", "trailing", "nonfinite", "utf"])
+        assert.equal(
+          (await d.ask({ ...fault, op })).code,
+          "INVALID_JSON",
+          `${language} ${op}`,
+        );
+      assert.equal(
+        (
+          await d.ask({
+            ...fault,
+            helper: "upload",
+            body: {
+              metadata: { version: 1, kind: "opaque", encoding: "fixture" },
+              data_hex: "00",
+            },
+          })
+        ).local,
+        true,
+        `${language} invalid upload receipt`,
+      );
+      for (const mode of [
+        "badhex",
+        "missing",
+        "truncated",
+        "changed",
+        "jump",
+        "badsize",
+        "badmetadata",
+      ])
+        assert.equal(
+          (await d.ask({ ...fault, helper: "read", body: { asset: mode } }))
+            .local,
+          true,
+          `${language} asset ${mode}`,
+        );
+      assert.equal(
+        (await d.ask({ ...fault, helper: "read", body: { asset: "reorder" } }))
+          .ok,
+        true,
+        `${language} equivalent reordered metadata`,
+      );
+      for (const session of ["cycle", "missing", "badflag", "badrows"])
+        assert.equal(
+          (
+            await d.ask({
+              ...fault,
+              helper: "pages",
+              op: "bci_records",
+              body: { session },
+              max_pages: 5,
+            })
+          ).local,
+          true,
+          `${language} pagination ${session}`,
+        );
+      const filtered = await d.ask({
+        ...fault,
+        helper: "pages",
+        op: "bci_records",
+        body: { session: "filtered" },
+        max_pages: 5,
+      });
+      assert.equal(filtered.ok, true);
+      assert.equal(filtered.value.length, 2);
+      checks.push(
+        "malformed UTF-8/JSON, incomplete assets, metadata consistency, cyclic/malformed cursors and filtered pages",
+      );
       const t = performance.now();
       assert.equal(
         (await d.ask({ ...fault, op: "slow", timeout: 100 })).local,
         true,
       );
       assert(performance.now() - t < 2000);
+      assert.equal(
+        (
+          await d.ask({
+            url: tlsURL,
+            token: "fixture-only",
+            op: "stats",
+          })
+        ).local,
+        true,
+        `${language} must reject untrusted TLS`,
+      );
+      assert.equal(tlsAuthenticated, 0);
+      checks.push(
+        "untrusted TLS certificate rejected before authenticated HTTP",
+      );
       checks.push(
         "redirect isolation, response limit, malformed JSON, proxy errors, Retry-After and timeout",
       );
@@ -315,6 +531,19 @@ try {
         });
         checks.push("multi-chunk asset helper roundtrip");
       }
+      checks.push(
+        ...(await extended(
+          good,
+          d,
+          language,
+          fixtures,
+          readToken,
+          ingestToken,
+          6000 + languages.indexOf(language) * 2,
+        )),
+      );
+      assert.equal(await good("", {}, { helper: "parallel" }), 12);
+      checks.push("12 simultaneous reads on a shared client");
       results.push({
         language,
         checks,
@@ -328,15 +557,27 @@ try {
 } finally {
   faults.closeAllConnections();
   await new Promise((resolve) => faults.close(resolve));
+  tls.closeAllConnections();
+  await new Promise((resolve) => tls.close(resolve));
+  await rm(tlsRoot, { recursive: true, force: true });
   await server.stop();
 }
 await mkdir(join(root, ".work/sdk-evidence"), { recursive: true });
 await writeFile(
-  join(root, ".work/sdk-evidence/conformance.json"),
+  join(
+    root,
+    fixture
+      ? ".work/sdk-evidence/managed-conformance.json"
+      : process.env.SDK_SOURCE_ROOT
+        ? ".work/sdk-evidence/kit-conformance.json"
+        : ".work/sdk-evidence/conformance.json",
+  ),
   JSON.stringify(
     {
       date: new Date().toISOString(),
-      transport: "real Rust Community server plus controlled HTTP faults",
+      transport: fixture
+        ? "real Managed gateway and isolated project engines plus controlled HTTP faults"
+        : "real Rust Community server plus controlled HTTP faults",
       results,
     },
     null,

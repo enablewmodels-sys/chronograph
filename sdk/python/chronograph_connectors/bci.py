@@ -326,14 +326,14 @@ class BCIClient:
     def __init__(self, client, instance="bci_research"):
         self.client, self.instance = client, instance
 
-    def sessions(self):
-        args = {"instance": self.instance}
-        while True:
-            result = self.client.call("bci_sessions", args)
-            yield from result["sessions"]
-            if result["next_cursor"] is None:
-                return
-            args["after"] = result["next_cursor"]
+    def sessions(self, *, max_pages=1000):
+        for page in Client.pages(
+            self.client,
+            "bci_sessions",
+            {"instance": self.instance},
+            max_pages=max_pages,
+        ):
+            yield from page["sessions"]
 
     def session(self, session):
         return self.client.call(
@@ -352,19 +352,17 @@ class BCIClient:
         }
         if after is not None:
             args["after"] = str(after)
+        if type(max_records) is not int or not 1 <= max_records <= 5_000_000:
+            raise ValueError("Invalid record budget")
         count = 0
-        while True:
-            result = self.client.call("bci_records", args)
+        for result in Client.pages(
+            self.client, "bci_records", args, max_pages=min(max_records + 1, 10000)
+        ):
             for row in result["records"]:
                 count += 1
                 if count > max_records:
                     raise ValueError("Recording exceeds local record limit")
                 yield row
-            if not result["has_more"]:
-                return
-            if not result["cursor"] or result["cursor"] == args.get("after"):
-                raise ValueError("Non-progressing BCI cursor")
-            args["after"] = result["cursor"]
 
     def window(self, session, stream, start_us, end_us, **options):
         return self.client.call(

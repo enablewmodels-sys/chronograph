@@ -209,3 +209,26 @@ Shorter `--seconds` runs are smoke tests and must not be presented as a full soa
 Specify a report path on durable local storage if needed. The default test uses
 local HTTP and a debug binary; those numbers do not represent hosted WAN/TLS
 latency. No raw participant recordings are included in these tests.
+
+
+## Cross-language protocol and distribution checks
+
+`scripts/sdk/conformance.mjs` runs the real Python, TypeScript, Java, C++, Go, Dart
+and C# clients against a disposable Rust server. It applies atomic migration plans,
+roundtrips multipart assets and f64 bit patterns, records and replays BCI sessions,
+verifies dataset manifests, and sends fixture records through all 38 connector
+presets. HTTP/TLS fault fixtures reject untrusted certificates and redirects,
+malformed UTF-8/JSON, incomplete assets, metadata changes and cyclic cursors.
+Read-only keys cannot ingest and uncertain batches retain explicit retry semantics.
+
+`python3 scripts/build-sdk-bundle.py` builds an allowlisted, checksummed SDK kit.
+`python3 scripts/sdk/test-kit.py` extracts it into a temporary directory, builds
+every client again, and repeats conformance using the extracted libraries. The
+SDK workflow checks that the committed kit matches its source. No temporary
+credentials or scientific/device runtimes are included in that archive.
+
+Managed acceptance uses a private disposable gateway and separate project engines
+with the same SDK suite. Scoped keys must select only their project, a second
+project must remain empty, and revoked keys must immediately stop working. This
+fixture never targets customer projects. Hardware/QPU certification and Windows
+coverage remain separate milestones in the [SDK roadmap](SDK.md).

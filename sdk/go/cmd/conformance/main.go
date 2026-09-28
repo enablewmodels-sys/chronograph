@@ -24,6 +24,9 @@ func main() {
 				Timeout                      int64
 				Limit                        int64
 				Construct                    bool
+				Helper                       string
+				MaxPages                     int `json:"max_pages"`
+				StopAfter                    int `json:"stop_after"`
 			}
 			if err := json.Unmarshal(s.Bytes(), &q); err != nil {
 				panic(err)
@@ -35,7 +38,9 @@ func main() {
 			var value any
 			if err == nil {
 				defer c.Close()
-				if q.Construct {
+				if q.Helper != "" {
+					value, err = helper(c, q.Helper, q.Op, q.Body, q.MaxPages, q.StopAfter)
+				} else if q.Construct {
 					value = true
 				} else if q.Method != "" {
 					var raw []byte

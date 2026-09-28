@@ -2,7 +2,7 @@
 
 Clients share the `/v1` HTTP contract and normalized connector records. They connect to your own Community server; model inference, acquisition and quantum execution stay in the producer process.
 
-The generated OpenAPI contract is in `schema/openapi.json`. Python also offers a durable SQLite producer spool and optional domain adapters. TypeScript builds JavaScript plus declarations. Q# uses the Python host bridge: quantum code does not perform network requests.
+The generated OpenAPI contract is in `schema/openapi.json`. All seven HTTP clients provide bounded binary asset transfer and incremental graph/BCI pagination. Python also offers a durable SQLite producer spool and optional domain adapters. TypeScript builds JavaScript plus declarations. Q# uses the Python host bridge: quantum code does not perform network requests.
 
 See the language READMEs and [the SDK guide](../docs/SDK.md) for setup, bounds, compatibility and test results. IDs and microsecond timestamps are decimal strings in every language. There are no implicit retries of writes. Use explicit `fsync` durability and retain uncertain connector batches until their receipts are resolved.
 

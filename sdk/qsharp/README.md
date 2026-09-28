@@ -17,3 +17,10 @@ This is an alpha.3 source package for the Chronograph Community `/v1` API, not a
 All IDs and microsecond timestamps are decimal strings. `call` exposes JSON operations; `request` handles GET/DELETE and bounded binary responses. No application write retries are performed. Defaults: 30-second timeout, 4 MiB request/response caps. Remote origins require HTTPS; redirects are rejected. Increase the response cap explicitly for larger Arrow/backup downloads (maximum 256 MiB).
 
 Source-available under [PolyForm Perimeter 1.0.0](LICENSE); preserve [NOTICE](NOTICE). Third-party libraries retain their own licenses.
+
+
+The Python host also inherits the bounded asset and BCI pagination helpers. Use the
+Managed origin plus its project key, or an isolated origin; do not pass API keys
+into Q# operations. The conformance suite runs 128 Bell simulator shots, persists
+exact counts and source bytes, and verifies the quantum record contract. Physical
+QPU execution and arbitrary quantum source execution are outside this bridge.
