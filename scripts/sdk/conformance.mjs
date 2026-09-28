@@ -233,7 +233,11 @@ function driver(language) {
     if (waiting) waiting.reject(error);
   });
   child.on("exit", () => {
-    if (waiting) waiting.reject(Error(`${language}: driver exited: ${errors}`));
+    if (waiting) {
+      clearTimeout(waiting.timer);
+      waiting.reject(Error(`${language}: driver exited: ${errors}`));
+      waiting = null;
+    }
   });
   return {
     ask: async (q) => {
@@ -253,7 +257,7 @@ function driver(language) {
         );
       });
     },
-    close: async () => {
+    close: async (verifyExit = true) => {
       child.stdin.end();
       if (child.exitCode === null) {
         const done = once(child, "exit");
@@ -262,6 +266,12 @@ function driver(language) {
         clearTimeout(timer);
       }
       lines.close();
+      if (verifyExit)
+        assert.equal(
+          child.exitCode,
+          0,
+          `${language}: driver failed on shutdown: ${errors}`,
+        );
     },
   };
 }
@@ -270,6 +280,7 @@ try {
   for (const language of languages) {
     const d = driver(language),
       checks = [];
+    let completed = false;
     const started = performance.now();
     const good = async (op, body = {}, override = {}) => {
       const r = await d.ask({ op, body, ...override });
@@ -550,8 +561,10 @@ try {
         duration_ms: Math.round(performance.now() - started),
       });
       console.log(`PASS ${language}: ${checks.length} conformance groups`);
+      completed = true;
     } finally {
-      await d.close();
+      // Cleanup must not replace the original request/assertion failure.
+      await d.close(completed);
     }
   }
 } finally {
