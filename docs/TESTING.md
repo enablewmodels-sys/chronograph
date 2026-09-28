@@ -230,5 +230,27 @@ credentials or scientific/device runtimes are included in that archive.
 Managed acceptance uses a private disposable gateway and separate project engines
 with the same SDK suite. Scoped keys must select only their project, a second
 project must remain empty, and revoked keys must immediately stop working. This
-fixture never targets customer projects. Hardware/QPU certification and Windows
-coverage remain separate milestones in the [SDK roadmap](SDK.md).
+fixture never targets customer projects. Hardware/QPU certification remains a
+separate milestone in the [SDK roadmap](SDK.md).
+
+The `SDK portability` workflow runs the Go driver with `-race` and the C++ driver
+with Clang AddressSanitizer and UndefinedBehaviorSanitizer on Ubuntu 24.04.
+Leak detection and halt-on-error are enabled; a nonzero driver exit fails the
+suite, including errors emitted during process shutdown. Both clients passed all
+15 conformance groups under instrumentation on 28 September 2026. The ordinary
+Linux SDK workflow separately compiles C++ with GCC and strict warnings.
+
+Windows Server 2025 runs all seven clients as native processes. A disposable
+Ubuntu 24.04 WSL1 instance hosts the Linux database, with private Linux data files
+and short-lived fixture credentials. `scripts/sdk/build-windows.ps1` builds the
+drivers; `scripts/sdk/test-windows.ps1` starts the fixture, runs the same HTTP/TLS
+fault suite, then terminates it and removes credentials. The workflow uses the
+MSYS2 installation's reported path, explicit UTF-8 driver I/O, LF shell scripts
+and direct WSL execution to preserve Windows paths. All 107 groups passed on
+28 September 2026. This covers SDK network clients, not Windows acquisition or a
+native Windows database server.
+
+The `SDK release provenance` workflow rebuilds the allowlisted kit, rejects
+committed-archive drift, and signs the artifact digest through GitHub OIDC.
+Release downloads include checksums and the verification bundle. Publication is a
+separate step after reviewing the compatibility results; see [SDK verification](SDK.md).

@@ -1,6 +1,6 @@
 # Chronograph Community SDKs
 
-Clients share the `/v1` HTTP contract and normalized connector records. They connect to your own Community server; model inference, acquisition and quantum execution stay in the producer process.
+Clients share the `/v1` HTTP contract and normalized connector records. Connect to your own Community server with a workspace key, or to a Managed HTTPS origin with a scoped project key. Model inference, acquisition and quantum execution stay in the producer process.
 
 The generated OpenAPI contract is in `schema/openapi.json`. All seven HTTP clients provide bounded binary asset transfer and incremental graph/BCI pagination. Python also offers a durable SQLite producer spool and optional domain adapters. TypeScript builds JavaScript plus declarations. Q# uses the Python host bridge: quantum code does not perform network requests.
 

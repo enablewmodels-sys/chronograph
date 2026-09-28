@@ -2,7 +2,7 @@
 
 The Community repository contains Python, TypeScript/JavaScript, Java, C++, Go, Dart and C# clients. Q# uses a Python host bridge. Rust applications can embed `chronograph-db` directly. All HTTP clients use the same authenticated `/v1` API; the server owns validation, transactions and connector checkpoints.
 
-These are **alpha.3 source packages on `main`**, not packages published to npm, PyPI, Maven Central, NuGet or pub.dev. The alpha.2 release downloads predate the new clients and five new connector descriptors. Build the current checkout for the complete catalog. Existing `/v1` operations remain compatible with alpha.2.
+These are **alpha.3 source packages**, available in the versioned SDK kit and on `main`. They are not published to npm, PyPI, Maven Central, NuGet or pub.dev. The native alpha.2 release downloads predate these clients; use the current SDK kit or checkout for the complete catalog. Existing `/v1` operations remain compatible with alpha.2.
 
 ## Managed and isolated connections
 
@@ -43,6 +43,23 @@ private working directory and follow the per-language README. The kit includes
 sources, TypeScript build output, the OpenAPI contract and BCI guides; it does not
 bundle credentials, scientific runtimes or device drivers. Packages remain source
 distributions rather than published registry releases.
+The kit contains the seven HTTP clients and the Q# host bridge. Obtain the Rust
+embedded engine from the Community repository's `crates/` directory.
+
+Versioned kits include SHA-256 checksums and signed GitHub build provenance. Verify
+the downloaded archive with the GitHub CLI. The
+[alpha.3 SDK release](https://github.com/enablewmodels-sys/chronograph/releases/tag/sdk-v0.4.0-alpha.3)
+keeps the kit, checksum file and verification bundle together:
+
+```sh
+gh attestation verify chronodb-sdk-kit.zip --repo enablewmodels-sys/chronograph --signer-workflow enablewmodels-sys/chronograph/.github/workflows/sdk-release.yml --deny-self-hosted-runners
+```
+
+Add `--source-digest FULL_COMMIT_SHA` from the release to pin an exact source
+revision. Provenance identifies the source and workflow that produced the bytes;
+test results are linked separately in the release notes. The
+`SDK release provenance` workflow rebuilds the kit and rejects a difference from
+the committed archive before signing it.
 
 ## Install from this checkout
 
@@ -155,7 +172,26 @@ CHRONOGRAPH_TEST_PROFILE=target/debug node scripts/sdk/adapters.mjs
 
 Install Go, JDK, libcurl, a C++ compiler, Dart and .NET first. `GO`, `DOTNET`, `SDK_TOOLS`, `GSON_JAR`, `JSON_INCLUDE`, `SDK_PYTHON` and `SDK_LANGUAGES` let the scripts use isolated tools. Linux pylsl needs liblsl; the workflow pins and verifies the Ubuntu 24.04 package. LSL fixtures discover only a random local test source with the supplied loopback config.
 
-Local validation used Python 3.12/3.14, Node 20.20/22, Go 1.27.1, JDK 25 with Java 17 target, Apple Clang, Dart 3.11.5 and .NET SDK 8.0.425 on macOS ARM64. Windows has not been exercised. Synthetic device/local simulator tests do not certify physical devices, cross-host clock accuracy, clinical performance, model quality or QPU behavior.
+### Tested platforms
+
+| Platform | HTTP clients | Observed result |
+| --- | --- | --- |
+| macOS ARM64 | All seven | 107 conformance groups; also passed against an external Community fixture |
+| Ubuntu 24.04 x64 | All seven | 107 groups from source and 107 after independently building the extracted kit |
+| Windows Server 2025 x64 | All seven, running natively | 107 groups against a disposable Linux server in WSL1; C++ uses MinGW UCRT64 |
+| Ubuntu 24.04 x64 instrumentation | Go and C++ | 30 groups with Go race detection and Clang ASAN/UBSAN, including leak detection and successful process shutdown |
+
+The [Windows and sanitizer run](https://github.com/enablewmodels-sys/chronograph/actions/runs/36415350377)
+and [Linux source/kit run](https://github.com/enablewmodels-sys/chronograph/actions/runs/36415350349)
+passed on 28 September 2026. WSL hosts only the CI database fixture. Windows SDK
+applications connect directly to Managed or a supported Community server and do
+not require WSL themselves. This does not validate a native Windows database
+server, MSVC builds, or the Python acquisition/spooling agent on Windows.
+
+Validation used Python 3.12/3.14, Node 20.20/22, Go 1.27.1, JDK 17/25 with Java 17
+target, Apple Clang/GCC/Clang/MinGW, Dart 3.11.5 and .NET 8. Synthetic device/local
+simulator tests do not certify physical devices, cross-host clock accuracy,
+clinical performance, model quality or QPU behavior.
 
 ## Jev decision binding
 
@@ -213,13 +249,15 @@ contract is exposed by the Rust HTTP/MCP server, not a separate Rust HTTP SDK.
 The current release establishes shared Community/Managed protocol behavior. Further
 work should be gated by evidence rather than labeling every runtime supported:
 
-1. Add Windows-native CI for Java/C++/Go/Dart/C#; the POSIX Python acquisition spool
-   remains Linux/macOS until locking and interruption behavior are implemented there.
+1. Extend the Python acquisition spool to Windows only after private file ACLs,
+   exclusive locking, interrupted writes and restart/retry behavior have their own
+   acceptance tests. HTTP client compatibility does not enable the capture agent.
 2. Run real-board acceptance with channel order, units, reference, clock drift,
    reconnect behavior and recorded-file fixtures supplied by device owners.
 3. Add official BIDS validation and long-duration cross-host LSL clock tests.
-4. Publish signed, versioned registry packages after release provenance and package
-   ownership are configured. Pin a source commit until then.
+4. Publish versioned registry packages after publisher accounts and ownership are
+   configured. The source kit has build provenance; pin its source commit until
+   registry distributions have equivalent verification and consumer tests.
 5. Add independently tested Swift/Kotlin/Julia/R/MATLAB clients only with their own
    transport, cancellation, exact-integer and binary conformance runs.
 6. Scale recording storage and standalone training workers using measured workloads;
