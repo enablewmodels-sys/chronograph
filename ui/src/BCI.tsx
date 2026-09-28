@@ -1261,9 +1261,9 @@ export function BCIPage() {
           ))}
         </section>
         <p className="bci-independence">
-          Independent infrastructure for BCI research. Not affiliated with
-          Neuralink. Synthetic and recorded-data tests do not establish
-          physical-device compatibility or clinical approval.
+          Independent infrastructure for BCI research. Synthetic and
+          recorded-data tests do not establish physical-device compatibility or
+          clinical approval.
         </p>
       </main>
       <SiteFooter />

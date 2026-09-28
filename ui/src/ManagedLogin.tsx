@@ -83,8 +83,8 @@ export default function ManagedLogin({
   } | null>(null);
   const [saved, setSaved] = useState(false);
   const socialStarted = useRef(false);
-  useEffect(() => {
-    void action.run(async () => {
+  const loadConfig = () =>
+    action.run(async () => {
       const c = await managedApi<ManagedAuthConfig>("/managed/config");
       setConfig(c);
       const provider = new URLSearchParams(location.search).get("provider");
@@ -98,6 +98,8 @@ export default function ManagedLogin({
         await socialSignIn(provider);
       }
     });
+  useEffect(() => {
+    void loadConfig();
   }, []);
   const user = session?.user;
   if (user && !user.needsMfa && user.twoFactorEnabled && !user.needsActivation)
@@ -264,9 +266,27 @@ export default function ManagedLogin({
           <h2>{signup ? "Create your account." : "Sign in to ChronoDB."}</h2>
           <p>
             {signup
-              ? "One account for your projects and models."
+              ? "Your account. Your projects. Your connected history."
               : "Welcome back. Your projects are waiting."}
           </p>
+          {!config && (
+            <div className="notice" role="status">
+              {action.busy ? (
+                "Loading sign-in options…"
+              ) : (
+                <>
+                  Sign-in options could not be loaded.{" "}
+                  <button
+                    type="button"
+                    className="text-link"
+                    onClick={() => void loadConfig()}
+                  >
+                    Try again
+                  </button>
+                </>
+              )}
+            </div>
+          )}
           {new URLSearchParams(location.search).has("error") && (
             <div className="notice error" role="alert">
               {new URLSearchParams(location.search)
@@ -289,24 +309,38 @@ export default function ManagedLogin({
                 Continue with {provider === "google" ? "Google" : "GitHub"}
               </button>
             ))}
-          <div className="form-divider">
-            <span>
-              {signup
-                ? "or create an account with email"
-                : "or sign in with email"}
-            </span>
-          </div>
+          {config && (!signup || config.emailSignup) && (
+            <div className="form-divider">
+              <span>
+                {signup
+                  ? "or create an account with email"
+                  : "or sign in with email"}
+              </span>
+            </div>
+          )}
           {signup && emailSent ? (
             <div className="notice" role="status">
               Check your inbox. If this address is eligible, you’ll receive a
               private link to finish setup. The link expires in one hour.
             </div>
           ) : signup && config && !config.emailSignup ? (
-            <p className="small">
-              Create your account with Google or GitHub. Email registration is
-              awaiting email delivery setup.
-            </p>
-          ) : (
+            <div className="signup-help">
+              <p>One sign-in. A workspace for all your models.</p>
+              <ul>
+                <li>Create and manage private projects</li>
+                <li>Connect your code and AI agents</li>
+                <li>Invite your team when you’re ready</li>
+              </ul>
+              <details>
+                <summary>Prefer email?</summary>
+                <p>
+                  Email signup is not available yet. You can create an account
+                  now using Google or GitHub. Invited users can{" "}
+                  <Link to="/login">sign in with email</Link>.
+                </p>
+              </details>
+            </div>
+          ) : config ? (
             <SubmitForm
               onSubmit={() =>
                 void action.run(async () => {
@@ -368,7 +402,7 @@ export default function ManagedLogin({
                 </Busy>
               </button>
             </SubmitForm>
-          )}
+          ) : null}
           <p className="account-switch">
             {signup ? "Already have an account? " : "New to ChronoDB? "}
             <Link to={signup ? "/login" : "/signup"}>
@@ -543,9 +577,9 @@ export function ForgotPassword() {
       </p>
       {config && !config.passwordReset ? (
         <div className="notice" role="status">
-          Email recovery is awaiting email delivery setup. You can sign in with
-          your linked Google or GitHub account, or ask the platform
-          administrator for a private recovery link.
+          Email recovery is not available yet. Sign in with your linked Google
+          or GitHub account, or <Link to="/support">contact support</Link> for
+          help recovering access.
         </div>
       ) : (
         !sent && (

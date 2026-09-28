@@ -37,6 +37,28 @@ API calls are disabled in the public build. The synthetic console stays read onl
 and does not accept a workspace token. The native/server build retains normal
 token authentication and its existing same-origin API behavior.
 
+## Keep the UI editions separate
+
+| Deployment | Build command | Output | Human access |
+| --- | --- | --- | --- |
+| Public Community website | `node scripts/build-site.mjs` | `dist/site` | Synthetic demo |
+| Self-hosted Community database | `npm --prefix ui run build` | `ui/dist` | Scoped engine credentials |
+| Managed account service | `npm --prefix ui run build:managed` | `ui/dist-managed` | Google, GitHub, or an existing email account |
+
+Each build includes `chronodb-build.json` and an edition tag in `index.html`.
+Before deploying, run `node scripts/verify-ui-build.mjs <output> <edition>`,
+where the edition is `public`, `community`, or `managed`. The Managed build
+explicitly selects its edition and writes a separate directory, so a later
+Community test build cannot overwrite the artifact intended for hosting.
+
+The Managed gateway also declares the edition in the HTML it serves. This
+controls the interface only; the server independently enforces account sessions,
+MFA, project membership and API key scopes. Never deploy the static public demo
+as a replacement for the Managed account service. Google/GitHub account creation
+requires configured providers; email registration and recovery additionally
+require configured email delivery. A project API key is for software access,
+not a substitute for signing in to the hosted console.
+
 ## Hosting the database
 
 The Rust service is a long-running process owning a durable journal and local

@@ -27,6 +27,7 @@ execFileSync(
       ...process.env,
       CHRONOGRAPH_SITE_BASE: base,
       VITE_PUBLIC_SITE: "true",
+      VITE_MANAGED_SITE: "false",
     },
     stdio: "inherit",
   },

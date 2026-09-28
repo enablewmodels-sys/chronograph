@@ -67,6 +67,169 @@
   gap: 10px;
   padding: 9px 0 9px 10px;
 }
+.public-nav > div {
+  gap: clamp(16px, 2vw, 30px);
+}
+.public-nav .nav-signup {
+  min-height: 42px;
+  padding: 10px 17px;
+  color: #fff;
+  font-size: 12px;
+}
+.landing-eyebrow {
+  display: block;
+  color: #89b3ff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+  line-height: 1.7;
+}
+.memory-hero h1 {
+  white-space: normal;
+  font-size: clamp(42px, 4.8vw, 76px);
+  line-height: 1.08;
+}
+.memory-hero h1 span {
+  color: #a9c8ff;
+}
+.memory-hero .hero-note {
+  font-size: 11px;
+  line-height: 1.8;
+  max-width: 340px;
+  margin: 20px 0 0;
+}
+.platform-intro {
+  max-width: 660px;
+}
+.platform-intro > p {
+  max-width: 560px;
+}
+.platform-features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 48px 72px;
+  margin-top: 54px;
+}
+.platform-features article {
+  padding-top: 26px;
+  border-top: 1px solid var(--rule);
+}
+.platform-features article > svg {
+  color: #8bb6ff;
+}
+.platform-features h3,
+.start-steps h3 {
+  font-size: 19px;
+  font-weight: 550;
+  letter-spacing: -0.03em;
+  margin: 19px 0 12px;
+}
+.platform-features p {
+  max-width: 460px;
+  margin-bottom: 22px;
+}
+.start-steps {
+  list-style: none;
+  padding: 0;
+  margin: 45px 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 44px;
+}
+.start-steps li {
+  border-top: 1px solid var(--rule);
+  padding-top: 25px;
+}
+.start-steps li > span {
+  color: #89b3ff;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.start-steps p {
+  font-size: 14px;
+}
+.start-steps a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-top: 12px;
+  color: #afccff;
+}
+.landing-faq {
+  display: grid;
+  grid-template-columns: 0.85fr 1.4fr;
+  gap: 64px;
+}
+.faq-list details {
+  border-top: 1px solid var(--rule);
+  padding: 23px 0;
+}
+.faq-list summary {
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1.7;
+  padding-inline-end: 14px;
+}
+.faq-list details p {
+  font-size: 14px;
+  margin-bottom: 0;
+}
+.final-invitation {
+  padding: 100px 0;
+  text-align: center;
+  background: radial-gradient(ellipse at center, #16375a44, transparent 65%);
+}
+.final-invitation h2 {
+  font-size: clamp(32px, 3.7vw, 52px);
+  letter-spacing: -0.05em;
+  line-height: 1.2;
+  font-weight: 520;
+  margin: 0 0 30px;
+}
+.final-invitation .hero-actions {
+  justify-content: center;
+}
+.final-invitation > p {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 25px;
+}
+.final-invitation > p a {
+  color: #afccff;
+}
+@media (max-width: 900px) {
+  .public-nav > div > .nav-resource {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .platform-features,
+  .start-steps,
+  .landing-faq {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .platform-features {
+    margin-top: 30px;
+  }
+  .final-invitation {
+    padding: 65px 0;
+  }
+}
+@media (max-width: 380px) {
+  .public-nav > div {
+    gap: 12px;
+  }
+  .public-nav .nav-signup {
+    padding: 10px 12px;
+  }
+  .public-nav .nav-signup svg {
+    display: none;
+  }
+}
 .hero {
   display: grid;
   grid-template-columns: 43% 57%;

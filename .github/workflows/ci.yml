@@ -38,6 +38,9 @@ jobs:
       - run: RUSTDOCFLAGS='-D warnings' cargo doc --locked --workspace --no-deps
       - run: node scripts/build-site.mjs
       - run: npm --prefix ui run build
+      - run: node scripts/verify-ui-build.mjs ui/dist community
+      - run: npm --prefix ui run build:managed
+      - run: node scripts/verify-ui-build.mjs ui/dist-managed managed
       - run: cargo build --locked --release -p chronograph-server --bins
       - run: node scripts/protocol-test.mjs
       - run: node scripts/migration-client-test.mjs

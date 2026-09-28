@@ -11,6 +11,7 @@ __pycache__/
 /data/
 /ui/node_modules/
 /ui/dist/
+/ui/dist-managed/
 /ui/test-results/
 /ui/playwright-report/
 /ui/*.tsbuildinfo

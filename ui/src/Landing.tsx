@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  GitBranch,
+  ShieldCheck,
+  Code2,
+  Network,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import SiteFooter from "./SiteFooter";
 import { Code, Logo, Tabs } from "./shared";
@@ -84,6 +91,7 @@ export default function Landing() {
   const [language, setLanguage] = useState("HTTP");
   const current = domains[domain];
   const doc = managedSite ? "HOSTED" : "ISOLATED";
+  const start = managedSite ? "/signup" : "/documentation/ISOLATED";
   return (
     <div className="landing cinematic-landing">
       <div className="integration-banner">
@@ -99,14 +107,27 @@ export default function Landing() {
       <nav className="public-nav" aria-label="Main navigation">
         <Logo />
         <div>
-          <a href="#product">Product</a>
-          <Link to="/bci">BCI</Link>
-          <a href="#use-cases">Use cases</a>
-          <Link to={`/documentation/${doc}`}>Docs</Link>
+          <a className="nav-resource" href="#platform">
+            Platform
+          </a>
+          <Link className="nav-resource" to="/bci">
+            BCI
+          </Link>
+          <a className="nav-resource" href="#use-cases">
+            Use cases
+          </a>
+          <Link className="nav-resource" to={`/documentation/${doc}`}>
+            Docs
+          </Link>
           {managedSite ? (
-            <Link to="/login" className="nav-signin">
-              Sign in <ArrowUpRight size={14} />
-            </Link>
+            <>
+              <Link to="/login" className="nav-signin">
+                Sign in
+              </Link>
+              <Link to="/signup" className="button primary nav-signup">
+                Sign up <ArrowUpRight size={14} />
+              </Link>
+            </>
           ) : (
             <Link className="nav-signin" to={publicSite ? "/app" : "/login"}>
               {publicSite ? "Open demo" : "Connect"} <ArrowUpRight size={14} />
@@ -115,7 +136,7 @@ export default function Landing() {
         </div>
       </nav>
       <main id="main">
-        <section className="hero bci-hero" id="product">
+        <section className="hero memory-hero" id="product">
           <img
             className="hero-ambient"
             fetchPriority="high"
@@ -126,24 +147,31 @@ export default function Landing() {
             aria-hidden="true"
           />
           <div className="hero-copy">
-            <h1>The database for teams building alternatives to Neuralink.</h1>
+            <span className="landing-eyebrow">
+              A temporal graph database, built in Rust
+            </span>
+            <h1>
+              Give intelligence
+              <br />
+              <span>a memory.</span>
+            </h1>
             <p>
-              Capture EEG, replay experiments and trace decoder decisions—all in
-              one workspace.
+              For AI that senses, decides and acts. Connect signals, world
+              states and decisions in a graph you can replay through time.
             </p>
             <div className="hero-actions">
-              <Link className="button primary" to="/bci">
-                Explore a BCI session <ArrowRight size={16} />
+              <Link className="button primary" to={start}>
+                {managedSite ? "Create your account" : "Start building"}{" "}
+                <ArrowRight size={16} />
               </Link>
-              <Link
-                className="demo-link"
-                to={managedSite ? "/login" : "/documentation/ISOLATED"}
-              >
-                Create your workspace <ArrowRight size={16} />
+              <Link className="demo-link" to="/bci">
+                Explore the demo <ArrowRight size={16} />
               </Link>
             </div>
-            <p className="bci-independence">
-              Independent BCI infrastructure. Not affiliated with Neuralink.
+            <p className="hero-note">
+              {managedSite
+                ? "Sign up with Google or GitHub. Build in your own private project."
+                : "Run Community on your infrastructure. Keep control of your data."}
             </p>
           </div>
           <WorldTimeline />
@@ -247,6 +275,64 @@ export default function Landing() {
             </CinematicScene>
           </div>
         </section>
+        <section className="platform-section landing-section" id="workspace">
+          <div className="platform-intro">
+            <span className="landing-eyebrow">
+              From experiment to application
+            </span>
+            <h2>
+              Your models move forward.
+              <br />
+              Your data should keep up.
+            </h2>
+            <p>
+              Give every observation, relationship and outcome a place. Work in
+              the console, connect your code, or let an agent query the same
+              history.
+            </p>
+          </div>
+          <div className="platform-features">
+            {[
+              {
+                icon: Network,
+                title: "One connected history",
+                text: "Connect observations to actions and outcomes. Query relationships at a moment in time, with their original context intact.",
+                link: "TUTORIAL",
+                label: "Explore temporal queries",
+              },
+              {
+                icon: GitBranch,
+                title: "Schema that evolves with you",
+                text: "Define properties and relations, preview migration changes and apply ordered files. Branch a graph to explore another outcome.",
+                link: "SCHEMA",
+                label: "See the migration workflow",
+              },
+              {
+                icon: ShieldCheck,
+                title: "A workspace for your team",
+                text: "Manage private projects, invite collaborators and assign roles. Control software access with scoped, revocable API keys.",
+                link: "HOSTED",
+                label: "Explore managed projects",
+              },
+              {
+                icon: Code2,
+                title: "Ready for code and agents",
+                text: "Connect through seven HTTP SDKs, REST or MCP. Bring your Python pipeline, TypeScript app or AI coding assistant.",
+                link: "SDK",
+                label: "Find your SDK",
+              },
+            ].map(({ icon: Icon, title, text, link, label }) => (
+              <article key={title}>
+                <Icon size={23} aria-hidden="true" />
+                <h3>{title}</h3>
+                <p>{text}</p>
+                <Link className="text-link" to={`/documentation/${link}`}>
+                  {label} <ArrowRight size={14} />
+                </Link>
+              </article>
+            ))}
+          </div>
+        </section>
         <section className="developer-section landing-section" id="platform">
           <h2>Your graph. Your workflow.</h2>
           <div className="developer-grid">
@@ -291,6 +377,118 @@ export default function Landing() {
               </Link>
             </div>
           </div>
+        </section>
+        <section className="getting-started landing-section" id="start">
+          <span className="landing-eyebrow">Less setup. More building.</span>
+          <h2>
+            From your first account
+            <br />
+            to your first connected world.
+          </h2>
+          <ol className="start-steps">
+            <li>
+              <span>01</span>
+              <h3>Create your account</h3>
+              <p>
+                Sign up with Google or GitHub, secure your account and open your
+                workspace.
+              </p>
+              <Link to={managedSite ? "/signup" : "/documentation/HOSTED"}>
+                Get started <ArrowRight size={14} />
+              </Link>
+            </li>
+            <li>
+              <span>02</span>
+              <h3>Make it your project</h3>
+              <p>
+                Create a private graph. Start with a connector preset or write a
+                migration for your own schema.
+              </p>
+              <Link to="/documentation/SCHEMA">
+                Explore schemas <ArrowRight size={14} />
+              </Link>
+            </li>
+            <li>
+              <span>03</span>
+              <h3>Connect your world</h3>
+              <p>
+                Send observations from your code. Inspect the timeline and query
+                what changed through REST or MCP.
+              </p>
+              <Link to="/documentation/TUTORIAL">
+                Follow the tutorial <ArrowRight size={14} />
+              </Link>
+            </li>
+          </ol>
+        </section>
+        <section
+          className="landing-faq landing-section"
+          aria-labelledby="faq-title"
+        >
+          <div>
+            <span className="landing-eyebrow">Before you build</span>
+            <h2 id="faq-title">
+              A few things
+              <br />
+              worth knowing.
+            </h2>
+            <Link className="text-link" to="/documentation/HOSTED">
+              Read the managed guide <ArrowRight size={15} />
+            </Link>
+          </div>
+          <div className="faq-list">
+            {[
+              [
+                "What is ChronoDB built for?",
+                "Applications where relationships change over time: BCI experiments, world models, robotics, decision systems and quantum experiment records. Store connected history, then query the state at a chosen moment.",
+              ],
+              [
+                "Do I need an API key to sign in?",
+                "No. ChronoDB Managed uses Google, GitHub or an existing email and password account. Project API keys are for your applications and agents, and are created inside the console.",
+              ],
+              [
+                "Can I use my own models and data?",
+                "Yes. Use a connector preset or define your own graph schema. HTTP, MCP and language SDKs give you access without tying your application to one model provider. Jev and Laya examples are available to download.",
+              ],
+              [
+                "Can I run it on my own infrastructure?",
+                "Yes. Community runs locally or on your own servers. Managed adds hosted projects, user accounts and team access. Review the Community licence and deployment guide before choosing your setup.",
+              ],
+              [
+                "Can I connect BCI equipment or quantum hardware?",
+                "Start with the documented adapters and recorded or synthetic examples. Physical-device support depends on the adapter and your hardware. ChronoDB records experiments; it does not provide a clinical system or operate a quantum processor.",
+              ],
+            ].map(([question, answer]) => (
+              <details key={question}>
+                <summary>{question}</summary>
+                <p>{answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+        <section className="final-invitation">
+          <span className="landing-eyebrow">
+            Build the next thing that remembers
+          </span>
+          <h2>
+            Every decision has a history.
+            <br />
+            Start keeping yours.
+          </h2>
+          <div className="hero-actions">
+            <Link className="button primary" to={start}>
+              {managedSite ? "Create your account" : "Start building"}{" "}
+              <ArrowRight size={16} />
+            </Link>
+            <Link className="text-link" to={`/documentation/${doc}`}>
+              Read the docs <ArrowRight size={15} />
+            </Link>
+          </div>
+          {managedSite && (
+            <p>
+              Already building with us? <Link to="/login">Sign in</Link>
+            </p>
+          )}
         </section>
       </main>
       <SiteFooter />

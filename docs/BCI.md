@@ -2,7 +2,7 @@
 
 ChronoDB connects EEG recordings, experimental events, datasets and decoder history.
 The database is independent infrastructure for teams building brain–computer
-interfaces, including alternatives to Neuralink. There is no Neuralink affiliation,
+interfaces. There is no hardware-vendor affiliation,
 implant interface, clinical certification or safety-critical device control.
 
 [Download the starter archive](https://chronodb.co/downloads/chronodb-bci-examples.zip) or

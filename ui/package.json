@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
+    "build:managed": "node ../scripts/build-managed-ui.mjs",
     "test:e2e": "playwright test --repeat-each=2",
     "test:protocol": "node ../scripts/protocol-test.mjs",
     "test:latency": "node ../scripts/service-latency.mjs",

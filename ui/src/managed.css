@@ -4,6 +4,25 @@
   padding: 30px 5vw;
   color: var(--ink);
 }
+.signup-help {
+  border-top: 1px solid var(--rule);
+  margin-top: 28px;
+  padding-top: 18px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.signup-help ul {
+  padding-left: 18px;
+  margin: 14px 0 22px;
+}
+.signup-help summary {
+  cursor: pointer;
+  color: #afccff;
+}
+.signup-help a {
+  color: #afccff;
+}
 .account-top,
 .account-footer,
 .projects-page > header {

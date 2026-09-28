@@ -358,7 +358,7 @@ test("landing artwork, documentation and connector navigation render at this vie
   await page.goto("/");
   await expect(
     page.getByRole("heading", {
-      name: "The database for teams building alternatives to Neuralink.",
+      name: "Give intelligence a memory.",
       exact: true,
     }),
   ).toBeVisible();
