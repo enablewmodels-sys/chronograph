@@ -573,7 +573,7 @@ export function ForgotPassword() {
       <p>
         {sent
           ? "If this address is eligible, a reset link will arrive shortly. Check your spam folder too. The link expires in one hour."
-          : "Enter your account email to receive a private reset link."}
+          : "Recover access to your ChronoDB account."}
       </p>
       {config && !config.passwordReset ? (
         <div className="notice" role="status">
