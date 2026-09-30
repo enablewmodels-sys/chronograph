@@ -1,0 +1,78 @@
+# Publishes the SDKs to PyPI and npm using OIDC trusted publishing.
+#
+# No API token is stored anywhere: each registry trusts this repository and
+# workflow through a short-lived OIDC token, so there is no long-lived secret to
+# leak or rotate. Each registry needs a one-time trusted-publisher entry, which
+# only an account holder can create:
+#
+#   PyPI  -> Your projects -> Publishing -> Add a pending publisher
+#            GitHub · owner enablewmodels-sys · repo chronograph
+#            workflow publish.yml · environment pypi
+#
+#   npm   -> the package's Settings -> Trusted Publisher -> GitHub Actions
+#            owner enablewmodels-sys · repo chronograph · workflow publish.yml
+#            environment npm
+#
+# Until those entries exist the publish steps fail with an authentication error;
+# they are safe to leave in place, and they never run on a normal push.
+name: Publish packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Which registry to publish to
+        type: choice
+        options: [both, pypi, npm]
+        default: both
+  push:
+    tags: ["sdk-v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  pypi:
+    if: github.event_name == 'push' || inputs.target == 'both' || inputs.target == 'pypi'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade build twine
+      - run: python -m build --outdir dist sdk/python
+      - run: python -m twine check dist/*
+      - name: Verify a clean install
+        run: |
+          python -m venv /tmp/verify
+          /tmp/verify/bin/pip install dist/*.whl
+          /tmp/verify/bin/python -c "import chronograph_connectors"
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
+
+  npm:
+    if: github.event_name == 'push' || inputs.target == 'both' || inputs.target == 'npm'
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      id-token: write
+    defaults:
+      run:
+        working-directory: sdk/typescript
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+      # Trusted publishing needs npm 11.5.1 or newer.
+      - run: npm install -g npm@latest
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - run: npm publish --access public --provenance
