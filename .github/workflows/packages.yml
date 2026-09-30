@@ -21,6 +21,10 @@ jobs:
   python:
     if: inputs.target == 'all' || inputs.target == 'python'
     runs-on: ubuntu-latest
+    # PyPI trusted publishing exchanges an OIDC token, which needs id-token: write.
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
