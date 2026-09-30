@@ -39,15 +39,10 @@
 //! the journal lock and the import fails with a lock error rather than
 //! competing for the writer.
 
-use crate::{AppResult, ApiError};
+use crate::{ApiError, AppResult};
 use chronograph_db::{BoundedEdgeInput, EdgeInput, EdgeKind, Graph, NodeId};
 use serde_json::{Value, json};
-use std::{
-    collections::BTreeSet,
-    fs,
-    path::Path,
-    time::Instant,
-};
+use std::{collections::BTreeSet, fs, path::Path, time::Instant};
 
 /// Edge versions appended per atomic journal frame.
 const BATCH: usize = 10_000;
@@ -236,11 +231,7 @@ fn parse_records(text: &str) -> AppResult<Vec<(usize, Vec<String>)>> {
     Ok(records)
 }
 
-fn flush(
-    records: &mut Vec<(usize, Vec<String>)>,
-    fields: &mut Vec<String>,
-    record_line: usize,
-) {
+fn flush(records: &mut Vec<(usize, Vec<String>)>, fields: &mut Vec<String>, record_line: usize) {
     let record = std::mem::take(fields);
     // Whitespace-only and empty lines are not records.
     if record.iter().all(|f| f.trim().is_empty()) {
@@ -424,7 +415,11 @@ mod tests {
 
     #[test]
     fn a_comment_after_data_is_still_ignored() {
-        let (dir, csv) = write_csv(&format!("{}\n# trailing comment\n{}\n", row(1, 2, 7, 1_000, None), row(3, 4, 7, 2_000, None)));
+        let (dir, csv) = write_csv(&format!(
+            "{}\n# trailing comment\n{}\n",
+            row(1, 2, 7, 1_000, None),
+            row(3, 4, 7, 2_000, None)
+        ));
         let summary = import_csv(&dir.path().join("d"), &csv).unwrap();
         assert_eq!(summary["imported"], "2");
     }
@@ -502,4 +497,3 @@ mod tests {
         assert_eq!(summary["workspace_edge_versions"], "2");
     }
 }
-

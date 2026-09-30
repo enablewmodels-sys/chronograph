@@ -71,7 +71,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         if args.next().is_some() {
             return Err("Unexpected arguments".into());
         }
-        println!("{}", chronograph_server::import::import_csv(&data, &source)?);
+        println!(
+            "{}",
+            chronograph_server::import::import_csv(&data, &source)?
+        );
         return Ok(());
     }
     if cmd == "restore" {
