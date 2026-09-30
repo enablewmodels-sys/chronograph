@@ -54,6 +54,7 @@ const entry = await readFile(path.join(output, "index.html"));
 const routes = [
   "login",
   "bci",
+  "pricing",
   "privacy",
   "terms",
   "data-protection",
