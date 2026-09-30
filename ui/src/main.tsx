@@ -76,6 +76,7 @@ const Write = lazy(() => import("./Write"));
 const Access = lazy(() => import("./Access"));
 const Operations = lazy(() => import("./Operations"));
 const Documentation = lazy(() => import("./Documentation"));
+const Pricing = lazy(() => import("./Pricing"));
 const Branches = lazy(() => import("./Branches"));
 const Connectors = lazy(() => import("./Connectors"));
 const ManagedSecurity = lazy(() => import("./ManagedSecurity"));
@@ -187,6 +188,7 @@ function App() {
             }
           />
           <Route path="/documentation/*" element={<Documentation />} />
+          <Route path="/pricing" element={<Pricing />} />
           {[
             "privacy",
             "terms",

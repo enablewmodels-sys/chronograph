@@ -1,6 +1,15 @@
-name: chronograph
-description: Bounded authenticated client for the Chronograph Community v1 API.
+name: chronodb
+description: Bounded authenticated Dart and Flutter client for the ChronoDB Community temporal graph database API.
 version: 0.4.0-alpha.3
+homepage: https://chronodb.co
 repository: https://github.com/enablewmodels-sys/chronograph
+issue_tracker: https://github.com/enablewmodels-sys/chronograph/issues
+documentation: https://chronodb.co/documentation
+topics:
+  - database
+  - graph-database
+  - temporal
+  - time-series
+  - sdk
 environment:
   sdk: '>=3.3.0 <4.0.0'

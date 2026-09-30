@@ -116,6 +116,9 @@ export default function Landing() {
           <a className="nav-resource" href="#use-cases">
             Use cases
           </a>
+          <Link className="nav-resource" to="/pricing">
+            Pricing
+          </Link>
           <Link className="nav-resource" to={`/documentation/${doc}`}>
             Docs
           </Link>

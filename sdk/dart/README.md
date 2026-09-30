@@ -4,13 +4,13 @@ Dart 3.3+, no third-party dependencies. Add a source dependency in your applicat
 
 ```yaml
 dependencies:
-  chronograph:
+  chronodb:
     path: /absolute/path/to/chronograph/sdk/dart
 ```
 
 ```dart
 import 'dart:io';
-import 'package:chronograph/chronograph.dart';
+import 'package:chronodb/chronodb.dart';
 
 final client = ChronographClient(Platform.environment['CHRONOGRAPH_URL']!,
     Platform.environment['CHRONOGRAPH_TOKEN']!);

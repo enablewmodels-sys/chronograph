@@ -2,6 +2,10 @@
 name = "chronograph-db"
 description = "An embedded temporal graph database for evolving world models"
 readme = "../../README.md"
+homepage = "https://chronodb.co"
+documentation = "https://docs.rs/chronograph-db"
+keywords = ["database", "temporal", "graph", "embedded", "time-series"]
+categories = ["database-implementations", "data-structures", "database"]
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

@@ -28,6 +28,7 @@ export default function SiteFooter() {
         <Link to={managedSite ? "/signup" : "/documentation/ISOLATED"}>
           {managedSite ? "Create an account" : "Get started"}
         </Link>
+        <Link to="/pricing">Pricing</Link>
         {managedSite && <Link to="/login">Sign in</Link>}
         <Link to="/documentation/HOSTED">Managed docs</Link>
         <Link to="/documentation/ISOLATED">Community docs</Link>
