@@ -1,11 +1,200 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Chronograph Community Java SDK - project ChronoDB (https://chronodb.co), IntelliNxT.
+
+  Release target: Maven Central, deployed through the Central Portal.
+  Nothing in this module has been uploaded to Central yet. Before the first
+  release, read "Publishing to Maven Central" in README.md and CHANGELOG.md.
+
+  groupId: co.chronodb reverses to the project domain chronodb.co, so the namespace
+  is verifiable with a DNS TXT record at that registrar. The earlier value,
+  io.chronograph, reversed to chronograph.io - a domain this project does NOT
+  control - and could never be verified, so publishing under it was rejected.
+  The Java package name io.chronograph is unchanged and independent of the
+  Maven coordinate. Alternative if DNS is inconvenient:
+    io.github.enablewmodels-sys    - GitHub-linked namespace, verified from the
+                                     project GitHub account.
+  Publishing with an unverified namespace is still rejected by the Portal.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>io.chronograph</groupId><artifactId>chronograph-community</artifactId><version>0.4.0-alpha.3</version>
-  <properties><maven.compiler.release>17</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>
-  <licenses><license><name>PolyForm Perimeter 1.0.0</name><url>https://polyformproject.org/licenses/perimeter/1.0.0/</url></license></licenses>
-  <dependencies><dependency><groupId>com.google.code.gson</groupId><artifactId>gson</artifactId><version>2.14.0</version></dependency></dependencies>
+
+  <groupId>co.chronodb</groupId>
+  <artifactId>chronograph-community</artifactId>
+  <version>0.4.0-alpha.3</version>
+  <packaging>jar</packaging>
+
+  <name>Chronograph Community Java SDK</name>
+  <description>Bounded, authenticated Java 17+ client for the Chronograph Community /v1 temporal graph, connector and BCI HTTP API. Exact IDs and microsecond timestamps are decimal JSON strings; remote origins require HTTPS, redirects are rejected, and bodies are bounded.</description>
+  <url>https://chronodb.co</url>
+  <inceptionYear>2026</inceptionYear>
+
+  <organization>
+    <name>IntelliNxT</name>
+    <url>https://chronodb.co</url>
+  </organization>
+
+  <!-- Source-available, not OSI open source: PolyForm Perimeter 1.0.0 restricts
+       providing a competing product and has no SPDX identifier. Declared honestly
+       here; the unmodified licence text ships in META-INF/LICENSE of every jar. -->
+  <licenses>
+    <license>
+      <name>PolyForm Perimeter License 1.0.0</name>
+      <!-- polyformproject.org/licenses/perimeter/1.0.0/ now returns HTTP 404; this
+           tag-pinned file is the unmodified canonical text and resolves. -->
+      <url>https://github.com/polyformproject/polyform-licenses/blob/1.0.0/PolyForm-Perimeter-1.0.0.md</url>
+      <distribution>repo</distribution>
+      <comments>Source-available licence, not OSI-approved and with no SPDX licence identifier. PolyForm Perimeter 1.0.0 permits modification and noncompeting commercial use and restricts providing a product that competes with the software. The unmodified licence text and the required notices are included in META-INF of this artifact.</comments>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>intellinxt</id>
+      <name>IntelliNxT</name>
+      <email>enablewmodels@gmail.com</email>
+      <organization>IntelliNxT</organization>
+      <organizationUrl>https://chronodb.co</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Australia/Sydney</timezone>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/enablewmodels-sys/chronograph.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/enablewmodels-sys/chronograph.git</developerConnection>
+    <tag>v0.4.0-alpha.3</tag>
+    <url>https://github.com/enablewmodels-sys/chronograph</url>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/enablewmodels-sys/chronograph/issues</url>
+  </issueManagement>
+
+  <!-- Publishing target: the Central Portal OSSRH-compatible staging API. This is
+       the documented deploy endpoint of the Central Publisher Portal (it replaces
+       https://s01.oss.sonatype.org). Deploying here stages a deployment that is
+       published from https://central.sonatype.com/publishing, or made visible there
+       with POST /manual/upload/defaultRepository/<namespace> from the same IP.
+       Alternative: the org.sonatype.central:central-publishing-maven-plugin (0.11.0)
+       uploads a bundle through the Portal publisher API instead; see README.md.
+       Credentials: a Central Portal user token in ~/.m2/settings.xml under <id>central</id>. -->
+  <distributionManagement>
+    <repository>
+      <id>central</id>
+      <name>Central Portal (OSSRH-compatible staging API)</name>
+      <url>https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/</url>
+    </repository>
+    <snapshotRepository>
+      <id>central</id>
+      <name>Central Portal snapshots</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <properties>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+    <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+    <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.14.0</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
   <build>
-    <resources><resource><directory>.</directory><includes><include>LICENSE</include><include>NOTICE</include></includes><targetPath>META-INF</targetPath></resource></resources>
-    <plugins><plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.14.1</version></plugin></plugins>
+    <!-- The licence, the required notices and the readme travel inside the jar. -->
+    <resources>
+      <resource>
+        <directory>.</directory>
+        <includes>
+          <include>LICENSE</include>
+          <include>NOTICE</include>
+          <include>README.md</include>
+        </includes>
+        <targetPath>META-INF</targetPath>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.14.1</version>
+      </plugin>
+
+      <!-- Central requires <artifactId>-<version>-sources.jar and
+           <artifactId>-<version>-javadoc.jar next to every jar. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>${maven-source-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${maven-javadoc-plugin.version}</version>
+        <configuration>
+          <!-- doclint failures must not block the Central-required javadoc jar;
+               today the sources pass default doclint with warnings only. -->
+          <doclint>none</doclint>
+          <quiet>true</quiet>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
+
+  <profiles>
+    <!-- mvn -Prelease deploy  =>  signed, sources+javadoc, uploaded to the Portal. -->
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>${maven-gpg-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

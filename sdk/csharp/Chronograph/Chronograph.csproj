@@ -1,15 +1,50 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    ChronoDB Community .NET client (project ChronoDB, https://chronodb.co, IntelliNxT).
+    NuGet metadata lives here so that "dotnet pack" produces a complete, restore-safe package.
+
+    Licence: PolyForm Perimeter 1.0.0 is source-available, is not OSI-approved and has no SPDX
+    expression, so the package uses PackageLicenseFile (the packed LICENSE), never
+    <PackageLicenseExpression>. The readme and the required notices are packed too.
+
+    Package ID warning: nuget.org already hosts an unrelated "Chronograph" package (owner
+    aL1fe) and a "Chronograph.*" family (owner Ironic). If that owner has a reserved
+    Chronograph.* ID prefix, a submission under that prefix can be rejected. The package id
+    is ChronoDB.Client instead, which avoids the contested family entirely. Confirm
+    availability on nuget.org, or publish under a company-owned prefix such as IntelliNxT.*,
+    before the first push.
+  -->
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>Chronograph.Community</PackageId>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>ChronoDB.Client</PackageId>
     <Version>0.4.0-alpha.3</Version>
-    <Description>Chronograph Community bounded HTTP client</Description>
+    <Title>ChronoDB Community .NET client</Title>
+    <Authors>IntelliNxT</Authors>
+    <Company>IntelliNxT</Company>
+    <Product>ChronoDB Community</Product>
+    <Copyright>Copyright (c) 2026 IntelliNxT</Copyright>
+    <Description>Bounded, authenticated .NET 8+ client for the Chronograph Community /v1 temporal graph, connector and BCI HTTP API. Exact IDs and microsecond timestamps are decimal JSON strings; remote origins require HTTPS, redirects are rejected, and bodies are bounded.</Description>
+    <PackageTags>chronodb;chronograph;temporal;graph;database;branching;time-travel;connectors</PackageTags>
+    <PackageProjectUrl>https://chronodb.co</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/enablewmodels-sys/chronograph</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/enablewmodels-sys/chronograph</RepositoryUrl>
+    <PackageReleaseNotes>0.4.0-alpha.3 - initial ChronoDB Community .NET client source package. Not yet published to nuget.org. Changelog: https://github.com/enablewmodels-sys/chronograph/blob/main/sdk/csharp/CHANGELOG.md</PackageReleaseNotes>
+    <!-- Left at the NuGet default. Set to true if the restrictive PolyForm Perimeter terms
+         should prompt every consumer for acceptance before install. -->
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
+
+  <!-- Pack the licence, the required notice and the readme at the package root: NuGet fails
+       to restore a package whose PackageLicenseFile or PackageReadmeFile is missing. -->
   <ItemGroup>
     <None Include="../LICENSE" Pack="true" PackagePath="" />
     <None Include="../NOTICE" Pack="true" PackagePath="" />

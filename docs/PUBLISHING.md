@@ -4,18 +4,60 @@ This page is for maintainers. Nothing here is needed to *use* ChronoDB. It recor
 the exact steps to publish the SDKs and the container image, and what still
 requires a human account holder.
 
-## What can be published today
+## Registry status
 
-| Artifact | Registry | Package name | Account needed |
-| --- | --- | --- | --- |
-| Python client and agent | PyPI | `chronograph-connectors` | PyPI account with 2FA and an API token |
-| TypeScript client | npm | `@chronograph-community/sdk` | npm account with an automation token |
-| Container image | Docker Hub or GHCR | not yet published | Docker Hub account, or a GHCR token |
-| Binaries, wheel, source | GitHub Releases | attached to a tag | Write access to this repository |
+Every package is prepared and locally verified. Nothing has been uploaded. The
+names below were all checked against the live registries.
 
-The two SDK names are already scoped and do not collide with any existing package.
-`chronodb` on npm and `chronograph` on crates.io are held by unrelated projects, which is
-why the npm package is published under the `@chronograph-community` scope.
+| Artifact | Registry | Name | Local verification | Remaining blocker |
+| --- | --- | --- | --- | --- |
+| Python client and agent | PyPI | `chronograph-connectors` | wheel and sdist build; clean-venv install runs | PyPI account with 2FA and an API token |
+| TypeScript client | npm | `@chronograph-community/sdk` | `npm pack` tarball, 12 files | npm account with an automation token |
+| Dart client | pub.dev | `chronodb` | `dart analyze` clean; `pub publish --dry-run` has no errors | pub.dev account |
+| Rust engine | crates.io | `chronograph-db` | `cargo package` + `publish --dry-run` succeed and verify | crates.io account and token |
+| Java client | Maven Central | `co.chronodb:chronograph-community` | POM validates against the 4.0.0 XSD; sources compile; javadoc builds | Sonatype namespace, GPG key, Portal token; no `mvn` on the build host |
+| .NET client | NuGet | `ChronoDB.Client` | manifests are well-formed | nuget.org account and API key; no `dotnet` on the build host |
+| Container image | GHCR | `ghcr.io/enablewmodels-sys/chronograph` | **published**; pulled and run successfully | Multi-arch build in progress |
+| Binaries, wheel, source | GitHub Releases | attached to a tag | **published** | — |
+
+### Why several names are not what you would expect
+
+Registry names are global, and three of the obvious ones are already held by
+unrelated projects. Each was checked, not assumed:
+
+- **pub.dev `chronograph` is taken** by an unrelated Flutter stopwatch package, so a
+  publish under it is rejected outright. The Dart package is named `chronodb`, which
+  is free. This was renamed before the first release, when there is no installed
+  base to break.
+- **Maven `io.chronograph` reverses to `chronograph.io`**, a domain this project does
+  not control, so the namespace could never be verified and the upload would be
+  rejected. The groupId is `co.chronodb`, the reverse of the project's own domain.
+- **npm `chronodb` is taken** by an unrelated local-first database, so the TypeScript
+  package is scoped as `@chronograph-community/sdk`.
+- **NuGet already hosts `Chronograph` and a `Chronograph.*` family** from another
+  owner, and reserved prefixes cannot be queried without an account. The package
+  id is `ChronoDB.Client`, which avoids the contested family entirely.
+- crates.io `chronograph` is taken, but the package is `chronograph-db`, which is free.
+
+### The licence, honestly
+
+PolyForm Perimeter 1.0.0 has **no SPDX identifier** — the SPDX list contains only
+PolyForm-Noncommercial-1.0.0 and PolyForm-Small-Business-1.0.0. It therefore cannot
+go in a `license` field or a `PackageLicenseExpression`:
+
+- Python uses `LicenseRef-PolyForm-Perimeter-1.0.0`
+- Rust uses `license-file`; crates.io reports "non-standard licence"
+- .NET uses `PackageLicenseFile` with the LICENSE packed at the package root
+- Java declares the licence name and URL; Maven Central's published requirements
+  ask only that a licence be declared, and non-SPDX licences are demonstrably
+  live there. A human reviewer may still object — treat that as risk, not a pass.
+
+**Never describe these artifacts as open source.** They are source-available.
+
+The LICENSE files are byte-identical to the upstream PolyForm template, including
+its own licence URL, which currently returns 404. Do not edit a licence file to
+chase a link: the canonical text is pinned at
+[polyform-licenses 1.0.0](https://github.com/polyformproject/polyform-licenses/blob/1.0.0/PolyForm-Perimeter-1.0.0.md).
 
 ## Python: build, check, publish
 
