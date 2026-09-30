@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
-import 'package:chronograph/chronograph.dart';
+import 'package:chronodb/chronodb.dart';
 
 Future<void> main() async {
   stdout.encoding = utf8;
