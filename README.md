@@ -77,7 +77,41 @@ the console. The token is kept in browser memory and cleared on reload. Config
 stays outside graph data; no password, cookie session or cloud account is needed.
 Ctrl+C synchronizes and stops the service. No server starts during installation.
 The [native bundle guide](docs/INSTALL.md) avoids compiler/Node requirements on a
-matching prebuilt target. Download only the assets attached to the versioned GitHub release; no crates.io, PyPI or container-registry publication is assumed.
+matching prebuilt target. Prebuilt binaries, a Python wheel and the source archive
+are attached to the [v0.4.0-alpha.3 release](https://github.com/enablewmodels-sys/chronograph/releases/tag/v0.4.0-alpha.3).
+
+Install a client without cloning anything:
+
+```sh
+# TypeScript, .NET and Java are on GitHub Packages, which needs a token with read:packages
+npm install @enablewmodels-sys/chronodb-sdk --registry=https://npm.pkg.github.com
+```
+
+The Python, Dart and Rust clients are not on a public registry yet; install them
+from this repository. [docs/SDK.md](docs/SDK.md) covers every language, and
+[docs/PUBLISHING.md](docs/PUBLISHING.md) records exactly what each registry still
+needs.
+
+## Run the published container
+
+```sh
+docker run --rm -p 8080:8080 \
+  -v chronodb-data:/data -v chronodb-config:/config \
+  ghcr.io/enablewmodels-sys/chronograph:main
+```
+
+The image is multi-architecture (`linux/amd64` and `linux/arm64`), so it runs
+natively on Apple Silicon. Create a token inside the container and paste it into
+the console at http://127.0.0.1:8080:
+
+```sh
+docker run --rm -v chronodb-config:/config --entrypoint chronograph-server \
+  ghcr.io/enablewmodels-sys/chronograph:main \
+  admin create-token local-admin admin 90 /config/admin.token
+```
+
+It is a convenience build, not a hardened distribution: it is unsigned and not
+notarized, and [known limits](docs/LIMITATIONS.md) still apply.
 
 The console supports exact temporal queries, clickable graph inspection, durable
 branches, bounded writes, Arrow export, expiring scoped tokens and local backups.

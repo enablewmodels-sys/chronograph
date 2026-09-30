@@ -6,6 +6,38 @@ requires a human account holder.
 
 ## Registry status
 
+Live now, verified by upload logs and by a 409 conflict when the same version was
+re-published:
+
+| Artifact | Registry | Name | Status |
+| --- | --- | --- | --- |
+| TypeScript client | **GitHub Packages** | `@enablewmodels-sys/chronodb-sdk` | **published** 0.4.0-alpha.3 |
+| .NET client | **GitHub Packages** | `ChronoDB.Client` | **published** 0.4.0-alpha.3 |
+| Java client | **GitHub Packages** | `co.chronodb:chronograph-community` | **published** 0.4.0-alpha.3, with sources and javadoc |
+| Container image | **GHCR** | `ghcr.io/enablewmodels-sys/chronograph` | **published**; multi-arch `amd64` and `arm64`, pulled and run |
+| Source, binaries, wheel | **GitHub Releases** | `v0.4.0-alpha.3` | **published**, 5 assets with checksums |
+
+Wired and waiting on one credential each:
+
+| Artifact | Registry | Name | Blocker |
+| --- | --- | --- | --- |
+| Python client and agent | PyPI | `chronograph-connectors` | a trusted publisher entry for `packages.yml`; no token needed |
+| Rust engine | crates.io | `chronograph-db` | `CARGO_REGISTRY_TOKEN` repository secret |
+| Dart client | pub.dev | `chronodb` | `PUB_TOKEN` repository secret |
+| TypeScript client | npmjs.com | `@chronograph-community/sdk` | npm access token, or a trusted publisher once the package exists |
+| Java client | Maven Central | `co.chronodb:chronograph-community` | Sonatype namespace, GPG key and Portal token |
+| .NET client | NuGet | `ChronoDB.Client` | nuget.org API key |
+
+The GitHub Packages routes are live because they need no separate account: the
+workflow authenticates with its own repository-scoped `GITHUB_TOKEN`. That is
+also why the Java and .NET packages exist at all — the CI runner has `mvn` and
+`dotnet`, which this development machine does not, so those were the first real
+builds of either package.
+
+Run `.github/workflows/packages.yml` manually to publish, or
+`.github/workflows/publish.yml` to target PyPI and npmjs. Re-publishing an
+existing version is rejected with a 409 by design; bump the version instead.
+
 Every package is prepared and locally verified. Nothing has been uploaded. The
 names below were all checked against the live registries.
 
