@@ -118,6 +118,9 @@ jobs:
   dart:
     if: inputs.target == 'all' || inputs.target == 'dart'
     runs-on: ubuntu-latest
+    env:
+      # secrets cannot be referenced in a step-level if, so surface it here.
+      PUB_TOKEN: ${{ secrets.PUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
@@ -129,12 +132,9 @@ jobs:
       # for interactive authorisation and hang the job, so it only runs when the
       # secret exists.
       - name: Publish to pub.dev
-        if: ${{ secrets.PUB_TOKEN != '' }}
-        continue-on-error: true
+        if: env.PUB_TOKEN != ''
         working-directory: sdk/dart
         run: dart pub publish --force
-        env:
-          PUB_TOKEN: ${{ secrets.PUB_TOKEN }}
 
   crates:
     if: inputs.target == 'all' || inputs.target == 'crates'
