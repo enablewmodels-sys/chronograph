@@ -6,10 +6,35 @@ build-backend = "setuptools.build_meta"
 name = "chronograph-connectors"
 version = "0.4.0a3"
 description = "Normalized record transport and durable local spool for Chronograph"
+readme = "README.md"
 requires-python = ">=3.10"
 license = "LicenseRef-PolyForm-Perimeter-1.0.0"
 license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "IntelliNxT", email = "enablewmodels@gmail.com" }]
+keywords = ["temporal", "graph", "database", "branching", "time-travel", "connectors"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Rust",
+  "Topic :: Database",
+  "Topic :: Scientific/Engineering",
+  "Typing :: Typed",
+]
 dependencies = []
+
+[project.urls]
+Homepage = "https://chronodb.co"
+Documentation = "https://chronodb.co/documentation/QUICKSTART"
+Repository = "https://github.com/enablewmodels-sys/chronograph"
+Issues = "https://github.com/enablewmodels-sys/chronograph/issues"
+Changelog = "https://github.com/enablewmodels-sys/chronograph/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 bci = ["numpy>=2.0,<3", "scipy>=1.14,<2", "mne>=1.13,<1.14", "scikit-learn>=1.7,<2"]

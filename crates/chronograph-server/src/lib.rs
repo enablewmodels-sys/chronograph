@@ -3,6 +3,7 @@ pub mod backup;
 mod bci;
 mod connectors;
 pub mod contract;
+pub mod import;
 mod mcp;
 mod operations;
 pub mod schema;

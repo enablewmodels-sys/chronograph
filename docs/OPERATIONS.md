@@ -67,6 +67,20 @@ state: rotate credentials after suspected compromise. Credential and graph store
 are not one atomic multi-file transaction. A maintenance window is required for
 a mutually consistent operator backup.
 
+## Load data from CSV
+
+`import` is an offline verb: stop the service first, because a running server
+holds the journal lock.
+
+```sh
+./target/release/chronograph-server import examples/episodes.csv
+```
+
+It reads `src,dst,kind,valid_from[,valid_to][,payload]`, validates every row before
+opening the journal, applies rows in sorted order and appends. A file rejected by
+validation writes nothing. See the [quickstart](QUICKSTART.md) for the column
+semantics and the documented bounds.
+
 ## Lost or expired administrator token
 
 Stop the service and preserve the external auth file. Create a new admin token

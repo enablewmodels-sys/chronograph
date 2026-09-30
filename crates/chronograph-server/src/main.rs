@@ -15,7 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         std::env::var("CHRONOGRAPH_ORIGIN").unwrap_or_else(|_| "http://127.0.0.1:8080".into());
     if matches!(cmd.as_str(), "--help" | "-h") {
         println!(
-            "alpha — validate operational limits for your deployment\nchronograph-server [serve|check|restore BACKUP|migrate-v1 SOURCE DEST|migrate-v2 SOURCE DEST|admin create-token NAME SCOPE DAYS OUTPUT_FILE]\nSCOPE: read, ingest, admin. Offline admin locks config; stop the service first. Tokens are written once to a new mode-0600 file.\nEnvironment: CHRONOGRAPH_DATA (./community-data), CHRONOGRAPH_AUTH (./config/auth.json, outside data), CHRONOGRAPH_BIND (127.0.0.1:8080), CHRONOGRAPH_ORIGIN (http://127.0.0.1:8080), CHRONOGRAPH_UI (ui/dist), CHRONOGRAPH_DOCS (docs), CHRONOGRAPH_REQUIRE_FSYNC (false; set true to require durable writes).\nRestore requires an absent or empty destination. Migration preserves its source and creates a new journal destination. Legacy password/cookie auth is retired."
+            "alpha — validate operational limits for your deployment\nchronograph-server [serve|check|import FILE.csv|restore BACKUP|migrate-v1 SOURCE DEST|migrate-v2 SOURCE DEST|admin create-token NAME SCOPE DAYS OUTPUT_FILE]\nSCOPE: read, ingest, admin. Offline commands lock the workspace; stop the service first. Tokens are written once to a new mode-0600 file.\nEnvironment: CHRONOGRAPH_DATA (./community-data), CHRONOGRAPH_AUTH (./config/auth.json, outside data), CHRONOGRAPH_BIND (127.0.0.1:8080), CHRONOGRAPH_ORIGIN (http://127.0.0.1:8080), CHRONOGRAPH_UI (ui/dist), CHRONOGRAPH_DOCS (docs), CHRONOGRAPH_REQUIRE_FSYNC (false; set true to require durable writes).\nImport reads src,dst,kind,valid_from[,valid_to][,payload] and validates every row before writing. Restore requires an absent or empty destination. Migration preserves its source and creates a new journal destination. Legacy password/cookie auth is retired."
         );
         return Ok(());
     }
@@ -64,6 +64,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "{}",
             serde_json::json!({"migrated":true,"nodes":stats.nodes.to_string(),"edge_versions":stats.edge_versions.to_string()})
         );
+        return Ok(());
+    }
+    if cmd == "import" {
+        let source = PathBuf::from(args.next().ok_or("CSV file required")?);
+        if args.next().is_some() {
+            return Err("Unexpected arguments".into());
+        }
+        println!("{}", chronograph_server::import::import_csv(&data, &source)?);
         return Ok(());
     }
     if cmd == "restore" {

@@ -1,0 +1,12 @@
+# ChronoDB example episode: an agent observing and acting on objects.
+# Columns: src,dst,kind,valid_from,valid_to,payload
+# kind 1 = observes, kind 2 = acts_on, kind 3 = located_at
+# Times are microseconds since the Unix epoch. Payloads are 4-byte f32 little-endian
+# values written as hex; the schema catalog in docs/SCHEMA.md maps typed properties.
+src,dst,kind,valid_from,valid_to,payload
+100,200,1,1000000,3000000,0000803f00000000
+100,200,1,3000000,,0000404000000000
+100,201,1,1500000,2500000,0000004000000000
+100,202,2,2000000,4000000,0000804000000000
+201,300,3,500000,2000000,0000000000000000
+202,301,3,2000000,,

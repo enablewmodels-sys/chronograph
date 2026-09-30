@@ -1,7 +1,11 @@
 # Changelog
 
-## 0.4.0-alpha.3 — development checkout
+## 0.4.0-alpha.3 — 2026-09-30
 
+- `scripts/quickstart.sh` starts a local Community console in one command: it builds the console and server, mints an admin token when none exists, and serves without overwriting an existing workspace or credential file.
+- `chronograph-server import FILE.csv` loads `src,dst,kind,valid_from[,valid_to][,payload]` into a workspace offline. Every row is validated before the first write, so a rejected file leaves the journal byte-identical; rows are applied in sorted order and a second run appends. Thirteen unit tests plus an `examples/episodes.csv` sample.
+- New [comparison and alternatives](docs/COMPARISON.md) page stating plainly when to use PostgreSQL, SQLite, DuckDB, Neo4j, Memgraph, XTDB, Dolt, TerminusDB, LadybugDB, CozoDB or a plain Arrow lake instead, with a capability matrix and the honest limits side by side.
+- [Quickstart](docs/QUICKSTART.md) rewritten around the one-command path, with the environment variables, the CSV import format and a Windows note.
 - TypeSafe Jev `decisions-v1` preset, validated Python/TypeScript decision bindings, opt-in JSON attachments, example bundle and Binder notebook (36 presets across 18 connectors).
 - Hosted invitation-only alpha documentation and console build mode, Jev homepage announcement, fixed SDK CI setup and an explicit static Pages workflow.
 - Upgrade rustls to 0.23.45 to address RUSTSEC-2026-0285.

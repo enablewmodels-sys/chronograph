@@ -455,6 +455,7 @@ test("landing artwork, documentation and connector navigation render at this vie
     "BCI_TRAINING",
     "ISOLATED",
     "PRODUCTION",
+    "COMPARISON",
     "QUICKSTART",
     "TUTORIAL",
     "BRANCHES",

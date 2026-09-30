@@ -46,17 +46,31 @@ Both connectors are available from the schema editor and through every SDK.
 
 ## Start locally
 
-Requires Rust 1.93+, Node 20.19+ or 22.12+, and npm. Clone the Community repository, then build:
+Requires Rust 1.93+, Node 20.19+ or 22.12+, and npm. Clone the Community
+repository and run one command:
 
 ```sh
 git clone https://github.com/enablewmodels-sys/chronograph.git
 cd chronograph
-npm --prefix ui ci
-npm --prefix ui run build
+./scripts/quickstart.sh
+```
+
+The script builds the console and the server, mints an admin token if you do not
+have one, and serves the console. It prints the console URL and the token path;
+no existing workspace or credential file is overwritten.
+
+Or run the stages yourself:
+
+```sh
+npm --prefix ui ci && npm --prefix ui run build
 cargo build --locked --release -p chronograph-server --bins
 ./target/release/chronograph-server admin create-token local-admin admin 90 config/admin.token
 ./target/release/chronograph-server serve
 ```
+
+Load your own data without writing code: `chronograph-server import rows.csv`
+reads `src,dst,kind,valid_from[,valid_to][,payload]`, validates every row before
+writing, and appends to the workspace. See the [quickstart](docs/QUICKSTART.md).
 
 Open http://127.0.0.1:8080, read `config/admin.token` privately and paste it into
 the console. The token is kept in browser memory and cleared on reload. Config
@@ -181,6 +195,9 @@ bash scripts/verify.sh
 ```
 
 ## Documentation and operation
+
+Not sure this is the right tool? Read [comparison and alternatives](docs/COMPARISON.md)
+first — it states plainly when to use PostgreSQL, DuckDB, Neo4j, XTDB or Dolt instead.
 
 Start with [Quickstart](docs/QUICKSTART.md), [temporal tutorial](docs/TUTORIAL.md),
 [architecture](docs/ARCHITECTURE.md), [HTTP API](docs/API.md) and [MCP](docs/MCP.md).

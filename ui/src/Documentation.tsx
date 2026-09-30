@@ -11,6 +11,7 @@ const docs = [
   ["HOSTED", "Managed quickstart"],
   ["ISOLATED", "Self-hosted quickstart"],
   ["PRODUCTION", "Production operations"],
+  ["COMPARISON", "Comparison and alternatives"],
   ["QUICKSTART", "Embedded and local setup"],
   ["TUTORIAL", "Temporal model"],
   ["BRANCHES", "Durable branches"],
@@ -41,6 +42,7 @@ const docs = [
   ["REQUIREMENTS", "Release status"],
   ["LICENSING", "License and permitted use"],
   ["WEBSITE", "Deploy on Vercel"],
+  ["PUBLISHING", "Publishing packages"],
 ];
 function textOf(node: ReactNode): string {
   if (typeof node === "string" || typeof node === "number") return String(node);
@@ -194,10 +196,10 @@ export default function Documentation() {
           </p>
           <nav aria-label="Documentation">
             {[
-              ["Get started", docs.slice(0, 5)],
-              ["Build", docs.slice(5, 12)],
-              ["Integrations", docs.slice(12, 18)],
-              ["Operate & reference", docs.slice(18)],
+              ["Get started", docs.slice(0, 6)],
+              ["Build", docs.slice(6, 13)],
+              ["Integrations", docs.slice(13, 19)],
+              ["Operate & reference", docs.slice(19)],
             ].map(([label, entries]) => {
               const links = entries as string[][];
               return (

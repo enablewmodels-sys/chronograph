@@ -4,6 +4,27 @@
   "type": "module",
   "description": "Chronograph Community HTTP client and normalized connector transport",
   "license": "SEE LICENSE IN LICENSE",
+  "author": "IntelliNxT <enablewmodels@gmail.com>",
+  "homepage": "https://chronodb.co",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enablewmodels-sys/chronograph.git",
+    "directory": "sdk/typescript"
+  },
+  "bugs": {
+    "url": "https://github.com/enablewmodels-sys/chronograph/issues"
+  },
+  "keywords": [
+    "temporal",
+    "graph",
+    "database",
+    "branching",
+    "time-travel",
+    "connectors"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=20"
   },
