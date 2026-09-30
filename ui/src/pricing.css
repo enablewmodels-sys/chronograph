@@ -194,6 +194,41 @@
   white-space: nowrap;
   width: 1px;
 }
+.pricing-lede {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0 0 16px;
+  max-width: 70ch;
+}
+.pricing-table.four td {
+  width: 17%;
+}
+.pricing-table .pricing-money,
+.pricing-table .pricing-left {
+  text-align: left;
+  width: auto;
+}
+.pricing-table .pricing-money {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.pricing-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pricing-list li {
+  border-bottom: 1px solid var(--rule);
+  color: var(--muted);
+  line-height: 1.6;
+  padding: 12px 0;
+}
+.pricing-list strong {
+  color: var(--ink);
+  display: block;
+  margin-bottom: 2px;
+}
+
 @media (max-width: 640px) {
   .pricing-main {
     padding: 32px 16px 72px;

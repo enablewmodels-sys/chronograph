@@ -6,8 +6,8 @@ import SiteFooter from "./SiteFooter";
 import { managedSite, publicSite } from "./site";
 import "./pricing.css";
 
-// Billing is not enabled. Prices shown for the planned Managed tiers are
-// indicative and are labelled as such everywhere they appear.
+// Billing is not enabled. Every figure below is planned launch pricing, shown so
+// the tiers can be reviewed; none of it can be purchased.
 const billingLive = false;
 
 type Plan = {
@@ -18,7 +18,6 @@ type Plan = {
   summary: string;
   cta: string;
   to: string;
-  external?: boolean;
   featured?: boolean;
   included: string[];
   excluded?: string[];
@@ -26,71 +25,118 @@ type Plan = {
 
 const plans: Plan[] = [
   {
-    name: "Community",
-    price: "Free",
-    cadence: "forever",
+    name: "Free",
+    price: "$0",
+    cadence: "/month",
     summary:
-      "The full engine, service and console, on your own infrastructure. No account, no licence server, no telemetry.",
+      "Community on your own machine, plus one small hosted project to try Managed. Community needs no account at all.",
     cta: "Read the quickstart",
     to: "/documentation/QUICKSTART",
     included: [
-      "Embedded Rust engine and durable branches",
-      "Self-hosted service, console and MCP",
-      "Schema designer and 38 connector presets",
-      "All eight language SDKs",
-      "Local backups and restore",
+      "Community engine, console and MCP, self-hosted",
+      "1 hosted project, 1 GB memory, 1 GB storage",
+      "Unlimited API requests on your own hardware",
+      "Scoped API keys",
+      "Local backup and restore",
+      "Community support",
     ],
-    excluded: ["Hosted projects", "Team roles and audit records"],
+    excluded: ["Scheduled off-host backups", "Support agreement"],
   },
   {
-    name: "Managed preview",
-    price: "Free",
-    cadence: "during preview",
-    badge: "Invite only",
+    name: "Pro",
+    price: "$25",
+    cadence: "/month",
+    badge: "Most popular",
     summary:
-      "The same engine, operated for you. Private projects, accounts, scoped keys and an encrypted secret vault.",
-    cta: "About Managed",
+      "For a production graph and a team that needs it to keep serving. First project included; add more as you grow.",
+    cta: "Read the Managed guide",
     to: "/documentation/HOSTED",
     featured: true,
     included: [
-      "Private project with its own database and process",
-      "Google, GitHub and invited email accounts",
-      "Authenticator MFA and recovery codes",
-      "Scoped API keys and project roles",
-      "Encrypted project secret vault",
-      "Scheduled local backups and protected metrics",
+      "Everything in Free, plus:",
+      "First project included, extra projects from $10/month",
+      "4 GB memory and 10 GB storage per project",
+      "Scheduled daily backups kept 7 days",
+      "Raised branch and fork limits",
+      "Email support",
     ],
-    excluded: ["Self-service billing", "Off-host recovery or an SLA"],
+    excluded: ["Single sign-on", "Uptime SLA"],
   },
   {
-    name: "Managed Team",
-    price: "Coming soon",
+    name: "Team",
+    price: "$599",
+    cadence: "/month",
     summary:
-      "Planned for teams that need to hand operation to us: larger projects, more seats and a support agreement.",
+      "For organisations that need access control, longer retention and someone contractually answerable.",
     cta: "Read the editions guide",
     to: "/documentation/EDITIONS",
     included: [
-      "Everything in the Managed preview",
-      "More projects and collaborators",
-      "Longer key expiry and rotation",
-      "Priority support",
+      "Everything in Pro, plus:",
+      "Single sign-on for the console",
+      "Project roles and audit records",
+      "Daily backups kept 14 days",
+      "Read-only and project-scoped access",
+      "Priority support with response targets",
     ],
-    excluded: ["Published price", "Uptime commitment"],
+    excluded: ["Uptime SLA", "Private deployment"],
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    summary:
+      "For regulated or very large deployments, including running the control plane inside your own account.",
+    cta: "Read the production guide",
+    to: "/documentation/PRODUCTION",
+    included: [
+      "Everything in Team, plus:",
+      "Private deployment on your own infrastructure",
+      "Uptime SLA and named support",
+      "Security questionnaires and review",
+      "Longer retention and custom limits",
+      "Migration and integration assistance",
+    ],
   },
 ];
 
-const comparison: [string, string, string][] = [
-  ["Embedded engine and branching", "included", "included"],
-  ["Self-hosted service, console, MCP", "included", "included"],
-  ["Schema designer and migrations", "included", "included"],
-  ["Language SDKs", "included", "included"],
-  ["Operated for you", "none", "included"],
-  ["User accounts and team roles", "none", "included"],
-  ["Scoped API keys", "workspace tokens", "per project"],
-  ["Encrypted secret vault", "none", "included"],
-  ["Scheduled off-host backups", "none", "local only"],
-  ["Availability commitment", "none", "none"],
-  ["Self-service billing", "none", "none"],
+// A hosted project is one process with its own database, and the engine keeps its
+// indexes in memory, so memory is the honest unit to price.
+const compute: [string, string, string][] = [
+  ["Micro", "$10", "1 GB memory, shared"],
+  ["Small", "$15", "2 GB memory, shared"],
+  ["Medium", "$60", "4 GB memory, shared"],
+  ["Large", "$110", "8 GB memory, dedicated"],
+  ["XL", "$210", "16 GB memory, dedicated"],
+  ["2XL", "$410", "32 GB memory, dedicated"],
+];
+
+const comparison: [string, string, string, string, string][] = [
+  [
+    "Community engine, self-hosted",
+    "included",
+    "included",
+    "included",
+    "included",
+  ],
+  ["Hosted projects", "1", "1 + $10 each", "1 + $10 each", "Custom"],
+  ["Memory per project", "1 GB", "4 GB", "4 GB", "Custom"],
+  ["Scoped API keys", "included", "included", "included", "included"],
+  ["Scheduled off-host backups", "none", "7 days", "14 days", "Custom"],
+  ["Team roles and audit records", "none", "included", "included", "included"],
+  ["Single sign-on", "none", "none", "included", "included"],
+  ["Uptime SLA", "none", "none", "none", "included"],
+  ["Support", "community", "email", "priority", "named"],
+];
+
+const unmetered: [string, string][] = [
+  [
+    "Collaborators",
+    "Pricing is per project, never per seat. Invite the people who need access.",
+  ],
+  [
+    "API requests",
+    "Requests are not metered. A project's cost tracks the history it keeps.",
+  ],
+  ["Egress", "No egress fee is planned for normal API use."],
 ];
 
 export default function Pricing() {
@@ -134,10 +180,11 @@ export default function Pricing() {
       <main id="main" className="pricing-main">
         <header className="pricing-header">
           <span className="landing-eyebrow">Pricing</span>
-          <h1>Start free. Pay only when we operate it for you.</h1>
+          <h1>Start free. Scale when we operate it for you.</h1>
           <p>
-            Community is free and self-hosted, permanently. Managed hosting is
-            in an invited preview and costs nothing today.
+            Community is free and self-hosted, permanently. Hosted plans are
+            planned as four tiers, priced on project memory because that is what
+            the engine actually consumes.
           </p>
         </header>
 
@@ -145,10 +192,11 @@ export default function Pricing() {
           <div className="pricing-notice" role="status">
             <Clock size={18} aria-hidden="true" />
             <div>
-              <strong>Billing coming soon.</strong> Self-service billing is not
-              enabled, so nothing on this page can be purchased. The preview is
+              <strong>Billing coming soon.</strong> Nothing on this page can be
+              purchased. These are planned launch prices, published for review,
+              and they may change before billing ships. The Managed preview is
               free while it lasts and no account is enrolled automatically. Any
-              paid plan will be shown with a final price and your explicit
+              paid plan will show a final price and require your explicit
               agreement before a charge. See the <Link to="/terms">terms</Link>{" "}
               and the <Link to="/documentation/HOSTED">Managed guide</Link>.
             </div>
@@ -199,25 +247,30 @@ export default function Pricing() {
         </section>
 
         <section className="pricing-compare" aria-label="Plan comparison">
-          <h2>Compare</h2>
+          <h2>Compare plans</h2>
           <div className="pricing-table-wrap">
-            <table className="pricing-table">
+            <table className="pricing-table four">
               <caption className="sr-only">
-                Feature comparison between Community and Managed
+                Feature comparison across the Free, Pro, Team and Enterprise
+                plans
               </caption>
               <thead>
                 <tr>
                   <th scope="col">Capability</th>
-                  <th scope="col">Community</th>
-                  <th scope="col">Managed preview</th>
+                  <th scope="col">Free</th>
+                  <th scope="col">Pro</th>
+                  <th scope="col">Team</th>
+                  <th scope="col">Enterprise</th>
                 </tr>
               </thead>
               <tbody>
-                {comparison.map(([capability, community, managed]) => (
+                {comparison.map(([capability, free, pro, team, enterprise]) => (
                   <tr key={capability}>
                     <th scope="row">{capability}</th>
-                    <td>{mark(community)}</td>
-                    <td>{mark(managed)}</td>
+                    <td>{mark(free)}</td>
+                    <td>{mark(pro)}</td>
+                    <td>{mark(team)}</td>
+                    <td>{mark(enterprise)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -225,35 +278,84 @@ export default function Pricing() {
           </div>
         </section>
 
+        <section className="pricing-compare" aria-label="Project memory">
+          <h2>Project memory</h2>
+          <p className="pricing-lede">
+            A hosted project is one process with its own database, and its
+            resident cost tracks the history it keeps. Paid plans include{" "}
+            <strong>$10/month in compute credit</strong>, enough to cover one
+            Micro project.
+          </p>
+          <div className="pricing-table-wrap">
+            <table className="pricing-table">
+              <thead>
+                <tr>
+                  <th scope="col">Size</th>
+                  <th scope="col">Per month</th>
+                  <th scope="col">Included</th>
+                </tr>
+              </thead>
+              <tbody>
+                {compute.map(([size, price, included]) => (
+                  <tr key={size}>
+                    <th scope="row">{size}</th>
+                    <td className="pricing-money">{price}</td>
+                    <td className="pricing-left">{included}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="pricing-compare" aria-label="What we do not meter">
+          <h2>What we do not meter</h2>
+          <ul className="pricing-list">
+            {unmetered.map(([name, note]) => (
+              <li key={name}>
+                <strong>{name}.</strong> {note}
+              </li>
+            ))}
+          </ul>
+        </section>
+
         <section className="pricing-faq" aria-label="Pricing questions">
           <h2>Questions people actually ask</h2>
           <details>
             <summary>What does Community cost?</summary>
             <p>
-              Nothing. It is source-available under PolyForm Perimeter 1.0.0,
-              which permits modification and commercial use in noncompeting
-              products. You pay only for your own infrastructure. It is not OSI
-              open source. See <Link to="/licensing">the licence</Link>.
+              Nothing, on your own hardware and with no account. It is
+              source-available under PolyForm Perimeter 1.0.0, which permits
+              modification and commercial use in noncompeting products. It is
+              not OSI open source. See <Link to="/licensing">the licence</Link>.
             </p>
           </details>
           <details>
-            <summary>When will billing exist?</summary>
+            <summary>Can I buy a plan today?</summary>
             <p>
-              Not yet, and no date is promised. Managed currently runs as an
-              invited preview with bounded capacity. A paid plan will ship with
-              a published price, metered usage and a cancellation path before
-              anyone is charged.
+              No. Billing is not enabled, so nothing here is purchasable and no
+              card is ever stored. The Managed preview is free while it lasts. A
+              paid plan will ship with metered usage, a published final price
+              and a cancellation path before anyone is charged.
             </p>
           </details>
           <details>
-            <summary>What will Managed cost at launch?</summary>
+            <summary>Why price per project rather than per seat?</summary>
             <p>
-              Undecided, and deliberately not published here. Agent-memory tools
-              sit at $125–375 per month and managed data platforms start near
-              $29. A temporal database for engineering teams is most likely to
-              land in that lower band, but the number will be announced with the
-              billing feature, not before. Do not budget against a figure this
-              page does not state.
+              A project is the unit that costs us money: one process, one
+              database, its own memory footprint. Per-seat pricing would
+              penalise exactly the collaboration the product exists for, and
+              per-byte pricing would earn almost nothing on a 16-byte payload
+              model.
+            </p>
+          </details>
+          <details>
+            <summary>Are these prices final?</summary>
+            <p>
+              No. They are planned launch prices published so the tiers can be
+              reviewed, modelled on comparable managed platforms. Treat them as
+              indicative and do not budget against them. Final numbers ship with
+              billing.
             </p>
           </details>
           <details>
@@ -268,7 +370,8 @@ export default function Pricing() {
           <details>
             <summary>Is there an SLA?</summary>
             <p>
-              No. Neither edition carries an availability commitment. The{" "}
+              Not below Enterprise. Free, Pro and Team carry no availability
+              commitment. The{" "}
               <Link to="/documentation/LIMITATIONS">known limits</Link> describe
               what is and is not guaranteed.
             </p>
