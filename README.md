@@ -80,17 +80,27 @@ The [native bundle guide](docs/INSTALL.md) avoids compiler/Node requirements on 
 matching prebuilt target. Prebuilt binaries, a Python wheel and the source archive
 are attached to the [v0.4.0-alpha.3 release](https://github.com/enablewmodels-sys/chronograph/releases/tag/v0.4.0-alpha.3).
 
-Install a client without cloning anything:
+Install a client straight from the release: no account, no clone. These commands
+are tested against the published assets.
 
 ```sh
-# TypeScript, .NET and Java are on GitHub Packages, which needs a token with read:packages
-npm install @enablewmodels-sys/chronodb-sdk --registry=https://npm.pkg.github.com
+npm install https://github.com/enablewmodels-sys/chronograph/releases/download/v0.4.0-alpha.3/chronograph-community-sdk-0.4.0-alpha.3.tgz
+pip install https://github.com/enablewmodels-sys/chronograph/releases/download/v0.4.0-alpha.3/chronograph_connectors-0.4.0a3-py3-none-any.whl
 ```
 
-The Python, Dart and Rust clients are not on a public registry yet; install them
-from this repository. [docs/SDK.md](docs/SDK.md) covers every language, and
-[docs/PUBLISHING.md](docs/PUBLISHING.md) records exactly what each registry still
-needs.
+The npm package is ESM-only. Import it by name after installing:
+
+```js
+import { Client } from "@chronograph-community/sdk";
+const client = new Client("https://chronodb.co", process.env.CHRONOGRAPH_TOKEN);
+```
+
+No package is on a public registry yet: npmjs.com, PyPI, crates.io and pub.dev each
+still need one credential. **GitHub Packages is not a substitute** — it answers
+401 to anonymous installs even for public packages, so the release download above
+is the only publicly available install path today. [docs/SDK.md](docs/SDK.md)
+covers every language and [docs/PUBLISHING.md](docs/PUBLISHING.md) tracks what each
+registry still needs.
 
 ## Run the published container
 
