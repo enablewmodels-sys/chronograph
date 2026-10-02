@@ -77,6 +77,7 @@ const Access = lazy(() => import("./Access"));
 const Operations = lazy(() => import("./Operations"));
 const Documentation = lazy(() => import("./Documentation"));
 const Pricing = lazy(() => import("./Pricing"));
+const SuperAdmin = lazy(() => import("./SuperAdmin"));
 const Branches = lazy(() => import("./Branches"));
 const Connectors = lazy(() => import("./Connectors"));
 const ManagedSecurity = lazy(() => import("./ManagedSecurity"));
@@ -189,6 +190,9 @@ function App() {
           />
           <Route path="/documentation/*" element={<Documentation />} />
           <Route path="/pricing" element={<Pricing />} />
+          {/* Operator-only. The server rejects non-operators; the page renders its
+              own not-authorised state rather than assuming the client is trusted. */}
+          <Route path="/admin" element={<SuperAdmin />} />
           {[
             "privacy",
             "terms",
@@ -434,6 +438,13 @@ function Console() {
           <Link to="/projects">
             <Database size={17} />
             All projects
+          </Link>
+        )}
+        {/* Platform operators only. The server decides this, not the browser. */}
+        {managedSite && managed?.superadmin && (
+          <Link to="/admin">
+            <ShieldCheck size={17} />
+            Operator panel
           </Link>
         )}
         <Link

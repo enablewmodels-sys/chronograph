@@ -1,0 +1,334 @@
+/* Read-only superadmin console. Colours come from the shared theme tokens and
+   every selector stays inside the page scope. */
+.superadmin-page {
+  margin: 0 auto;
+  max-width: 1180px;
+  min-width: 0;
+  padding: 28px 26px 72px;
+}
+.superadmin-page .page-head {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.superadmin-status {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0 0 20px;
+}
+.superadmin-panel {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  display: grid;
+  gap: 16px;
+  margin-bottom: 20px;
+  min-width: 0;
+  padding: 22px;
+}
+.superadmin-panel-head h2 {
+  font-size: 17px;
+  margin: 0 0 6px;
+}
+.superadmin-panel-tools {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+}
+.superadmin-hint {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.superadmin-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 0;
+}
+.superadmin-note-warn {
+  color: var(--accent);
+}
+.superadmin-grid {
+  display: grid;
+  gap: 16px 22px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  margin: 0;
+}
+/* The shared dl rules lay definition lists out as bordered key/value rows.
+   Stats stack the label over the value instead, which holds up at any width. */
+.superadmin-grid > div {
+  border: 0;
+  display: block;
+  padding: 0;
+}
+.superadmin-stat {
+  min-width: 0;
+}
+.superadmin-stat dt {
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+.superadmin-stat dd {
+  margin: 0;
+  min-width: 0;
+  text-align: left;
+}
+.superadmin-stat strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+.superadmin-mono {
+  font-size: 13px !important;
+  overflow-wrap: anywhere;
+}
+.superadmin-on {
+  color: var(--success);
+}
+.superadmin-off {
+  color: var(--muted);
+}
+.superadmin-off-bad {
+  color: var(--danger);
+}
+.superadmin-unknown {
+  color: var(--muted);
+}
+.superadmin-on,
+.superadmin-off,
+.superadmin-off-bad,
+.superadmin-unknown {
+  font-size: 12px;
+}
+.superadmin-badge {
+  border: 1px solid var(--danger-border);
+  border-radius: 4px;
+  color: var(--danger);
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  margin-top: 5px;
+  padding: 2px 6px;
+  text-transform: uppercase;
+}
+.superadmin-bar {
+  background: var(--canvas);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  height: 8px;
+  margin-top: 9px;
+  max-width: 220px;
+  min-width: 96px;
+  overflow: hidden;
+}
+.superadmin-bar > span {
+  background: var(--accent);
+  display: block;
+  height: 100%;
+}
+.superadmin-alerts {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.superadmin-alert {
+  align-items: flex-start;
+  background: var(--canvas);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--muted);
+  border-radius: 6px;
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.superadmin-alert svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+.superadmin-alert-body {
+  min-width: 0;
+}
+.superadmin-alert-body p {
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.superadmin-alert-body code {
+  font-size: 11px;
+  margin: 0 6px;
+}
+.superadmin-level {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  margin-right: 6px;
+  text-transform: uppercase;
+}
+.superadmin-alert-critical {
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+  border-left-color: var(--danger);
+}
+.superadmin-alert-critical svg,
+.superadmin-alert-critical .superadmin-level {
+  color: var(--danger);
+}
+.superadmin-alert-warning {
+  border-left-color: var(--accent);
+}
+.superadmin-alert-warning svg,
+.superadmin-alert-warning .superadmin-level {
+  color: var(--accent);
+}
+.superadmin-alert-info {
+  border-left-color: var(--muted);
+}
+.superadmin-alert-info svg,
+.superadmin-alert-info .superadmin-level {
+  color: var(--muted);
+}
+.superadmin-clear {
+  align-items: center;
+  color: var(--success);
+  display: flex;
+  font-size: 12px;
+  gap: 9px;
+  line-height: 1.6;
+  margin: 0;
+}
+.superadmin-clear svg {
+  flex: 0 0 auto;
+}
+.superadmin-result {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0;
+}
+.superadmin-result-ok {
+  color: var(--success);
+}
+.superadmin-result-bad {
+  color: var(--danger);
+}
+.superadmin-scroll {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+.superadmin-table {
+  border-collapse: collapse;
+  min-width: 520px;
+  width: 100%;
+}
+.superadmin-table caption {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 0 0 10px;
+  text-align: left;
+  text-transform: uppercase;
+}
+.superadmin-table th,
+.superadmin-table td {
+  border-bottom: 1px solid var(--rule);
+  padding: 11px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+.superadmin-table thead th {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+.superadmin-table tbody th {
+  font-weight: 550;
+}
+.superadmin-table tbody th strong,
+.superadmin-table tbody th span,
+.superadmin-table td span {
+  display: block;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.superadmin-table tbody th strong {
+  font-size: 12px;
+}
+.superadmin-table td span.superadmin-unknown,
+.superadmin-table tbody th span.superadmin-unknown {
+  font-size: 12px;
+}
+.superadmin-table td span.superadmin-on,
+.superadmin-table td span.superadmin-off,
+.superadmin-table td span.superadmin-off-bad {
+  font-size: 12px;
+}
+.superadmin-table td .superadmin-badge,
+.superadmin-table tbody th .superadmin-badge {
+  display: inline-block;
+}
+.superadmin-table .superadmin-hint {
+  font-size: 11px;
+}
+.superadmin-table code {
+  overflow-wrap: anywhere;
+}
+.superadmin-wrap {
+  min-width: 180px;
+  white-space: normal;
+}
+.superadmin-denied {
+  align-items: flex-start;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  border-radius: 10px;
+  display: flex;
+  gap: 14px;
+  padding: 22px;
+}
+.superadmin-denied svg {
+  color: var(--danger);
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+.superadmin-denied h2 {
+  font-size: 17px;
+  margin: 0 0 6px;
+}
+.superadmin-denied p {
+  color: var(--danger);
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 0;
+}
+.superadmin-denied .superadmin-signin {
+  margin-top: 10px;
+}
+.superadmin-denied a {
+  color: var(--danger);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .superadmin-page {
+    padding: 20px 16px 56px;
+  }
+  .superadmin-panel {
+    padding: 18px 16px;
+  }
+  .superadmin-page .page-head > button {
+    min-height: 40px;
+  }
+}

@@ -21,6 +21,8 @@ export interface ManagedSession {
   user: ManagedUser | null;
   project: ManagedProject | null;
   projects: ManagedProject[];
+  /** True only for a platform operator named in the server's superadminEmails. */
+  superadmin?: boolean;
 }
 export interface ManagedAuthConfig {
   github: boolean;
