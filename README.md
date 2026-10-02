@@ -16,7 +16,7 @@ quantum circuit/calibration support is exploratory.
 This checkout is a **Community alpha**, **source-available under PolyForm Perimeter 1.0.0**. The new [connector platform](docs/CONNECTOR_PLATFORM.md) adds 38 migration presets, typed assets and durable ingestion receipts. Existing format-2 workspaces require an [explicit upgrade to a separate destination](docs/UPGRADE_0_4.md).
 Modification and noncompeting commercial use are allowed; offering a competing product is restricted, including free competing products. See [licensing](docs/LICENSING.md).
 
-[Source repository](https://github.com/enablewmodels-sys/chronograph) · [Download the alpha](https://github.com/enablewmodels-sys/chronograph/releases/tag/v0.4.0-alpha.2).
+[Source repository](https://github.com/enablewmodels-sys/chronograph) · [Download the alpha](https://github.com/enablewmodels-sys/chronograph/releases/tag/v0.4.0-alpha.3).
 [Managed hosting](docs/HOSTED.md) is available as a launch preview with Google and GitHub signup,
 invited email accounts, MFA, private project databases, scoped API keys and an
 encrypted secret vault. Billing and automated email delivery are not configured. See [release status](docs/REQUIREMENTS.md),
@@ -26,7 +26,7 @@ To host the Community landing, documentation and read-only demo on Vercel, impor
 
 ## Language SDKs
 
-[Python, TypeScript/JavaScript, Java, C++, Go, Dart and C#](docs/SDK.md) share the authenticated API. [Q# uses a Python host bridge](docs/INTEGRATIONS.md); Rust applications can embed the engine directly. The SDK guide covers source installation, retry semantics and tested platform adapters. New SDK sources are on `main`; the linked alpha.2 release predates this expansion.
+[Python, TypeScript/JavaScript, Java, C++, Go, Dart and C#](docs/SDK.md) share the authenticated API. [Q# uses a Python host bridge](docs/INTEGRATIONS.md); Rust applications can embed the engine directly. The SDK guide covers source installation, retry semantics and tested platform adapters. New SDK sources are on `main`; the alpha.2 release predates this expansion.
 
 ## BCI research
 
@@ -95,12 +95,13 @@ import { Client } from "@chronograph-community/sdk";
 const client = new Client("https://chronodb.co", process.env.CHRONOGRAPH_TOKEN);
 ```
 
-No package is on a public registry yet: npmjs.com, PyPI, crates.io and pub.dev each
-still need one credential. **GitHub Packages is not a substitute** — it answers
-401 to anonymous installs even for public packages, so the release download above
-is the only publicly available install path today. [docs/SDK.md](docs/SDK.md)
-covers every language and [docs/PUBLISHING.md](docs/PUBLISHING.md) tracks what each
-registry still needs.
+No package is on a public registry yet: npmjs.com, PyPI, crates.io, pub.dev, Maven
+Central and nuget.org each still need a credential or an account. **GitHub Packages
+is not a substitute**: it answers 401 to anonymous installs even for public packages
+(verified 2026-10-01 with an unauthenticated request against `npm.pkg.github.com`),
+so the release download above is the only publicly available client install path
+today. [docs/SDK.md](docs/SDK.md) covers every language and
+[docs/PUBLISHING.md](docs/PUBLISHING.md) tracks what each registry still needs.
 
 ## Run the published container
 
