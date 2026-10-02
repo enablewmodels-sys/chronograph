@@ -10,7 +10,16 @@ const STAMP = 1_790_881_860;
 function snapshot(overrides: Record<string, unknown> = {}) {
   return {
     at: STAMP,
+    // The aggregator can emit both levels at once, so the fixture carries a
+    // critical and a warning and the page must distinguish them.
     alerts: [
+      {
+        level: "critical",
+        code: "project.engine_unreachable",
+        message: "A project engine did not answer its readiness probe.",
+        detail:
+          "prj_f3736c2c28523976 — The engine refused the readiness connection.",
+      },
       {
         level: "warning",
         code: "backup.stale",
@@ -75,14 +84,11 @@ function snapshot(overrides: Record<string, unknown> = {}) {
       invitesExpired: 0,
       lastSignInAt: STAMP - 120,
     },
+    // backupsSection derives ok = latestAt !== null && !stale, so a missing
+    // archive is the only shape that yields ok false with a stale identity.
     backups: {
       ok: false,
-      identity: {
-        latestAt: STAMP - 60,
-        latestBytes: 9_588_736,
-        count: 3,
-        stale: false,
-      },
+      identity: { latestAt: null, latestBytes: null, count: 0, stale: true },
     },
     audit: {
       total: 128,
@@ -186,13 +192,23 @@ test("an operator reads every section and unknown readings are never healthy", a
     ).toBeVisible();
   }
 
-  // The alert is surfaced with its code and detail, not folded into a count.
-  const alert = page.locator(".superadmin-alert");
-  await expect(alert).toHaveCount(1);
-  await expect(alert).toContainText(
+  // Every alert is surfaced with its code and detail, not folded into a count,
+  // and the level is visible rather than implied by colour alone.
+  const alerts = page.locator(".superadmin-alert");
+  await expect(alerts).toHaveCount(2);
+  const critical = page.locator(".superadmin-alert-critical");
+  await expect(critical).toHaveCount(1);
+  await expect(critical).toContainText("project.engine_unreachable");
+  await expect(critical).toContainText("critical");
+  await expect(critical).toContainText(
+    "The engine refused the readiness connection.",
+  );
+  const warning = page.locator(".superadmin-alert-warning");
+  await expect(warning).toHaveCount(1);
+  await expect(warning).toContainText(
     "A project backup is older than the freshness window.",
   );
-  await expect(alert).toContainText("secondary");
+  await expect(warning).toContainText("secondary");
 
   // Real values render.
   // The id appears in both the Projects and Project backups tables, so the
@@ -412,4 +428,116 @@ test("the operator entry appears in the console only for an operator", async ({
   await expect(
     page.getByRole("heading", { name: "Platform status" }),
   ).toBeVisible();
+});
+
+test("a degraded deployment renders unknown rather than zero", async ({
+  page,
+}) => {
+  // The real probe never returns a null section: a failing section keeps its
+  // shape and reports null fields. That is the shape that could silently read as
+  // zero, so it is asserted directly.
+  await managedDocument(page);
+  await page.route("**/managed/session", (route) =>
+    route.fulfill({
+      json: {
+        user: { id: "user_1", email: "enablewmodels@gmail.com" },
+        project: null,
+        projects: [],
+        superadmin: true,
+      },
+    }),
+  );
+  await page.route("**/managed/superadmin/overview", (route) =>
+    route.fulfill({
+      json: snapshot({
+        host: {
+          uptimeSec: null,
+          loadAvg: [],
+          cpuCount: null,
+          cpuModel: "",
+          memoryTotalBytes: null,
+          memoryAvailableBytes: null,
+          swapTotalBytes: null,
+          swapFreeBytes: null,
+          disks: [],
+        },
+        services: [],
+        engines: { count: null, limit: 3, processes: [] },
+        projects: [],
+        accounts: {
+          total: null,
+          byStatus: { invited: null, active: null, suspended: null },
+          byRole: { owner: null, admin: null, editor: null, viewer: null },
+          mfaEnrolled: null,
+          sessionsActive: null,
+          invitesPending: null,
+          invitesExpired: null,
+          lastSignInAt: null,
+        },
+        backups: {
+          ok: false,
+          identity: {
+            latestAt: null,
+            latestBytes: null,
+            count: 0,
+            stale: true,
+          },
+        },
+        audit: { recent: [], total: null },
+        traffic: {
+          requests: null,
+          clientErrors: null,
+          serverErrors: null,
+          rateLimited: null,
+          since: null,
+        },
+        release: {
+          release: null,
+          commit: null,
+          edition: null,
+          deployedAt: null,
+        },
+        alerts: [
+          {
+            level: "warning",
+            code: "section.unavailable",
+            message: "The host section could not be read.",
+            detail: "statfs failed",
+          },
+        ],
+      }),
+    }),
+  );
+
+  await page.goto("/admin");
+
+  // A count that was never measured reads as unknown, and the literal 0 never
+  // appears where a measurement is missing.
+  const stat = (label: string) =>
+    page
+      .locator(".superadmin-stat")
+      .filter({
+        has: page.locator("dt", { hasText: new RegExp("^" + label + "$") }),
+      });
+  for (const label of [
+    "Accounts",
+    "Invited",
+    "Active",
+    "Suspended",
+    "MFA enrolled",
+  ]) {
+    await expect(stat(label).locator("dd")).toHaveText("unknown");
+  }
+  await expect(
+    page.getByText("unknown of 3 engine processes running."),
+  ).toBeVisible();
+  await expect(
+    page.getByText("No engine processes are running."),
+  ).toBeVisible();
+
+  // The degradation is visible as an alert rather than as an empty panel.
+  await expect(page.locator(".superadmin-alert")).toHaveCount(1);
+  await expect(page.locator(".superadmin-alert")).toContainText(
+    "The host section could not be read.",
+  );
 });
