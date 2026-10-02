@@ -224,6 +224,9 @@ test("an operator reads every section and unknown readings are never healthy", a
   await expect(page.locator("body")).toContainText(
     "2d87c427d460ffd91d38d93ef1361fd4bce93896",
   );
+  // A measured byte value still renders as a size, so the unknown assertions in
+  // the degraded case cannot pass merely because bytes never render at all.
+  await expect(page.getByText("8.0 KB").first()).toBeVisible();
   await expect(page.locator("body")).toContainText("superadmin.viewed");
 
   // An unmeasurable unit state is unknown, not "not running".
@@ -514,11 +517,9 @@ test("a degraded deployment renders unknown rather than zero", async ({
   // A count that was never measured reads as unknown, and the literal 0 never
   // appears where a measurement is missing.
   const stat = (label: string) =>
-    page
-      .locator(".superadmin-stat")
-      .filter({
-        has: page.locator("dt", { hasText: new RegExp("^" + label + "$") }),
-      });
+    page.locator(".superadmin-stat").filter({
+      has: page.locator("dt", { hasText: new RegExp("^" + label + "$") }),
+    });
   for (const label of [
     "Accounts",
     "Invited",
@@ -531,9 +532,28 @@ test("a degraded deployment renders unknown rather than zero", async ({
   await expect(
     page.getByText("unknown of 3 engine processes running."),
   ).toBeVisible();
+  // The zero claim needs a real zero: an unmeasured process list must not be
+  // reported as "nothing is running".
+  await expect(page.getByText("No engine processes are running.")).toHaveCount(
+    0,
+  );
   await expect(
-    page.getByText("No engine processes are running."),
+    page.getByText("The engine process list was not reported."),
   ).toBeVisible();
+
+  // Bytes and timestamps must fail the same way counts do, or a "0" fallback in
+  // any one formatter would slip through.
+  // These two read "<used> of <total>", so both halves must be unknown. The
+  // usage bar inside the same cell carries its own label, hence contains.
+  await expect(stat("Memory used").locator("dd")).toContainText(
+    "unknown of unknown",
+  );
+  await expect(stat("Swap used").locator("dd")).toContainText(
+    "unknown of unknown",
+  );
+  await expect(stat("Identity size").locator("dd")).toHaveText("unknown");
+  await expect(stat("Last sign-in").locator("dd")).toHaveText("unknown");
+  await expect(stat("Identity archive").locator("dd")).toHaveText("unknown");
 
   // The degradation is visible as an alert rather than as an empty panel.
   await expect(page.locator(".superadmin-alert")).toHaveCount(1);

@@ -723,9 +723,15 @@ export default function SuperAdmin() {
                     </tbody>
                   </table>
                 </div>
-              ) : (
+              ) : isNumber(engines?.count) && engines.count === 0 ? (
                 <p className="superadmin-note">
                   No engine processes are running.
+                </p>
+              ) : (
+                /* An unmeasured process list must not be reported as an empty
+                   one: "nothing is running" is a claim, and it needs a count. */
+                <p className="superadmin-note">
+                  The engine process list was not reported.
                 </p>
               )}
             </Body>
