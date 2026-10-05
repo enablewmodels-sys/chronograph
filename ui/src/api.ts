@@ -95,7 +95,12 @@ export async function request(
     ...(data !== undefined ? { body: JSON.stringify(data) } : {}),
   });
   if (!response.ok) {
-    if (response.status === 401)
+    // 401 here is the engine refusing this browser, and in the Managed console that is the
+    // ordinary state of a project whose graph connection has not been established — the
+    // account session is the control plane's answer, not the engine's. Treating it as a
+    // sign-out bounced an operator reading /admin back to the sign-in form. A token
+    // workspace is different: there the token is the session.
+    if (response.status === 401 && !managedSite)
       window.dispatchEvent(new Event("session-expired"));
     const text = await response.text();
     let message = text;

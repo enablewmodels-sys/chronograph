@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+- A session lasts as long as a working day does not end it. The control plane dropped any session
+  that had been quiet for thirty minutes and the cookie expired after twelve hours with no refresh,
+  so an operator who left the console open came back to the sign-in form — and reported it as
+  "/admin is broken", because that is what it looked like. The lifetime is now 30 days and rolls
+  with use, the idle window is 14 days, and a session that does end sends the reader to
+  `/login?expired=1`, which says the session expired instead of showing an unexplained form.
+  `launch/private/managed/control-plane/identity.mjs` owns the three numbers; the control-plane
+  suite asserts both sides of the idle boundary.
+- The account an operator signs in with is the account that can open the panel. The allowlist held
+  two addresses while the browser was signed in as a third, so /admin answered "operator access
+  required" for its owner. The deployment's `superadminEmails` now names every address the owner
+  signs in with.
+- The console suite visits every page, and against a real deployment rather than a mock. A mock
+  whose payload the server never sends tests the mock: the previous sweep invented bodies, so pages
+  that crashed on a missing list looked like page bugs and pages that survived proved nothing.
+  `scripts/capture-engine-shapes.mjs` boots a real engine and records what each operation actually
+  answers into `ui/e2e/fixtures/engine.json`, which the sweep replays; `scripts/managed-local.mjs`
+  runs the real gateway over a real engine with a real session, and with
+  `CHRONOGRAPH_SWEEP_ORIGIN` the same 13 pages plus the operator panel are walked there: 14/14.
+- A page that fails to render no longer takes the console with it. Every route now sits inside a
+  boundary that names the failure and offers a retry, because one bad payload previously produced an
+  empty screen with nothing to read.
+- A 401 from a project's engine is no longer treated as a sign-out in the Managed console. It means
+  the graph connection is not established, which is an ordinary state; reading it as an expired
+  session bounced an operator away from /admin and, with the new redirect, could loop.
 - Layer 4 is implemented, not just declared. `deploy/platform/appctl.mjs` runs one container per
   app with persistent storage, a health gate that stops an unhealthy container, preview then
   promote that re-tags the exact image digest the preview ran, rollback, an append-only ledger

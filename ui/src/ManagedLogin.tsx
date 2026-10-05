@@ -320,6 +320,12 @@ export default function ManagedLogin({
               )}
             </div>
           )}
+          {new URLSearchParams(location.search).has("expired") && (
+            <div className="notice" role="status">
+              Your session expired, so you were signed out. Sign in again to
+              return to your workspace.
+            </div>
+          )}
           {new URLSearchParams(location.search).has("error") && (
             <div className="notice error" role="alert">
               {new URLSearchParams(location.search)

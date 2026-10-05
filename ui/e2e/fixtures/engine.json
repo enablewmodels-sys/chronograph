@@ -1,0 +1,702 @@
+{
+  "generated": {
+    "binary": "target/release",
+    "seed": [
+      200,
+      200,
+      409,
+      400
+    ]
+  },
+  "routes": {
+    "GET /v1/info": {
+      "status": 200,
+      "body": {
+        "configured_default_durability": "buffered",
+        "credential": {
+          "id": "2ba0a42e7708ef98",
+          "scope": "admin"
+        },
+        "default_durability": "buffered",
+        "edition": "community",
+        "limits": {
+          "batch_edges": 10000,
+          "body_bytes": 4194304,
+          "query_results": 1000,
+          "queue": 32,
+          "workers": 8
+        },
+        "mcp_url": "http://127.0.0.1:18711/mcp",
+        "require_fsync": false,
+        "uptime_seconds": 0,
+        "version": "0.4.0-alpha.3",
+        "workspace_name": "My graph"
+      }
+    },
+    "GET /v1/tokens": {
+      "status": 200,
+      "body": {
+        "tokens": [
+          {
+            "created_at": 1791238314,
+            "expires_at": 1791324714,
+            "id": "2ba0a42e7708ef98",
+            "name": "shape capture",
+            "scope": "admin"
+          }
+        ]
+      }
+    },
+    "GET /v1/backups": {
+      "status": 200,
+      "body": {
+        "backups": []
+      }
+    },
+    "GET /v1/metrics": {
+      "status": 200,
+      "body": {
+        "unparsed": "# TYPE chronograph_uptime_seconds gauge\nchronograph_uptime_seconds 0\n# TYPE chronograph_http_requests_total counter\nchronograph_http_requests_total 9\n# TYPE chronograph_http_server_errors_total counter\nchronograph_http_server_errors_total 0\n# TYPE chronograph_graph_nodes gauge\nchronograph_graph_nodes 3\n# TYPE chronograph_edge_versions gauge\nchronograph_edge_versions 2\n# TYPE chronograph_journal_by"
+      }
+    },
+    "POST /v1/stats": {
+      "status": 200,
+      "body": {
+        "active_forks": "1",
+        "default_durability": "buffered",
+        "duration_ms": 0.013958,
+        "edge_versions": "2",
+        "log_bytes": "216",
+        "nodes": "3",
+        "parent_revision": "1",
+        "recovered_tail_bytes": "0",
+        "require_fsync": false,
+        "revision": "2",
+        "writer_healthy": true
+      }
+    },
+    "POST /v1/schema": {
+      "status": 200,
+      "body": {
+        "connectors": [],
+        "duration_ms": 0.018375,
+        "history": [],
+        "limits": {
+          "history": 1024,
+          "migration_bytes": 262144,
+          "payload_bytes": 16,
+          "plan_bytes": 1048576,
+          "plan_files": 64,
+          "relations": 1024
+        },
+        "relations": [],
+        "revision": 0,
+        "scope": "workspace",
+        "settings": {
+          "default_durability": "buffered",
+          "default_query_limit": 100,
+          "description": "",
+          "name": "My graph",
+          "strict_relations": false
+        },
+        "version": 3
+      }
+    },
+    "POST /v1/forks": {
+      "status": 200,
+      "body": {
+        "duration_ms": 0.00775,
+        "forks": [
+          {
+            "delta_edges": "0",
+            "id": "1",
+            "inherited_edges": "2",
+            "merge": null,
+            "name": "experiment",
+            "new_nodes": "0",
+            "parent_revision": "1",
+            "revision": "0",
+            "status": "active",
+            "timestamp": "30"
+          }
+        ],
+        "next_after": null,
+        "revision": "2"
+      }
+    },
+    "POST /v1/query": {
+      "status": 200,
+      "body": {
+        "count": 2,
+        "duration_ms": 0.025958000000000002,
+        "edges": [
+          {
+            "dst": "2",
+            "id": "0",
+            "kind": 1,
+            "payload": "00000000000000000000000000000000",
+            "src": "1",
+            "valid_from": "10",
+            "valid_to": "9223372036854775807"
+          },
+          {
+            "dst": "3",
+            "id": "1",
+            "kind": 2,
+            "payload": "00000000000000000000000000000000",
+            "src": "2",
+            "valid_from": "20",
+            "valid_to": "9223372036854775807"
+          }
+        ],
+        "fork": null,
+        "mode": "as_of",
+        "next_cursor": null,
+        "revision": "2"
+      }
+    },
+    "POST /v1/tokens": {
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "missing field `name`"
+        }
+      }
+    },
+    "POST /v1/backups": {
+      "status": 405,
+      "body": {
+        "unparsed": ""
+      }
+    },
+    "POST /v1/sync": {
+      "status": 200,
+      "body": {
+        "durability": "fsync",
+        "duration_ms": 3.828041,
+        "revision": "2",
+        "synced": true
+      }
+    },
+    "POST /v1/load_demo": {
+      "status": 409,
+      "body": {
+        "error": {
+          "code": "CONFLICT",
+          "message": "Demo can only be loaded into an empty workspace"
+        }
+      }
+    },
+    "POST /v1/add_node": {
+      "status": 200,
+      "body": {
+        "durability": "fsync",
+        "duration_ms": 3.0037499999999997,
+        "fork": null,
+        "id": "9001",
+        "revision": "3"
+      }
+    },
+    "POST /v1/add_edges": {
+      "status": 200,
+      "body": {
+        "durability": "fsync",
+        "duration_ms": 4.381208999999999,
+        "fork": null,
+        "ids": [
+          "2"
+        ],
+        "revision": "4"
+      }
+    },
+    "POST /v1/invalidate_edge": {
+      "status": 200,
+      "body": {
+        "durability": "fsync",
+        "duration_ms": 3.258708,
+        "fork": null,
+        "invalidated": "1",
+        "revision": "5"
+      }
+    },
+    "POST /v1/fork": {
+      "status": 200,
+      "body": {
+        "durability": "buffered",
+        "duration_ms": 0.01525,
+        "fork": {
+          "delta_edges": "0",
+          "id": "2",
+          "inherited_edges": "2",
+          "merge": null,
+          "name": "experiment",
+          "new_nodes": "0",
+          "parent_revision": "4",
+          "revision": "0",
+          "status": "active",
+          "timestamp": "30"
+        },
+        "revision": "6"
+      }
+    },
+    "POST /v1/merge": {
+      "status": 409,
+      "body": {
+        "error": {
+          "code": "CONFLICT",
+          "message": "fork merge conflict: parent revision changed since the fork"
+        }
+      }
+    },
+    "POST /v1/discard": {
+      "status": 200,
+      "body": {
+        "durability": "buffered",
+        "duration_ms": 0.007917,
+        "fork": {
+          "delta_edges": "0",
+          "id": "1",
+          "inherited_edges": "2",
+          "merge": null,
+          "name": "experiment",
+          "new_nodes": "0",
+          "parent_revision": "1",
+          "revision": "0",
+          "status": "discarded",
+          "timestamp": "30"
+        },
+        "revision": "7"
+      }
+    },
+    "POST /v1/schema_preview": {
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "missing field `version` at line 1 column 2"
+        }
+      }
+    },
+    "POST /v1/schema_apply": {
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "missing field `expected_revision`"
+        }
+      }
+    },
+    "POST /v1/schema_export": {
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "missing field `id`"
+        }
+      }
+    },
+    "POST /v1/schema_rollback": {
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "unknown field `revision`, expected one of `target_revision`, `id`, `name`"
+        }
+      }
+    },
+    "POST /v1/connector_catalog": {
+      "status": 200,
+      "body": {
+        "connectors": [
+          {
+            "contract_version": 1,
+            "description": "Recording sessions, exact signal chunks, events, gaps, clock measurements, immutable datasets and decoder runs. Acquisition and inference run in external workers; physical devices require separate validation.",
+            "family": "BCI",
+            "id": "bci",
+            "name": "BCI research workspace",
+            "native_import": "python_bci_agent",
+            "presets": [
+              "research-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://chronodb.co/documentation/BCI"
+          },
+          {
+            "contract_version": 1,
+            "description": "Store Jev Choice, Score and Noul decisions with probabilities, input fingerprints and model provenance. Inference runs in your producer using a separate TypeSafe API key.",
+            "family": "Decision models",
+            "id": "jev",
+            "name": "TypeSafe Jev",
+            "native_import": "python_typescript_adapter",
+            "presets": [
+              "decisions-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://docs.typesafe.ai/api"
+          },
+          {
+            "contract_version": 1,
+            "description": "Store locally produced Laya Choice, Score and Noul decisions, checkpoint and routing provenance. Run the Laya runtime in your own environment; no weights or inference run in the database.",
+            "family": "Decision models",
+            "id": "laya",
+            "name": "Convai Laya",
+            "native_import": "python_typescript_adapter",
+            "presets": [
+              "decisions-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://github.com/NandhaKishorM/laya"
+          },
+          {
+            "contract_version": 1,
+            "description": "Store output tensors, masks, actions and checkpoint provenance from your model process.",
+            "family": "JEPA",
+            "id": "jepa",
+            "name": "JEPA outputs",
+            "native_import": "external_runtime",
+            "presets": [
+              "i-jepa",
+              "v-jepa-1",
+              "v-jepa-2",
+              "v-jepa-2-ac",
+              "v-jepa-2.1",
+              "jepa-wms"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://github.com/facebookresearch/vjepa2"
+          },
+          {
+            "contract_version": 1,
+            "description": "Generic multi-level latent contract with parent IDs and prediction horizons; no upstream-specific architecture assumed.",
+            "family": "H-JEPA",
+            "id": "hierarchical-jepa",
+            "name": "Hierarchical JEPA",
+            "native_import": "external_runtime",
+            "presets": [
+              "hierarchical-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": ""
+          },
+          {
+            "contract_version": 1,
+            "description": "Multimodal transitions, structured actions, rewards and independent terminated/truncated flags. Simulator restoration requires an external complete-state codec.",
+            "family": "World models",
+            "id": "gymnasium",
+            "name": "Gymnasium",
+            "native_import": "normalized_only",
+            "presets": [
+              "transition-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://gymnasium.farama.org/"
+          },
+          {
+            "contract_version": 1,
+            "description": "Episode transitions converted by the local producer. Existing CLI supports the documented Gridworld codec; generalized native conversion remains separate.",
+            "family": "World models",
+            "id": "minari",
+            "name": "Minari",
+            "native_import": "legacy_cli",
+            "presets": [
+              "episode-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://minari.farama.org/main/content/dataset_standards/"
+          },
+          {
+            "contract_version": 1,
+            "description": "Timestamped signal chunks, markers and explicit gaps. Existing Rust LSL float32 acquisition remains available separately.",
+            "family": "BCI",
+            "id": "lsl",
+            "name": "Lab Streaming Layer",
+            "native_import": "legacy_rust",
+            "presets": [
+              "signal-v1",
+              "marker-v1",
+              "gap-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://labstreaminglayer.readthedocs.io/"
+          },
+          {
+            "contract_version": 1,
+            "description": "EEG tensors with channel names, units and source-clock timestamps, prepared by the local Python MNE reader.",
+            "family": "BCI",
+            "id": "mne",
+            "name": "MNE recorded EEG",
+            "native_import": "python_mne_reader",
+            "presets": [
+              "eeg-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://mne.tools/stable/auto_tutorials/io/20_reading_eeg_data.html"
+          },
+          {
+            "contract_version": 1,
+            "description": "Normalized episode records with binary image/video assets. Existing v3 CLI exports joint vectors; native media dataset conversion is not provided by this endpoint.",
+            "family": "Robotics",
+            "id": "lerobot",
+            "name": "LeRobot",
+            "native_import": "legacy_cli",
+            "presets": [
+              "v3-records",
+              "v2.1-records"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://huggingface.co/docs/lerobot/lerobot-dataset-v3"
+          },
+          {
+            "contract_version": 1,
+            "description": "Normalized message records. Existing Rust bag reader handles JointState; other native message decoders require local conversion.",
+            "family": "Robotics",
+            "id": "ros2",
+            "name": "ROS 2 / MCAP",
+            "native_import": "legacy_joint_state",
+            "presets": [
+              "joint-state",
+              "image",
+              "compressed-image",
+              "imu",
+              "odometry",
+              "tf"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://docs.ros.org/en/rolling/p/rosbag2/"
+          },
+          {
+            "contract_version": 1,
+            "description": "Preserve circuit source as an opaque asset. The existing Rust parser supports its documented static unitary subset; uploading source never executes it.",
+            "family": "Quantum",
+            "id": "openqasm",
+            "name": "OpenQASM",
+            "native_import": "legacy_static_subset",
+            "presets": [
+              "source-v1",
+              "calibration-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://openqasm.com/"
+          },
+          {
+            "contract_version": 1,
+            "description": "Circuit source and result provenance exported by your Qiskit process; no QPU connection or executable DAG is inferred.",
+            "family": "Quantum",
+            "id": "qiskit",
+            "name": "Qiskit",
+            "native_import": "python_qiskit_adapter",
+            "presets": [
+              "circuit-v1",
+              "result-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://quantum.cloud.ibm.com/docs/en/api/qiskit/qasm3"
+          },
+          {
+            "contract_version": 1,
+            "description": "Circuit artifacts and measurement results exported by your Cirq process.",
+            "family": "Quantum",
+            "id": "cirq",
+            "name": "Cirq",
+            "native_import": "python_cirq_adapter",
+            "presets": [
+              "circuit-v1",
+              "result-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://quantumai.google/cirq"
+          },
+          {
+            "contract_version": 1,
+            "description": "Locally acquired BrainFlow channel matrices with explicit units and board provenance. Synthetic board is tested; physical board support depends on your installed BrainFlow driver.",
+            "family": "BCI",
+            "id": "brainflow",
+            "name": "BrainFlow / OpenBCI",
+            "native_import": "python_brainflow_adapter",
+            "presets": [
+              "signal-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://brainflow.readthedocs.io/"
+          },
+          {
+            "contract_version": 1,
+            "description": "A Python host stores Q# source, QIR artifacts and local simulation results. The database never executes quantum programs or contacts a QPU.",
+            "family": "Quantum",
+            "id": "qsharp",
+            "name": "Q# / QDK",
+            "native_import": "python_qdk_host",
+            "presets": [
+              "source-v1",
+              "result-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": "https://learn.microsoft.com/en-us/azure/quantum/"
+          },
+          {
+            "contract_version": 1,
+            "description": "Counts or observables from caller-run PennyLane, Braket or other quantum runtimes, with explicit basis and execution provenance. No provider authentication or job execution.",
+            "family": "Quantum",
+            "id": "quantum-results",
+            "name": "Portable quantum results",
+            "native_import": "normalized_only",
+            "presets": [
+              "counts-v1",
+              "observables-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": ""
+          },
+          {
+            "contract_version": 1,
+            "description": "Named NumPy/PyTorch output tensors with model and checkpoint identifiers; usable for ONNX or other runtimes after local conversion. This does not load models.",
+            "family": "World models",
+            "id": "model-output",
+            "name": "Named model outputs",
+            "native_import": "python_tensor_adapter",
+            "presets": [
+              "tensors-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": ""
+          },
+          {
+            "contract_version": 1,
+            "description": "Observation/action/reward transitions exported by caller-run robotics or simulation environments. Isaac, MuJoCo and other producers must supply their own complete-state codecs.",
+            "family": "Robotics",
+            "id": "physical-ai",
+            "name": "Physical AI transitions",
+            "native_import": "normalized_only",
+            "presets": [
+              "transition-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": ""
+          },
+          {
+            "contract_version": 1,
+            "description": "Versioned records, tensors, binary assets and temporal graph relationships.",
+            "family": "Custom",
+            "id": "custom",
+            "name": "Custom records",
+            "native_import": "extension_sdk",
+            "presets": [
+              "record-v1"
+            ],
+            "transport": "normalized_records_v1",
+            "upstream": ""
+          }
+        ],
+        "duration_ms": 0.019833,
+        "execution": "external producers; normalized transport does not load models or execute uploaded files",
+        "limits": {
+          "assets_per_batch": 64,
+          "http_asset_bytes": 1048576,
+          "partitions": 4096,
+          "records_per_batch": 500
+        },
+        "registry_version": 1
+      }
+    },
+    "POST /v1/connector_template": {
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "missing field `id`"
+        }
+      }
+    },
+    "POST /v1/connector_record": {
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "unknown field `id`, expected `edge`"
+        }
+      }
+    },
+    "POST /v1/connector_ingest": {
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "unknown field `connector`, expected one of `instance`, `partition`, `sequence`, `fork`, `records`"
+        }
+      }
+    },
+    "POST /v1/connector_checkpoint": {
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "unknown field `connector`, expected one of `instance`, `partition`, `fork`"
+        }
+      }
+    },
+    "POST /v1/asset_put": {
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "missing field `version`"
+        }
+      }
+    },
+    "POST /v1/asset_get": {
+      "status": 400,
+      "body": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Invalid hexadecimal identifier length"
+        }
+      }
+    },
+    "POST /v1/bci_sessions": {
+      "status": 200,
+      "body": {
+        "index_bytes": 0,
+        "index_limit_bytes": 67108864,
+        "next_cursor": null,
+        "sessions": []
+      }
+    },
+    "POST /v1/bci_session": {
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "BCI session not found"
+        }
+      }
+    },
+    "POST /v1/bci_records": {
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "BCI session not found"
+        }
+      }
+    },
+    "POST /v1/bci_window": {
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "BCI session not found"
+        }
+      }
+    },
+    "POST /v1/bci_manifest": {
+      "status": 404,
+      "body": {
+        "error": {
+          "code": "NOT_FOUND",
+          "message": "Dataset session not found"
+        }
+      }
+    }
+  }
+}

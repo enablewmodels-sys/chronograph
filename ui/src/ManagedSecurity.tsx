@@ -19,7 +19,6 @@ export default function ManagedSecurity() {
     action = useAction(),
     navigate = useNavigate();
   const [sessions, setSessions] = useState<Session[]>([]),
-    [code, setCode] = useState(""),
     [password, setPassword] = useState(""),
     [nextPassword, setNextPassword] = useState("");
   const load = async () =>
@@ -33,7 +32,7 @@ export default function ManagedSecurity() {
     <>
       <Head
         title="Your account, protected."
-        text="Manage your identity, authenticator and signed-in devices."
+        text="Manage your identity and the devices signed in to it."
       />
       <section className="security-summary panel">
         <ShieldCheck size={32} />
@@ -41,40 +40,11 @@ export default function ManagedSecurity() {
           <h2>{user?.name}</h2>
           <p>{user?.email}</p>
         </div>
-        <span className="scope-badge">Authenticator enabled</span>
+        <span className="scope-badge">
+          {user?.hasPassword ? "Password sign-in" : "Provider sign-in"}
+        </span>
       </section>
       <div className="managed-two-column">
-        <section className="panel form-panel">
-          <h2>Verify a sensitive action</h2>
-          <p>
-            Confirm a new authenticator code to manage keys, secrets and team
-            access for the next five minutes.
-          </p>
-          <SubmitForm
-            onSubmit={() =>
-              void action.run(async () => {
-                await managedApi("/api/auth/two-factor/verify-totp", { code });
-                setCode("");
-                await refreshManaged();
-              }, "Verified. Sensitive actions are available for five minutes.")
-            }
-          >
-            <Field label="Authenticator code">
-              <input
-                autoComplete="one-time-code"
-                inputMode="numeric"
-                pattern="[0-9]{6}"
-                maxLength={6}
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                required
-              />
-            </Field>
-            <button className="primary" disabled={action.busy}>
-              <Busy busy={action.busy}>Verify identity</Busy>
-            </button>
-          </SubmitForm>
-        </section>
         <section className="panel form-panel">
           <h2>
             <KeyRound size={20} /> Change password
@@ -83,7 +53,7 @@ export default function ManagedSecurity() {
             <>
               <p>
                 Changing your password signs out every device. You’ll sign in
-                again with your authenticator.
+                again with the new one.
               </p>
               <SubmitForm
                 onSubmit={() =>
@@ -129,7 +99,7 @@ export default function ManagedSecurity() {
           ) : (
             <p>
               You sign in with GitHub. Your GitHub account manages your primary
-              credentials; ChronoDB also requires your authenticator.
+              credentials; there is nothing to change here.
             </p>
           )}
         </section>

@@ -15,7 +15,9 @@ setting or credential — nothing half-on, and nothing pretending to be on.
 | Source picker reaching every board | `ui/e2e/catalogue.spec.ts` — walks the widget, 64/64 selectable |
 | Decoder: Python, TypeScript, WASM, and in the browser | `sdk/typescript/test/decoder.mjs` and `scripts/bci-wasm-test.py` — parity 1.1e-16; the live console decodes the artifact it serves |
 | Console sign-in, projects, team, secrets, audit | `ui/e2e/managed-auth.spec.ts`; control-plane suite 41 tests / 39 pass / 0 fail |
-| Operator panel | allowlisted operator only; non-operators are told, not bounced |
+| Every console page, against a real deployment | `ui/e2e/console-sweep.spec.ts` — 13 pages plus the operator panel, pointed at `scripts/managed-local.mjs` (real gateway, real engine, real session): 14/14 |
+| Sessions that survive a quiet afternoon | 30-day rolling lifetime, 14-day idle window, and an explained sign-out; the boundary is asserted both ways in the control-plane suite |
+| Operator panel | allowlisted operator only; non-operators are told, not bounced; verified against a real deployment in `console-sweep.spec.ts` |
 | Docs, both editions, TLS, asset caching at the edge | every chapter 200 on chronodb.co and the Community site; `cf-cache-status: HIT` |
 | Scheduled backups and per-project backup freshness | `chronograph-managed-backup` exit 0; health report `ok: true` for every project |
 | Host monitor | `chronograph-monitor.timer`; `/var/lib/chronograph-managed/operational-health.json` |
@@ -54,7 +56,9 @@ node scripts/hosting-test.mjs                    # 386
 node scripts/platform-connectors-test.mjs        # 9
 node scripts/provider-identity-test.mjs          # 108
 cd launch/private/managed/control-plane && node --test test/*.test.mjs   # 41 tests
-cd ui && node node_modules/@playwright/test/cli.js test --project=desktop-chromium   # 26
+cd ui && node node_modules/@playwright/test/cli.js test --project=desktop-chromium   # 40
+node scripts/capture-engine-shapes.mjs           # refreshes ui/e2e/fixtures/engine.json
+node scripts/managed-local.mjs                   # a real Managed deployment on 127.0.0.1
 python scripts/alerts-test.py                    # 14
 ```
 

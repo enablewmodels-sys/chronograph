@@ -77,6 +77,11 @@ export async function managedApi<T>(path: string, body?: unknown): Promise<T> {
     });
   }
   if (!response.ok) {
+    // A 401 here is the control plane saying this browser is no longer signed in. The
+    // console listens for this so it can explain the sign-out instead of rendering a page
+    // full of failed requests.
+    if (response.status === 401 && !path.startsWith("/api/auth"))
+      window.dispatchEvent(new Event("session-expired"));
     throw Object.assign(
       new Error(
         value.error?.message ||

@@ -1,6 +1,8 @@
 import {
+  Component,
   createContext,
   lazy,
+  type ReactNode,
   Suspense,
   useContext,
   useEffect,
@@ -173,13 +175,25 @@ function App() {
       setManagedProject("");
     }
   };
+  // A session that ends is not the same thing as a visitor who was never signed in.
+  // Landing on the sign-in form with no explanation is what made /admin look broken, so
+  // the reason travels to the form and is shown there.
+  const [expiredSession, setExpiredSession] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
-    const expire = () => update(null);
+    const expire = () => {
+      update(null);
+      setExpiredSession(true);
+      // Only when leaving a page that needs the session: a second navigation while the
+      // sign-in form is already on screen aborts a load in flight.
+      if (!location.pathname.startsWith("/login"))
+        navigate("/login?expired=1", { replace: true });
+    };
     window.addEventListener("session-expired", expire);
     return () => {
       window.removeEventListener("session-expired", expire);
     };
-  }, []);
+  }, [navigate]);
   return (
     <AuthContext.Provider
       value={{ connection, update, managed, refreshManaged }}
@@ -187,13 +201,18 @@ function App() {
       <a className="skip" href="#main">
         Skip to content
       </a>
-      <Suspense
-        fallback={
-          <p className="loading" role="status">
-            Loading workspace…
-          </p>
-        }
-      >
+      {/* Without this, one page that fails to render takes the whole application with
+          it and the reader sees an empty screen — which is what a broken product looks
+          like, whether the cause is a payload the page did not expect or a bug in the
+          page itself. The boundary names the page and offers a way out. */}
+      <PageBoundary>
+        <Suspense
+          fallback={
+            <p className="loading" role="status">
+              Loading workspace…
+            </p>
+          }
+        >
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/bci" element={<BCIPage />} />
@@ -249,7 +268,7 @@ function App() {
                   </p>
                 </div>
               ) : (
-                <Navigate to="/login" replace />
+                <Navigate to={expiredSession ? "/login?expired=1" : "/login"} replace />
               )
             }
           />
@@ -306,7 +325,7 @@ function App() {
                       refresh={refreshManaged}
                     />
                   ) : (
-                    <Navigate to="/login" replace />
+                    <Navigate to={expiredSession ? "/login?expired=1" : "/login"} replace />
                   )
                 }
               />
@@ -320,7 +339,7 @@ function App() {
                       <ManagedSecurity />
                     </div>
                   ) : (
-                    <Navigate to="/login" replace />
+                    <Navigate to={expiredSession ? "/login?expired=1" : "/login"} replace />
                   )
                 }
               />
@@ -344,7 +363,9 @@ function App() {
                     !managed.user.needsMfa &&
                     !managed.user.needsActivation
                       ? "/projects"
-                      : "/login"
+                      : expiredSession
+                        ? "/login?expired=1"
+                        : "/login"
                   }
                   replace
                 />
@@ -362,7 +383,8 @@ function App() {
             }
           />
         </Routes>
-      </Suspense>
+        </Suspense>
+      </PageBoundary>
     </AuthContext.Provider>
   );
 }
@@ -434,6 +456,44 @@ function Login() {
       </footer>
     </main>
   );
+}
+interface BoundaryState {
+  error: Error | null;
+}
+/**
+ * Keep one failing page from blanking the console.
+ *
+ * A render error anywhere below this point used to unmount the whole application, so the
+ * reader got an empty page with no explanation and no way back short of a reload.
+ */
+class PageBoundary extends Component<{ children: ReactNode }, BoundaryState> {
+  state: BoundaryState = { error: null };
+  static getDerivedStateFromError(error: Error): BoundaryState {
+    return { error };
+  }
+  componentDidCatch(error: Error): void {
+    // The message is what the reader sees; the console keeps the stack for whoever is
+    // debugging the deployment.
+    console.error("Console page failed to render:", error);
+  }
+  render(): ReactNode {
+    if (!this.state.error) return this.props.children;
+    return (
+      <div className="standalone-security" role="alert">
+        <Logo />
+        <Link to="/app">Back to the workspace</Link>
+        <h2>This page could not be displayed.</h2>
+        <p>
+          Something in this view failed to render. The rest of the console still
+          works.
+        </p>
+        <p className="small muted">{this.state.error.message}</p>
+        <button type="button" onClick={() => this.setState({ error: null })}>
+          Try again
+        </button>
+      </div>
+    );
+  }
 }
 const navigation = [
   { path: "", title: "Overview", icon: Home },
