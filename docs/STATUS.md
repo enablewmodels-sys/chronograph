@@ -19,7 +19,7 @@ setting or credential — nothing half-on, and nothing pretending to be on.
 | Docs, both editions, TLS, asset caching at the edge | every chapter 200 on chronodb.co and the Community site; `cf-cache-status: HIT` |
 | Scheduled backups and per-project backup freshness | `chronograph-managed-backup` exit 0; health report `ok: true` for every project |
 | Host monitor | `chronograph-monitor.timer`; `/var/lib/chronograph-managed/operational-health.json` |
-| Layer 4 runtime (plan, build, deploy, promote, rollback, destroy, bind-domain) | `scripts/appctl-test.mjs` — 34 checks |
+| Layer 4 runtime (plan, build, deploy, promote, rollback, destroy, bind-domain) | `scripts/appctl-test.mjs` — 35 checks, including a build context that cannot escape its manifest |
 | Layer 4 from the console | `scripts/hosting-test.mjs` — 12 scenarios, 386 checks |
 | Layer 5 connectors (identity verification, billing mapping, domain binding) | `scripts/platform-connectors-test.mjs` — 9 checks with real keys and signatures |
 
@@ -49,12 +49,13 @@ setting or credential — nothing half-on, and nothing pretending to be on.
 ## How to check this page has not drifted
 
 ```sh
-node scripts/appctl-test.mjs                     # 34
+node scripts/appctl-test.mjs                     # 35
 node scripts/hosting-test.mjs                    # 386
 node scripts/platform-connectors-test.mjs        # 9
 node scripts/provider-identity-test.mjs          # 108
 cd launch/private/managed/control-plane && node --test test/*.test.mjs   # 41 tests
-cd ui && node node_modules/@playwright/test/cli.js test --project=desktop-chromium
+cd ui && node node_modules/@playwright/test/cli.js test --project=desktop-chromium   # 26
+python scripts/alerts-test.py                    # 14
 ```
 
 If a row here claims something the commands do not show, the row is wrong and should be
