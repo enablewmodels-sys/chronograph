@@ -27,6 +27,7 @@
 - [Quantum experiments](connectors/quantum.md)
 - [Architecture](ARCHITECTURE.md)
 - [Platform layers](PLATFORM.md)
+- [What is live, what is inert, and what turns it on](STATUS.md)
 - [Why BCI teams bounce](ADOPTION.md)
 - [Storage format](FORMAT.md)
 - [Authentication](SECURITY.md)
