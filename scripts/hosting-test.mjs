@@ -217,7 +217,7 @@ function readJson(file) {
 }
 
 // ---------------------------------------------------------------------------
-// 1. config.mjs: the block is optional, normalised, and loud when malformed
+// A control.json on disk for loadConfig, so the configuration rules are proven on the real loader.
 // ---------------------------------------------------------------------------
 async function configFixture(hosting) {
   const root = await mkdtemp(join(tmpdir(), "chronograph-hosting-config-"));
@@ -246,6 +246,31 @@ async function configFixture(hosting) {
   return { path, root };
 }
 
+// ---------------------------------------------------------------------------
+// 1. The shared opted-in deployment, on the dry-run runtime.
+//
+// WHY the deployment and its four accounts are built before the first scenario is registered:
+// node:test starts running a queued test as soon as the module body yields to the event loop, so a
+// fixture created by a later top-level await would race the runner - and a hook could close this
+// database while that await was still using it.
+// ---------------------------------------------------------------------------
+const main = await hostingFixture((root) => ({
+  enabled: true,
+  stateRoot: join(root, "state"),
+  manifestsRoot: join(root, "manifests"),
+  runtime: "dry-run",
+}));
+after(async () => {
+  await main.close();
+});
+const owner = await signIn(main, "owner@example.com", "owner", "198.51.100.1");
+const admin = await signIn(main, "admin@example.com", "admin", "198.51.100.2");
+const editor = await signIn(main, "editor@example.com", "editor", "198.51.100.3");
+const viewer = await signIn(main, "viewer@example.com", "viewer", "198.51.100.4");
+
+// ---------------------------------------------------------------------------
+// 2. config.mjs: the block is optional, normalised, and loud when malformed
+// ---------------------------------------------------------------------------
 scenario(
   "config.mjs keeps hosting optional, normalises an enabled block and refuses a malformed one",
   async () => {
@@ -332,23 +357,6 @@ scenario(
     }
   },
 );
-
-// ---------------------------------------------------------------------------
-// 2. The shared opted-in deployment, on the dry-run runtime
-// ---------------------------------------------------------------------------
-const main = await hostingFixture((root) => ({
-  enabled: true,
-  stateRoot: join(root, "state"),
-  manifestsRoot: join(root, "manifests"),
-  runtime: "dry-run",
-}));
-after(async () => {
-  await main.close();
-});
-const owner = await signIn(main, "owner@example.com", "owner", "198.51.100.1");
-const admin = await signIn(main, "admin@example.com", "admin", "198.51.100.2");
-const editor = await signIn(main, "editor@example.com", "editor", "198.51.100.3");
-const viewer = await signIn(main, "viewer@example.com", "viewer", "198.51.100.4");
 
 // ---------------------------------------------------------------------------
 // 3. A deployment without the block: the routes do not exist
@@ -730,9 +738,19 @@ scenario(
     const linkedApp = listed.value.apps.find((app) => app.name === "linked-app");
     ok(Boolean(linkedApp), "the app is still listed, because an operator must see it");
     equal(
+      linkedApp.manifest.present,
+      true,
+      "the file on disk is reported as present",
+    );
+    equal(
       linkedApp.deployable,
       false,
       "but it is not deployable while the file is a link",
+    );
+    ok(
+      typeof linkedApp.manifest.problem === "string" &&
+        linkedApp.manifest.problem.includes("regular file"),
+      "and the console can say why",
     );
 
     equal(

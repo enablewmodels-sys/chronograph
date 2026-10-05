@@ -392,6 +392,15 @@
 .table-scroll {
   overflow-x: auto;
 }
+/* Layer 4 app hosting. The selected row marks which app the ledger and the actions below belong
+   to, and the action row mixes buttons with the purge checkbox. */
+.managed-table tr.selected td {
+  background: var(--surface-hover);
+}
+.app-actions {
+  align-items: center;
+  margin: 20px 0;
+}
 .standalone-security {
   max-width: 1150px;
   margin: auto;

@@ -36,6 +36,7 @@ import {
   LockKeyhole,
   Menu,
   ChevronDown,
+  Rocket,
 } from "lucide-react";
 import "@fontsource-variable/manrope";
 import "./style.css";
@@ -84,6 +85,7 @@ const Connectors = lazy(() => import("./Connectors"));
 const ManagedSecurity = lazy(() => import("./ManagedSecurity"));
 const ManagedTeam = lazy(() => import("./ManagedTeam"));
 const ManagedSecrets = lazy(() => import("./ManagedSecrets"));
+const ManagedApps = lazy(() => import("./ManagedApps"));
 const AuthContext = createContext<{
   connection: Connection | null;
   update: (s: Connection | null) => void;
@@ -331,9 +333,9 @@ function App() {
                   Loading workspace…
                 </p>
               ) : accountError ? (
-                  <AccountUnavailable retry={retryAccount} />
-                ) : connection ? (
-                  <Console key={connection.project?.id || "community"} />
+                <AccountUnavailable retry={retryAccount} />
+              ) : connection ? (
+                <Console key={connection.project?.id || "community"} />
               ) : (
                 <Navigate
                   to={
@@ -450,6 +452,7 @@ const navigation = [
     ? [
         { path: "team", title: "Team & audit", icon: Users },
         { path: "secrets", title: "Secrets", icon: LockKeyhole },
+        { path: "apps", title: "Apps", icon: Rocket },
         { path: "security", title: "Account security", icon: ShieldCheck },
       ]
     : []),
@@ -461,8 +464,8 @@ function AccountUnavailable({ retry }: { retry: () => void }) {
       <Logo />
       <h2>The account service is not answering.</h2>
       <p>
-        Your session is still in this browser and nothing was signed out. Try again
-        in a moment.
+        Your session is still in this browser and nothing was signed out. Try
+        again in a moment.
       </p>
       <button type="button" onClick={retry}>
         Try again
@@ -484,7 +487,7 @@ function Console() {
         {[
           ["Workspace", ["", "bci", "explorer", "branches"]],
           ["Build", ["schema", "write", "connectors"]],
-          ["Manage", ["access", "secrets", "team", "operations"]],
+          ["Manage", ["access", "secrets", "team", "operations", "apps"]],
         ].map(([label, paths]) => {
           const items = navigation
             .filter((n) => paths.includes(n.path))
@@ -494,8 +497,9 @@ function Console() {
             )
             .filter(
               (n) =>
-                !["access", "operations", "team", "secrets"].includes(n.path) ||
-                connection?.credential.scope === "admin",
+                !["access", "operations", "team", "secrets", "apps"].includes(
+                  n.path,
+                ) || connection?.credential.scope === "admin",
             );
           return items.length ? (
             <div key={String(label)}>
@@ -653,6 +657,19 @@ function Console() {
                       element={
                         connection?.credential.scope === "admin" ? (
                           <ManagedSecrets />
+                        ) : (
+                          <Navigate to="/app" replace />
+                        )
+                      }
+                    />
+                    {/* App hosting is administrator-only on the server, so the route is
+                        mounted for the same scope the sidebar uses. Hosting switched off is a
+                        404 the page itself reports; the server still authorises every call. */}
+                    <Route
+                      path="apps"
+                      element={
+                        connection?.credential.scope === "admin" ? (
+                          <ManagedApps />
                         ) : (
                           <Navigate to="/app" replace />
                         )
