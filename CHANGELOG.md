@@ -17,6 +17,26 @@
   returned no `Set-Cookie` before, and `Max-Age=2592000` with the row back at 30 days after.
   A test that pins the policy literals replaced the boundary-only assertion, which stayed green
   for any value including the half hour it replaced.
+- A refusal now says what to do. The gateway replaced every 5xx message with "The account
+  service is unavailable. Please try again.", including the ones this codebase raises on purpose,
+  so a deployment whose disk had fallen below the write floor reported itself as an account-service
+  outage — found by pressing "New API key" against a real control plane, where the write was refused
+  at 503 and the console showed the wrong reason. An error carrying a deliberate status and code
+  keeps its message; an unexpected throw is still masked so internals do not leak. `test/errors.test.mjs`
+  pins both directions, and the refusal now names the measurement and the floor.
+- The write floor is a deployment decision. Five gigabytes suited an instance holding real projects
+  and made the product look broken on a small development volume, which is where the write paths
+  above were first exercised. `minimumFreeBytes` defaults to 5 GiB, is bounded by `config.mjs`, and
+  `scripts/managed-local.mjs` sets a small one deliberately.
+- The console's controls are tested, not just its pages. `ui/e2e/console-actions.spec.ts` creates and
+  revokes an API key, stores a secret and issues a reader key, invites a collaborator (asserting the
+  refusal and its reason on a deployment without mail delivery), creates a durable branch and takes a
+  consistent backup — all through the rendered controls against a real deployment, 5/5. The suites
+  that need one now share `ui/e2e/real-deployment.ts`.
+- The authenticator UI is gone from the sign-in page. The operator removed the authenticator, so the
+  enrolment screen and the code prompt could not be reached, and the one remaining call to
+  `/api/auth/two-factor/enable` answered 404. A `needsMfa` account is now refused explicitly with
+  its reason rather than falling through to a password form that cannot help it.
 - Two holes a review found in the sweep itself are closed, and it now presses a button. A page whose
   reads all failed still drew its own headings and passed; a page that redirected away drew another
   page's content and passed too. Each page carries copy only that page draws, and the control

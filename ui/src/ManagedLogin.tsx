@@ -75,19 +75,10 @@ export default function ManagedLogin({
     location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
-  const [challenge, setChallenge] = useState(false);
-  const [recovery, setRecovery] = useState(false);
   const [name, setName] = useState("");
   const [emailSent, setEmailSent] = useState(false);
   const signup = location.pathname === "/signup";
   const [config, setConfig] = useState<ManagedAuthConfig | null>(null);
-  const [enrollment, setEnrollment] = useState<{
-    qrDataUrl: string;
-    totpURI: string;
-    backupCodes: string[];
-  } | null>(null);
-  const [saved, setSaved] = useState(false);
   const socialStarted = useRef(false);
   const loadConfig = () =>
     action.run(async () => {
@@ -109,128 +100,37 @@ export default function ManagedLogin({
   }, []);
   const user = session?.user;
   // The operator removed the authenticator, so a signed-in account enters its workspace
-  // directly. `needsMfa` is the switch the client reads, and the control plane currently
-  // hardcodes it to false in `safeUser`: turning the gate back on is a server change plus
-  // an entry-point that verifies a code, not a UI change on its own.
+  // directly. `needsMfa` is the switch the client reads, and the control plane hardcodes
+  // it to false in `safeUser`; turning that gate back on is a server change plus an
+  // entry-point that verifies a code, which is why this page no longer offers to enrol one.
   if (user && !user.needsMfa && !user.needsActivation)
     return <Navigate to={session.project ? "/app" : "/projects"} replace />;
-  const verify = () =>
-    action.run(async () => {
-      await managedApi(
-        recovery
-          ? "/api/auth/two-factor/verify-backup-code"
-          : "/api/auth/two-factor/verify-totp",
-        { code: code.trim(), trustDevice: false },
-      );
-      setCode("");
-      setPassword("");
-      setEnrollment(null);
-      await refresh();
-    });
   return (
     <AccountFrame>
       {user && user.needsMfa ? (
+        // Unreachable while the control plane reports needsMfa false for every account,
+        // and deliberately not a fall-through to the sign-in form: a signed-in person
+        // sent to a password prompt reads it as a broken session.
         <>
           <span className="account-symbol">
-            <ShieldCheck size={24} />
+            <LockKeyhole size={24} />
           </span>
-          <h2>Secure your account.</h2>
-          <p>Finish securing your account.</p>
-          {!enrollment ? (
-            <SubmitForm
-              onSubmit={() =>
-                void action.run(async () => {
-                  setEnrollment(
-                    await managedApi("/api/auth/two-factor/enable", {
-                      ...(user.hasPassword ? { password } : {}),
-                      method: "totp",
-                    }),
-                  );
-                  setPassword("");
-                })
-              }
-            >
-              {user.hasPassword && (
-                <Field label="Current password">
-                  <input
-                    type="password"
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    maxLength={128}
-                  />
-                </Field>
-              )}
-              <button className="primary" disabled={action.busy}>
-                <Busy busy={action.busy}>Set up authenticator</Busy>
-              </button>
-            </SubmitForm>
-          ) : (
-            <>
-              <img
-                className="auth-qr"
-                src={enrollment.qrDataUrl}
-                alt="Scan this QR code using your authenticator app"
-                width={240}
-                height={240}
-              />
-              <details className="account-details">
-                <summary>Enter setup key manually</summary>
-                <code className="secret-text">
-                  {new URL(enrollment.totpURI).searchParams.get("secret")}
-                </code>
-              </details>
-              <details className="account-details" open>
-                <summary>Save your recovery codes</summary>
-                <p className="small">
-                  Each code works once. Store these in your password manager;
-                  they replace an authenticator code if you lose your device.
-                </p>
-                <div className="recovery-codes">
-                  {enrollment.backupCodes.map((c) => (
-                    <code key={c}>{c}</code>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  onClick={() =>
-                    void action.run(async () => {
-                      await navigator.clipboard.writeText(
-                        enrollment.backupCodes.join("\n"),
-                      );
-                    }, "Recovery codes copied.")
-                  }
-                >
-                  Copy recovery codes
-                </button>
-              </details>
-              <label className="check-field">
-                <input
-                  type="checkbox"
-                  checked={saved}
-                  onChange={(e) => setSaved(e.target.checked)}
-                />
-                I saved my recovery codes.
-              </label>
-              <SubmitForm onSubmit={() => void verify()}>
-                <Field label="Authenticator code">
-                  <input
-                    autoComplete="one-time-code"
-                    inputMode="numeric"
-                    pattern="[0-9]{6}"
-                    maxLength={6}
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    required
-                  />
-                </Field>
-                <button className="primary" disabled={action.busy || !saved}>
-                  <Busy busy={action.busy}>Verify and continue</Busy>
-                </button>
-              </SubmitForm>
-            </>
-          )}
+          <h2>This account needs a second step.</h2>
+          <p>
+            Your account requires an authenticator, and this deployment does not
+            offer one yet. Ask the operator to clear the requirement, or use a
+            different account.
+          </p>
+          <SubmitForm
+            onSubmit={() =>
+              void action.run(async () => {
+                await managedApi("/api/auth/sign-out", {});
+                await refresh();
+              })
+            }
+          >
+            <Busy busy={action.busy}>Sign out</Busy>
+          </SubmitForm>
         </>
       ) : user && user.needsActivation ? (
         // An invitation that has not been accepted is not a second factor, and asking
@@ -254,45 +154,6 @@ export default function ManagedLogin({
           >
             <Busy busy={action.busy}>Use a different account</Busy>
           </SubmitForm>
-        </>
-      ) : challenge || user ? (
-        <>
-          <span className="account-symbol">
-            <LockKeyhole size={24} />
-          </span>
-          <h2>
-            {recovery ? "Use a recovery code." : "One more security check."}
-          </h2>
-          <p>
-            {recovery
-              ? "Enter one of the recovery codes you saved during setup."
-              : "Enter the six-digit code from your authenticator app."}
-          </p>
-          <SubmitForm onSubmit={() => void verify()}>
-            <Field label={recovery ? "Recovery code" : "Authenticator code"}>
-              <input
-                autoFocus
-                autoComplete="one-time-code"
-                inputMode={recovery ? "text" : "numeric"}
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                required
-                maxLength={recovery ? 100 : 6}
-              />
-            </Field>
-            <button className="primary" disabled={action.busy}>
-              <Busy busy={action.busy}>Verify and continue</Busy>
-            </button>
-          </SubmitForm>
-          <button
-            className="text-link"
-            onClick={() => {
-              setRecovery(!recovery);
-              setCode("");
-            }}
-          >
-            {recovery ? "Use authenticator instead" : "Use a recovery code"}
-          </button>
         </>
       ) : (
         <>
@@ -388,12 +249,11 @@ export default function ManagedLogin({
                     setEmailSent(true);
                     return;
                   }
-                  const result = await managedApi<{
-                    twoFactorRedirect?: boolean;
-                  }>("/api/auth/sign-in/email", { email, password });
+                  // The deployment ships no authenticator, so a sign-in either has a
+                  // session or it failed; there is no code prompt to hand off to.
+                  await managedApi("/api/auth/sign-in/email", { email, password });
                   setPassword("");
-                  if (result.twoFactorRedirect) setChallenge(true);
-                  else await refresh();
+                  await refresh();
                 })
               }
             >

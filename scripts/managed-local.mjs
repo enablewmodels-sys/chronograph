@@ -181,6 +181,9 @@ await writeFile(
     docs: join(root, "docs"),
     ownerEmail: OWNER,
     superadminEmails: [OWNER],
+    // A development volume is legitimately small. The production default of 5 GiB would refuse
+    // every write on a nearly full laptop, which is how a working control plane looks broken.
+    minimumFreeBytes: 256 * 1024 ** 2,
   }),
   { mode: 0o600 },
 );

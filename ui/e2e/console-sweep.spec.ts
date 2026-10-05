@@ -9,14 +9,16 @@
 // real chronograph-server by scripts/capture-engine-shapes.mjs, so a page that breaks in this
 // suite breaks on a payload the server really sends. Set CHRONOGRAPH_SWEEP_ORIGIN to a running
 // deployment to sweep it for real instead, with no interception at all.
-import { readFileSync, writeFileSync } from "node:fs";
-import { test, expect, type Cookie, type Page } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { test, expect, type Page } from "@playwright/test";
+import {
+  NEEDS_DEPLOYMENT,
+  ORIGIN,
+  applySession,
+  configured,
+  signInOnce,
+} from "./real-deployment";
 
-const ORIGIN = process.env.CHRONOGRAPH_SWEEP_ORIGIN || "";
-// A real deployment needs a session, so the same suite can be pointed at one by supplying an
-// account. Nothing is defaulted: without a credential the suite only runs against mocks.
-const EMAIL = process.env.CHRONOGRAPH_SWEEP_EMAIL || "";
-const PASSWORD = process.env.CHRONOGRAPH_SWEEP_PASSWORD || "";
 const fixture = JSON.parse(
   readFileSync(new URL("./fixtures/engine.json", import.meta.url), "utf8"),
 ) as { routes: Record<string, { status: number; body: unknown }> };
@@ -144,52 +146,10 @@ async function mockConsole(page: Page) {
   });
 }
 
-/**
- * One sign-in for the whole file, reused by every test. Each test gets a fresh browser
- * context, and signing in per test hit the provider's rate limit (ten attempts a minute)
- * before the last pages ran. The sign-in goes through the provider's own endpoint rather
- * than the form: the form is covered by managed-auth.spec.ts, and what this suite needs is
- * a session, not a click path.
- */
-const STATE = process.env.CHRONOGRAPH_SWEEP_STATE || "";
-let cookies: Cookie[] = [];
+// The sign-in, the session and the deployment coordinates live in one place because two
+// suites need them: see ui/e2e/real-deployment.ts.
 test.beforeAll(async ({ playwright }) => {
-  if (!ORIGIN || !EMAIL || !PASSWORD) return;
-  const context = await playwright.request.newContext({ baseURL: ORIGIN });
-  try {
-    // The provider rate-limits sign-in attempts, so a saved session is reused until it stops
-    // answering. That also means a sweep of a real deployment costs one sign-in, not thirteen.
-    if (STATE) {
-      try {
-        const saved = JSON.parse(readFileSync(STATE, "utf8")) as { cookies: Cookie[] };
-        await context.setExtraHTTPHeaders({});
-        const check = await context.get("/managed/session", {
-          headers: { cookie: saved.cookies.map((c) => c.name + "=" + c.value).join("; ") },
-        });
-        const body = check.ok() ? await check.json() : null;
-        if (body?.user) {
-          cookies = saved.cookies;
-          return;
-        }
-      } catch {
-        /* no usable saved session; sign in below */
-      }
-    }
-    const response = await context.post("/api/auth/sign-in/email", {
-      data: { email: EMAIL, password: PASSWORD },
-      headers: { origin: ORIGIN },
-    });
-    if (!response.ok())
-      throw new Error(
-        "sign-in failed: " + response.status() + " " + (await response.text()),
-      );
-    cookies = (await context.storageState()).cookies;
-    if (!cookies.length) throw new Error("sign-in produced no session cookie");
-    if (STATE)
-      writeFileSync(STATE, JSON.stringify({ cookies }, null, 2) + "\n", { mode: 0o600 });
-  } finally {
-    await context.dispose();
-  }
+  await signInOnce(playwright);
 });
 
 /* The point of the product is an encoder, a database and a decoder that agree. Every other
@@ -200,8 +160,8 @@ test.beforeAll(async ({ playwright }) => {
 test("the browser decoder decodes the artifact this deployment serves", async ({
   page,
 }) => {
-  test.skip(!ORIGIN, "Only meaningful against a real deployment.");
-  await page.context().addCookies(cookies);
+  test.skip(!configured, NEEDS_DEPLOYMENT);
+  await applySession(page);
   await page.goto(ORIGIN + "/app/bci");
   const run = page.getByRole("button", { name: /run a decode/i });
   await expect(run).toBeVisible({ timeout: 20_000 });
@@ -218,8 +178,8 @@ test("the browser decoder decodes the artifact this deployment serves", async ({
    sign-in form and read as a broken panel. Against a real deployment this asserts the panel
    itself renders, which the mocked superadmin suite cannot say. */
 test("the operator panel renders for the operator account", async ({ page }) => {
-  test.skip(!ORIGIN, "Only meaningful against a real deployment.");
-  await page.context().addCookies(cookies);
+  test.skip(!configured, NEEDS_DEPLOYMENT);
+  await applySession(page);
   await page.goto(ORIGIN + "/admin");
   await expect(page.getByRole("heading", { name: "Platform status" })).toBeVisible({
     timeout: 20_000,
@@ -241,7 +201,7 @@ for (const [name, path, markers] of PAGES) {
         console_.push(`[${message.type()}] ${message.text()}`);
     });
     await mockConsole(page);
-    if (cookies.length) await page.context().addCookies(cookies);
+    await applySession(page);
     await page.goto(ORIGIN ? ORIGIN + path : path);
     // The console shell is the proof that the route mounted at all. When it is missing,
     // say what the page is showing instead: a redirect and a render failure look nothing
