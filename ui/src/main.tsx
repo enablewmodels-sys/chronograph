@@ -243,7 +243,8 @@ function App() {
                   <Link to="/projects">Back to projects</Link>
                   <h2>Operator access required.</h2>
                   <p>
-                    This panel belongs to the platform operator account. Your
+                    This panel belongs to the platform operator account. You are currently
+                      signed in as {managed?.user?.email || "an unknown account"}. Your
                     own projects are unaffected.
                   </p>
                 </div>

@@ -354,6 +354,11 @@ test("a signed-in account that is not an operator is refused", async ({
   await expect(
     page.getByRole("heading", { name: "Operator access required." }),
   ).toBeVisible();
+  // The panel names the account, so a refused operator can see the cause instead of
+  // concluding the panel is broken: the address simply is not on the server's list.
+  await expect(
+    page.getByText("member@example.com", { exact: false }),
+  ).toBeVisible();
   await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
   await expect(page.locator(".superadmin-panel")).toHaveCount(0);
 });
