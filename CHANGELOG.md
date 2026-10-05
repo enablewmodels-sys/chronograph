@@ -34,6 +34,16 @@
   behind a green suite; the suite is now 2,902 checks.
 - The repo's own browser suite is green again: `superadmin.spec.ts` and `console.spec.ts` still
   asserted the pre-change `/admin` behaviour and headings from an older landing copy.
+- Layer 4 is reachable from the product. The console's Apps page lists a project's apps with
+  health and the active image digest, and offers plan, deploy, promote, roll back and destroy
+  through `/managed/apps*` in the control plane, driving the same `appctl` runtime the CLI uses.
+  Hosting is opt-in: with no `hosting` block every route answers 404 and the page says so. A
+  deploy can only name a manifest that already exists under the project's own directory, a plan is
+  the one call a viewer may make, mutations need an admin, destroying needs the owner plus a
+  confirmation echo, and the child process gets an argv array, a minimal environment that carries a
+  secret reference by name only, and bounded time and output.
+  `scripts/hosting-test.mjs` covers 12 scenarios and 386 checks against the real gateway with real
+  owner, admin, editor and viewer accounts.
 - Operational alerts have somewhere to go. The monitor reported
   `external_alert_delivery: False` as a literal, so an unhealthy host produced nothing
   anybody would see. `launch/private/managed/control-plane/alerts.py` posts an unhealthy

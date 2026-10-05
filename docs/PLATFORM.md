@@ -82,6 +82,16 @@ preview, and every action appends to a ledger that holds reference names rather 
 persistence size is a ceiling: a container with database-like environment names and no persistent
 mount is refused, and so is a volume whose recorded size disagrees with the manifest.
 
+The product reaches it too. The console's **Apps** page lists a project's apps with health and the
+active image digest and offers plan, deploy, promote, roll back and destroy, behind
+`/managed/apps*` in the control plane. Hosting is opt-in through a `hosting` block in the
+configuration: with it absent every one of those routes answers 404 and the page says hosting is not
+enabled. A deploy only ever names a manifest that already exists under the project's own manifests
+directory — the request cannot supply a manifest, a path or a runtime — a plan is the one call a
+viewer may make, mutations need an admin, destroying needs the owner plus a confirmation echo, and
+the child process is spawned with an argv array, a minimal environment in which a secret reference
+travels by name only, and bounded time and output.
+
 What is still not here: a multi-tenant scheduler with a queue, horizontal scaling (`replicas > 1`
 is refused rather than silently downgraded), and a filesystem-level volume quota, which needs
 host-specific storage options. `scripts/appctl-test.mjs` covers 34 checks on the dry-run driver;
