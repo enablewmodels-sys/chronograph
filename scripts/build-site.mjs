@@ -4,6 +4,9 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 
+// Same dependency as the managed console: the site imports the SDK's compiled output.
+await import("./build-sdk.mjs");
+
 const root = fileURLToPath(new URL("../", import.meta.url));
 const output = path.join(root, "dist/site");
 const base = process.env.CHRONOGRAPH_SITE_BASE || "/";

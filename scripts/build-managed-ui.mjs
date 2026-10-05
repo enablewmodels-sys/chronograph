@@ -3,6 +3,10 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { verifyUiBuild } from "./verify-ui-build.mjs";
 
+// The console imports the SDK's compiled entry point, so the SDK is built first: see
+// scripts/build-sdk.mjs for why a clean checkout cannot skip this.
+await import("./build-sdk.mjs");
+
 const ui = fileURLToPath(new URL("../ui/", import.meta.url));
 const env = {
   ...process.env,

@@ -34,6 +34,15 @@
   behind a green suite; the suite is now 2,902 checks.
 - The repo's own browser suite is green again: `superadmin.spec.ts` and `console.spec.ts` still
   asserted the pre-change `/admin` behaviour and headings from an older landing copy.
+- A provider token can now open a workspace session. `POST /managed/provider-session` verifies the
+  token through the Layer 5 connector and exchanges it for the control plane's own session, reusing
+  the existing account hook, session adapter and cookie signer rather than inventing a second
+  identity path. It is opt-in through an `identityProvider` block in `control.json`: with the block
+  absent the route answers 404 and nothing else changes, which is what the release ships.
+  `scripts/provider-identity-test.mjs` signs real tokens with generated keys and covers a foreign
+  key, an expired token, a wrong audience, an unverified address, an allowlist miss, an unknown
+  project, role escalation and a replayed exchange — 108 checks, with no token present in any audit
+  row or response.
 - Layer 5 is implemented, not just declared. `deploy/platform/connectors/` verifies a provider
   token (RS256 and ES256 against a cached JWKS with `iss`, `aud`, `exp`, `nbf` and skew checks),
   maps a subscription state to project capacity behind a signed, unexpired, unseen webhook, and

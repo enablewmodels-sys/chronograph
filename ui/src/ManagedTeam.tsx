@@ -17,7 +17,9 @@ interface Member {
   email: string;
   role: string;
   status: string;
-  twoFactorEnabled: boolean;
+  // The user table is built from the auth plugins, so the field a removed plugin owned
+  // no longer exists. The server now reports how the account signs in.
+  hasPassword: boolean;
 }
 interface Audit {
   seq: number;
@@ -212,7 +214,7 @@ export default function ManagedTeam() {
                         </select>
                       </td>
                       <td>
-                        {m.twoFactorEnabled ? "MFA enabled" : "Setup pending"}
+                        {m.hasPassword ? "Password" : "Provider sign-in"}
                       </td>
                       <td>{m.status}</td>
                       <td>
