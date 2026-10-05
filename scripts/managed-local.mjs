@@ -196,8 +196,26 @@ app.db
   )
   .run(PRIMARY, "Local project", "operator", "ready", Date.now(), 1);
 
+/**
+ * The engine's readiness probe cannot tell our engine from one already running: a second
+ * deployment is started with the same origin, so the probe of the deployment already on the
+ * port answers 200 for the port the newcomer wanted. The listen that then fails is this one,
+ * and it used to surface as a raw EADDRINUSE stack with the temporary state left behind.
+ */
+app.server.on("error", (error) => {
+  void abort(
+    error.code === "EADDRINUSE"
+      ? "Port " + PORT + " is already serving a deployment."
+      : "The console could not start: " + error.message,
+  );
+});
 app.server.listen(PORT, "127.0.0.1");
-await new Promise((done) => app.server.once("listening", done));
+await new Promise((done, fail) => {
+  app.server.once("listening", done);
+  app.server.once("error", fail);
+}).catch(() => {
+  /* abort() above already reported it and exited */
+});
 
 // --- an owner who can sign in with a password, the way an invited operator does -------------
 // Between 15 and 128 characters, which is what the identity provider accepts.

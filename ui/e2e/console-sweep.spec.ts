@@ -192,6 +192,27 @@ test.beforeAll(async ({ playwright }) => {
   }
 });
 
+/* The point of the product is an encoder, a database and a decoder that agree. Every other
+   check here only looks at a page, so this one presses the button: it runs the decoder the
+   deployment serves, in the browser, through the wasm module built from the same crate as the
+   Python SDK, and requires a real token out the other end. A page that renders a panel and a
+   button that does nothing would pass everything else in this file. */
+test("the browser decoder decodes the artifact this deployment serves", async ({
+  page,
+}) => {
+  test.skip(!ORIGIN, "Only meaningful against a real deployment.");
+  await page.context().addCookies(cookies);
+  await page.goto(ORIGIN + "/app/bci");
+  const run = page.getByRole("button", { name: /run a decode/i });
+  await expect(run).toBeVisible({ timeout: 20_000 });
+  await run.click();
+  // The result names the decoded token and how confident it was; the shape is the contract,
+  // not the words, because the decoder is seeded and the demo is synthetic.
+  await expect(
+    page.getByText(/(up|down)\s+(at|·|:)\s*\d/i).first(),
+  ).toBeVisible({ timeout: 45_000 });
+});
+
 /* The operator panel is the page that was reported broken while everything underneath it
    was fine: the account was signed out twenty minutes earlier, so /admin answered with the
    sign-in form and read as a broken panel. Against a real deployment this asserts the panel
@@ -288,6 +309,17 @@ for (const [name, path, markers] of PAGES) {
         failures.push(
           `${path} did not draw its own page: expected one of ${markers.join(" / ")}` +
             ` | drew: ${text.slice(0, 240)}`,
+        );
+      // A page whose reads all failed still draws its own headings and its own static copy,
+      // which is how a renamed or removed control-plane route stayed invisible here. The
+      // control plane answers one string for a route it does not serve and another for
+      // hosting it was not given; the first is never a correct state for a live deployment.
+      const unavailable = text.match(
+        /This workspace operation is not available\./,
+      );
+      if (unavailable)
+        failures.push(
+          `the control plane does not serve an operation this page needs — ${unavailable[0]}`,
         );
       for (const error of errors) failures.push(`raised ${error}`);
     }

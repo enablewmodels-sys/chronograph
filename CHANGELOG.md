@@ -17,6 +17,13 @@
   returned no `Set-Cookie` before, and `Max-Age=2592000` with the row back at 30 days after.
   A test that pins the policy literals replaced the boundary-only assertion, which stayed green
   for any value including the half hour it replaced.
+- Two holes a review found in the sweep itself are closed, and it now presses a button. A page whose
+  reads all failed still drew its own headings and passed; a page that redirected away drew another
+  page's content and passed too. Each page carries copy only that page draws, and the control
+  plane's "this workspace operation is not available" answer fails the run wherever it appears. The
+  sweep also stops only reading the page that offers the decoder: against a real deployment it
+  clicks through, runs the served wasm module in a browser and requires a token back, which makes
+  the encoder-database-decoder claim checkable rather than described.
 - The account an operator signs in with is the account that can open the panel. The allowlist held
   two addresses while the browser was signed in as a third, so /admin answered "operator access
   required" for its owner. The deployment's `superadminEmails` now names every address the owner
