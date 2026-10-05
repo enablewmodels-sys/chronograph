@@ -34,6 +34,13 @@
   behind a green suite; the suite is now 2,902 checks.
 - The repo's own browser suite is green again: `superadmin.spec.ts` and `console.spec.ts` still
   asserted the pre-change `/admin` behaviour and headings from an older landing copy.
+- Operational alerts have somewhere to go. The monitor reported
+  `external_alert_delivery: False` as a literal, so an unhealthy host produced nothing
+  anybody would see. `launch/private/managed/control-plane/alerts.py` posts an unhealthy
+  report to `alertWebhook` (or `CHRONOGRAPH_ALERT_WEBHOOK`) and records the outcome:
+  `destination: none` with no destination configured, `delivered: false` with the
+  reason when the destination refuses, and no request at all for a healthy tick.
+  `scripts/alerts-test.py` runs the real module against a local server — 14 checks.
 - A provider token can now open a workspace session. `POST /managed/provider-session` verifies the
   token through the Layer 5 connector and exchanges it for the control plane's own session, reusing
   the existing account hook, session adapter and cookie signer rather than inventing a second

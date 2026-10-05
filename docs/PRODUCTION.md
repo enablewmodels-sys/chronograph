@@ -139,9 +139,18 @@ format with an older binary. See [upgrade requirements](UPGRADE_0_4.md).
 The live host has TLS, MFA for accounts, scoped keys, separate project stores,
 fsync enforcement, health/metrics endpoints and six-hour local backup timers.
 An encrypted recovery copy has been captured outside the instance manually.
-Automated off-host backup, external alert delivery, replication and automatic
-failover are **not configured**. Email signup/recovery awaits an email provider;
-GitHub and operator-issued email invitations are the available account paths.
+Automated off-host backup, replication and automatic failover are **not
+configured**. Email signup/recovery awaits an email provider; GitHub and
+operator-issued email invitations are the available account paths.
+
+Alert delivery is wired but has no destination here: the monitor probes each
+project, writes `/var/lib/chronograph-managed/operational-health.json`, and posts
+an unhealthy report to `alertWebhook` in the control-plane configuration (or
+`CHRONOGRAPH_ALERT_WEBHOOK`) when one is set. The status file always records what
+happened — `{"destination":"none","delivered":null,"reason":"..."}` means no
+destination is configured, and a configured destination that answers with an error
+leaves `delivered: false` with the reason. `scripts/alerts-test.py` drives the
+real module against a local server, so the flag cannot be a literal again.
 
 New tenant engines share one Unix identity and machine. Dedicated tenant VMs,
 organization SSO, billing, a stable owned customer domain and an availability SLA
