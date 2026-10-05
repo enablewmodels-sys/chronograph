@@ -60,7 +60,7 @@ node scripts/appctl-test.mjs                     # 35
 node scripts/hosting-test.mjs                    # 386
 node scripts/platform-connectors-test.mjs        # 9
 node scripts/provider-identity-test.mjs          # 108
-cd launch/private/managed/control-plane && node --test test/*.test.mjs   # 44 tests, 42 pass
+cd launch/private/managed/control-plane && node --test test/*.test.mjs   # 46 tests, 44 pass
 cd ui && node node_modules/@playwright/test/cli.js test --project=desktop-chromium   # 39 passed, 8 skipped
 #   the eight skips all need a real deployment: the operator panel, the decoder click, and the
 #   six control tests in console-actions.spec.ts
