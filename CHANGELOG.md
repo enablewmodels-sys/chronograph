@@ -24,6 +24,16 @@
   at 503 and the console showed the wrong reason. An error carrying a deliberate status and code
   keeps its message; an unexpected throw is still masked so internals do not leak. `test/errors.test.mjs`
   pins both directions, and the refusal now names the measurement and the floor.
+- Intent is a mark rather than an inference. The gateway decided whether an error was a written
+  refusal or a crash by looking for an integer status and a string code — correct for everything in
+  the installed dependency set, but it read intent off objects this codebase does not own, so one
+  dependency that set both fields would start leaking its message to a client. `problem()` and
+  `HostingFailure` now set a non-enumerable symbol and the gateway asks `isDeliberate(error)`. The
+  message of a masked failure is also logged with its request id now: it was the only description of
+  the failure anywhere, and it went nowhere, so nobody could find out what had happened.
+- The operator panel's disk warning names the trigger that fired. It has two — an absolute floor and
+  a tenth of the volume — and it named the floor whichever one tripped, so a panel could read "below
+  the operating threshold of 5.0 GiB" beside "6.0 GiB free of 100.0 GiB".
 - The write floor is one number in three places, not three numbers. A review found that
   `minimumFreeBytes` governed only the graph-write guard while `projects.mjs` still hardcoded
   5 GiB for provisioning and the operator panel used its own 5 GiB for the disk warning, so a
