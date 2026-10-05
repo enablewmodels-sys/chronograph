@@ -116,13 +116,62 @@ test("a durable branch can be created", async ({ page }) => {
 
 test("a consistent backup can be created", async ({ page }) => {
   await page.goto(ORIGIN + "/app/operations");
-  const rows = page.locator("table tbody tr");
-  const before = await rows.count();
+  // Wait for the page to have read the engine before reading the table: an empty read here once
+  // skipped the room-making below and left the test asserting a success the cap forbade.
+  await expect(page.getByRole("button", { name: "Create backup" })).toBeVisible({
+    timeout: 20_000,
+  });
+  await expect(
+    page.locator("table tbody tr").first().or(page.getByText("No local backups yet.")),
+  ).toBeVisible({ timeout: 20_000 });
+  // Identify the backups by their IDs rather than counting rows: a count that grew would also be
+  // satisfied by an unrelated row appearing, and this test's claim is that a *new* backup exists.
+  const ids = async () =>
+    (await page.locator("table tbody tr td:nth-child(3)").allInnerTexts())
+      .map((value) => value.trim())
+      .filter(Boolean);
+  let before = new Set(await ids());
+  // The engine keeps three local backups and refuses the fourth, saying so. A repeated run has
+  // to make room rather than assert a success it cannot have, and removing one exercises the
+  // delete path on the way.
+  if (before.size >= 3) {
+    await page
+      .locator("table tbody tr")
+      .last()
+      .getByRole("button", { name: "Delete" })
+      .click();
+    await expect.poll(async () => (await ids()).length, { timeout: 20_000 }).toBeLessThan(
+      before.size,
+    );
+    before = new Set(await ids());
+  }
   await page.getByRole("button", { name: "Create backup" }).click();
   await expect(page.getByText("Consistent backup created.")).toBeVisible({
     timeout: 20_000,
   });
   await expect
-    .poll(async () => rows.count(), { timeout: 20_000 })
-    .toBeGreaterThan(before);
+    .poll(async () => (await ids()).some((id) => !before.has(id)), { timeout: 20_000 })
+    .toBe(true);
+});
+
+/* The suites sign in through the provider's endpoint, which is not the path a person takes. This
+   one uses the rendered form on a real deployment, because the failure this product actually had
+   was a form that accepted a password and then bounced the reader back to itself. */
+test("the sign-in form itself works against this deployment", async ({ browser }) => {
+  // A context with no session, or the form would never render.
+  const context = await browser.newContext();
+  try {
+    const page = await context.newPage();
+    await page.goto(ORIGIN + "/login");
+    await page.getByLabel("Email address").fill(process.env.CHRONOGRAPH_SWEEP_EMAIL || "");
+    await page.getByLabel("Password").fill(process.env.CHRONOGRAPH_SWEEP_PASSWORD || "");
+    await page.getByRole("button", { name: "Sign in" }).click();
+    // The signed-in shell, not the form again: a bounce is the defect this test exists for.
+    await expect(page.locator(".workspace-top")).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole("heading", { name: "Sign in to ChronoDB." })).toHaveCount(
+      0,
+    );
+  } finally {
+    await context.close();
+  }
 });

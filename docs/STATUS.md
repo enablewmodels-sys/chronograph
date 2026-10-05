@@ -14,11 +14,11 @@ setting or credential — nothing half-on, and nothing pretending to be on.
 | Ingestion: 64 BrainFlow boards, 18 vendors, LSL, EDF/BDF/FIF/BrainVision/EEGLAB, CSV/NPY | `scripts/bci-formats-test.py` — 2,902 checks |
 | Source picker reaching every board | `ui/e2e/catalogue.spec.ts` — walks the widget, 64/64 selectable |
 | Decoder: Python, TypeScript, WASM, and in the browser | `sdk/typescript/test/decoder.mjs` and `scripts/bci-wasm-test.py` — parity 1.1e-16; the live console decodes the artifact it serves |
-| Console sign-in, projects, team, secrets, audit | `ui/e2e/managed-auth.spec.ts`; control-plane suite 41 tests / 39 pass / 0 fail |
+| Console sign-in, projects, team, secrets, audit | `ui/e2e/managed-auth.spec.ts`; control-plane suite 44 tests / 42 pass / 0 fail |
 | Every console page, and the page it claims to be | `ui/e2e/console-sweep.spec.ts` — 13 console pages plus the operator panel, each asserted against copy only that page draws, so a redirect or a page that rendered one error notice fails |
 | The console's own controls | `ui/e2e/console-actions.spec.ts` — an API key created then revoked, a secret stored, a reader key issued, an invitation answered or refused with its reason, a durable branch created, a backup taken, all against a real deployment |
 | A refusal says what to do | The gateway masks an unexpected failure but passes through a deliberate one, so "writes are paused because storage is low: 3200 MiB free, below this deployment's 4096 MiB floor" reaches the reader; `test/errors.test.mjs` |
-| The write floor | `minimumFreeBytes`, default 5 GiB, validated by `config.mjs`; a small development volume sets its own |
+| The write floor, in all three places that check it | `minimumFreeBytes` (default 5 GiB) is validated by `config.mjs` and used by the graph-write guard, project provisioning and the operator panel's disk warning, each naming the measurement and the floor it compared against |
 | The decoder, pressed rather than described | `console-sweep.spec.ts` runs the browser decoder against a real deployment and requires a token back (13 pages + operator panel + decode = 15) |
 | The same pages against a real deployment | `scripts/managed-local.mjs` (real gateway, real engine, real session) with `CHRONOGRAPH_SWEEP_ORIGIN`; needs `ui/dist-managed` and `target/release/chronograph-server`, both build artifacts |
 | Sessions that survive a quiet afternoon | 30-day lifetime that the browser cookie *and* the server row both follow, a 14-day idle window, and an explained sign-out; the policy literals and both sides of the idle boundary are asserted in the control-plane suite |

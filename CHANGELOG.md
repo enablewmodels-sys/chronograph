@@ -24,6 +24,13 @@
   at 503 and the console showed the wrong reason. An error carrying a deliberate status and code
   keeps its message; an unexpected throw is still masked so internals do not leak. `test/errors.test.mjs`
   pins both directions, and the refusal now names the measurement and the floor.
+- The write floor is one number in three places, not three numbers. A review found that
+  `minimumFreeBytes` governed only the graph-write guard while `projects.mjs` still hardcoded
+  5 GiB for provisioning and the operator panel used its own 5 GiB for the disk warning, so a
+  deployment that lowered the floor could serve writes but not create the project they belong to,
+  and the panel would warn about a state that was not a problem. All three read the deployment's
+  value now, and each refusal names the measurement and the floor it compared against. The
+  loader's exact bounds are pinned too: 64 MiB and 1 TiB accepted, one byte either side rejected.
 - The write floor is a deployment decision. Five gigabytes suited an instance holding real projects
   and made the product look broken on a small development volume, which is where the write paths
   above were first exercised. `minimumFreeBytes` defaults to 5 GiB, is bounded by `config.mjs`, and
@@ -31,8 +38,12 @@
 - The console's controls are tested, not just its pages. `ui/e2e/console-actions.spec.ts` creates and
   revokes an API key, stores a secret and issues a reader key, invites a collaborator (asserting the
   refusal and its reason on a deployment without mail delivery), creates a durable branch and takes a
-  consistent backup — all through the rendered controls against a real deployment, 5/5. The suites
-  that need one now share `ui/e2e/real-deployment.ts`.
+  consistent backup — all through the rendered controls against a real deployment, 6/6. Two of them
+  assert state rather than appearance: the backup is identified by a new backup ID (the engine keeps
+  three and refuses the fourth, so the test removes the oldest first), and a separate test signs in
+  through the rendered form, because the failure this product actually had was a form that accepted a
+  password and bounced the reader back to itself. The suites that need a real deployment now share
+  `ui/e2e/real-deployment.ts`.
 - The authenticator UI is gone from the sign-in page. The operator removed the authenticator, so the
   enrolment screen and the code prompt could not be reached, and the one remaining call to
   `/api/auth/two-factor/enable` answered 404. A `needsMfa` account is now refused explicitly with
