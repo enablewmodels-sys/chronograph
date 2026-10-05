@@ -276,6 +276,41 @@ export default function Schema() {
         <div id="schema-content" role="tabpanel" aria-labelledby={`tab-${tab}`}>
           {tab === "Relations" && (
             <>
+              {/* The page is about meaning, not bytes. Say so before the controls. */}
+              <section className="panel schema-start">
+                <h2>Name what your data means.</h2>
+                <p>
+                  A recording writes numeric relation kinds. Naming them here is what
+                  turns those numbers into readable history: a kind becomes a named
+                  relation with typed properties, so a query answers with
+                  channels, cue and probability instead of raw bytes.
+                </p>
+                <ol className="schema-start-steps">
+                  <li>
+                    Define a relation here, or apply a connector preset such as the
+                    BCI research contract.
+                  </li>
+                  <li>
+                    Record with the SDK on the machine wired to the device. Nothing on
+                    this page touches hardware.
+                  </li>
+                  <li>
+                    Read it back in the BCI workspace as a moment, a branch or a
+                    causal path.
+                  </li>
+                </ol>
+                <div className="schema-start-actions">
+                  <Link className="text-link" to="/app/bci">
+                    Open the BCI workspace
+                  </Link>
+                  <Link className="text-link" to="/documentation/SCHEMA">
+                    Schema guide
+                  </Link>
+                  <Link className="text-link" to="/documentation/FORMATS">
+                    Device and file formats
+                  </Link>
+                </div>
+              </section>
               <div className="schema-toolbar">
                 <Field label="Find a relation">
                   <input

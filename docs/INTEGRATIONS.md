@@ -13,7 +13,7 @@ Use the [SDK guide](SDK.md) to connect and [schema migrations](SCHEMA.md) to con
 | NumPy, PyTorch, ONNX outputs | `model_outputs()` → `model-output/tensors-v1` | Named tensor/endian fixtures; run ONNX or other inference locally and pass its numeric outputs |
 | Gymnasium, Minari | `transition()`; existing Gridworld/Minari converter | Existing runtime fixtures; arbitrary simulator restoration needs a complete state and RNG codec |
 | Physical AI, Isaac, MuJoCo | `transition()` → `physical-ai/transition-v1` | Normalized transition fixture only; no Isaac/MuJoCo runtime or hardware control certification |
-| BrainFlow / OpenBCI | `brainflow()` converts an already acquired board matrix | BrainFlow 5.22.2 synthetic board tested; physical board drivers and transports remain the caller's responsibility |
+| BrainFlow / OpenBCI | `brainflow()` converts an already acquired board matrix | BrainFlow 5.23.0 synthetic board tested; physical board drivers and transports remain the caller's responsibility |
 | Lab Streaming Layer | `lsl_chunk()` converts `pull_chunk()` output | pylsl 1.18.2/liblsl 1.17.7 local stream fixture; explicit local timestamps, no automatic Unix conversion |
 | MNE, EDF/BDF/FIF | `eeg()` / `eeg_file()` | Existing MNE 1.13 fixtures; recorded data, not clinical interpretation |
 | ROS 2 / MCAP | `ros_message()` for decoded dictionaries and media | Decoded-image fixture; native Rust bag reader remains JointState-only |

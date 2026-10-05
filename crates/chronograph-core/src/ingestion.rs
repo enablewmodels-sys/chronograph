@@ -2,7 +2,7 @@
 use std::collections::BTreeMap;
 
 use crate::{
-    BoundedEdgeInput, EdgeId, Error, Graph, Result,
+    BoundedEdgeInput, EdgeId, Error, ForkId, Graph, Result, WriteOp, WriteResult,
     storage::{Insert, Record},
 };
 use serde::{Deserialize, Serialize};
@@ -33,42 +33,56 @@ pub struct IngestReceipt {
     pub revision: u64,
 }
 
+/// Shared partition identity and sequencing rules for the parent and every branch. One
+/// implementation serves all writers, so adding branches never adds a checkpoint code path.
+fn identify(cursor: &IngestCursor) -> Result<()> {
+    let valid = |s: &str| {
+        !s.is_empty()
+            && s.len() <= 96
+            && s.bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b"_.-".contains(&b))
+    };
+    if !valid(&cursor.source) || !valid(&cursor.partition) {
+        return Err(Error::InvalidIngest(
+            "source/partition must contain 1–96 ASCII identifier characters".into(),
+        ));
+    }
+    Ok(())
+}
+
+fn admit(previous: Option<&IngestReceipt>, cursor: &IngestCursor) -> Result<Option<IngestReceipt>> {
+    identify(cursor)?;
+    match previous {
+        Some(previous)
+            if previous.cursor.sequence == cursor.sequence
+                && previous.cursor.digest == cursor.digest =>
+        {
+            Ok(Some(previous.clone()))
+        }
+        Some(previous) if previous.cursor.sequence.checked_add(1) == Some(cursor.sequence) => {
+            Ok(None)
+        }
+        Some(_) => Err(Error::IngestConflict(
+            "expected the next sequence or an identical retry of the latest batch".into(),
+        )),
+        None if cursor.sequence != 0 => Err(Error::IngestConflict(
+            "a new partition must start at sequence 0".into(),
+        )),
+        None => Ok(None),
+    }
+}
+
 #[derive(Default)]
 pub(crate) struct Checkpoints(BTreeMap<(String, String), IngestReceipt>);
 impl Checkpoints {
     pub fn check(&self, cursor: &IngestCursor) -> Result<Option<IngestReceipt>> {
-        let valid = |s: &str| {
-            !s.is_empty()
-                && s.len() <= 96
-                && s.bytes()
-                    .all(|b| b.is_ascii_alphanumeric() || b"_.-".contains(&b))
-        };
-        if !valid(&cursor.source) || !valid(&cursor.partition) {
+        identify(cursor)?;
+        if self.get(&cursor.source, &cursor.partition).is_none() && self.0.len() >= 4096 {
             return Err(Error::InvalidIngest(
-                "source/partition must contain 1–96 ASCII identifier characters".into(),
+                "workspace checkpoint limit of 4096 partitions reached".into(),
             ));
         }
-        match self.get(&cursor.source, &cursor.partition) {
-            Some(previous)
-                if previous.cursor.sequence == cursor.sequence
-                    && previous.cursor.digest == cursor.digest =>
-            {
-                Ok(Some(previous.clone()))
-            }
-            Some(previous) if previous.cursor.sequence.checked_add(1) == Some(cursor.sequence) => {
-                Ok(None)
-            }
-            Some(_) => Err(Error::IngestConflict(
-                "expected the next sequence or an identical retry of the latest batch".into(),
-            )),
-            None if cursor.sequence != 0 => Err(Error::IngestConflict(
-                "a new partition must start at sequence 0".into(),
-            )),
-            None if self.0.len() >= 4096 => Err(Error::InvalidIngest(
-                "workspace checkpoint limit of 4096 partitions reached".into(),
-            )),
-            None => Ok(None),
-        }
+        admit(self.get(&cursor.source, &cursor.partition), cursor)
     }
     pub fn get(&self, source: &str, partition: &str) -> Option<&IngestReceipt> {
         self.0.get(&(source.to_owned(), partition.to_owned()))
@@ -96,6 +110,55 @@ impl Checkpoints {
             || receipt.revision != revision
         {
             return Err(Error::IngestConflict("invalid journal receipt".into()));
+        }
+        Ok(())
+    }
+}
+
+/// Branch-scoped partition cursors. Keyed by fork so a branch commit never shares state with
+/// the parent or another branch, while one implementation serves every branch.
+#[derive(Default)]
+pub(crate) struct ForkCheckpoints(BTreeMap<(u64, String, String), IngestReceipt>);
+impl ForkCheckpoints {
+    pub fn check(&self, fork: u64, cursor: &IngestCursor) -> Result<Option<IngestReceipt>> {
+        identify(cursor)?;
+        if self.get(fork, &cursor.source, &cursor.partition).is_none() && self.0.len() >= 4096 {
+            return Err(Error::InvalidIngest(
+                "workspace branch checkpoint limit of 4096 partitions reached".into(),
+            ));
+        }
+        admit(self.get(fork, &cursor.source, &cursor.partition), cursor)
+    }
+    pub fn get(&self, fork: u64, source: &str, partition: &str) -> Option<&IngestReceipt> {
+        self.0.get(&(fork, source.to_owned(), partition.to_owned()))
+    }
+    pub fn insert(&mut self, fork: u64, receipt: IngestReceipt) {
+        self.0.insert(
+            (
+                fork,
+                receipt.cursor.source.clone(),
+                receipt.cursor.partition.clone(),
+            ),
+            receipt,
+        );
+    }
+    pub fn replay(
+        &mut self,
+        fork: u64,
+        receipt: &IngestReceipt,
+        inserts: &[Insert],
+        revision: u64,
+        first: u64,
+    ) -> Result<()> {
+        if self.check(fork, &receipt.cursor)?.is_some()
+            || inserts.is_empty()
+            || receipt.edge_count != inserts.len() as u64
+            || receipt.first_edge.0 != first
+            || receipt.revision != revision
+        {
+            return Err(Error::IngestConflict(
+                "invalid journal branch receipt".into(),
+            ));
         }
         Ok(())
     }
@@ -143,6 +206,45 @@ impl Graph {
     /// Read the last durably acknowledged batch for this source and partition.
     pub fn checkpoint(&self, source: &str, partition: &str) -> Option<&IngestReceipt> {
         self.checkpoints.get(source, partition)
+    }
+    /// Atomically commit a branch ingestion batch and its receipt in one journal frame.
+    ///
+    /// This is the same single writer that serves the parent: the receipt and the
+    /// branch-local versions share the frame, so a branch commit is as durable as a parent
+    /// commit and a byte-identical retry is idempotent. Opening a writer per branch is never
+    /// required, so branch count does not scale writer count.
+    pub fn ingest_to_fork(
+        &mut self,
+        fork: ForkId,
+        cursor: IngestCursor,
+        inputs: &[BoundedEdgeInput],
+    ) -> Result<IngestReceipt> {
+        self.journal.ensure_writable()?;
+        if let Some(receipt) = self.fork_checkpoints.check(fork.0, &cursor)? {
+            return Ok(receipt);
+        }
+        if inputs.is_empty() {
+            return Err(Error::InvalidIngest(
+                "ingestion batches cannot be empty".into(),
+            ));
+        }
+        match self.apply(WriteOp::ForkIngest {
+            fork,
+            cursor,
+            inputs: inputs.to_vec(),
+        })? {
+            WriteResult::Ingest(receipt) => Ok(receipt),
+            _ => unreachable!(),
+        }
+    }
+    /// Read the last durably acknowledged branch batch for this fork, source and partition.
+    pub fn fork_checkpoint(
+        &self,
+        fork: ForkId,
+        source: &str,
+        partition: &str,
+    ) -> Option<&IngestReceipt> {
+        self.fork_checkpoints.get(fork.0, source, partition)
     }
 }
 

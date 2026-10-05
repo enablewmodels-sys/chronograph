@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/chronograph-core", "crates/chronograph-bench", "crates/chronograph-server", "crates/chronograph-conn-bci", "crates/chronograph-connector-common", "crates/chronograph-conn-robotics", "crates/chronograph-conn-worldmodel", "crates/chronograph-conn-quantum"]
+members = ["crates/chronograph-core", "crates/chronograph-bench", "crates/chronograph-server", "crates/chronograph-conn-bci", "crates/chronograph-connector-common", "crates/chronograph-conn-robotics", "crates/chronograph-conn-worldmodel", "crates/chronograph-conn-quantum", "crates/chronograph-decoder", "crates/chronograph-wasm"]
 resolver = "2"
 
 [workspace.package]

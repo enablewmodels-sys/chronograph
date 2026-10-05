@@ -1,6 +1,6 @@
 # Security reporting
 
-Chronograph Community 0.4.0-alpha.2 is an alpha. There is no response SLA or
+ChronoDB Community 0.4.0-alpha.2 is an alpha. There is no response SLA or
 third-party penetration-test certification. The supported review target is the
 latest Community alpha; older local candidates are not maintained release lines.
 

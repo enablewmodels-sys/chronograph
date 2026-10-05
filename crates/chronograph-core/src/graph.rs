@@ -33,6 +33,9 @@ pub struct Graph {
     pub(crate) index: Index,
     pub(crate) journal: Journal,
     pub(crate) checkpoints: crate::ingestion::Checkpoints,
+    /// Branch-scoped partition cursors. One map serves every branch, so branch count does
+    /// not scale the number of writers, journals or checkpoint stores.
+    pub(crate) fork_checkpoints: crate::ingestion::ForkCheckpoints,
     pub(crate) branches: crate::branch::BranchStore,
 }
 
@@ -50,6 +53,7 @@ impl Graph {
         let mut index = Index::default();
         let mut branches = crate::branch::BranchStore::default();
         let mut checkpoints = crate::ingestion::Checkpoints::default();
+        let mut fork_checkpoints = crate::ingestion::ForkCheckpoints::default();
         let journal = Journal::open(path.as_ref(), options, |record, offset| {
             if let Record::Ingest(receipt, inserts) = record {
                 checkpoints
@@ -63,6 +67,17 @@ impl Graph {
                 branches.replay(&mut index, Record::Batch(inserts), offset)?;
                 checkpoints.insert(receipt);
                 Ok(())
+            } else if let Record::ForkIngest(fork, receipt, inserts) = &record {
+                let fork = *fork;
+                let receipt = receipt.clone();
+                let revision = branches.revision(fork)? + 1;
+                let first = inserts.first().map(|i| i.edge.id.0).unwrap_or_default();
+                fork_checkpoints
+                    .replay(fork.0, &receipt, inserts, revision, first)
+                    .map_err(|e| crate::storage::corrupt(offset, e.to_string()))?;
+                branches.replay(&mut index, record, offset)?;
+                fork_checkpoints.insert(fork.0, receipt);
+                Ok(())
             } else {
                 branches.replay(&mut index, record, offset)
             }
@@ -73,6 +88,7 @@ impl Graph {
             journal,
             branches,
             checkpoints,
+            fork_checkpoints,
         })
     }
 

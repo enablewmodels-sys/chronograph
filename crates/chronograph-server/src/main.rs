@@ -116,7 +116,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap_or_else(|_| "127.0.0.1:8080".into())
         .parse()?;
     let listener = tokio::net::TcpListener::bind(addr).await?;
-    eprintln!("Chronograph listening on {addr}; public origin {origin}");
+    eprintln!("ChronoDB listening on {addr}; public origin {origin}");
     axum::serve(listener, router(state.clone(), ui, docs))
         .with_graceful_shutdown(shutdown())
         .await?;

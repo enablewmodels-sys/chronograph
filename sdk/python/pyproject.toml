@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "chronograph-connectors"
 version = "0.4.0a3"
-description = "Normalized record transport and durable local spool for Chronograph"
+description = "Normalized record transport and durable local spool for ChronoDB"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "LicenseRef-PolyForm-Perimeter-1.0.0"
 license-files = ["LICENSE", "NOTICE"]
-authors = [{ name = "IntelliNxT", email = "enablewmodels@gmail.com" }]
+authors = [{ name = "ChronoDB, Inc.", email = "enablewmodels@gmail.com" }]
 keywords = ["temporal", "graph", "database", "branching", "time-travel", "connectors"]
 classifiers = [
   "Development Status :: 3 - Alpha",

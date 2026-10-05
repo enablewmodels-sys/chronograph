@@ -1,0 +1,18 @@
+[package]
+name = "chronograph-wasm"
+description = "Browser decoder: runs a portable decoder artifact inside WebAssembly"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+repository.workspace = true
+publish = false
+
+[lib]
+# cdylib for the WebAssembly module; rlib so a Rust host can also link it.
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+chronograph-decoder = { path = "../chronograph-decoder" }
+# The result is the same JSON shape the Python SDK and the native binary emit.
+serde_json = { version = "1", features = ["float_roundtrip"] }

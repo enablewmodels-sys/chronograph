@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write and verify a real local Minari dataset from complete Chronograph Arrow episodes."""
+"""Write and verify a real local Minari dataset from complete ChronoDB Arrow episodes."""
 import argparse
 import importlib.metadata
 import json
@@ -83,7 +83,7 @@ def export(source, output, dataset_id="chronograph-gridworld-v0"):
     minari.create_dataset_from_buffers(dataset_id, buffers, env=environment,
         observation_space=environment.observation_space if environment else gym.spaces.Box(-np.inf, np.inf, (mapping["observation_dim"],), dtype=np.float64),
         action_space=gym.spaces.Discrete(mapping["action_count"]), data_format="hdf5",
-        algorithm_name="chronograph recorded actions", description="Local Chronograph episodes with complete versioned state snapshots",
+        algorithm_name="chronodb recorded actions", description="Local ChronoDB episodes with complete versioned state snapshots",
         requirements=["gymnasium==" + importlib.metadata.version("gymnasium")])
     if environment:
         environment.close()

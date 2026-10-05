@@ -12,7 +12,11 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class Service:
-    def __init__(self, port=18096):
+    def __init__(self, port=18096, require_fsync=True):
+        # The default mirrors production: ingestion synchronizes before it acknowledges.
+        # Set False only to prove that this deployment flag still refuses a weaker
+        # durability claim.
+        self.require_fsync = require_fsync
         self.temp = tempfile.TemporaryDirectory(prefix="chronodb-bci-test-")
         self.root = Path(self.temp.name)
         self.url = f"http://127.0.0.1:{port}"
@@ -25,7 +29,7 @@ class Service:
             "CHRONOGRAPH_DATA": str(self.root / "data"),
             "CHRONOGRAPH_BIND": f"127.0.0.1:{port}",
             "CHRONOGRAPH_ORIGIN": self.url,
-            "CHRONOGRAPH_REQUIRE_FSYNC": "true",
+            "CHRONOGRAPH_REQUIRE_FSYNC": "true" if require_fsync else "false",
             "CHRONOGRAPH_UI": str(ROOT / "ui/dist"),
             "CHRONOGRAPH_DOCS": str(ROOT / "docs"),
         }

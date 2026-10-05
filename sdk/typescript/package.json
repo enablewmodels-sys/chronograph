@@ -2,9 +2,9 @@
   "name": "@chronograph-community/sdk",
   "version": "0.4.0-alpha.3",
   "type": "module",
-  "description": "Chronograph Community HTTP client and normalized connector transport",
+  "description": "ChronoDB Community HTTP client and normalized connector transport",
   "license": "SEE LICENSE IN LICENSE",
-  "author": "IntelliNxT <enablewmodels@gmail.com>",
+  "author": "ChronoDB, Inc. <enablewmodels@gmail.com>",
   "homepage": "https://chronodb.co",
   "repository": {
     "type": "git",

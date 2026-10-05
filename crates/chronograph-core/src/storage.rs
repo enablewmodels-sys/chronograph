@@ -48,6 +48,11 @@ pub(crate) enum Record {
     ForkInvalidate(ForkId, EdgeId, i64),
     ForkDiscard(ForkId),
     ForkMerge(MergeData),
+    /// Fork-scoped ingestion: the receipt and the branch inserts share one frame, so a
+    /// branch commit is as durable as a parent commit and retries stay idempotent.
+    ForkIngest(ForkId, crate::IngestReceipt, Vec<Insert>),
+    /// One frame carrying independent batches for several forks, applied in the listed order.
+    ForkBatchMany(Vec<(ForkId, Vec<Insert>)>),
 }
 
 pub(crate) struct Journal {
@@ -378,6 +383,37 @@ fn encode_insert(insert: &Insert, out: &mut Vec<u8>) {
     }
 }
 
+/// Shared receipt layout for parent and branch ingestion records.
+fn encode_receipt(receipt: &crate::IngestReceipt, output: &mut Vec<u8>) -> Result<()> {
+    for value in [&receipt.cursor.source, &receipt.cursor.partition] {
+        if value.len() > 96 {
+            return Err(Error::RecordTooLarge);
+        }
+        output.push(value.len() as u8);
+        output.extend_from_slice(value.as_bytes());
+    }
+    output.extend_from_slice(&receipt.cursor.sequence.to_le_bytes());
+    output.extend_from_slice(&receipt.cursor.digest);
+    output.extend_from_slice(&receipt.first_edge.0.to_le_bytes());
+    output.extend_from_slice(&receipt.edge_count.to_le_bytes());
+    output.extend_from_slice(&receipt.revision.to_le_bytes());
+    Ok(())
+}
+
+fn decode_receipt(reader: &mut Decoder<'_>) -> Result<crate::IngestReceipt> {
+    Ok(crate::IngestReceipt {
+        cursor: crate::IngestCursor {
+            source: reader.identifier()?,
+            partition: reader.identifier()?,
+            sequence: reader.u64()?,
+            digest: reader.take()?,
+        },
+        first_edge: EdgeId(reader.u64()?),
+        edge_count: reader.u64()?,
+        revision: reader.u64()?,
+    })
+}
+
 pub(crate) fn encode_record(record: &Record, output: &mut Vec<u8>) -> Result<()> {
     // Use u128 for preflight arithmetic, before allocating an oversized frame.
     let maximum = match record {
@@ -385,6 +421,17 @@ pub(crate) fn encode_record(record: &Record, output: &mut Vec<u8>) -> Result<()>
             128 + receipt.cursor.source.len() as u128
                 + receipt.cursor.partition.len() as u128
                 + items.len() as u128 * 67
+        }
+        Record::ForkIngest(_, receipt, items) => {
+            136 + receipt.cursor.source.len() as u128
+                + receipt.cursor.partition.len() as u128
+                + items.len() as u128 * 67
+        }
+        Record::ForkBatchMany(groups) => {
+            28 + groups
+                .iter()
+                .map(|(_, items)| 16 + items.len() as u128 * 67)
+                .sum::<u128>()
         }
         Record::Batch(items) => 20 + items.len() as u128 * 67,
         Record::ForkBatch(_, items) => 28 + items.len() as u128 * 67,
@@ -414,23 +461,14 @@ pub(crate) fn encode_record(record: &Record, output: &mut Vec<u8>) -> Result<()>
         Record::ForkDiscard(..) => 9,
         Record::ForkMerge(..) => 10,
         Record::Ingest(..) => 11,
+        Record::ForkIngest(..) => 12,
+        Record::ForkBatchMany(..) => 13,
     };
     output.extend_from_slice(&tag.to_le_bytes());
     output.extend_from_slice(&0u32.to_le_bytes());
     match record {
         Record::Ingest(receipt, items) => {
-            for value in [&receipt.cursor.source, &receipt.cursor.partition] {
-                if value.len() > 96 {
-                    return Err(Error::RecordTooLarge);
-                }
-                output.push(value.len() as u8);
-                output.extend_from_slice(value.as_bytes());
-            }
-            output.extend_from_slice(&receipt.cursor.sequence.to_le_bytes());
-            output.extend_from_slice(&receipt.cursor.digest);
-            output.extend_from_slice(&receipt.first_edge.0.to_le_bytes());
-            output.extend_from_slice(&receipt.edge_count.to_le_bytes());
-            output.extend_from_slice(&receipt.revision.to_le_bytes());
+            encode_receipt(receipt, output)?;
             output.extend_from_slice(&(items.len() as u64).to_le_bytes());
             for item in items {
                 encode_insert(item, output);
@@ -477,6 +515,24 @@ pub(crate) fn encode_record(record: &Record, output: &mut Vec<u8>) -> Result<()>
             output.extend_from_slice(&t.to_le_bytes());
         }
         Record::ForkDiscard(fork) => output.extend_from_slice(&fork.0.to_le_bytes()),
+        Record::ForkIngest(fork, receipt, items) => {
+            output.extend_from_slice(&fork.0.to_le_bytes());
+            encode_receipt(receipt, output)?;
+            output.extend_from_slice(&(items.len() as u64).to_le_bytes());
+            for item in items {
+                encode_insert(item, output);
+            }
+        }
+        Record::ForkBatchMany(groups) => {
+            output.extend_from_slice(&(groups.len() as u64).to_le_bytes());
+            for (fork, items) in groups {
+                output.extend_from_slice(&fork.0.to_le_bytes());
+                output.extend_from_slice(&(items.len() as u64).to_le_bytes());
+                for item in items {
+                    encode_insert(item, output);
+                }
+            }
+        }
         Record::ForkMerge(m) => {
             output.extend_from_slice(&m.fork.0.to_le_bytes());
             output.extend_from_slice(&(m.nodes.len() as u64).to_le_bytes());
@@ -575,7 +631,12 @@ fn decode_record(body: &[u8], offset: u64, expected_version: u16) -> Result<Reco
     let maximum_tag = match expected_version {
         1 => 4,
         2 => 10,
-        _ => 11,
+        3 => 13,
+        // v3 originally accepted tags 1-11; 12 and 13 are additive and independent of the
+        // file format version, so a v3 journal written by an older build stays readable.
+        // Older readers reject tags 12-13 with an explicit unsupported-format error instead
+        // of skipping branch state.
+        _ => 13,
     };
     if version != expected_version || flags != 0 || !(1..=maximum_tag).contains(&tag) {
         return Err(Error::UnsupportedFormat(format!(
@@ -637,20 +698,20 @@ fn decode_record(body: &[u8], offset: u64, expected_version: u16) -> Result<Reco
                 invalidations,
             })
         }
-        11 => {
-            let cursor = crate::IngestCursor {
-                source: reader.identifier()?,
-                partition: reader.identifier()?,
-                sequence: reader.u64()?,
-                digest: reader.take()?,
-            };
-            let receipt = crate::IngestReceipt {
-                cursor,
-                first_edge: EdgeId(reader.u64()?),
-                edge_count: reader.u64()?,
-                revision: reader.u64()?,
-            };
-            Record::Ingest(receipt, reader.inserts()?)
+        11 => Record::Ingest(decode_receipt(&mut reader)?, reader.inserts()?),
+        12 => {
+            let fork = ForkId(reader.u64()?);
+            let receipt = decode_receipt(&mut reader)?;
+            Record::ForkIngest(fork, receipt, reader.inserts()?)
+        }
+        13 => {
+            let count = reader.count(16)?;
+            let mut groups = Vec::with_capacity(count);
+            for _ in 0..count {
+                let fork = ForkId(reader.u64()?);
+                groups.push((fork, reader.inserts()?));
+            }
+            Record::ForkBatchMany(groups)
         }
         _ => unreachable!(),
     };

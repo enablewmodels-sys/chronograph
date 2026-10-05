@@ -15,7 +15,7 @@ var page = client.call("as_of", args);
 
 Reuse one Client for connection pooling. Its synchronous operations may throw `IOException`, `InterruptedException` or `Client.ApiException`. The latter exposes `status`, `code` and `retryAfter`. The optional constructor accepts a `Duration` deadline and maximum response bytes. The custom body subscriber stops oversized responses before collecting them fully. `request(path, method, body)` returns bytes, `ingest` takes a Gson JsonArray, and `checkpoint` returns the response JsonObject. Use `getAsString()` for graph IDs; never `getAsDouble()`.
 
-This is an alpha.3 source package for the Chronograph Community `/v1` API, not a published package-registry release. Read the [SDK guide](../../docs/SDK.md), [platform recipes](../../docs/INTEGRATIONS.md) and [HTTP API reference](../../docs/API.md).
+This is an alpha.3 source package for the ChronoDB Community `/v1` API, not a published package-registry release. Read the [SDK guide](../../docs/SDK.md), [platform recipes](../../docs/INTEGRATIONS.md) and [HTTP API reference](../../docs/API.md).
 
 All IDs and microsecond timestamps are decimal strings. `call` exposes JSON operations; `request` handles GET/DELETE and bounded binary responses. No application write retries are performed. Defaults: 30-second timeout, 4 MiB request/response caps. Remote origins require HTTPS; redirects are rejected. Increase the response cap explicitly for larger Arrow/backup downloads (maximum 256 MiB).
 
@@ -31,7 +31,7 @@ what Central's automated validation and its reviewer checklist look for:
 - a non-SNAPSHOT version `0.4.0-alpha.3`, matching the Python (`0.4.0a3`), TypeScript, Dart and C# SDKs
 - `name`, `description`, `url`, `organization` and `inceptionYear`
 - `licenses`: PolyForm Perimeter 1.0.0 with its real name and a version-pinned canonical URL, a `distribution` element and an explicit SPDX caveat. PolyForm 1.0.0 has no SPDX identifier (the SPDX licence list 3.29.0 carries only PolyForm Noncommercial and Small Business), and the old `polyformproject.org/licenses/perimeter/1.0.0/` page now returns 404, so the POM cites the tag-pinned text instead
-- `developers` (IntelliNxT, enablewmodels@gmail.com) and `scm` with `connection`, `developerConnection` and `tag v0.4.0-alpha.3`
+- `developers` (ChronoDB, Inc., enablewmodels@gmail.com) and `scm` with `connection`, `developerConnection` and `tag v0.4.0-alpha.3`
 - `issueManagement` and a `distributionManagement` target for the Central Portal
 - `maven-source-plugin` 3.4.0 and `maven-javadoc-plugin` 3.12.0, which attach the required `-sources.jar` and `-javadoc.jar`
 - `maven-gpg-plugin` 3.2.8 in the `release` profile, which signs every uploaded file

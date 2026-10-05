@@ -277,6 +277,13 @@
   font-size: 10px;
   color: #8c9fb8;
 }
+.bci-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--bci-muted);
+  font-size: 11px !important;
+  line-height: 1.7;
+}
 .bci-muted {
   color: var(--bci-muted);
   font-size: 11px !important;
@@ -607,4 +614,88 @@
   .bci-workspace * {
     scroll-behavior: auto !important;
   }
+}
+/* Branch lineage: the curves are strokes, never filled shapes. */
+.lineage-main {
+  fill: none;
+  stroke: var(--line, #2a3550);
+  stroke-width: 2;
+}
+.lineage-branch path {
+  fill: none;
+  stroke: var(--accent, #4f7cff);
+  stroke-width: 1.6;
+  opacity: 0.75;
+}
+.lineage-branch:hover path,
+.lineage-branch.is-selected path {
+  opacity: 1;
+  stroke-width: 2.2;
+}
+.lineage-branch circle {
+  fill: var(--accent, #4f7cff);
+}
+.lineage-branch text {
+  fill: var(--text, #e8ecf5);
+  font-size: 13px;
+}
+.lineage-time {
+  fill: var(--muted, #8b96ad);
+  font-size: 12px;
+}
+
+/* Device catalogue. */
+.bci-boards table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.bci-boards th,
+.bci-boards td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line, #2a3550);
+  font-size: 13px;
+  vertical-align: top;
+}
+.bci-boards th {
+  color: var(--muted, #8b96ad);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.board-summary,
+.board-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.board-filters label,
+.board-detail label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted, #8b96ad);
+}
+.board-filters input,
+.board-filters select,
+.board-detail select {
+  min-width: 220px;
+}
+.board-detail {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line, #2a3550);
+}
+.board-command {
+  background: var(--surface, #0f1524);
+  border: 1px solid var(--line, #2a3550);
+  border-radius: 8px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  font-size: 12.5px;
 }

@@ -18,7 +18,7 @@ for folder,patterns in {
 }.items():
     for pattern in patterns: files.extend((root/folder).glob(pattern))
 output=root/'ui/public/downloads'; output.mkdir(exist_ok=True)
-archive=output/'chronograph-jev-examples.zip'
+archive=output/'chronodb-jev-examples.zip'
 with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED) as z:
     for p in sorted(set(files)):
         if p.is_symlink() or not p.is_file(): raise ValueError('Expected regular source file')
@@ -29,7 +29,7 @@ with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED) as z:
         z.writestr(info,data)
 notebook=output/'jev-decision-history.ipynb'
 notebook.write_bytes((root/'examples/jev/jev-decision-history.ipynb').read_bytes())
-combined=output/'chronograph-decision-examples.zip'
+combined=output/'chronodb-decision-examples.zip'
 combined.write_bytes(archive.read_bytes())
 laya_notebook=output/'laya-decision-history.ipynb'
 laya_notebook.write_bytes((root/'examples/laya/laya-decision-history.ipynb').read_bytes())

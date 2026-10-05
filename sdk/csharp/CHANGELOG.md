@@ -7,7 +7,7 @@ pack has been run in this workspace (the .NET SDK is not installed here).
 ## Unreleased - NuGet packaging
 
 - `Chronograph/Chronograph.csproj` now carries the metadata NuGet requires: `PackageId`,
-  `Version` `0.4.0-alpha.3`, `Title`, `Authors` and `Company` (IntelliNxT), `Product`,
+  `Version` `0.4.0-alpha.3`, `Title`, `Authors` and `Company` (ChronoDB, Inc.), `Product`,
   `Copyright`, `Description`, `PackageTags`, `PackageProjectUrl`, `RepositoryUrl`,
   `RepositoryType` git, `PublishRepositoryUrl`, `PackageReleaseNotes` and `IsPackable`.
 - Licence handling uses `PackageLicenseFile` LICENSE rather than `PackageLicenseExpression`,
@@ -27,7 +27,7 @@ pack has been run in this workspace (the .NET SDK is not installed here).
 
 ## 0.4.0-alpha.3 - 2026-09-30
 
-- Initial source package for the Chronograph Community `/v1` API: `CallAsync`, `RequestAsync`,
+- Initial source package for the ChronoDB Community `/v1` API: `CallAsync`, `RequestAsync`,
   `IngestAsync` and `CheckpointAsync` with `CancellationToken` support, a 30-second default
   timeout and 4 MiB request/response caps, origin and bearer-token validation, HTTPS for
   remote origins, redirect rejection and bounded response bodies.

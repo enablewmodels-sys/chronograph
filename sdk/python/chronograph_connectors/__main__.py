@@ -8,7 +8,7 @@ from . import Client, Spool, ApiError
 
 
 def main():
-    p=argparse.ArgumentParser(description="Chronograph outbound normalized-record agent (Linux/macOS)")
+    p=argparse.ArgumentParser(description="ChronoDB outbound normalized-record agent (Linux/macOS)")
     p.add_argument("command", choices=["enqueue","run","pause","resume","cancel","status"])
     p.add_argument("--spool", required=True)
     p.add_argument("--instance", required=True)

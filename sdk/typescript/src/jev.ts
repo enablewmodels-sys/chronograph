@@ -54,7 +54,7 @@ export async function decisionRecord(response: JevResponse, provider: "typesafe"
   const digest = await crypto.subtle.digest("SHA-256", data);
   const assets: Record<string, string> = {};
   if (attachInputs) {
-    if (!client) throw new TypeError("Attachment uploads require a Chronograph client");
+    if (!client) throw new TypeError("Attachment uploads require a ChronoDB client");
     for (const [name, bytes] of [["request", data], ["response", encoder.encode(strictStringify(response))]] as const) {
       assets[name] = await client.uploadAsset(bytes, { version: 1, kind: "opaque", encoding: "json", provenance: { provider, mode } });
     }

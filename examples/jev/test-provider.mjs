@@ -14,4 +14,4 @@ const provider=new TypeSafeClient({apiKey:'test-fixture-not-a-real-key',baseURL:
 const result=await provider.systemOne(request);
 const record=await jevDecision(result,{request,src:'9007199254740993',dst:'9007199254740994',timestampUs:'1700000000000000',mode:'fixture'});
 assert.equal(calls,1);assert.deepEqual(record.fields.answers,fixture.answers);
-console.log('Official TypeSafe JS 0.6.0: mocked HTTP serialization, typed response and Chronograph adapter passed');
+console.log('Official TypeSafe JS 0.6.0: mocked HTTP serialization, typed response and ChronoDB adapter passed');

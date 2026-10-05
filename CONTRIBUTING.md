@@ -1,6 +1,6 @@
 # Contributing
 
-Chronograph is an early embedded temporal graph database. Useful contributions include reproducible bug reports, examples from actual workflows, documentation corrections and measured improvements to temporal queries or ingestion.
+ChronoDB is an early embedded temporal graph database. Useful contributions include reproducible bug reports, examples from actual workflows, documentation corrections and measured improvements to temporal queries or ingestion.
 
 Read the [quickstart](docs/QUICKSTART.md), [architecture](docs/ARCHITECTURE.md), [file format](docs/FORMAT.md) and [current limits](docs/LIMITATIONS.md). The [replay tutorial](docs/TUTORIAL.md) is a small starting point.
 

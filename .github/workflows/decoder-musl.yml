@@ -1,0 +1,43 @@
+# Builds the portable decoder executor as a static musl binary.
+#
+# The executor has no Python, BLAS or framework dependency, which is the whole point: the
+# artifact decodes on a machine where the training environment does not exist. The build runs
+# on Linux because rustup supplies a complete musl target there. A macOS host can compile the
+# same code (cargo check --target x86_64-unknown-linux-musl passes) but cannot link it without
+# a GNU cross-linker it does not ship.
+name: Static decoder binary
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  musl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-musl
+
+      - name: Build
+        run: cargo build --locked --release --target x86_64-unknown-linux-musl -p chronograph-decoder --bins
+
+      # A static build is the deliverable, so prove it instead of assuming it.
+      - name: Prove the binary is static
+        run: |
+          file target/x86_64-unknown-linux-musl/release/chronograph-decode | tee /tmp/static.txt
+          grep -q "statically linked" /tmp/static.txt
+
+      - name: Checksum
+        run: sha256sum target/x86_64-unknown-linux-musl/release/chronograph-decode
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chronograph-decode-musl
+          path: target/x86_64-unknown-linux-musl/release/chronograph-decode

@@ -107,7 +107,7 @@ Limits: 64 migrations, 256 KiB each, 1 MiB total. Requires schema v3 service.`);
   url.pathname = url.pathname.replace(/\/$/, "") + "/";
   const token = (await regularFile(options["--token-file"], 4096, true)).trim();
   if (!/^cg_[a-f0-9]{16}_[a-f0-9]{64}$/.test(token))
-    throw new Error("Invalid Chronograph API key in token file");
+    throw new Error("Invalid ChronoDB API key in token file");
   const request = async (op, body = {}) => {
     const response = await fetch(new URL(`v1/${op}`, url), {
       method: "POST",

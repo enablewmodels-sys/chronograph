@@ -1,3 +1,5 @@
+export { Decoder } from "./decoder.js";
+export type { DecoderDescription, DecoderSource } from "./decoder.js";
 export { BCIClient } from "./bci.js";
 export type { BCIRecord } from "./bci.js";
 export { layaDecision } from "./laya.js";

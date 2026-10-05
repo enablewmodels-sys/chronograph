@@ -1,7 +1,7 @@
 """Local adapters for external runtimes. Optional packages load only when called.
 
 Model inference, device control and untrusted file conversion never run on the
-Chronograph server. These functions produce the normalized v1 transport contract.
+ChronoDB server. These functions produce the normalized v1 transport contract.
 """
 import json
 from pathlib import Path

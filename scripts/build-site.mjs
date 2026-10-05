@@ -9,20 +9,15 @@ const output = path.join(root, "dist/site");
 const base = process.env.CHRONOGRAPH_SITE_BASE || "/";
 if (!/^\/(?:[a-zA-Z0-9_-]+\/)*$/.test(base))
   throw new Error("CHRONOGRAPH_SITE_BASE must be / or a slash-delimited path.");
-execFileSync(
-  "npm",
-  [
-    "--prefix",
-    "ui",
-    "run",
-    "build",
-    "--",
-    "--outDir",
-    "../dist/site",
-    "--emptyOutDir",
-  ],
-  {
-    cwd: root,
+// The local toolchain, not npm: this environment has node without npm, and the
+// managed build already invokes tsc and vite the same way, so both editions build
+// from one kind of command.
+for (const [entry, args] of [
+  ["./node_modules/typescript/bin/tsc", ["-b"]],
+  ["./node_modules/vite/bin/vite.js", ["build", "--outDir", "../dist/site", "--emptyOutDir"]],
+])
+  execFileSync(process.execPath, [entry, ...args], {
+    cwd: path.join(root, "ui"),
     env: {
       ...process.env,
       CHRONOGRAPH_SITE_BASE: base,
@@ -30,8 +25,7 @@ execFileSync(
       VITE_MANAGED_SITE: "false",
     },
     stdio: "inherit",
-  },
-);
+  });
 const summary = await readFile(path.join(root, "docs/SUMMARY.md"), "utf8");
 const chapters = [...summary.matchAll(/\]\(([^)]+\.md)\)/g)].map((m) => m[1]);
 for (const chapter of chapters) {

@@ -1,6 +1,6 @@
 [package]
 name = "chronograph-conn-quantum"
-description = "Exploratory static OpenQASM circuit DAG and calibration windows for Chronograph"
+description = "Exploratory static OpenQASM circuit DAG and calibration windows for ChronoDB"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

@@ -32,4 +32,5 @@ Motion pauses when offscreen, when the document is hidden, or through the visibl
 pause control. Replay is explicit; reduced-motion preferences produce a static
 image. Only the selected model's scene is mounted and images load lazily.
 `HistorySequence` lets visitors expand a recorded moment without a database call.
-The existing robot timeline, Jev banner and native keyboard controls remain.
+The existing robot timeline and native keyboard controls remain. The former
+Jev & Laya integration banner was removed.

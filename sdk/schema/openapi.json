@@ -150,7 +150,7 @@
   },
   "info": {
     "description": "REST v1 with decimal-string IDs and timestamps, scoped bearer authentication and bounded requests. Input schemas are shared with MCP. Responses remain extensible JSON objects; this specification is not a complete generated response type library.",
-    "title": "Chronograph Community API",
+    "title": "ChronoDB Community API",
     "version": "0.4.0-alpha.3"
   },
   "openapi": "3.1.0",
@@ -912,6 +912,89 @@
         "x-required-scope": "admin"
       }
     },
+    "/v1/bci_causal_path": {
+      "post": {
+        "description": "Walk recorded lineage backwards from one BCI observation: prediction to run, run to dataset, dataset to sessions, session to streams, stream to signal chunks and events. Read scope; bounded depth and rows.",
+        "operationId": "bci_causal_path",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "depth": {
+                    "maximum": 8,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "fork": {
+                    "description": "Optional selected branch ID; omitted uses the parent graph. Branch records, cursors and receipts stay isolated from the parent and from every other branch, and all branches share one writer.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "instance": {
+                    "type": "string"
+                  },
+                  "limit": {
+                    "maximum": 1000,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "observation": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "session": {
+                    "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "observation",
+                  "instance",
+                  "session"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Success. See API.md for operation-specific response fields."
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Structured API error; 429/503 may include Retry-After. Proxies may return non-JSON bodies.",
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-required-scope": "read"
+      }
+    },
     "/v1/bci_manifest": {
       "post": {
         "description": "Freeze recording cutoffs and source hashes for a reproducible dataset. No data is changed; publish the returned manifest as a dataset record.",
@@ -929,6 +1012,11 @@
                       "type": "string"
                     },
                     "type": "object"
+                  },
+                  "fork": {
+                    "description": "Optional selected branch ID; omitted uses the parent graph. Branch records, cursors and receipts stay isolated from the parent and from every other branch, and all branches share one writer.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
                   },
                   "instance": {
                     "type": "string"
@@ -1006,6 +1094,11 @@
                     "pattern": "^[0-9]+$",
                     "type": "string"
                   },
+                  "fork": {
+                    "description": "Optional selected branch ID; omitted uses the parent graph. Branch records, cursors and receipts stay isolated from the parent and from every other branch, and all branches share one writer.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
                   "instance": {
                     "type": "string"
                   },
@@ -1079,6 +1172,11 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
+                  "fork": {
+                    "description": "Optional selected branch ID; omitted uses the parent graph. Branch records, cursors and receipts stay isolated from the parent and from every other branch, and all branches share one writer.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
                   "instance": {
                     "type": "string"
                   },
@@ -1143,6 +1241,11 @@
                 "properties": {
                   "after": {
                     "description": "Exact u64 ID as a decimal string",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
+                  "fork": {
+                    "description": "Optional selected branch ID; omitted uses the parent graph. Branch records, cursors and receipts stay isolated from the parent and from every other branch, and all branches share one writer.",
                     "pattern": "^[0-9]+$",
                     "type": "string"
                   },
@@ -1217,6 +1320,11 @@
                   "end": {
                     "description": "Exact i64 microseconds as a decimal string",
                     "pattern": "^-?[0-9]+$",
+                    "type": "string"
+                  },
+                  "fork": {
+                    "description": "Optional selected branch ID; omitted uses the parent graph. Branch records, cursors and receipts stay isolated from the parent and from every other branch, and all branches share one writer.",
+                    "pattern": "^[0-9]+$",
                     "type": "string"
                   },
                   "instance": {
@@ -1425,6 +1533,11 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
+                  "fork": {
+                    "description": "Optional selected branch ID; omitted uses the parent graph. Branch records, cursors and receipts stay isolated from the parent and from every other branch, and all branches share one writer.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
                   "instance": {
                     "type": "string"
                   },
@@ -1485,6 +1598,11 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
+                  "fork": {
+                    "description": "Optional selected branch ID; omitted uses the parent graph. Branch records, cursors and receipts stay isolated from the parent and from every other branch, and all branches share one writer.",
+                    "pattern": "^[0-9]+$",
+                    "type": "string"
+                  },
                   "instance": {
                     "type": "string"
                   },

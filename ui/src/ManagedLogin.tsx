@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
-import { ArrowLeft, Github, LockKeyhole, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  Github,
+  LockKeyhole,
+  MailCheck,
+  ShieldCheck,
+} from "lucide-react";
 import { publicPath } from "./site";
 import { Busy, Field, Logo, SubmitForm, useAction } from "./shared";
 import { PolicyLinks } from "./SiteFooter";
@@ -37,7 +43,7 @@ export function AccountFrame({ children }: { children: ReactNode }) {
             <span>
               Private projects. Scoped access.
               <br />
-              An authenticator protects your account.
+              Your projects stay private to your account.
             </span>
           </div>
           <Link to="/documentation/HOSTED">Explore ChronoDB Managed</Link>
@@ -102,7 +108,11 @@ export default function ManagedLogin({
     void loadConfig();
   }, []);
   const user = session?.user;
-  if (user && !user.needsMfa && user.twoFactorEnabled && !user.needsActivation)
+  // The operator removed the authenticator, so a signed-in account enters its workspace
+  // directly. `needsMfa` is the switch the client reads, and the control plane currently
+  // hardcodes it to false in `safeUser`: turning the gate back on is a server change plus
+  // an entry-point that verifies a code, not a UI change on its own.
+  if (user && !user.needsMfa && !user.needsActivation)
     return <Navigate to={session.project ? "/app" : "/projects"} replace />;
   const verify = () =>
     action.run(async () => {
@@ -119,13 +129,13 @@ export default function ManagedLogin({
     });
   return (
     <AccountFrame>
-      {user && !user.twoFactorEnabled ? (
+      {user && user.needsMfa ? (
         <>
           <span className="account-symbol">
             <ShieldCheck size={24} />
           </span>
           <h2>Secure your account.</h2>
-          <p>Connect an authenticator app before entering your projects.</p>
+          <p>Finish securing your account.</p>
           {!enrollment ? (
             <SubmitForm
               onSubmit={() =>
@@ -221,6 +231,29 @@ export default function ManagedLogin({
               </SubmitForm>
             </>
           )}
+        </>
+      ) : user && user.needsActivation ? (
+        // An invitation that has not been accepted is not a second factor, and asking
+        // for an authenticator code here left the account with no way forward.
+        <>
+          <span className="account-symbol">
+            <MailCheck size={24} />
+          </span>
+          <h2>Finish setting up your account.</h2>
+          <p>
+            This invitation has not been accepted yet. Open the link in your
+            invitation email to set a password, then sign in here.
+          </p>
+          <SubmitForm
+            onSubmit={() =>
+              void action.run(async () => {
+                await managedApi("/api/auth/sign-out", {});
+                await refresh();
+              })
+            }
+          >
+            <Busy busy={action.busy}>Use a different account</Busy>
+          </SubmitForm>
         </>
       ) : challenge || user ? (
         <>

@@ -10,7 +10,7 @@ database; it does not provision GPUs, download weights or execute your model.
 Community uses the same record and migration contract. Jev remains a separate
 connector: see the [decision-model guide](DECISION_MODELS.md).
 
-[Download Python & TypeScript examples](https://chronodb.co/downloads/chronograph-decision-examples.zip) ·
+[Download Python & TypeScript examples](https://chronodb.co/downloads/chronodb-decision-examples.zip) ·
 [Download the fixture notebook](https://chronodb.co/downloads/laya-decision-history.ipynb) ·
 [Open in Binder](https://mybinder.org/v2/gh/enablewmodels-sys/chronograph/main?labpath=examples%2Flaya%2Flaya-decision-history.ipynb)
 

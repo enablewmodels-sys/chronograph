@@ -37,17 +37,45 @@ export function setManagedProject(id: string) {
 export function projectHeaders(): Record<string, string> {
   return project ? { "X-Chronograph-Project": project } : {};
 }
+/**
+ * Every call is bounded. Without this a slow or restarting control plane left the
+ * console on "Checking your account…" forever, because the session probe never
+ * settled and the sign-in form was never allowed to render.
+ */
+const REQUEST_TIMEOUT_MS = 8000;
 export async function managedApi<T>(path: string, body?: unknown): Promise<T> {
-  const response = await fetch(path, {
-    method: body === undefined ? "GET" : "POST",
-    credentials: "same-origin",
-    headers: {
-      ...projectHeaders(),
-      ...(body === undefined ? {} : { "Content-Type": "application/json" }),
-    },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-  });
-  const value = await response.json();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let response: Response;
+  try {
+    response = await fetch(path, {
+      method: body === undefined ? "GET" : "POST",
+      credentials: "same-origin",
+      signal: controller.signal,
+      headers: {
+        ...projectHeaders(),
+        ...(body === undefined ? {} : { "Content-Type": "application/json" }),
+      },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    });
+  } catch (error) {
+    throw Object.assign(
+      new Error(
+        (error as Error)?.name === "AbortError"
+          ? "The service did not answer in time. Try again."
+          : "The service is unreachable.",
+      ),
+      { code: "NETWORK" },
+    );
+  } finally {
+    clearTimeout(timer);
+  }
+  const value = await response.json().catch(() => null);
+  if (value === null) {
+    throw Object.assign(new Error("The service returned an unreadable answer."), {
+      code: "BAD_RESPONSE",
+    });
+  }
   if (!response.ok) {
     throw Object.assign(
       new Error(

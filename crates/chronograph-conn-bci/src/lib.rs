@@ -1,4 +1,4 @@
-//! Neural stream adapters over the public Chronograph API. No medical decoding is performed.
+//! Neural stream adapters over the public ChronoDB API. No medical decoding is performed.
 use arrow::{
     array::{ArrayRef, Float32Array, Int64Array, UInt32Array, UInt64Array},
     datatypes::{DataType, Field, Schema},

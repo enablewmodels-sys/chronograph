@@ -38,6 +38,7 @@ pub fn definitions() -> Vec<Tool> {
     let limit = json!({"type":"integer","minimum":1,"maximum":1000});
     let cursor = json!({"type":"string","description":"Opaque revision-bound cursor from the previous identical query; restart after a conflict"});
     let durability = json!({"type":"string","enum":["buffered","fsync"],"description":"Omitted uses schema settings. fsync acknowledges disk synchronization; buffered needs a later sync"});
+    let branch = json!({"type":"string","pattern":"^[0-9]+$","description":"Optional selected branch ID; omitted uses the parent graph. Branch records, cursors and receipts stay isolated from the parent and from every other branch, and all branches share one writer."});
     let input = json!({"type":"object","additionalProperties":false,"properties":{"src":id,"dst":id,"kind":{"type":"integer","minimum":0,"maximum":65535},"valid_from":integer,"valid_to":integer,"payload":{"type":"string","pattern":"^[0-9a-fA-F]{32}$"},"properties":{"type":"object","description":"Values matching schema property names/types. Use this or payload. u64/i64 values are decimal strings."}},"required":["src","dst","kind","valid_from"]});
     let batch = json!({"edges":{"type":"array","minItems":1,"maxItems":10000,"items":input},"durability":durability});
     let specs = vec![
@@ -50,31 +51,37 @@ pub fn definitions() -> Vec<Tool> {
         (
             "bci_sessions",
             "List BCI research sessions. Read scope; bounded pages.",
-            json!({"instance":{"type":"string"},"after":id,"limit":limit}),
+            json!({"instance":{"type":"string"},"after":id,"limit":limit,"fork":branch}),
             vec![],
         ),
         (
             "bci_session",
             "Read immutable BCI session and stream metadata.",
-            json!({"instance":{"type":"string"},"session":id}),
+            json!({"instance":{"type":"string"},"session":id,"fork":branch}),
             vec!["instance", "session"],
         ),
         (
             "bci_records",
             "Read original BCI records after an append cursor. cursor remains usable while new recordings arrive; continue while has_more. Empty pages can advance the cursor.",
-            json!({"instance":{"type":"string"},"session":id,"stream":{"type":"string"},"record_type":{"type":"string"},"after":id,"limit":limit}),
+            json!({"instance":{"type":"string"},"session":id,"stream":{"type":"string"},"record_type":{"type":"string"},"after":id,"limit":limit,"fork":branch}),
             vec!["instance", "session"],
         ),
         (
             "bci_manifest",
             "Freeze recording cutoffs and source hashes for a reproducible dataset. No data is changed; publish the returned manifest as a dataset record.",
-            json!({"instance":{"type":"string"},"sessions":{"type":"array","minItems":1,"maxItems":100,"items":id},"stream":{"type":"string"},"cutoffs":{"type":"object","additionalProperties":id}}),
+            json!({"instance":{"type":"string"},"sessions":{"type":"array","minItems":1,"maxItems":100,"items":id},"stream":{"type":"string"},"cutoffs":{"type":"object","additionalProperties":id},"fork":branch}),
             vec!["instance", "sessions", "stream"],
+        ),
+        (
+            "bci_causal_path",
+            "Walk recorded lineage backwards from one BCI observation: prediction to run, run to dataset, dataset to sessions, session to streams, stream to signal chunks and events. Read scope; bounded depth and rows.",
+            json!({"observation":id,"instance":{"type":"string"},"session":id,"depth":{"type":"integer","minimum":1,"maximum":8},"limit":limit,"fork":branch}),
+            vec!["observation", "instance", "session"],
         ),
         (
             "bci_window",
             "Read a display-only min/max waveform envelope plus coverage and events, at most 60 seconds, 16 channels and 64 MiB decoded. Original samples remain in assets.",
-            json!({"instance":{"type":"string"},"session":id,"stream":{"type":"string"},"start":integer,"end":integer,"channels":{"type":"array","maxItems":16,"items":{"type":"integer","minimum":0,"maximum":511}},"points":{"type":"integer","minimum":16,"maximum":2048}}),
+            json!({"instance":{"type":"string"},"session":id,"stream":{"type":"string"},"start":integer,"end":integer,"channels":{"type":"array","maxItems":16,"items":{"type":"integer","minimum":0,"maximum":511}},"points":{"type":"integer","minimum":16,"maximum":2048},"fork":branch}),
             vec!["instance", "session", "stream", "start", "end"],
         ),
         (
@@ -99,13 +106,13 @@ pub fn definitions() -> Vec<Tool> {
         (
             "connector_ingest",
             "Durably ingest 1–500 normalized records. Sequence starts at zero per instance/partition. Identical latest retries return the original receipt; conflicts fail. Upload referenced assets first.",
-            json!({"instance":{"type":"string"},"partition":{"type":"string"},"sequence":id,"records":{"type":"array","minItems":1,"maxItems":500,"items":crate::contract::record()}}),
+            json!({"instance":{"type":"string"},"partition":{"type":"string"},"sequence":id,"fork":branch,"records":{"type":"array","minItems":1,"maxItems":500,"items":crate::contract::record()}}),
             vec!["instance", "partition", "sequence", "records"],
         ),
         (
             "connector_checkpoint",
             "Read the last durable ingestion receipt for a configured instance and partition.",
-            json!({"instance":{"type":"string"},"partition":{"type":"string"}}),
+            json!({"instance":{"type":"string"},"partition":{"type":"string"},"fork":branch}),
             vec!["instance", "partition"],
         ),
         (
@@ -318,7 +325,7 @@ impl ServerHandler for GraphMcp {
         let mut info = ServerInfo::default();
         info.capabilities = ServerCapabilities::builder().enable_tools().build();
         info.server_info = Implementation::new("chronograph", env!("CARGO_PKG_VERSION"));
-        info.instructions=Some("Chronograph stores directed temporal relationships. IDs and microsecond timestamps must be decimal strings. Query bounded pages and check next_cursor. Intervals are [from,to); 9223372036854775807 means open end. Writes require ingest/admin scope and change persistent state. Read schema settings for default acknowledgment; choose fsync or call sync for disk durability. Schema migration apply requires admin scope and a current preview. Raw add_edges insertions cannot be safely retried. connector_ingest supports identical latest-batch retries. Backup requires admin scope.".into());
+        info.instructions=Some("ChronoDB stores directed temporal relationships. IDs and microsecond timestamps must be decimal strings. Query bounded pages and check next_cursor. Intervals are [from,to); 9223372036854775807 means open end. Writes require ingest/admin scope and change persistent state. Read schema settings for default acknowledgment; choose fsync or call sync for disk durability. Schema migration apply requires admin scope and a current preview. Raw add_edges insertions cannot be safely retried. connector_ingest supports identical latest-batch retries. Backup requires admin scope.".into());
         info
     }
     async fn list_tools(

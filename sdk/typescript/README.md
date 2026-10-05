@@ -18,7 +18,7 @@ try {
 
 Browser usage is limited to a same-origin server/proxy; the server intentionally does not enable arbitrary CORS origins. A bearer token in a browser is visible to the user. Never bundle administrative credentials into a public landing page. JavaScript consumers use the identical import from built `dist/index.js`.
 
-This is an alpha.3 source package for the Chronograph Community `/v1` API, not a published package-registry release. Read the [SDK guide](../../docs/SDK.md), [platform recipes](../../docs/INTEGRATIONS.md) and [HTTP API reference](../../docs/API.md).
+This is an alpha.3 source package for the ChronoDB Community `/v1` API, not a published package-registry release. Read the [SDK guide](../../docs/SDK.md), [platform recipes](../../docs/INTEGRATIONS.md) and [HTTP API reference](../../docs/API.md).
 
 All IDs and microsecond timestamps are decimal strings. `call` exposes JSON operations; `request` handles GET/DELETE and bounded binary responses. No application write retries are performed. Defaults: 30-second timeout, 4 MiB request/response caps. Remote origins require HTTPS; redirects are rejected. Increase the response cap explicitly for larger Arrow/backup downloads (maximum 256 MiB).
 

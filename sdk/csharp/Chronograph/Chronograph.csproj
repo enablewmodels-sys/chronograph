@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!--
-    ChronoDB Community .NET client (project ChronoDB, https://chronodb.co, IntelliNxT).
+    ChronoDB Community .NET client (project ChronoDB, https://chronodb.co, ChronoDB, Inc.).
     NuGet metadata lives here so that "dotnet pack" produces a complete, restore-safe package.
 
     Licence: PolyForm Perimeter 1.0.0 is source-available, is not OSI-approved and has no SPDX
@@ -11,7 +11,7 @@
     aL1fe) and a "Chronograph.*" family (owner Ironic). If that owner has a reserved
     Chronograph.* ID prefix, a submission under that prefix can be rejected. The package id
     is ChronoDB.Client instead, which avoids the contested family entirely. Confirm
-    availability on nuget.org, or publish under a company-owned prefix such as IntelliNxT.*,
+    availability on nuget.org, or publish under a company-owned prefix such as ChronoDB.*,
     before the first push.
   -->
   <PropertyGroup>
@@ -24,11 +24,11 @@
     <PackageId>ChronoDB.Client</PackageId>
     <Version>0.4.0-alpha.3</Version>
     <Title>ChronoDB Community .NET client</Title>
-    <Authors>IntelliNxT</Authors>
-    <Company>IntelliNxT</Company>
+    <Authors>ChronoDB, Inc.</Authors>
+    <Company>ChronoDB, Inc.</Company>
     <Product>ChronoDB Community</Product>
-    <Copyright>Copyright (c) 2026 IntelliNxT</Copyright>
-    <Description>Bounded, authenticated .NET 8+ client for the Chronograph Community /v1 temporal graph, connector and BCI HTTP API. Exact IDs and microsecond timestamps are decimal JSON strings; remote origins require HTTPS, redirects are rejected, and bodies are bounded.</Description>
+    <Copyright>Copyright (c) 2026 ChronoDB, Inc.</Copyright>
+    <Description>Bounded, authenticated .NET 8+ client for the ChronoDB Community /v1 temporal graph, connector and BCI HTTP API. Exact IDs and microsecond timestamps are decimal JSON strings; remote origins require HTTPS, redirects are rejected, and bodies are bounded.</Description>
     <PackageTags>chronodb;chronograph;temporal;graph;database;branching;time-travel;connectors</PackageTags>
     <PackageProjectUrl>https://chronodb.co</PackageProjectUrl>
     <RepositoryUrl>https://github.com/enablewmodels-sys/chronograph</RepositoryUrl>

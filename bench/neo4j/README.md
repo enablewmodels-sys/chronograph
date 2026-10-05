@@ -24,23 +24,23 @@ with results. Run engines sequentially so they do not contend for memory or CPUs
 `edges.csv` contains exactly the final intervals produced by the operation stream
 in `operations.csv`. Replay operations in row order, then apply nonempty
 `invalidate_at` values to their IDs. Payloads are represented as hex strings in
-Neo4j; Chronograph stores 16 raw bytes. Nodes and relationships are loaded in
+Neo4j; ChronoDB stores 16 raw bytes. Nodes and relationships are loaded in
 10,000-row transactions. The loader creates node uniqueness and relationship
 start/end indexes and waits for the indexes to become usable.
 
 The runner uses the persistent HTTP Query API connection, ten warm-up queries,
-and the same 200 seeded timestamps as Chronograph. It checks counts and ID sums
+and the same 200 seeded timestamps as ChronoDB. It checks counts and ID sums
 against independent expected results and saves a PROFILE response. It reports:
 
 - Aggregate count plus ID sum, including transport and JSON parsing.
 - With `--rows`, all seven projected fields (six data fields plus validation ID),
   consumed through the streaming Query API, also including transport/parsing.
 
-Chronograph's traversal is an in-process count/checksum over yielded edge values;
+ChronoDB's traversal is an in-process count/checksum over yielded edge values;
 its Arrow export separately measures column materialization. Do not describe
 Neo4j's HTTP result as pure engine latency or compare a count-only query with row
 transfer without naming the distinction. CSV loading plus index construction is
-not equivalent to Chronograph's live version insertion. A general-purpose database
+not equivalent to ChronoDB's live version insertion. A general-purpose database
 offers functionality outside this MVP, so these numbers cannot establish a general
 database ranking. Cold OS caches are not forced; mark results as warm traversal.
 

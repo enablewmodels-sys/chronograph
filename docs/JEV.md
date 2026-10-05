@@ -9,7 +9,7 @@ model identifier, requested model, probabilities, confidence where supplied,
 usage, source IDs and event timestamp. Jev inference runs in your application;
 the graph does not load Jev weights or call TypeSafe on your behalf.
 
-[Download the example bundle](https://chronodb.co/downloads/chronograph-jev-examples.zip) ·
+[Download the example bundle](https://chronodb.co/downloads/chronodb-jev-examples.zip) ·
 [Download the notebook](https://chronodb.co/downloads/jev-decision-history.ipynb) ·
 [Open the fixture notebook in Binder](https://mybinder.org/v2/gh/enablewmodels-sys/chronograph/main?labpath=examples%2Fjev%2Fjev-decision-history.ipynb)
 

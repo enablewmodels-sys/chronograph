@@ -16,7 +16,7 @@ use serde::Deserialize;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
-    collections::{BTreeMap, BTreeSet},
+    collections::{BTreeMap, BTreeSet, VecDeque},
     path::Path,
 };
 
@@ -282,6 +282,14 @@ pub fn validate(
     }
     Ok(())
 }
+/// Read one normalized connector record from the immutable sidecar store.
+fn read_record(store: &ArrowStore, payload: [u8; 16], b: &Binding) -> AppResult<Record> {
+    let (batch, row) = store.read(payload).map_err(ApiError::bad)?;
+    let mapping = serde_json::to_string(b).map_err(ApiError::internal)?;
+    chronograph_connector_common::decode(&batch, row, "normalized_records_v1", &mapping)
+        .map_err(ApiError::bad)
+}
+
 #[derive(Clone)]
 struct Row {
     edge: u64,
@@ -299,11 +307,29 @@ struct Session {
     last_us: i64,
     signal_count: usize,
 }
+/// Derived session index over the parent graph and every branch.
+///
+/// Sessions are keyed by scope, so one writer's records for the parent and for any number
+/// of branches are indexed by the same code without a per-branch index or writer.
+pub const PARENT_SCOPE: &str = "parent";
+
+pub fn fork_scope(fork: u64) -> String {
+    format!("fork:{fork}")
+}
+
+pub fn parse_scope(fork: &str) -> AppResult<String> {
+    if fork.is_empty() {
+        return Err(ApiError::bad("Fork must be a decimal branch ID"));
+    }
+    Ok(fork_scope(number::<u64>(fork)?))
+}
+
 #[derive(Default)]
 pub struct Index {
     scanned: usize,
+    fork_scanned: BTreeMap<u64, usize>,
     bytes: usize,
-    sessions: BTreeMap<(String, String), Session>,
+    sessions: BTreeMap<(String, String, String), Session>,
 }
 impl Index {
     pub fn refresh(&mut self, g: &Graph, schema: &Snapshot, path: &Path) -> AppResult<()> {
@@ -316,25 +342,47 @@ impl Index {
             .collect();
         for e in &g.history()[self.scanned..] {
             if let Some(b) = bindings.get(&e.kind.0) {
-                let (batch, row) = store.read(e.payload).map_err(ApiError::bad)?;
-                let mapping = serde_json::to_string(b).map_err(ApiError::internal)?;
-                let record: Record = chronograph_connector_common::decode(
-                    &batch,
-                    row,
-                    "normalized_records_v1",
-                    &mapping,
-                )
-                .map_err(ApiError::bad)?;
-                self.insert(b, e.id.0, record)?;
+                let record = read_record(&store, e.payload, b)?;
+                self.insert(b, PARENT_SCOPE, e.id.0, record)?;
             }
             self.scanned += 1;
         }
+        if bindings.is_empty() {
+            return Ok(());
+        }
+        // Branch records are derived through the same reader and the same writer contract.
+        let active: Vec<(u64, u64)> = g
+            .forks()
+            .filter(|f| f.status == chronograph_db::ForkStatus::Active)
+            .map(|f| (f.id.0, f.revision))
+            .collect();
+        for (fork, _) in &active {
+            let scanned = *self.fork_scanned.get(fork).unwrap_or(&0);
+            let edges: Vec<(u64, [u8; 16], u16)> = g
+                .fork_history(chronograph_db::ForkId(*fork))?
+                .skip(scanned)
+                .map(|e| (e.id.0, e.payload, e.kind.0))
+                .collect();
+            for (edge, payload, kind) in edges {
+                if let Some(b) = bindings.get(&kind) {
+                    let record = read_record(&store, payload, b)?;
+                    self.insert(b, &fork_scope(*fork), edge, record)?;
+                }
+                *self.fork_scanned.entry(*fork).or_default() += 1;
+            }
+        }
+        // A merged or discarded branch is no longer queryable, so drop its derived rows.
+        let live: BTreeSet<String> = active.iter().map(|(f, _)| fork_scope(*f)).collect();
+        self.sessions
+            .retain(|(scope, _, _), _| scope == PARENT_SCOPE || live.contains(scope));
+        self.fork_scanned
+            .retain(|fork, _| active.iter().any(|(f, _)| f == fork));
         Ok(())
     }
-    fn insert(&mut self, b: &Binding, edge: u64, r: Record) -> AppResult<()> {
+    fn insert(&mut self, b: &Binding, scope: &str, edge: u64, r: Record) -> AppResult<()> {
         let s = self
             .sessions
-            .entry((b.id.clone(), r.src.clone()))
+            .entry((scope.to_owned(), b.id.clone(), r.src.clone()))
             .or_default();
         if !s.ids.insert(r.dst.clone()) {
             return Ok(());
@@ -371,8 +419,11 @@ impl Index {
         s.rows.push(Row { edge, record: r });
         Ok(())
     }
+    /// Validate a pending batch against the parent or one selected branch scope.
+    /// The same rules apply to every branch, so a new branch never needs a new validator.
     pub fn validate_batch(
         &self,
+        scope: &str,
         b: &Binding,
         records: &[Record],
         store: &AssetStore,
@@ -391,7 +442,9 @@ impl Index {
         let mut pending_samples: BTreeMap<(String, String, String), Vec<(u64, u64)>> =
             BTreeMap::new();
         for r in records {
-            let s = self.sessions.get(&(b.id.clone(), r.src.clone()));
+            let s = self
+                .sessions
+                .get(&(scope.to_owned(), b.id.clone(), r.src.clone()));
             if s.is_some_and(|s| s.ids.contains(&r.dst))
                 || !new_ids.insert((r.src.clone(), r.dst.clone()))
             {
@@ -495,6 +548,12 @@ impl Index {
 struct Query {
     sessions: Vec<String>,
     cutoffs: BTreeMap<String, String>,
+    /// Selected branch. Empty selects the parent graph, exactly like every other read.
+    fork: String,
+    /// Causal path origin, as a decimal observation destination ID.
+    observation: String,
+    /// Maximum causal path depth, 1-8.
+    depth: usize,
     instance: String,
     session: String,
     stream: String,
@@ -509,6 +568,120 @@ struct Query {
 fn wire(row: &Row) -> Value {
     json!({"edge":row.edge.to_string(),"record":row.record})
 }
+
+/// Walk the recorded lineage backwards from one observation to its sources.
+///
+/// The path follows only relationships already stored as immutable records: a prediction
+/// names its run, a run names its dataset, a dataset names its sessions, a session declares
+/// its streams, and a stream observed its chunks and events. Nothing is inferred that was
+/// not recorded, and the walk is bounded by depth and row count.
+fn causal_path(scope: &str, s: &Session, origin: &str, depth: usize, limit: usize) -> Value {
+    let mut by_dst: BTreeMap<&str, &Row> = BTreeMap::new();
+    for row in &s.rows {
+        by_dst.insert(row.record.dst.as_str(), row);
+    }
+    let mut nodes: Vec<Value> = Vec::new();
+    let mut links: Vec<Value> = Vec::new();
+    let mut seen: BTreeSet<String> = BTreeSet::new();
+    let mut queue: VecDeque<(String, usize)> = VecDeque::from([(origin.to_owned(), 0usize)]);
+    let mut truncated = false;
+    while let Some((id, level)) = queue.pop_front() {
+        if nodes.len() >= limit {
+            truncated = true;
+            break;
+        }
+        if !seen.insert(id.clone()) {
+            continue;
+        }
+        let Some(row) = by_dst.get(id.as_str()) else {
+            continue;
+        };
+        let record = &row.record;
+        nodes.push(json!({
+            "observation": id,
+            "edge": row.edge.to_string(),
+            "type": record.fields.get("type"),
+            "timestamp_us": record.timestamp_us,
+            "stream_id": record.fields.get("stream_id"),
+        }));
+        if level >= depth {
+            truncated = true;
+            continue;
+        }
+        let mut parents: Vec<(String, &str)> = Vec::new();
+        match record.fields.get("type").and_then(Value::as_str) {
+            Some("prediction") => {
+                if let Some(run) = record.fields.get("run_id").and_then(Value::as_str) {
+                    parents.push((run.to_owned(), "produced_by_run"));
+                }
+            }
+            Some("run") => {
+                if let Some(dataset) = record.fields.get("dataset_id").and_then(Value::as_str) {
+                    parents.push((dataset.to_owned(), "trained_on_dataset"));
+                }
+            }
+            Some("dataset") => {
+                for session in record.fields["manifest"]["sessions"]
+                    .as_array()
+                    .map(Vec::as_slice)
+                    .unwrap_or_default()
+                {
+                    if let Some(id) = session.as_str() {
+                        parents.push((id.to_owned(), "includes_session"));
+                    }
+                }
+            }
+            Some("session") => {
+                for stream in s.streams.values() {
+                    parents.push((stream.dst.clone(), "declares_stream"));
+                }
+            }
+            Some("event" | "gap" | "clock" | "signal") => {
+                // An observation names the stream it was recorded on.
+                if let Some(stream_id) = record.fields.get("stream_id").and_then(Value::as_str)
+                    && let Some(stream) = s.streams.get(stream_id)
+                {
+                    parents.push((stream.dst.clone(), "observed_in"));
+                }
+            }
+            Some("stream") => {
+                // The session that declares this stream, and every observation on it.
+                if let Some(metadata) = s.metadata.as_ref() {
+                    parents.push((metadata.dst.clone(), "declared_by_session"));
+                }
+                let stream_id = record.fields.get("stream_id");
+                for row in &s.rows {
+                    if row.record.fields.get("stream_id") == stream_id
+                        && matches!(
+                            row.record.fields.get("type").and_then(Value::as_str),
+                            Some("signal" | "event" | "gap" | "clock")
+                        )
+                    {
+                        parents.push((row.record.dst.clone(), "observed_in"));
+                    }
+                }
+            }
+            _ => {}
+        }
+        for (parent, kind) in parents {
+            if links.len() < limit {
+                links.push(json!({"from": id, "to": parent, "kind": kind}));
+            } else {
+                truncated = true;
+            }
+            queue.push_back((parent, level + 1));
+        }
+    }
+    json!({
+        "scope": scope,
+        "origin": origin,
+        "depth_limit": depth,
+        "row_limit": limit,
+        "nodes": nodes,
+        "links": links,
+        "truncated": truncated,
+    })
+}
 pub fn execute(state: &Shared, op: &str, args: Value) -> AppResult<Value> {
     let q: Query = parse(args)?;
     let limit = if q.limit == 0 { 100 } else { q.limit };
@@ -519,13 +692,18 @@ pub fn execute(state: &Shared, op: &str, args: Value) -> AppResult<Value> {
     let schema = state.schema.read().map_err(ApiError::internal)?;
     let mut index = state.bci.lock().map_err(ApiError::internal)?;
     index.refresh(&g, schema.snapshot()?, &state.data)?;
+    let scope = if q.fork.is_empty() {
+        PARENT_SCOPE.to_owned()
+    } else {
+        parse_scope(&q.fork)?
+    };
     if op == "bci_sessions" {
         let offset = if q.after.is_empty() {
             0
         } else {
             number::<usize>(&q.after)?
         };
-        let values:Vec<_>=index.sessions.iter().filter(|((instance,_),s)|(q.instance.is_empty()||*instance==q.instance)&&s.metadata.is_some()).skip(offset).take(limit+1).map(|((instance,id),s)|json!({"instance":instance,"session":id,"metadata":s.metadata.as_ref().unwrap().fields,"streams":s.streams.len(),"chunks":s.signal_count,"records":s.rows.len(),"last_us":s.last_us.to_string()})).collect();
+        let values:Vec<_>=index.sessions.iter().filter(|((recorded,q_instance,_),s)|(q.instance.is_empty()||*q_instance==q.instance)&&s.metadata.is_some()&&recorded==&scope).skip(offset).take(limit+1).map(|((recorded,instance,id),s)|json!({"scope":recorded,"instance":instance,"session":id,"metadata":s.metadata.as_ref().unwrap().fields,"streams":s.streams.len(),"chunks":s.signal_count,"records":s.rows.len(),"last_us":s.last_us.to_string()})).collect();
         return Ok(
             json!({"sessions":values.iter().take(limit).collect::<Vec<_>>(),"next_cursor":if values.len()>limit{Some((offset+limit).to_string())}else{None},"index_bytes":index.bytes,"index_limit_bytes":MAX_INDEX_BYTES}),
         );
@@ -541,7 +719,7 @@ pub fn execute(state: &Shared, op: &str, args: Value) -> AppResult<Value> {
         for id in &q.sessions {
             let session = index
                 .sessions
-                .get(&(q.instance.clone(), id.clone()))
+                .get(&(scope.clone(), q.instance.clone(), id.clone()))
                 .ok_or_else(|| ApiError::missing("Dataset session not found"))?;
             if !session.streams.contains_key(&q.stream) {
                 return Err(ApiError::bad(
@@ -580,7 +758,7 @@ pub fn execute(state: &Shared, op: &str, args: Value) -> AppResult<Value> {
     }
     let s = index
         .sessions
-        .get(&(q.instance.clone(), q.session.clone()))
+        .get(&(scope.clone(), q.instance.clone(), q.session.clone()))
         .ok_or_else(|| ApiError::missing("BCI session not found"))?;
     if op == "bci_session" {
         return Ok(
@@ -611,6 +789,17 @@ pub fn execute(state: &Shared, op: &str, args: Value) -> AppResult<Value> {
             }
         }
         return Ok(json!({"records":rows,"cursor":cursor.map(|v|v.to_string()),"has_more":more}));
+    }
+    if op == "bci_causal_path" {
+        if q.observation.is_empty() || number::<u64>(&q.observation)? == 0 {
+            return Err(ApiError::bad("Select a nonzero observation ID"));
+        }
+        let depth = if q.depth == 0 { 8 } else { q.depth };
+        if depth > 8 {
+            return Err(ApiError::bad("Causal path depth is 1-8"));
+        }
+        let value = causal_path(&scope, s, &q.observation, depth, limit);
+        return Ok(json!({"path": value, "index_bytes": index.bytes}));
     }
     if op != "bci_window" {
         return Err(ApiError::missing("Unknown BCI operation"));

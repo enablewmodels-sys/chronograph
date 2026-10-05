@@ -45,3 +45,39 @@ test("a nonprogressing BCI cursor is rejected instead of looping", async () => {
     }
   }, /Non-progressing/);
 });
+
+test("BCI reads and causal paths target a branch and reject bad arguments", async () => {
+  const calls = [];
+  const bci = new BCIClient(
+    {
+      call: async (op, args) => {
+        calls.push({ op, args });
+        return { sessions: [], records: [], path: {} };
+      },
+    },
+    "bci_research",
+  );
+  await bci.session("101", { branch: 7 });
+  await bci.window("101", "eeg", 0n, 1000n, [0], { branch: "7" });
+  await bci.manifest(["101"], "eeg", { branch: 7 });
+  await bci.causalPath("101", "9007199254740993", { branch: 7, depth: 3 });
+  assert.deepEqual(
+    calls.map((c) => [c.op, c.args.fork]),
+    [
+      ["bci_session", "7"],
+      ["bci_window", "7"],
+      ["bci_manifest", "7"],
+      ["bci_causal_path", "7"],
+    ],
+  );
+  assert.equal(calls[3].args.observation, "9007199254740993");
+  assert.equal(calls[3].args.depth, 3);
+  // An omitted branch stays on the parent: no fork key is sent at all.
+  await bci.session("101");
+  assert.equal(calls[4].args.fork, undefined);
+  assert.equal(JSON.stringify(calls[4].args).includes("fork"), false);
+  // Argument validation happens before any request, so it throws synchronously.
+  assert.throws(() => bci.session("101", { branch: "one" }), RangeError);
+  assert.throws(() => bci.causalPath("101", "0"), RangeError);
+  assert.throws(() => bci.causalPath("101", "5", { depth: 9 }), RangeError);
+});

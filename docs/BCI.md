@@ -71,7 +71,11 @@ Open `/app/bci`, select the recording, change the window or channels, and replay
 An ingest/admin credential can annotate the visible window as a cue, artifact,
 bad-channel span, feedback or note. Annotations append records; raw samples do not
 change. Select several recordings under **Datasets** to save a frozen manifest.
-The [decoder guide](BCI_TRAINING.md) explains training and live predictions.
+The [decoder guide](BCI_TRAINING.md) explains training and live predictions. The
+[decoder adapters](DECODERS.md) page covers pluggable decoders and the portable
+`decoder-v1` artifact, the [device and file formats](FORMATS.md) page lists every
+BrainFlow board, transport and file format ChronoDB can record, and
+[branches](BRANCHES.md) explains recording into a branch through the same writer.
 
 ## Capture on the acquisition machine
 

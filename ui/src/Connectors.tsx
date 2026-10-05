@@ -2,20 +2,28 @@ import { Activity, Bot, Boxes, Atom, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Code, Head } from "./shared";
 import ConnectorConsole from "./ConnectorConsole";
+import catalog from "./brainflow-boards.json";
 export const connectors = [
   {
     id: "bci",
     name: "BCI & neural signals",
-    title: "Keep signal timing intact.",
+    title: "Record the board you actually own.",
     icon: Activity,
-    state: "Synthetic + optional LSL",
+    state:
+      catalog.counts.describable +
+      " of " +
+      catalog.counts.boards +
+      " boards · BrainFlow " +
+      catalog.brainflow_version,
     description:
-      "Ingest timestamped channel frames. Preserve acquisition order and export epochs as Arrow.",
+      "Open any board the installed BrainFlow driver defines, or any LSL outlet, and keep every original timestamp. Then hand the recording to MNE, train a decoder and branch the result.",
     detail:
-      "Native LSL loopback verified; physical hardware and cross-host synchronization remain unverified.",
-    command:
-      "cargo run --locked -p chronograph-conn-bci --example bci_connector",
-    mapping: "examples/datasets/bci/mapping.toml",
+      "The console opens no hardware: the agent runs where the device is wired. Only the synthetic board and local files are exercised by the test suite.",
+    snippet:
+      "pip install './sdk/python[bci]'\n" +
+      "chronograph-bci brainflow --board-id -1 --preset 0 --units uV \\\n" +
+      "  --seconds 60 --spool ./recording --sync",
+    mapping: "BCI workspace → Boards lists every board, preset and channel name",
   },
   {
     id: "robotics",
@@ -24,11 +32,15 @@ export const connectors = [
     icon: Bot,
     state: "JointState + video references",
     description:
-      "Read rosbag2 and MCAP captures, map joint observations and actions, and export real LeRobot datasets.",
+      "Record decoded joint observations, actions and rewards on the same timeline as the signal that caused them, so a robot run stays explainable afterwards.",
     detail:
       "Bounded JointState schemas and external video references; no automatic video decoding or arbitrary ROS messages.",
-    command:
-      "cargo run --locked -p chronograph-conn-robotics --example robotics_connector -- ./robotics-demo",
+    snippet:
+      "from chronograph_connectors.adapters import ros_message\n" +
+      "client.ingest('robot_observations', 'run_1', '0', [\n" +
+      "    ros_message(client, decoded, message_type='sensor_msgs/JointState',\n" +
+      "                topic='/joint_states', src='1', dst='2', timestamp_us='0'),\n" +
+      "])",
     mapping: "examples/datasets/robotics/mapping.toml",
   },
   {
@@ -38,11 +50,15 @@ export const connectors = [
     icon: Boxes,
     state: "Complete state + RNG",
     description:
-      "Record environment steps, restore full simulator state, fork policy futures, and export Arrow or Minari.",
+      "Record environment steps, restore full simulator state, fork policy futures and export Arrow or Minari.",
     detail:
       "Discrete actions and fixed-size observations; bring a versioned complete-state codec for another environment.",
-    command:
-      "cargo run --locked --release -p chronograph-conn-worldmodel --example fork_demo -- ./fork-demo",
+    snippet:
+      "from chronograph_connectors.adapters import transition\n" +
+      "step = transition(client, observation, action, reward,\n" +
+      "                  terminated, truncated, src='2', dst='3',\n" +
+      "                  timestamp_us='20000', episode='episode_1')\n" +
+      "client.ingest('robot_transitions', 'episode_1', '0', [step])",
     mapping: "examples/datasets/worldmodel/mapping.toml",
   },
   {
@@ -52,11 +68,14 @@ export const connectors = [
     icon: Atom,
     state: "Exploratory",
     description:
-      "Turn a static OpenQASM 3 unitary program into a circuit DAG. Track directed coupling calibration windows.",
+      "Store circuit source and measurement results with their provenance. Your runtime executes; the database records.",
     detail:
-      "A strict static subset, with unsupported programs rejected. No QPU or quantum simulator integration.",
-    command:
-      "cargo run --locked -p chronograph-conn-quantum --example quantum_connector",
+      "Source is kept as an opaque artifact and is never executed here. No QPU or simulator integration.",
+    snippet:
+      "from chronograph_connectors.adapters import qiskit_circuit, qiskit_result\n" +
+      "client.ingest('quantum_circuits', 'run_1', '0', [\n" +
+      "    qiskit_circuit(client, circuit, src='1', dst='2', timestamp_us='0'),\n" +
+      "])",
     mapping: "examples/datasets/quantum/mapping.toml",
   },
 ];
@@ -65,12 +84,12 @@ export default function Connectors() {
     <>
       <Head
         title="Bring your world into the graph."
-        text="Explicit mappings, preserved clocks, and portable datasets."
+        text="One encoder, one writer, one decoder interface — whatever produced the samples."
       />
       <div className="notice informational">
-        Configure normalized record connectors in Schema → Migrations. Native
-        Rust adapters and local conversion tools remain available in the guides
-        below.
+        Configure a connector binding in Schema → Migrations, then record with the
+        SDK below. <Link to="/app/bci">Open the BCI workspace</Link> to see the
+        device catalogue, branch a decode and replay a moment.
       </div>
       <ConnectorConsole />
       <div className="connector-workspace">
@@ -86,11 +105,11 @@ export default function Connectors() {
               </div>
               <p>{c.description}</p>
               <p className="small muted">{c.detail}</p>
+              <Code text={c.snippet} />
               <p className="connector-mapping">
-                <span>Mapping file</span>
+                <span>Details</span>
                 <code>{c.mapping}</code>
               </p>
-              <Code text={c.command} />
               <Link
                 className="text-link"
                 to={`/documentation/connectors/${c.id}`}

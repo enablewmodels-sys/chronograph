@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- Conformance harness for the Chronograph Community .NET client. A console executable,
+  <!-- Conformance harness for the ChronoDB Community .NET client. A console executable,
        never a package: IsPackable is false so no accidental "dotnet pack" publishes it. -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>

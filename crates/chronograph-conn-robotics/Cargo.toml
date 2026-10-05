@@ -1,6 +1,6 @@
 [package]
 name = "chronograph-conn-robotics"
-description = "Bounded rosbag2/MCAP replay and LeRobot export for Chronograph"
+description = "Bounded rosbag2/MCAP replay and LeRobot export for ChronoDB"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

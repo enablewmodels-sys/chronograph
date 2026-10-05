@@ -79,7 +79,7 @@ def _decision_record(response, *, request, src, dst, timestamp_us, mode, provide
     assets = {}
     if attach_inputs:
         if client is None:
-            raise ValueError("A Chronograph client is required for attachment uploads")
+            raise ValueError("A ChronoDB client is required for attachment uploads")
         for name, raw in (("request", data), ("response", json.dumps(response, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode())):
             assets[name] = client.asset(raw, kind="opaque", encoding="json", provenance={"provider": provider, "mode": mode})
     return {"src": str(src), "dst": str(dst), "timestamp_us": str(timestamp_us), "episode": episode,

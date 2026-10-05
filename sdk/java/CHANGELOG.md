@@ -30,7 +30,7 @@ has been uploaded to Maven Central, and no Maven build has been run in this work
 
 ## 0.4.0-alpha.3 - 2026-09-30
 
-- Initial source package for the Chronograph Community `/v1` API: thread-safe authenticated
+- Initial source package for the ChronoDB Community `/v1` API: thread-safe authenticated
   transport with a 30-second default timeout and 4 MiB request/response caps, origin and
   bearer-token validation, HTTPS for remote origins, redirect rejection and bounded response
   bodies.

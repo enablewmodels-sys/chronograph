@@ -128,7 +128,7 @@ pub fn openapi() -> Value {
         }
         paths.entry(path).or_insert(json!({}))[method] = entry;
     }
-    json!({"openapi":"3.1.0","info":{"title":"Chronograph Community API","version":env!("CARGO_PKG_VERSION"),"description":"REST v1 with decimal-string IDs and timestamps, scoped bearer authentication and bounded requests. Input schemas are shared with MCP. Responses remain extensible JSON objects; this specification is not a complete generated response type library."},
+    json!({"openapi":"3.1.0","info":{"title":"ChronoDB Community API","version":env!("CARGO_PKG_VERSION"),"description":"REST v1 with decimal-string IDs and timestamps, scoped bearer authentication and bounded requests. Input schemas are shared with MCP. Responses remain extensible JSON objects; this specification is not a complete generated response type library."},
         "servers":[{"url":"http://127.0.0.1:8080","description":"Local development; use HTTPS remotely"}],
         "security":[{"bearerAuth":[]}],"paths":paths,
         "components":{"securitySchemes":{"bearerAuth":{"type":"http","scheme":"bearer"}},"schemas":{

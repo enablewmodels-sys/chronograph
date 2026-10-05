@@ -208,6 +208,11 @@ impl Branch {
 }
 
 impl BranchStore {
+    /// Current write revision of one branch, used to bind a branch ingestion receipt.
+    pub(crate) fn revision(&self, id: ForkId) -> Result<u64> {
+        Ok(self.entry(id)?.info.revision)
+    }
+
     fn entry(&self, id: ForkId) -> Result<&Entry> {
         self.entries.get(&id).ok_or(Error::UnknownFork(id))
     }
@@ -552,6 +557,25 @@ impl BranchStore {
                 entry.state = None;
                 self.bases.retain(|_, weak| weak.strong_count() != 0);
             }
+            Record::ForkIngest(fork, _receipt, inserts) => {
+                self.replay_inner(parent, Record::ForkBatch(fork, inserts), offset)?;
+            }
+            Record::ForkBatchMany(groups) => {
+                if groups.is_empty() {
+                    return Err(Error::InvalidFork("empty multi-branch batch".into()));
+                }
+                let mut seen = std::collections::BTreeSet::new();
+                for (fork, inserts) in &groups {
+                    if inserts.is_empty() || !seen.insert(*fork) {
+                        return Err(Error::InvalidFork(
+                            "multi-branch batch requires non-empty distinct branches".into(),
+                        ));
+                    }
+                }
+                for (fork, inserts) in groups {
+                    self.replay_inner(parent, Record::ForkBatch(fork, inserts), offset)?;
+                }
+            }
             other => parent.replay(other, offset)?,
         }
         Ok(())
@@ -656,6 +680,60 @@ impl Graph {
         branch.time(start)?;
         Ok(branch.history().filter(move |e| e.overlaps(start, end)))
     }
+    /// Commit independent batches for several forks in ONE journal frame and one synchronize.
+    ///
+    /// Every branch is prepared before anything is written, so a rejected write leaves all
+    /// branches unchanged. This is what lets a single writer serve any number of branches:
+    /// branch results are grouped into one commit instead of one writer, frame and fsync each.
+    pub fn apply_fork_batch(
+        &mut self,
+        writes: &[(ForkId, ForkWriteOp)],
+    ) -> Result<Vec<WriteResult>> {
+        self.journal.ensure_writable()?;
+        if writes.is_empty() || writes.len() > 4096 {
+            return Err(Error::InvalidFork("provide 1-4096 branch batches".into()));
+        }
+        // One group per branch in a frame: two groups for the same branch would each be
+        // prepared against the unchanged branch, so the frame could not be replayed
+        // deterministically. Reject it here, before anything is written.
+        let mut seen = std::collections::BTreeSet::new();
+        if writes.iter().any(|(fork, _)| !seen.insert(*fork)) {
+            return Err(Error::InvalidFork(
+                "a branch batch may appear at most once per frame".into(),
+            ));
+        }
+        let mut prepared: Vec<(ForkId, Vec<Insert>)> = Vec::with_capacity(writes.len());
+        for (fork, operation) in writes {
+            let inserts = match operation {
+                ForkWriteOp::AddEdges(inputs) => {
+                    self.branches.active(*fork)?.prepare(inputs, None)?
+                }
+                ForkWriteOp::AddBoundedEdges(inputs) => {
+                    let edges: Vec<_> = inputs.iter().map(|i| i.edge).collect();
+                    let ends: Vec<_> = inputs.iter().map(|i| i.valid_to).collect();
+                    self.branches.active(*fork)?.prepare(&edges, Some(&ends))?
+                }
+                _ => {
+                    return Err(Error::InvalidFork(
+                        "branch batches accept edge insertions only".into(),
+                    ));
+                }
+            };
+            if inserts.is_empty() {
+                return Err(Error::InvalidFork("empty branch batch".into()));
+            }
+            prepared.push((*fork, inserts));
+        }
+        let results: Vec<WriteResult> = prepared
+            .iter()
+            .map(|(_, inserts)| WriteResult::Edges(inserts.iter().map(|i| i.edge.id).collect()))
+            .collect();
+        let record = Record::ForkBatchMany(prepared);
+        let offset = self.journal.append(&record)?;
+        self.branches.replay(&mut self.index, record, offset)?;
+        Ok(results)
+    }
+
     pub(crate) fn apply_branch(&mut self, operation: WriteOp) -> Result<WriteResult> {
         self.journal.ensure_writable()?;
         let (record, result) = match operation {
@@ -708,6 +786,37 @@ impl Graph {
                         (Record::ForkBatch(fork, inserts), result)
                     }
                 }
+            }
+            WriteOp::ForkIngest {
+                fork,
+                cursor,
+                inputs,
+            } => {
+                if let Some(receipt) = self.fork_checkpoints.check(fork.0, &cursor)? {
+                    return Ok(WriteResult::Ingest(receipt));
+                }
+                let edges: Vec<_> = inputs.iter().map(|i| i.edge).collect();
+                let ends: Vec<_> = inputs.iter().map(|i| i.valid_to).collect();
+                let inserts = self.branches.active(fork)?.prepare(&edges, Some(&ends))?;
+                let Some(first) = inserts.first().map(|i| i.edge.id) else {
+                    return Err(Error::InvalidIngest(
+                        "branch ingestion batches cannot be empty".into(),
+                    ));
+                };
+                let receipt = crate::IngestReceipt {
+                    cursor,
+                    first_edge: first,
+                    edge_count: inserts.len() as u64,
+                    revision: self.branches.entry(fork)?.info.revision + 1,
+                };
+                // The receipt and the branch versions share one frame, so a branch commit is
+                // as durable as a parent commit and a lost-ack retry is idempotent.
+                let record = Record::ForkIngest(fork, receipt.clone(), inserts);
+                let offset = self.journal.append(&record)?;
+                self.journal.sync()?;
+                self.branches.replay(&mut self.index, record, offset)?;
+                self.fork_checkpoints.insert(fork.0, receipt.clone());
+                return Ok(WriteResult::Ingest(receipt));
             }
             WriteOp::MergeFork(fork) => {
                 if let Some(result) = &self.branches.entry(fork)?.info.merge {

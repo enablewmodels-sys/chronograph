@@ -324,6 +324,12 @@ async fn boundary(State(s): State<Shared>, req: Request, next: Next) -> Response
         .get("host")
         .and_then(|v| v.to_str().ok())
         .is_some_and(|h| h.eq_ignore_ascii_case(&s.authority));
+    // Content-hashed bundles and static art are immutable under one URL, so they must be
+    // cacheable. Forcing no-store on them made every navigation re-download the whole
+    // console and stopped an edge cache from holding a single byte.
+    let request_path = req.uri().path().to_owned();
+    let immutable =
+        request_path.starts_with("/assets/") || request_path.starts_with("/images/");
     let mut r = if origin_ok && host_ok {
         next.run(req).await
     } else {
@@ -340,14 +346,25 @@ async fn boundary(State(s): State<Shared>, req: Request, next: Next) -> Response
         ("x-content-type-options", "nosniff"),
         ("x-frame-options", "DENY"),
         ("referrer-policy", "no-referrer"),
-        ("cache-control", "no-store"),
+        (
+            "cache-control",
+            if immutable {
+                "public, max-age=31536000, immutable"
+            } else {
+                "no-store"
+            },
+        ),
         (
             "permissions-policy",
             "camera=(), microphone=(), geolocation=()",
         ),
         (
             "content-security-policy",
-            "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+            // 'wasm-unsafe-eval' is the narrow source that permits WebAssembly compilation
+            // and nothing else: 'unsafe-eval' is still absent, so JavaScript string
+            // evaluation stays blocked. The console compiles the decoder module the same
+            // origin serves, so without this the browser decoder cannot start.
+            "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
         ),
     ] {
         r.headers_mut().insert(k, HeaderValue::from_static(v));

@@ -327,7 +327,8 @@ export default function Pricing() {
               Nothing, on your own hardware and with no account. It is
               source-available under PolyForm Perimeter 1.0.0, which permits
               modification and commercial use in noncompeting products. It is
-              not OSI open source. See <Link to="/licensing">the licence</Link>.
+              not OSI open source. See{" "}
+              <Link to="/documentation/LICENSING">the licence</Link>.
             </p>
           </details>
           <details>

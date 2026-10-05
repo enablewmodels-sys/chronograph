@@ -1,4 +1,19 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import Boards from "./Boards";
+import catalog from "./brainflow-boards.json";
+
+// One catalogue, two surfaces: this picker and the Boards tab both read the file
+// generated from the acquisition agent's own BrainFlow driver, so the device list
+// in the command preview can never drift from the one the SDK reports.
+import {
+  BCI_BOARD_COUNT,
+  BCI_PRESET_COUNT,
+  BCI_VENDORS,
+  BCI_VENDOR_COUNT,
+  boardsOf,
+  firstBoardOf,
+  vendorLabel,
+} from "./bci-vendors";
 import { Link } from "react-router-dom";
 import {
   Activity,
@@ -16,7 +31,12 @@ import { graph } from "./api";
 import { useAuth } from "./main";
 import { managedSite, publicSite } from "./site";
 import { managedApi } from "./managed-api";
-import { Logo, Code } from "./shared";
+import { Logo, Code, useAction } from "./shared";
+import {
+  loadBrowserDecoder,
+  decodeToken,
+  type BrowserDecode,
+} from "./browser-decoder";
 import SiteFooter from "./SiteFooter";
 import {
   bciRecord,
@@ -111,6 +131,107 @@ function Waveform({ data }: { data: BciWindow }) {
     </div>
   );
 }
+/**
+ * Decode one shipped artifact in this browser.
+ *
+ * The console already serves a decoder and the module that reads it, so this is the
+ * shortest honest answer to "does the browser agree with Python": it fetches both,
+ * synthesises a band-coded window and shows the token that comes back.
+ */
+function BrowserDecodeCheck() {
+  const action = useAction();
+  const [loaded, setLoaded] = useState<Awaited<
+    ReturnType<typeof loadBrowserDecoder>
+  > | null>(null);
+  const [token, setToken] = useState("");
+  const [result, setResult] = useState<BrowserDecode | null>(null);
+  const [failure, setFailure] = useState("");
+  const vocabulary = loaded?.document.vocabulary ?? [];
+  const load = () =>
+    action.run(async () => {
+      setFailure("");
+      try {
+        const next = await loadBrowserDecoder();
+        setLoaded(next);
+        const first = next.document.vocabulary[0] ?? "";
+        setToken(first);
+        setResult(decodeToken(next, first));
+      } catch (error) {
+        // useAction keeps a thrown error for its own notice; keep this one here too,
+        // because "the module did not load" is the only thing the reader can act on.
+        setFailure(error instanceof Error ? error.message : String(error));
+      }
+    });
+  const decode = (next: string) => {
+    setToken(next);
+    if (!loaded) return;
+    try {
+      setFailure("");
+      setResult(decodeToken(loaded, next));
+    } catch (error) {
+      setFailure(error instanceof Error ? error.message : String(error));
+    }
+  };
+  return (
+    <section className="bci-panel">
+      <div className="bci-section-title">
+        <h2>Browser decoder check</h2>
+        <span className="bci-chip">Same reader as Python</span>
+      </div>
+      <p>
+        Decode the artifact this deployment serves, in your browser, through the
+        module built from the same Rust crate the Python SDK and the CLI use.
+        Nothing is uploaded and no weights are downloaded.
+      </p>
+      {!loaded ? (
+        <button onClick={() => void load()} disabled={action.busy}>
+          {action.busy ? "Loading the decoder…" : "Run a decode here"}
+        </button>
+      ) : (
+        <>
+          <div className="bci-fields">
+            <label>
+              Expected token
+              <select value={token} onChange={(e) => decode(e.target.value)}>
+                {vocabulary.map((name) => (
+                  <option key={name}>{name}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Adapter
+              <input readOnly value={result?.adapter || ""} />
+            </label>
+            <label>
+              Module
+              <input
+                readOnly
+                value={`${(loaded.moduleBytes / 1024).toFixed(1)} kB · WebAssembly`}
+              />
+            </label>
+          </div>
+          {result && (
+            <p className="bci-muted">
+              {result.channels.length} channels · {result.windowSamples} samples ·{" "}
+              {result.sampleRateHz} Hz · decoded{" "}
+              <strong>{result.token ?? "no token"}</strong>
+              {result.abstained ? " (abstained)" : ""} at{" "}
+              {(result.probability * 100).toFixed(1)}% for an expected{" "}
+              {result.expected}. The window is synthesised in the browser; the
+              decoder is not.
+            </p>
+          )}
+        </>
+      )}
+      {failure && (
+        <p className="bci-error" role="alert">
+          {failure}
+        </p>
+      )}
+    </section>
+  );
+}
+
 function Setup({ onDone }: { onDone: () => void }) {
   const [source, setSource] = useState("synthetic"),
     [instance, setInstance] = useState("bci_research"),
@@ -119,6 +240,9 @@ function Setup({ onDone }: { onDone: () => void }) {
       "EEG01, EEG02, EEG03, EEG04, EEG05, EEG06, EEG07, EEG08",
     ),
     [units, setUnits] = useState("uV"),
+    [vendor, setVendor] = useState(BCI_VENDORS[0] || ""),
+    [board, setBoard] = useState(firstBoardOf(BCI_VENDORS[0] || "")),
+    [boardPreset, setBoardPreset] = useState(0),
     [reference, setReference] = useState("unspecified"),
     [rate, setRate] = useState(250),
     [preview, setPreview] = useState<{
@@ -201,7 +325,7 @@ function Setup({ onDone }: { onDone: () => void }) {
     (source === "lsl"
       ? ` \\\n  --source-id YOUR_SOURCE_ID --channels ${shell(channels.replaceAll(" ", ""))} --units ${shell(units)}`
       : source === "brainflow"
-        ? ` \\\n  --board-id -1 --units ${shell(units)} --seconds 60`
+        ? ` \\\n  --board-id ${board}${boardPreset ? ` --preset ${boardPreset}` : ""} --units ${shell(units)} --seconds 60`
         : source === "file"
           ? " \\\n  --input ./recording.edf --start-us YOUR_ACQUISITION_START_US"
           : ` --rate ${rate} --channels ${shell(channels.replaceAll(" ", ""))} --seconds 30 --realtime`);
@@ -223,11 +347,80 @@ function Setup({ onDone }: { onDone: () => void }) {
             }}
           >
             <option value="synthetic">Synthetic EEG · no hardware</option>
-            <option value="brainflow">BrainFlow / OpenBCI</option>
+            <option value="brainflow">
+              BrainFlow · {BCI_BOARD_COUNT} boards, {BCI_VENDOR_COUNT} vendors
+            </option>
             <option value="lsl">Lab Streaming Layer</option>
             <option value="file">Recorded EDF / BDF / FIF</option>
           </select>
         </label>
+        {source === "brainflow" && (
+          <>
+            <label>
+              Vendor
+              <select
+                value={vendor}
+                disabled={!!preview || applied}
+                onChange={(e) => {
+                  setVendor(e.target.value);
+                  setBoard(firstBoardOf(e.target.value));
+                  setBoardPreset(0);
+                }}
+              >
+                {BCI_VENDORS.map((name) => (
+                  <option key={name} value={name}>
+                    {vendorLabel(name)} · {boardsOf(name).length} boards
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Device
+              <select
+                value={board}
+                disabled={!!preview || applied}
+                onChange={(e) => {
+                  setBoard(Number(e.target.value));
+                  setBoardPreset(0);
+                }}
+              >
+                {boardsOf(vendor).map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name} · {b.channels} ch · {b.rate} Hz
+                    {b.describable ? "" : " · not described"}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {(catalog.boards.find((b) => b.id === board)?.presets.length || 0) >
+              1 && (
+              <label>
+                Preset
+                <select
+                  value={boardPreset}
+                  disabled={!!preview || applied}
+                  onChange={(e) => setBoardPreset(Number(e.target.value))}
+                >
+                  {(
+                    catalog.boards.find((b) => b.id === board)?.presets || []
+                  ).map((p) => (
+                    <option key={p.preset} value={p.preset}>
+                      {p.name} · {p.channels} ch · {p.rate} Hz
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <p className="bci-note">
+              {BCI_BOARD_COUNT} boards · {BCI_VENDOR_COUNT} documented vendors
+              {" · "}
+              {boardsOf("undocumented").length} undocumented ·{" "}
+              {BCI_PRESET_COUNT} presets from BrainFlow{" "}
+              {catalog.brainflow_version}. The Boards tab lists every channel
+              name.
+            </p>
+          </>
+        )}
         <label>
           Instance
           <input
@@ -719,8 +912,9 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
         </div>
       </header>
       {setup && <Setup onDone={() => void refresh()} />}
+      <BrowserDecodeCheck />
       <div className="bci-tabs" role="tablist" aria-label="BCI workspace">
-        {["Sessions", "Datasets", "Runs", "Live"].map((t) => (
+        {["Sessions", "Datasets", "Runs", "Live", "Boards"].map((t) => (
           <button
             key={t}
             role="tab"
@@ -740,7 +934,9 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
           {error}
         </p>
       )}
-      {!sessions.length ? (
+      {tab === "Boards" ? (
+        <Boards />
+      ) : !sessions.length ? (
         <section className="bci-panel bci-empty">
           <Activity size={34} />
           <h2>Your first recording starts here.</h2>

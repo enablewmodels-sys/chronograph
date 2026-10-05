@@ -178,7 +178,17 @@ class BCISpool:
         with self.transaction():
             self.db.execute("UPDATE config SET state=?", (state,))
 
-    def drain(self, client, *, max_batches=100):
+    def drain(self, client, *, max_batches=100, fork=None):
+        """Send queued batches. `fork` targets one branch with the same single writer.
+
+        The whole spool is recorded into the selected branch; the parent graph and every
+        other branch stay unchanged. Omit it to record into the parent.
+
+        Every batch is acknowledged only after the server has synchronized it, so the
+        cost of recording scales with the number of commits, not with the number of
+        samples. The knob for a closed loop is therefore samples per record: raise the
+        source chunk size (or the poll window) instead of weakening durability.
+        """
         import fcntl
 
         path = self.root / "sender.lock"
@@ -231,7 +241,12 @@ class BCISpool:
                         self.db.execute(
                             "UPDATE queue SET frozen=? WHERE sequence=?", (frozen, seq)
                         )
-                result = client.call("connector_ingest", json.loads(frozen))["receipt"]
+                request = json.loads(frozen)
+                if fork is not None:
+                    if not re.fullmatch(r"[0-9]+", str(fork)):
+                        raise ValueError("Branch must be a decimal fork ID")
+                    request["fork"] = str(fork)
+                result = client.call("connector_ingest", request)["receipt"]
                 if (
                     result.get("instance"),
                     result.get("partition"),

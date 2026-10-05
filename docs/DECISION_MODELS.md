@@ -14,7 +14,7 @@ as temporal relationships, through the same Managed and Community database APIs.
 | Example relation kind | `420` | `421` |
 | Guide | [Jev setup and examples](JEV.md) | [Laya setup and examples](LAYA.md) |
 
-[Download both integrations](https://chronodb.co/downloads/chronograph-decision-examples.zip)
+[Download both integrations](https://chronodb.co/downloads/chronodb-decision-examples.zip)
 
 ## A shared workflow
 

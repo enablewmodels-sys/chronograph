@@ -60,7 +60,7 @@ checks.append("BrainFlow 5.22.2 synthetic board acquisition, exact signal/timest
 
 # Local LSL outlet/inlet; no external stream discovery.
 from pylsl import StreamInfo,StreamOutlet,StreamInlet,local_clock,resolve_byprop
-info=StreamInfo("Chronograph SDK fixture","EEG",2,100,"float32",str(uuid.uuid4()))
+info=StreamInfo("ChronoDB SDK fixture","EEG",2,100,"float32",str(uuid.uuid4()))
 outlet=StreamOutlet(info,chunk_size=1)
 resolved=resolve_byprop("source_id",info.source_id(),timeout=5)
 assert len(resolved)==1

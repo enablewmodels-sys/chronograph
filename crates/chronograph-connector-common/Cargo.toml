@@ -1,6 +1,6 @@
 [package]
 name = "chronograph-connector-common"
-description = "Checked Arrow sidecars for Chronograph public-API connectors"
+description = "Checked Arrow sidecars for ChronoDB public-API connectors"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

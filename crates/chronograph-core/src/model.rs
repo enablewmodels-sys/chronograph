@@ -213,6 +213,19 @@ pub enum WriteOp {
         /// Atomic branch operation.
         operation: ForkWriteOp,
     },
+    /// Atomically commit a branch ingestion batch and its partition cursor in one frame.
+    ///
+    /// The receipt and the branch-local versions share the frame, so a branch commit is as
+    /// durable as a parent commit and a byte-identical retry stays idempotent. This is the
+    /// write path that lets one writer serve any number of branches without a writer per branch.
+    ForkIngest {
+        /// Selected fork; all edge IDs in the operation are local to this fork.
+        fork: ForkId,
+        /// Ordered batch identity used for lost-ack retry.
+        cursor: crate::IngestCursor,
+        /// Versions with explicit exclusive ends, inserted into the selected fork.
+        inputs: Vec<BoundedEdgeInput>,
+    },
     /// Atomically merge an eligible fork and close it.
     MergeFork(ForkId),
     /// Durably discard an active fork without changing the parent.
@@ -234,6 +247,8 @@ pub enum WriteResult {
     Merged(MergeResult),
     /// A fork was durably discarded.
     Discarded(ForkId),
+    /// A branch ingestion batch was committed; the receipt is returned for retries.
+    Ingest(crate::IngestReceipt),
 }
 
 /// Options for opening a database. A database file has one owning handle at a time.

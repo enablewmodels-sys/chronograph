@@ -34,7 +34,7 @@ with Writer(root / "rosbag2", version=9) as bag, (root / "joints.mcap").open("xb
     connections = {topic: bag.add_connection(topic, "sensor_msgs/msg/JointState", typestore=types)
                    for topic in ("/joint_states", "/commands")}
     mc = McapWriter(out, chunk_size=512)
-    mc.start(profile="ros2", library="Chronograph independent Python fixture")
+    mc.start(profile="ros2", library="ChronoDB independent Python fixture")
     schema = mc.register_schema("sensor_msgs/msg/JointState", "ros2msg", types.generate_msgdef("sensor_msgs/msg/JointState")[0].encode())
     channels = {topic: mc.register_channel(topic, "cdr", schema) for topic in connections}
     sequence = 0
@@ -72,7 +72,7 @@ with av.open(str(root / "camera/episode.mp4"), mode="w") as video:
 checksum = hashlib.sha256((root / "camera/episode.mp4").read_bytes()).hexdigest()
 with (root / "references.mcap").open("xb") as output:
     mc = McapWriter(output, chunk_size=512)
-    mc.start(library="Chronograph independent mixed-encoding fixture")
+    mc.start(library="ChronoDB independent mixed-encoding fixture")
     sid = mc.register_schema("sensor_msgs/msg/JointState", "ros2msg", types.generate_msgdef("sensor_msgs/msg/JointState")[0].encode())
     channels = {topic: mc.register_channel(topic, "cdr", sid) for topic in ("/joint_states", "/commands")}
     schema = {"type": "object", "properties": {"path": {"type": "string"}, "timestamp_ns": {"type": "integer"}, "sha256": {"type": "string"}}, "required": ["path", "timestamp_ns", "sha256"], "additionalProperties": False}

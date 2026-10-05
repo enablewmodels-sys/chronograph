@@ -310,13 +310,16 @@ test("a signed-out visitor is asked to sign in rather than shown the fleet", asy
     }),
   );
 
+  // The panel is no longer mounted for a signed-out visitor: the route hands them to
+  // the sign-in form, so the fleet is never in the DOM for anyone to inspect.
   await page.goto("/admin");
-  await expect(page.locator(".superadmin-denied")).toBeVisible();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByLabel("Email address", { exact: true })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Sign in required" }),
+    page.getByRole("button", { name: "Sign in", exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: "Sign in" })).toBeVisible();
   await expect(page.locator(".superadmin-panel")).toHaveCount(0);
+  await expect(page.locator(".superadmin-denied")).toHaveCount(0);
 });
 
 test("a signed-in account that is not an operator is refused", async ({
@@ -345,10 +348,13 @@ test("a signed-in account that is not an operator is refused", async ({
     }),
   );
 
+  // Signed in but not the operator: say so instead of bouncing to the sign-in form,
+  // which used to read as a broken session rather than a permission decision.
   await page.goto("/admin");
   await expect(
-    page.getByRole("heading", { name: "Not authorised" }),
+    page.getByRole("heading", { name: "Operator access required." }),
   ).toBeVisible();
+  await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
   await expect(page.locator(".superadmin-panel")).toHaveCount(0);
 });
 

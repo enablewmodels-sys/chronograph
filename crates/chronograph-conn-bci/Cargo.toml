@@ -1,6 +1,6 @@
 [package]
 name = "chronograph-conn-bci"
-description = "LSL and synthetic neural-stream adapters for Chronograph"
+description = "LSL and synthetic neural-stream adapters for ChronoDB"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

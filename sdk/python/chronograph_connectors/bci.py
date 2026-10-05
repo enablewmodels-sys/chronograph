@@ -26,6 +26,20 @@ class BCITransport(Client):
                 time.sleep(min(60, max(1, delay)))
 
 
+def _us(seconds):
+    """Microsecond timestamp with the same rounding the server validates with.
+
+    The service checks coverage with Rust's float round, which is half-away-from-zero,
+    while Python round() is half-to-even. A time that lands exactly on a half
+    microsecond would otherwise be accepted here and rejected on ingest with
+    "Signal timestamps must be finite, nondecreasing and within declared coverage".
+    """
+    value = float(seconds) * 1e6
+    if not math.isfinite(value):
+        raise ValueError("Timestamp must be finite")
+    return int(math.floor(value + 0.5)) if value >= 0 else int(math.ceil(value - 0.5))
+
+
 def uid():
     return str(secrets.randbits(63) or 1)
 
@@ -200,8 +214,8 @@ class Session:
             raise ValueError("Invalid sample indices")
         if not math.isfinite(correction_seconds):
             raise ValueError("Invalid clock correction")
-        start = round((float(times[0]) + correction_seconds) * 1e6)
-        end = round((float(times[-1]) + correction_seconds) * 1e6) + max(
+        start = _us(float(times[0]) + correction_seconds)
+        end = _us(float(times[-1]) + correction_seconds) + max(
             1, round(1e6 / meta["sample_rate_hz"])
         )
         if end - start > 60_000_000 or not -(2**63) <= start < end < 2**63 - 1:
@@ -403,6 +417,118 @@ class BCIClient:
                 self.tensor(r["assets"]["signal"]),
                 self.tensor(r["assets"]["timestamps"]),
             )
+
+    def to_mne(self, session, stream="eeg"):
+        """Return this recording as an mne.io.RawArray, without writing a file.
+
+        This is the bridge into an existing MNE and scikit-learn pipeline: the
+        channel names, types, sample rate, annotations and bad channels the
+        recording stored, in an object that tooling already understands. Nothing
+        is resampled, filtered or re-referenced, and a recording with explicit
+        gaps is refused instead of joined, because a joined gap is a fabricated
+        signal.
+        """
+        import numpy as np
+
+        try:
+            import mne
+        except ImportError as error:
+            raise RuntimeError(
+                "Install the BCI extra first: pip install './sdk/python[bci]'"
+            ) from error
+
+        declarations = [
+            row["record"]
+            for row in self.records(session, stream=stream, record_type="stream")
+        ]
+        if len(declarations) != 1:
+            raise ValueError(
+                f"A Raw conversion needs exactly one stream declaration for {stream!r}; "
+                f"found {len(declarations)}"
+            )
+        fields = declarations[0]["fields"]
+        channels = [str(name) for name in fields["channels"]]
+        units = [str(unit) for unit in fields["units"]]
+        if any(unit != "V" for unit in units):
+            raise ValueError(
+                "Only volt-scaled channels convert to MNE; rescale the source "
+                "explicitly and record the factor you applied"
+            )
+        rate = float(fields["sample_rate_hz"])
+        if not math.isfinite(rate) or rate <= 0:
+            raise ValueError("Invalid sample rate in stream metadata")
+        if list(self.records(session, stream=stream, record_type="gap")):
+            raise ValueError(
+                "Recording contains explicit gaps; convert each continuous segment "
+                "separately instead of joining them"
+            )
+
+        chunks = list(self.chunks(session, stream))
+        if not chunks:
+            raise ValueError("Recording has no signal chunks")
+        data = np.concatenate([chunk[1] for chunk in chunks], axis=1)
+        times = np.concatenate([chunk[2] for chunk in chunks])
+        if data.shape[0] != len(channels) or data.shape[1] != len(times):
+            raise ValueError("Signal chunks disagree with the stream declaration")
+        if np.any(np.diff(times) <= 0):
+            raise ValueError(
+                "Timestamps must strictly increase for a Raw conversion; irregular "
+                "timing needs the exact chunked export"
+            )
+
+        types = [str(kind).lower() for kind in fields["channel_types"]]
+        raw = mne.io.RawArray(
+            np.ascontiguousarray(data, dtype=np.float64),
+            mne.create_info(channels, rate, types),
+            verbose="ERROR",
+        )
+        origin_us = int(chunks[0][0]["timestamp_us"])
+        events = [
+            row["record"]
+            for row in self.records(session, stream=stream, record_type="event")
+        ]
+        marks = []
+        for record in events:
+            event = record["fields"]
+            start_us = int(record["timestamp_us"])
+            end_us = int(event.get("end_us") or start_us)
+            marks.append(
+                (
+                    (start_us - origin_us) / 1e6,
+                    max(0.0, (end_us - start_us) / 1e6),
+                    str(event["label"]),
+                )
+            )
+        marks.sort(key=lambda mark: (mark[0], mark[2]))
+        if marks:
+            raw.set_annotations(
+                mne.Annotations(
+                    [mark[0] for mark in marks],
+                    [mark[1] for mark in marks],
+                    [mark[2] for mark in marks],
+                )
+            )
+        # The writer nests extra metadata, so the channel arrives under fields.metadata
+        # and the record label carries the same name. Read all three shapes rather than
+        # silently returning an empty bad-channel list.
+        bad = set()
+        for record in events:
+            fields = record["fields"]
+            if fields.get("category") != "bad_channel":
+                continue
+            metadata = fields.get("metadata")
+            name = fields.get("channel")
+            if name is None and isinstance(metadata, dict):
+                name = metadata.get("channel")
+            bad.add(str(name if name is not None else fields.get("label")))
+        raw.info["bads"] = [name for name in channels if name in bad]
+        described = [
+            row["record"]["fields"]
+            for row in self.records(session, record_type="session")
+        ]
+        if described:
+            raw.info["description"] = str(described[0].get("name") or "")
+        return raw
 
     def export(self, session, stream, directory, *, max_bytes=512 * 1024 * 1024):
         """Exact chunked NumPy export; never joins gaps or silently scales units."""

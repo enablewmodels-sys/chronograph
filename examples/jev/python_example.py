@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Offline by default. --live calls TypeSafe; --write persists to Chronograph."""
+"""Offline by default. --live calls TypeSafe; --write persists to ChronoDB."""
 import argparse
 import json
 import os

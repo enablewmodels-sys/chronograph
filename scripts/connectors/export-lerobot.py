@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Convert a checked Chronograph Arrow handoff with the official LeRobot v3 writer. Local only."""
+"""Convert a checked ChronoDB Arrow handoff with the official LeRobot v3 writer. Local only."""
 import argparse
 import importlib.metadata
 import json
@@ -15,7 +15,7 @@ import pyarrow.ipc as ipc
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
 
-def export(input_path, output_path, repo_id="local/chronograph", task="Chronograph robotics replay", dtype="float64"):
+def export(input_path, output_path, repo_id="local/chronograph", task="ChronoDB robotics replay", dtype="float64"):
     input_path, output_path = pathlib.Path(input_path), pathlib.Path(output_path)
     if output_path.exists():
         raise ValueError(f"Refusing to replace {output_path}")
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     parser.add_argument("input", type=pathlib.Path)
     parser.add_argument("output", type=pathlib.Path)
     parser.add_argument("--repo-id", default="local/chronograph")
-    parser.add_argument("--task", default="Chronograph robotics replay")
+    parser.add_argument("--task", default="ChronoDB robotics replay")
     parser.add_argument("--dtype", choices=("float32", "float64"), default="float64")
     args = parser.parse_args()
     print(json.dumps(export(args.input, args.output, args.repo_id, args.task, args.dtype), indent=2))

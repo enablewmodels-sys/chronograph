@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Logo } from "./shared";
+import { operator } from "./legal-content";
 import { managedSite } from "./site";
 import "./footer.css";
 
@@ -21,7 +22,9 @@ export default function SiteFooter() {
       <div className="footer-brand">
         <Logo />
         <p>Memory for models that act.</p>
-        <small>Operated by IntelliNxT, Australia.</small>
+        <small>
+          Operated by {operator.name}, {operator.jurisdiction}.
+        </small>
       </div>
       <nav aria-label="Product resources">
         <h2>Build</h2>
@@ -52,7 +55,9 @@ export default function SiteFooter() {
         <Link to="/legal">Company information</Link>
       </nav>
       <div className="footer-bottom">
-        <span>© {new Date().getFullYear()} IntelliNxT</span>
+        <span>
+          © {new Date().getFullYear()} {operator.name}
+        </span>
         <span>ChronoDB Managed · Community available to self-host</span>
       </div>
     </footer>

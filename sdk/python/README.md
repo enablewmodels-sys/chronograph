@@ -1,4 +1,4 @@
-# Chronograph connector client and local agent
+# ChronoDB connector client and local agent
 
 Install with `python -m pip install ./sdk/python` from the repository root. Python 3.10+; the durable agent supports Linux and macOS. The HTTP client has no third-party dependencies. Optional adapters load their runtimes only when called.
 

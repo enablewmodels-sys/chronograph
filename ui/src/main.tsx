@@ -4,6 +4,7 @@ import {
   Suspense,
   useContext,
   useEffect,
+  useRef,
   useState,
   useCallback,
 } from "react";
@@ -104,15 +105,22 @@ function App() {
     publicSite ? demoConnection : null,
   );
   const [managed, setManaged] = useState<ManagedSession | null>(null);
+  // The account probe is bounded, so this cannot stick on forever.
   const [loadingAccount, setLoadingAccount] = useState(managedSite);
+  // True only when the account probe itself failed. A signed-out visitor answered by
+  // the account service is not an error, and a project that will not connect is a
+  // different failure, so the two must not be shown the same way.
+  const [accountError, setAccountError] = useState(false);
+  const accountAnswered = useRef(false);
   const refreshManaged = useCallback(async () => {
     setManagedProject("");
     const next = await managedApi<ManagedSession>("/managed/session");
+    accountAnswered.current = true;
+    setAccountError(false);
     setManagedProject(next.project?.id || "");
     if (
       next.user &&
       !next.user.needsMfa &&
-      next.user.twoFactorEnabled &&
       !next.user.needsActivation &&
       next.project
     ) {
@@ -131,10 +139,29 @@ function App() {
     }
   }, []);
   useEffect(() => {
-    if (managedSite)
-      void refreshManaged()
-        .catch(() => setManaged(null))
-        .finally(() => setLoadingAccount(false));
+    if (!managedSite) return;
+    // The account probe is bounded in managed-api.ts, so the sign-in form still
+    // renders when the account service is unreachable. A failure clears the graph
+    // connection only: the account session is the server's answer and has to
+    // survive an unreachable project, or a transient API error signs out a user
+    // who is still authenticated.
+    accountAnswered.current = false;
+    void refreshManaged()
+      .catch(() => {
+        setConnection(null);
+        // The account service did not answer, so the browser cannot say whether the
+        // visitor is signed in. Sending them to the sign-in form reads as a broken
+        // session; say what happened and offer the retry instead.
+        setAccountError(!accountAnswered.current);
+      })
+      .finally(() => setLoadingAccount(false));
+  }, [refreshManaged]);
+  const retryAccount = useCallback(() => {
+    setLoadingAccount(true);
+    accountAnswered.current = false;
+    void refreshManaged()
+      .catch(() => setAccountError(!accountAnswered.current))
+      .finally(() => setLoadingAccount(false));
   }, [refreshManaged]);
   const update = (s: Connection | null) => {
     setConnection(s);
@@ -190,9 +217,39 @@ function App() {
           />
           <Route path="/documentation/*" element={<Documentation />} />
           <Route path="/pricing" element={<Pricing />} />
-          {/* Operator-only. The server rejects non-operators; the page renders its
-              own not-authorised state rather than assuming the client is trusted. */}
-          <Route path="/admin" element={<SuperAdmin />} />
+          {/* Operator-only, and not a public surface: the panel is not mounted at all
+              without an account session that the control plane marks as superadmin.
+              The server still authorises every request, so this is a second gate. */}
+          <Route
+            path="/admin"
+            element={
+              !managedSite ? (
+                <Navigate to="/" replace />
+              ) : loadingAccount ? (
+                <p className="loading" role="status">
+                  Checking your account…
+                </p>
+              ) : accountError ? (
+                <AccountUnavailable retry={retryAccount} />
+              ) : managed?.superadmin ? (
+                <SuperAdmin />
+              ) : managed?.user ? (
+                // Signed in, but not the operator. Saying so is kinder than a silent
+                // bounce to the sign-in form, which reads as a broken session.
+                <div className="standalone-security">
+                  <Logo />
+                  <Link to="/projects">Back to projects</Link>
+                  <h2>Operator access required.</h2>
+                  <p>
+                    This panel belongs to the platform operator account. Your
+                    own projects are unaffected.
+                  </p>
+                </div>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
           {[
             "privacy",
             "terms",
@@ -236,9 +293,11 @@ function App() {
                 element={
                   loadingAccount ? (
                     <p className="loading">Loading projects…</p>
+                  ) : accountError ? (
+                    <AccountUnavailable retry={retryAccount} />
                   ) : managed?.user &&
                     !managed.user.needsMfa &&
-                    managed.user.twoFactorEnabled ? (
+                    !managed.user.needsActivation ? (
                     <ManagedProjects
                       session={managed}
                       refresh={refreshManaged}
@@ -271,14 +330,16 @@ function App() {
                 <p className="loading" role="status">
                   Loading workspace…
                 </p>
-              ) : connection ? (
-                <Console key={connection.project?.id || "community"} />
+              ) : accountError ? (
+                  <AccountUnavailable retry={retryAccount} />
+                ) : connection ? (
+                  <Console key={connection.project?.id || "community"} />
               ) : (
                 <Navigate
                   to={
                     managed?.user &&
                     !managed.user.needsMfa &&
-                    managed.user.twoFactorEnabled
+                    !managed.user.needsActivation
                       ? "/projects"
                       : "/login"
                   }
@@ -393,6 +454,22 @@ const navigation = [
       ]
     : []),
 ];
+/** Shown when the account service itself did not answer. */
+function AccountUnavailable({ retry }: { retry: () => void }) {
+  return (
+    <div className="standalone-security">
+      <Logo />
+      <h2>The account service is not answering.</h2>
+      <p>
+        Your session is still in this browser and nothing was signed out. Try again
+        in a moment.
+      </p>
+      <button type="button" onClick={retry}>
+        Try again
+      </button>
+    </div>
+  );
+}
 function Console() {
   const { update, connection, managed, refreshManaged } = useAuth(),
     action = useAction(),

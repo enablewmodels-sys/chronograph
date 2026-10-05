@@ -541,3 +541,24 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+/* The schema page opens by saying what it is for, then gets out of the way. */
+.schema-start {
+  margin-bottom: 20px;
+}
+.schema-start h2 {
+  margin-bottom: 6px;
+}
+.schema-start-steps {
+  margin: 10px 0 12px 18px;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--muted, #8b96ad);
+}
+.schema-start-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 14px;
+}

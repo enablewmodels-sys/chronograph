@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "name": "example-neural-app",
+  "kind": "container",
+  "build": {
+    "context": ".",
+    "dockerfile": "Dockerfile"
+  },
+  "run": {
+    "port": 8080,
+    "health": "/healthz",
+    "replicas": 1
+  },
+  "persistence": {
+    "mount": "/data",
+    "sizeGb": 20,
+    "note": "A database needs durable local storage; this is never serverless."
+  },
+  "domains": [
+    {
+      "hostname": "app.example.com",
+      "provider": "cloudflare-saas",
+      "env": ["CHRONOGRAPH_DOMAINS_API_TOKEN", "CHRONOGRAPH_DOMAINS_ZONE"]
+    }
+  ],
+  "env": [
+    {
+      "name": "CHRONOGRAPH_URL",
+      "kind": "plain"
+    },
+    {
+      "name": "CHRONOGRAPH_TOKEN",
+      "kind": "secret-ref"
+    }
+  ],
+  "stores": [
+    {
+      "store": "play",
+      "artifact": "app-release.aab",
+      "requires": "operator account, app record and upload key"
+    },
+    {
+      "store": "app-store",
+      "artifact": "app.ipa",
+      "requires": "operator account, bundle ID and distribution certificate"
+    }
+  ],
+  "boundary": "Building and running the app is automated locally. Publishing to a store is a documented manual step with the operator's own credentials."
+}

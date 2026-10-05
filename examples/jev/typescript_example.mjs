@@ -1,4 +1,4 @@
-// Node 20+. Offline by default; --live calls TypeSafe; --write uses Chronograph.
+// Node 20+. Offline by default; --live calls TypeSafe; --write uses ChronoDB.
 import { readFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { Client, jevDecision } from '../../sdk/typescript/dist/index.js';

@@ -31,6 +31,37 @@ graph.sync()?;
 
 `write_fork` accepts `ForkWriteOp::{AddNode, AddEdges, AddBoundedEdges, Invalidate}`. `add_bounded_edges_to_fork` inserts explicit ends atomically. Late and equal-time arrivals follow the same truncation rules as the parent. Invalidation only shortens; empty batches and already-existing nodes are no-ops. `fork_history`, `fork_edge`, `fork_between` and `ForkView::{edges, nodes, neighbors, sample_neighbors_seeded, export_arrow}` provide reads. A borrowed view prevents writes until it is no longer used.
 
+## Branch ingestion and one writer
+
+A branch does not need its own writer, journal or checkpoint store. `connector_ingest` accepts
+the same `fork` argument as every other write, so normalized records — including BCI sessions,
+signals, events and decoder predictions — are committed into the selected branch through the one
+central write path, guarded by the one journal lock:
+
+```python
+with BCISpool("./live-01", "bci_lsl", "live_01") as spool:
+    spool.drain(client, fork=fork_id)
+```
+
+The receipt and the branch-local versions share one checksummed frame, so a byte-identical retry
+returns the original receipt and inserts nothing, exactly as for the parent. Branch partition
+cursors are keyed per branch, so the same source and partition name can be recorded independently
+into many branches. `Graph::ingest_to_fork` is the embedded equivalent.
+
+`Graph::apply_fork_batch` commits independent batches for several branches in ONE frame and one
+synchronize, which is what keeps branch count from scaling writer, frame and fsync count. Every
+branch is prepared before anything is written, so a rejected batch leaves all branches unchanged.
+One group per branch per frame is accepted, and only edge insertions are batched this way.
+
+Reads accept the same argument: `bci_sessions`, `bci_session`, `bci_records`, `bci_window`,
+`bci_manifest` and `bci_causal_path` inspect one branch, while an omitted `fork` shows the
+parent only. A branch inherits the versions frozen at its fork time and isolates everything written
+afterwards; merging or discarding removes its derived rows from the read index.
+
+One BCI-specific note: stream metadata is recorded at timestamp 0, and a branch rejects writes
+before its fork time. A branch that records a *new recording* therefore forks at time 0 or earlier.
+A branch that only records decoder results forks at the decode time.
+
 ## Merge rules and mappings
 
 `preview_merge` and `merge` require the **parent state revision** to equal the fork's captured revision. Branch creation, editing and discarding affect the global revision, but leave this parent revision unchanged. A successful merge is one parent commit; other forks from the old parent then conflict, even if their changes are disjoint. There is no automatic rebase or three-way conflict resolution.

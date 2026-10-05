@@ -69,7 +69,10 @@ function BranchHistory({
               <title>
                 {f.name} · {f.timestamp} µs · {f.status}
               </title>
-              <path d={`M ${x} 50 C ${x} ${y} 425 ${y} 595 ${y}`} />
+              <path
+                d={`M ${x} 50 C ${x} ${y} 425 ${y} 595 ${y}`}
+                fill="none"
+              />
               <circle cx={x} cy="50" r="5" />
               <circle cx="595" cy={y} r="6" />
               <text x="615" y={y + 4}>

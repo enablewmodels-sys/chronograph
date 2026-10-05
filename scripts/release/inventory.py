@@ -98,7 +98,7 @@ def generate(out, target):
     now = dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     document = {
         'spdxVersion': 'SPDX-2.3', 'dataLicense': 'CC0-1.0', 'SPDXID': 'SPDXRef-DOCUMENT',
-        'name': f'Chronograph-{VERSION}-workspace-dependency-inventory-' + target,
+        'name': f'ChronoDB-{VERSION}-workspace-dependency-inventory-' + target,
         'documentNamespace': 'https://spdx.org/spdxdocs/chronograph-' + str(uuid.uuid4()),
         'creationInfo': {'created': now, 'creators': [f'Tool: chronograph-inventory-{VERSION}']},
         'comment': __doc__.strip(), 'packages': packages,

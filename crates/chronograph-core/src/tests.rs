@@ -852,7 +852,7 @@ fn frozen_forks_exclude_parent_future_and_reject_conflicting_merges() {
 #[test]
 fn every_truncated_branch_operation_recovers_atomically() {
     // Cover every byte boundary of each new record type using actual encoded appends.
-    for operation in 0..6 {
+    for operation in 0..7 {
         let f = TestFile::new();
         let mut g = Graph::open(&f.0).unwrap();
         add(&mut g, input(1, 2, 0));
@@ -882,7 +882,21 @@ fn every_truncated_branch_operation_recovers_atomically() {
                 operation: ForkWriteOp::Invalidate(EdgeId(1), 25),
             },
             4 => WriteOp::DiscardFork(fork),
-            _ => WriteOp::MergeFork(fork),
+            5 => WriteOp::MergeFork(fork),
+            // Branch ingestion shares the branch write path, so it must recover like any other.
+            _ => WriteOp::ForkIngest {
+                fork,
+                cursor: IngestCursor {
+                    source: "bci_decode".into(),
+                    partition: "torn".into(),
+                    sequence: 0,
+                    digest: [3; 32],
+                },
+                inputs: vec![BoundedEdgeInput {
+                    edge: input(1, 2, 60),
+                    valid_to: 70,
+                }],
+            },
         };
         g.apply(op.clone()).unwrap();
         g.close().unwrap();
@@ -913,6 +927,56 @@ fn every_truncated_branch_operation_recovers_atomically() {
             );
             assert_eq!(fs::metadata(&out.0).unwrap().len() as usize, baseline.len());
         }
+    }
+}
+
+#[test]
+fn every_torn_multi_branch_frame_recovers_atomically() {
+    // One frame carries two independent branches; every torn byte boundary must recover
+    // without applying either branch and without rewriting the source file.
+    let f = TestFile::new();
+    let mut g = Graph::open(&f.0).unwrap();
+    add(&mut g, input(1, 2, 0));
+    let a = g.fork_named(10, "torn-a").unwrap();
+    let b = g.fork_named(10, "torn-b").unwrap();
+    g.sync().unwrap();
+    let baseline = fs::read(&f.0).unwrap();
+    let writes = [
+        (a, ForkWriteOp::AddEdges(vec![input(1, 2, 20)])),
+        (
+            b,
+            ForkWriteOp::AddBoundedEdges(vec![BoundedEdgeInput {
+                edge: input(1, 9, 30),
+                valid_to: 40,
+            }]),
+        ),
+    ];
+    g.apply_fork_batch(&writes).unwrap();
+    g.close().unwrap();
+    let frame_len = fs::metadata(&f.0).unwrap().len() as usize - baseline.len();
+    assert!(frame_len > 0, "the multi-branch frame must be written");
+    for split in 0..frame_len {
+        let out = TestFile::new();
+        fs::write(&out.0, &baseline).unwrap();
+        let mut graph = Graph::open(&out.0).unwrap();
+        let revision = graph.revision();
+        let parent = graph.history().to_vec();
+        let branch_a: Vec<_> = graph.fork_history(a).unwrap().collect();
+        let branch_b: Vec<_> = graph.fork_history(b).unwrap().collect();
+        graph.journal.fault_after = Some(split);
+        assert!(
+            graph.apply_fork_batch(&writes).is_err(),
+            "split={split} must fail"
+        );
+        assert_eq!(graph.revision(), revision);
+        assert_eq!(graph.history(), &parent);
+        drop(graph);
+        let graph = Graph::open(&out.0).unwrap();
+        assert_eq!(graph.revision(), revision);
+        assert_eq!(graph.history(), &parent);
+        assert_eq!(graph.fork_history(a).unwrap().collect::<Vec<_>>(), branch_a);
+        assert_eq!(graph.fork_history(b).unwrap().collect::<Vec<_>>(), branch_b);
+        assert_eq!(fs::metadata(&out.0).unwrap().len() as usize, baseline.len());
     }
 }
 
@@ -1059,4 +1123,123 @@ proptest! {
         g.merge(fork).unwrap(); prop_assert_eq!(g.history(), &reference);
         g.close().unwrap(); let g = Graph::open(&f.0).unwrap(); prop_assert_eq!(g.history(), &reference);
     }
+}
+
+#[test]
+fn branch_ingestion_uses_one_writer_and_stays_idempotent() {
+    let f = TestFile::new();
+    let mut g = Graph::open(&f.0).unwrap();
+    for src in 1..4 {
+        add(&mut g, input(src, 9, 0));
+    }
+    let parent = g.history().to_vec();
+    let a = g.fork_named(10, "decode-a").unwrap();
+    let b = g.fork_named(10, "decode-b").unwrap();
+    let cursor = |sequence| IngestCursor {
+        source: "bci_decode".into(),
+        partition: "branch_run".into(),
+        sequence,
+        digest: [7; 32],
+    };
+    let batch = |t| {
+        vec![BoundedEdgeInput {
+            edge: input(1, 9, t),
+            valid_to: t + 5,
+        }]
+    };
+    let first = g.ingest_to_fork(a, cursor(0), &batch(11)).unwrap();
+    assert_eq!(first.edge_count, 1);
+    assert_eq!(first.revision, 1);
+    // A byte-identical lost-ack retry returns the original receipt and writes nothing.
+    let revision = g.revision();
+    assert_eq!(g.ingest_to_fork(a, cursor(0), &batch(11)).unwrap(), first);
+    assert_eq!(g.revision(), revision);
+    // Each branch keeps its own cursor for the same source and partition.
+    let other = g.ingest_to_fork(b, cursor(0), &batch(21)).unwrap();
+    assert_eq!(other.edge_count, 1);
+    assert_eq!(
+        g.fork_checkpoint(a, "bci_decode", "branch_run")
+            .unwrap()
+            .cursor,
+        first.cursor
+    );
+    // Sequencing is enforced per branch, and an empty batch is refused.
+    assert!(g.ingest_to_fork(a, cursor(2), &batch(15)).is_err());
+    assert!(g.ingest_to_fork(a, cursor(1), &[]).is_err());
+    // The parent graph is completely untouched by branch ingestion.
+    assert_eq!(g.history(), &parent);
+    assert_eq!(g.revision(), revision + 1);
+    // Branch receipts survive a reopen because the receipt shares the branch frame.
+    let revision = g.revision();
+    g.close().unwrap();
+    let mut g = Graph::open(&f.0).unwrap();
+    assert_eq!(g.revision(), revision);
+    assert_eq!(
+        g.fork_checkpoint(a, "bci_decode", "branch_run")
+            .unwrap()
+            .edge_count,
+        1
+    );
+    assert_eq!(g.history(), &parent);
+    // The retry is still idempotent after replay, and the next sequence is accepted.
+    let revision = g.revision();
+    assert_eq!(g.ingest_to_fork(a, cursor(0), &batch(11)).unwrap(), first);
+    assert_eq!(g.revision(), revision);
+    assert!(g.ingest_to_fork(a, cursor(1), &batch(15)).is_ok());
+    // Merging the branch publishes exactly its own versions.
+    let merged = g.merge(a).unwrap();
+    // Two inserted versions plus the inherited parent version the first insert truncated.
+    assert_eq!(merged.edges.len(), 3);
+    g.close().unwrap();
+    let g = Graph::open(&f.0).unwrap();
+    assert_eq!(g.history().len(), parent.len() + 2);
+    // The untouched branch stays active and never reaches the parent.
+    assert_eq!(g.fork_info(b).unwrap().status, ForkStatus::Active);
+}
+
+#[test]
+fn one_frame_commits_several_branches_and_rejects_atomically() {
+    let f = TestFile::new();
+    let mut g = Graph::open(&f.0).unwrap();
+    add(&mut g, input(1, 9, 0));
+    let a = g.fork_named(10, "batch-a").unwrap();
+    let b = g.fork_named(10, "batch-b").unwrap();
+    let branch = |t| ForkWriteOp::AddEdges(vec![input(2, 9, t)]);
+    let results = g
+        .apply_fork_batch(&[(a, branch(11)), (b, branch(21))])
+        .unwrap();
+    assert_eq!(results.len(), 2);
+    assert_eq!(g.fork_history(a).unwrap().count(), 2);
+    assert_eq!(g.fork_history(b).unwrap().count(), 2);
+    // An empty batch, a duplicate branch, a register-only operation and an empty
+    // insertion are all refused before anything is written.
+    let before_a = g.fork_history(a).unwrap().collect::<Vec<_>>();
+    assert!(g.apply_fork_batch(&[]).is_err());
+    assert!(
+        g.apply_fork_batch(&[(a, branch(31)), (a, branch(41))])
+            .is_err()
+    );
+    assert!(
+        g.apply_fork_batch(&[(a, ForkWriteOp::AddNode(NodeId(5)))])
+            .is_err()
+    );
+    assert!(
+        g.apply_fork_batch(&[(b, ForkWriteOp::AddEdges(vec![]))])
+            .is_err()
+    );
+    assert_eq!(g.fork_history(a).unwrap().collect::<Vec<_>>(), before_a);
+    let discarded = g.fork_named(10, "batch-c").unwrap();
+    g.discard(discarded).unwrap();
+    assert!(
+        g.apply_fork_batch(&[(a, branch(31)), (discarded, branch(41))])
+            .is_err()
+    );
+    assert_eq!(g.fork_history(a).unwrap().collect::<Vec<_>>(), before_a);
+    // The multi-branch frame replays after a reopen.
+    let revision = g.revision();
+    g.close().unwrap();
+    let g = Graph::open(&f.0).unwrap();
+    assert_eq!(g.revision(), revision);
+    assert_eq!(g.fork_history(a).unwrap().count(), 2);
+    assert_eq!(g.fork_history(b).unwrap().count(), 2);
 }

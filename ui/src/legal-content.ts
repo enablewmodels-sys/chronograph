@@ -1,11 +1,15 @@
 export const operator = {
-  name: "SAI YOGADA ENTERPRISES PTY LTD",
-  tradingName: "IntelliNxT",
-  abn: "19 618 905 936",
-  acn: "618 905 936",
-  location: "Victoria 3167, Australia",
-  email: "contact@intellinxt.com.au",
-  registry: "https://abr.business.gov.au/ABN/View/19618905936",
+  // The registered entity name. Distinct from the product brand "ChronoDB" and from
+  // the domain chronodb.co; legal documents must use this spelling.
+  name: "Chronodb, Inc.",
+  entityType: "a Delaware corporation",
+  jurisdiction: "Delaware, United States",
+  // Published as the legal, privacy, security, support and abuse contact.
+  // VERIFY BEFORE RELYING ON IT: on 5 October 2026 `dig MX chronodb.co`
+  // returned no records, so this address cannot receive mail yet. Configure MX
+  // and test delivery, or point this at a monitored mailbox.
+  email: "legal@chronodb.co",
+  registry: "https://icis.corp.delaware.gov/ecorp/entitysearch/NameSearch.aspx",
 };
 
 export interface PolicyPage {
@@ -14,10 +18,9 @@ export interface PolicyPage {
   sections: { id: string; title: string; body: string }[];
 }
 
-const contact = "[contact@intellinxt.com.au](mailto:contact@intellinxt.com.au)";
-const company =
-  "SAI YOGADA ENTERPRISES PTY LTD, trading as IntelliNxT (ABN 19 618 905 936)";
-export const policyDate = "23 September 2026";
+const contact = "[legal@chronodb.co](mailto:legal@chronodb.co)";
+const company = "Chronodb, Inc., a Delaware corporation";
+export const policyDate = "5 October 2026";
 export const policies: Record<string, PolicyPage> = {
   privacy: {
     title: "Privacy policy",
@@ -26,7 +29,7 @@ export const policies: Record<string, PolicyPage> = {
       {
         id: "operator",
         title: "Who is responsible",
-        body: `ChronoDB Managed is operated by ${company}, based in Victoria, Australia. Contact ${contact} for privacy questions or requests. This policy covers chronodb.co and the hosted account, database and support services. Self-hosted Community operators are responsible for their own deployments; this policy does not give us access to those databases.`,
+        body: `ChronoDB Managed is operated by ${company}, based in the United States. Contact ${contact} for privacy questions or requests. This policy covers chronodb.co and the hosted account, database and support services. Self-hosted Community operators are responsible for their own deployments; this policy does not give us access to those databases.`,
       },
       {
         id: "information",
@@ -41,7 +44,7 @@ export const policies: Record<string, PolicyPage> = {
       {
         id: "sharing",
         title: "Recipients and overseas processing",
-        body: "Authorised members of your project can access information according to their role. Your API and MCP keys give access to the software or agents to which you provide them. We use infrastructure and identity providers described on the [subprocessors and providers page](/subprocessors).\n\nThe current primary hosting region is AWS US West (Northern California), **us-west-1**. Cloudflare processes website traffic through its global network. Google or GitHub processes sign-in under its own terms when you choose that provider. This is not an Australia-only or EU-only data-residency service.\n\nWe may disclose information when legally required or necessary to address abuse, protect rights or investigate a security incident. If your organisation requires a specific processing agreement or international transfer mechanism, contact us before uploading that data. We do not represent that a signed DPA or transfer agreement exists merely because you create an account.",
+        body: "Authorised members of your project can access information according to their role. Your API and MCP keys give access to the software or agents to which you provide them. We use infrastructure and identity providers described on the [subprocessors and providers page](/subprocessors).\n\nThe current primary hosting region is AWS US West (Northern California), **us-west-1**. Cloudflare processes website traffic through its global network. Google or GitHub processes sign-in under its own terms when you choose that provider. The service is not restricted to one region or to EU-only data residency.\n\nWe may disclose information when legally required or necessary to address abuse, protect rights or investigate a security incident. If your organisation requires a specific processing agreement or international transfer mechanism, contact us before uploading that data. We do not represent that a signed DPA or transfer agreement exists merely because you create an account.",
       },
       {
         id: "retention",
@@ -51,7 +54,7 @@ export const policies: Record<string, PolicyPage> = {
       {
         id: "rights",
         title: "Access, correction and complaints",
-        body: `Email ${contact} with “ChronoDB privacy” and the account email concerned. You may request access, correction, export or deletion, or ask about restricting or objecting to processing where applicable. We may request proportionate proof of ownership; never send us your password or MFA recovery codes. Project-content requests may need to be handled with the organisation that controls that project.\n\nWe aim to acknowledge requests within seven days and respond within 30 days, or explain an extension permitted by applicable law. If you are dissatisfied, you may contact the [Office of the Australian Information Commissioner](https://www.oaic.gov.au/privacy/privacy-complaints/lodge-a-privacy-complaint-with-us) where its jurisdiction applies, or your relevant local supervisory authority. Mandatory rights are not limited by this policy.`,
+        body: `Email ${contact} with “ChronoDB privacy” and the account email concerned. You may request access, correction, export or deletion, or ask about restricting or objecting to processing where applicable. We may request proportionate proof of ownership; never send us your password or MFA recovery codes. Project-content requests may need to be handled with the organisation that controls that project.\n\nWe aim to acknowledge requests within seven days and respond within 30 days, or explain an extension permitted by applicable law. If you are dissatisfied with our response, you may complain to the privacy or data protection authority with jurisdiction over you, or to a regulator with authority over us. Mandatory rights are not limited by this policy.`,
       },
       {
         id: "changes",
@@ -97,12 +100,12 @@ export const policies: Record<string, PolicyPage> = {
       {
         id: "rights",
         title: "Service assurances and mandatory rights",
-        body: "We provide the service with reasonable care and work to resolve reported faults. We do not promise uninterrupted availability, error-free model outputs, compatibility with every workload, or recovery from every failure. Liability and available remedies remain subject to applicable law and any separate written agreement.\n\nNothing in these terms excludes or restricts rights or guarantees that cannot lawfully be excluded, including applicable Australian Consumer Law guarantees. We do not impose a blanket waiver of those rights or require you to waive a lawful complaint.",
+        body: "We provide the service with reasonable care and work to resolve reported faults. We do not promise uninterrupted availability, error-free model outputs, compatibility with every workload, or recovery from every failure. Liability and available remedies remain subject to applicable law and any separate written agreement.\n\nNothing in these terms excludes or restricts any right, guarantee or remedy that cannot lawfully be excluded or limited, including mandatory consumer protections in your country or state of residence. We do not impose a blanket waiver of those rights or require you to waive a lawful complaint.",
       },
       {
         id: "disputes",
         title: "Contact and changes",
-        body: `Contact ${contact} with questions, disputes or a request for a commercial agreement. We will first seek to resolve a dispute in good faith. Australian law and the law applicable to the operator in Victoria apply, subject to mandatory protections and any courts or authorities that otherwise have jurisdiction.\n\nWe publish revisions with their effective date. Material changes will be notified in the service or by another appropriate channel where practicable. Changes do not retrospectively remove rights that have already accrued.`,
+        body: `Contact ${contact} with questions, disputes or a request for a commercial agreement. We will first seek to resolve a dispute in good faith. These terms are governed by the laws of the State of Delaware, United States, without regard to its conflict-of-law rules, and the state and federal courts located in Delaware have jurisdiction over any dispute, subject to any mandatory protections or courts that otherwise apply to you.\n\nWe publish revisions with their effective date. Material changes will be notified in the service or by another appropriate channel where practicable. Changes do not retrospectively remove rights that have already accrued.`,
       },
     ],
   },
@@ -251,7 +254,7 @@ export const policies: Record<string, PolicyPage> = {
       {
         id: "company",
         title: "Operator",
-        body: `**${operator.name}**\n\nTrading as **${operator.tradingName}**\n\nABN **${operator.abn}** · ACN **${operator.acn}**\n\nMain business location listed on the Australian Business Register: **${operator.location}**. This locality is not a published street or registered-office address. For formal service or postal correspondence, request the appropriate address through ${contact}.\n\n[View the Australian Business Register record](${operator.registry}) · [IntelliNxT website](https://intellinxt.com.au)`,
+        body: `**${operator.name}**\n\n${operator.name} is ${operator.entityType} in the United States, and is the operator named on the hosted chronodb.co service and in these documents.\n\nRegistered office and registered agent details are not published on this page. For formal service, legal correspondence or a procurement review, request the current registered-office details through ${contact}.\n\n[Search the Delaware Division of Corporations entity register](${operator.registry})`,
       },
       {
         id: "documents",

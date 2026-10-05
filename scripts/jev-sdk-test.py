@@ -19,4 +19,4 @@ with TypeSafeClient(api_key='test-fixture-not-a-real-key',base_url='https://api.
     record=jev_decision(result,request=request,src='9007199254740993',dst='9007199254740994',timestamp_us='1700000000000000',mode='fixture')
 assert calls==['POST']
 assert record['fields']['answers']==response['answers']
-print('Official TypeSafe Python 0.7.0: mocked HTTP serialization, typed response and Chronograph adapter passed')
+print('Official TypeSafe Python 0.7.0: mocked HTTP serialization, typed response and ChronoDB adapter passed')

@@ -1,6 +1,6 @@
 [package]
 name = "chronograph-conn-worldmodel"
-description = "Restorable environment steps and Minari/Arrow export for Chronograph"
+description = "Restorable environment steps and Minari/Arrow export for ChronoDB"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

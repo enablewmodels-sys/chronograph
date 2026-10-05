@@ -1,4 +1,4 @@
-# Chronograph 0.3.0 benchmark results
+# ChronoDB 0.3.0 benchmark results
 
 Final Community candidate run on 9 September 2026. Apple M5, 4 performance + 6
 efficiency cores (10 logical), 16 GiB RAM, macOS 26.5 arm64, Rust 1.93.0, release

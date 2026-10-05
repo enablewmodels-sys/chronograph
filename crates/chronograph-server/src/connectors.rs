@@ -10,7 +10,8 @@ use chronograph_connector_common::{
     registry::{self, Binding},
 };
 use chronograph_db::{
-    BoundedEdgeInput, EdgeId, EdgeInput, EdgeKind, Graph, IngestCursor, IngestReceipt, NodeId,
+    BoundedEdgeInput, EdgeId, EdgeInput, EdgeKind, ForkId, Graph, IngestCursor, IngestReceipt,
+    NodeId,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -37,6 +38,9 @@ struct Ingest {
     instance: String,
     partition: String,
     sequence: String,
+    /// Selected branch. Empty selects the parent graph, exactly like every other write.
+    #[serde(default)]
+    fork: String,
     records: Vec<Record>,
 }
 #[derive(Deserialize)]
@@ -44,6 +48,9 @@ struct Ingest {
 struct Select {
     instance: String,
     partition: String,
+    /// Selected branch. Empty reads the parent receipt, like every other read.
+    #[serde(default)]
+    fork: String,
 }
 pub fn hex<const N: usize>(s: &str) -> AppResult<[u8; N]> {
     if s.len() != N * 2 || !s.is_ascii() {
@@ -467,7 +474,15 @@ pub fn execute(state: &Shared, op: &str, args: Value) -> AppResult<Value> {
             let g = state.graph.read().map_err(ApiError::internal)?;
             let catalog = state.schema.read().map_err(ApiError::internal)?;
             binding(catalog.snapshot()?, &q.instance)?;
-            Ok(json!({"checkpoint":g.checkpoint(&q.instance,&q.partition).map(receipt)}))
+            // Branch receipts use the same lookup, scoped to the selected branch.
+            let checkpoint = if q.fork.is_empty() {
+                g.checkpoint(&q.instance, &q.partition).map(receipt)
+            } else {
+                let fork = ForkId(number(&q.fork)?);
+                g.fork_checkpoint(fork, &q.instance, &q.partition)
+                    .map(receipt)
+            };
+            Ok(json!({"checkpoint":checkpoint,"fork":q.fork}))
         }
         "connector_record" => {
             #[derive(Deserialize)]
@@ -508,6 +523,16 @@ pub fn execute(state: &Shared, op: &str, args: Value) -> AppResult<Value> {
             if q.records.is_empty() || q.records.len() > 500 {
                 return Err(ApiError::bad("Provide 1–500 records per batch"));
             }
+            // One writer serves the parent and every branch: only the target scope differs.
+            let target = if q.fork.is_empty() {
+                None
+            } else {
+                Some(ForkId(number(&q.fork)?))
+            };
+            let scope = match target {
+                Some(fork) => crate::bci::fork_scope(fork.0),
+                None => crate::bci::PARENT_SCOPE.to_owned(),
+            };
             let b = {
                 let s = state.schema.read().map_err(ApiError::internal)?;
                 binding(s.snapshot()?, &q.instance)?.clone()
@@ -525,9 +550,15 @@ pub fn execute(state: &Shared, op: &str, args: Value) -> AppResult<Value> {
             // Avoid rewriting sidecars on a lost-ack retry. The graph checks digest again at commit.
             {
                 let g = state.graph.read().map_err(ApiError::internal)?;
-                if let Some(old) = g.checkpoint(&q.instance, &q.partition) {
+                let previous = match target {
+                    Some(fork) => g.fork_checkpoint(fork, &q.instance, &q.partition).cloned(),
+                    None => g.checkpoint(&q.instance, &q.partition).cloned(),
+                };
+                if let Some(old) = previous {
                     if old.cursor == cursor {
-                        return Ok(json!({"receipt":receipt(old),"already_applied":true}));
+                        return Ok(
+                            json!({"receipt":receipt(&old),"already_applied":true,"scope":scope}),
+                        );
                     }
                     if old.cursor.sequence.checked_add(1) != Some(cursor.sequence) {
                         return Err(ApiError::conflict(
@@ -577,18 +608,26 @@ pub fn execute(state: &Shared, op: &str, args: Value) -> AppResult<Value> {
             if binding(s.snapshot()?, &q.instance)? != &b {
                 return Err(ApiError::conflict("Connector configuration changed"));
             }
-            let already = g
-                .checkpoint(&q.instance, &q.partition)
-                .is_some_and(|old| old.cursor == cursor);
+            let already = match target {
+                Some(fork) => g
+                    .fork_checkpoint(fork, &q.instance, &q.partition)
+                    .is_some_and(|old| old.cursor == cursor),
+                None => g
+                    .checkpoint(&q.instance, &q.partition)
+                    .is_some_and(|old| old.cursor == cursor),
+            };
             // Hold the graph lock while checking session invariants and publishing.
             // Identical checkpoint retries bypass immutable-record conflict checks.
             if b.connector == "bci" && !already {
                 let mut index = state.bci.lock().map_err(ApiError::internal)?;
                 index.refresh(&g, s.snapshot()?, &state.data)?;
-                index.validate_batch(&b, &q.records, &store)?;
+                index.validate_batch(&scope, &b, &q.records, &store)?;
             }
-            let result = g.ingest(cursor, &edges)?;
-            Ok(json!({"receipt":receipt(&result),"already_applied":already}))
+            let result = match target {
+                Some(fork) => g.ingest_to_fork(fork, cursor, &edges)?,
+                None => g.ingest(cursor, &edges)?,
+            };
+            Ok(json!({"receipt":receipt(&result),"already_applied":already,"scope":scope}))
         }
         _ => Err(ApiError::missing("Unknown connector operation")),
     }

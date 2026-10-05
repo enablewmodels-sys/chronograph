@@ -619,6 +619,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "chronograph-decoder"
+version = "0.4.0-alpha.3"
+dependencies = [
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
 name = "chronograph-server"
 version = "0.4.0-alpha.3"
 dependencies = [
@@ -641,6 +651,14 @@ dependencies = [
  "tower",
  "tower-http",
  "url",
+]
+
+[[package]]
+name = "chronograph-wasm"
+version = "0.4.0-alpha.3"
+dependencies = [
+ "chronograph-decoder",
+ "serde_json",
 ]
 
 [[package]]

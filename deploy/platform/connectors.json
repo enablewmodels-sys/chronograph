@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "note": "Provider-neutral contracts. This repository binds to these services; it does not implement them. Secrets are referenced by environment variable name and never stored here.",
+  "layers": [
+    {
+      "layer": 1,
+      "id": "ingestion",
+      "kind": "integration",
+      "boundary": "Device drivers, file readers and hardware validation stay on the operator's machine.",
+      "artifacts": [
+        "sdk/python/chronograph_connectors/sources"
+      ],
+      "modules": [
+        "chronograph_connectors.sources",
+        "chronograph_connectors.brainflow_catalog"
+      ],
+      "providers": [
+        "brainflow",
+        "lsl",
+        "mne"
+      ]
+    },
+    {
+      "layer": 2,
+      "id": "storage",
+      "kind": "runtime",
+      "boundary": "Single-writer journal with persistent local storage. No serverless database.",
+      "artifacts": [
+        "crates/chronograph-core"
+      ],
+      "modules": [],
+      "providers": [
+        "chronograph-engine"
+      ]
+    },
+    {
+      "layer": 3,
+      "id": "sdk",
+      "kind": "runtime",
+      "boundary": "The server never executes a caller's model.",
+      "artifacts": [
+        "sdk/python",
+        "sdk/typescript",
+        "crates/chronograph-decoder",
+        "crates/chronograph-wasm"
+      ],
+      "modules": [],
+      "providers": [
+        "python",
+        "typescript",
+        "wasm",
+        "openapi"
+      ]
+    },
+    {
+      "layer": 4,
+      "id": "hosting",
+      "kind": "runtime",
+      "boundary": "Persistent containers per project. Store submission requires the operator's own accounts and signing keys and is never performed unattended.",
+      "artifacts": [
+        "deploy/compose.yaml",
+        "deploy/Caddyfile",
+        "deploy/platform/app.example.json"
+      ],
+      "modules": [],
+      "providers": [
+        "containers",
+        "caddy",
+        "cloudflare-saas"
+      ]
+    },
+    {
+      "layer": 5,
+      "id": "identity",
+      "kind": "connector",
+      "boundary": "Identity is delegated: this repository verifies a provider's token and maps the subject to a project role, and never stores a password, OTP or recovery flow.",
+      "artifacts": [
+        "launch/private/managed/AUTH-PLAN.md",
+        "deploy/platform/connectors/identity.mjs",
+        "deploy/platform/connectors/secrets.mjs"
+      ],
+      "modules": [
+        "deploy/platform/connectors/identity.mjs"
+      ],
+      "providers": [
+        "ory-kratos",
+        "supertokens",
+        "authgear"
+      ],
+      "env": [
+        "CHRONOGRAPH_IDENTITY_ISSUER",
+        "CHRONOGRAPH_IDENTITY_CLIENT_ID",
+        "CHRONOGRAPH_IDENTITY_CLIENT_SECRET"
+      ]
+    },
+    {
+      "layer": 5,
+      "id": "billing",
+      "kind": "connector",
+      "boundary": "No card data reaches this repository or the engine; no PCI scope is claimed. A subscription state maps to project capacity and a signed event is required to change it.",
+      "artifacts": [
+        "deploy/platform/connectors/billing.mjs"
+      ],
+      "modules": [
+        "deploy/platform/connectors/billing.mjs"
+      ],
+      "providers": [
+        "stripe"
+      ],
+      "env": [
+        "CHRONOGRAPH_BILLING_API_KEY",
+        "CHRONOGRAPH_BILLING_WEBHOOK_SECRET"
+      ]
+    },
+    {
+      "layer": 5,
+      "id": "domains",
+      "kind": "connector",
+      "boundary": "Hostname and certificate issuance are delegated; the engine never sees a provider credential, and an unconfigured reference fails closed instead of binding anything.",
+      "artifacts": [
+        "deploy/platform/connectors/domains.mjs"
+      ],
+      "modules": [
+        "deploy/platform/connectors/domains.mjs"
+      ],
+      "providers": [
+        "cloudflare-saas"
+      ],
+      "env": [
+        "CHRONOGRAPH_DOMAINS_API_TOKEN",
+        "CHRONOGRAPH_DOMAINS_ZONE"
+      ]
+    }
+  ]
+}

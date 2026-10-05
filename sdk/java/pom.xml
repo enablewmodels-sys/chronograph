@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Chronograph Community Java SDK - project ChronoDB (https://chronodb.co), IntelliNxT.
+  ChronoDB Community Java SDK - project ChronoDB (https://chronodb.co), ChronoDB, Inc.
 
   Release target: Maven Central, deployed through the Central Portal.
   Nothing in this module has been uploaded to Central yet. Before the first
@@ -26,13 +26,13 @@
   <version>0.4.0-alpha.3</version>
   <packaging>jar</packaging>
 
-  <name>Chronograph Community Java SDK</name>
-  <description>Bounded, authenticated Java 17+ client for the Chronograph Community /v1 temporal graph, connector and BCI HTTP API. Exact IDs and microsecond timestamps are decimal JSON strings; remote origins require HTTPS, redirects are rejected, and bodies are bounded.</description>
+  <name>ChronoDB Community Java SDK</name>
+  <description>Bounded, authenticated Java 17+ client for the ChronoDB Community /v1 temporal graph, connector and BCI HTTP API. Exact IDs and microsecond timestamps are decimal JSON strings; remote origins require HTTPS, redirects are rejected, and bodies are bounded.</description>
   <url>https://chronodb.co</url>
   <inceptionYear>2026</inceptionYear>
 
   <organization>
-    <name>IntelliNxT</name>
+    <name>ChronoDB, Inc.</name>
     <url>https://chronodb.co</url>
   </organization>
 
@@ -52,15 +52,14 @@
 
   <developers>
     <developer>
-      <id>intellinxt</id>
-      <name>IntelliNxT</name>
+      <id>chronodb</id>
+      <name>ChronoDB, Inc.</name>
       <email>enablewmodels@gmail.com</email>
-      <organization>IntelliNxT</organization>
+      <organization>ChronoDB, Inc.</organization>
       <organizationUrl>https://chronodb.co</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
-      <timezone>Australia/Sydney</timezone>
     </developer>
   </developers>
 
