@@ -10,8 +10,8 @@
  */
 
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { dirname, isAbsolute, resolve } from "node:path";
+import { readFileSync, realpathSync } from "node:fs";
+import { delimiter, dirname, isAbsolute, resolve, sep } from "node:path";
 
 /** Manifest schema version this build understands. */
 export const MANIFEST_VERSION = 1;
@@ -163,7 +163,7 @@ function requireKeys(object, allowed, code, label) {
 /**
  * Validate an already-parsed manifest, returning a normalized copy.
  * @param {unknown} raw parsed manifest JSON
- * @param {{ manifestPath?: string, maxVolumeGb?: number }} [options]
+ * @param {{ manifestPath?: string, maxVolumeGb?: number, allowedContextRoots?: string[] }} [options]
  * @returns {object} normalized manifest
  */
 export function validateManifest(raw, options = {}) {
@@ -233,7 +233,41 @@ export function validateManifest(raw, options = {}) {
     );
   }
 
-  const run = requireRecord(raw.run, "run-shape", where + " run");
+    // WHY the context is constrained: the build context is what the runtime streams to the
+  // build daemon, and with a remote DOCKER_HOST that leaves the machine. Unconstrained, a
+  // manifest could name any host directory — one holding secrets or engine data — and bake
+  // it into an image. The context therefore has to sit inside the manifest's own directory
+  // or inside a root the operator allowlisted in CHRONOGRAPH_APP_CONTEXT_ROOTS.
+  if (manifestPath !== "<memory>") {
+    // Both sides are compared as real paths: a deployment directory is often reached through
+    // a symlink (macOS /var -> /private/var, for one), so comparing a resolved path with a
+    // canonical root would refuse a manifest that is perfectly inside its own directory.
+    const real = (candidate) => {
+      try {
+        return realpathSync(candidate);
+      } catch {
+        // A path that does not exist yet cannot have been reached through a symlink; the
+        // runtime refuses a missing context, which is not this check's job.
+        return resolve(candidate);
+      }
+    };
+    const manifestDirectory = real(dirname(resolve(manifestPath)));
+    const contextPath = real(resolve(dirname(resolve(manifestPath)), build.context));
+    const allowed = [manifestDirectory, ...(options.allowedContextRoots ?? []).map(real)];
+    const inside = allowed.some(
+      (root) => contextPath === root || contextPath.startsWith(root + sep),
+    );
+    if (!inside) {
+      throw new ManifestError(
+        "build-context-outside",
+        where +
+          " build.context resolves outside the manifest's own directory; keep the context" +
+          " beside the manifest or list its root in CHRONOGRAPH_APP_CONTEXT_ROOTS",
+      );
+    }
+  }
+
+const run = requireRecord(raw.run, "run-shape", where + " run");
   requireKeys(run, RUN_KEYS, "unknown-key", where + " run");
   if (!Number.isInteger(run.port) || run.port <= 0 || run.port > 65535) {
     throw new ManifestError(
@@ -587,6 +621,13 @@ export function validateManifest(raw, options = {}) {
  */
 export function loadManifest(manifestPath, options = {}) {
   const absolute = resolve(manifestPath);
+  // Operator-configured allowlist for build contexts that legitimately live outside the
+  // manifest's directory (a checkout beside it, for example). Read from the environment so a
+  // deployment sets it once; nothing in a request can widen it.
+  const allowedContextRoots = (
+    options.allowedContextRoots ??
+    (process.env.CHRONOGRAPH_APP_CONTEXT_ROOTS ?? "").split(delimiter)
+  ).filter(Boolean);
   let text;
   try {
     text = readFileSync(absolute, "utf8");
@@ -622,6 +663,7 @@ export function loadManifest(manifestPath, options = {}) {
   const manifest = validateManifest(raw, {
     manifestPath: absolute,
     ...options,
+    allowedContextRoots,
   });
   manifest.manifestPath = absolute;
   manifest.manifestHash = createHash("sha256").update(text).digest("hex");

@@ -250,6 +250,69 @@ test("an unreachable account service says so instead of showing the sign-in form
   await expect(page).toHaveURL(/\/app$/);
 });
 
+test("the Apps page reports missing hosting instead of an error", async ({
+  page,
+}) => {
+  // Layer 4 is opt-in. A deployment without the hosting block answers 404 with a code the
+  // page has to understand: an error toast here would read as a broken console.
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.route("**/managed/session", (route) =>
+    route.fulfill({ json: signedIn }),
+  );
+  await page.route("**/v1/info", (route) =>
+    route.fulfill({
+      json: {
+        credential: { id: "c-1", scope: "admin" },
+        edition: "managed",
+        mcp_url: "",
+        uptime_seconds: 12,
+        project: signedIn.project,
+        account: signedIn.user,
+      },
+    }),
+  );
+  await page.route("**/v1/stats", (route) =>
+    route.fulfill({
+      json: {
+        nodes: "1",
+        edge_versions: "1",
+        log_bytes: "1",
+        recovered_tail_bytes: "0",
+        default_durability: "fsync",
+        revision: "1",
+        active_forks: "0",
+        duration_ms: 1,
+      },
+    }),
+  );
+  await page.route("**/v1/forks", (route) =>
+    route.fulfill({ json: { forks: [], next_after: null } }),
+  );
+  await page.route("**/v1/schema", (route) =>
+    route.fulfill({
+      json: { revision: 0, history: [], relations: [], settings: {} },
+    }),
+  );
+  await page.route("**/managed/apps**", (route) =>
+    route.fulfill({
+      status: 404,
+      json: {
+        error: {
+          code: "HOSTING_DISABLED",
+          message: "This workspace operation is not available.",
+        },
+      },
+    }),
+  );
+  await page.goto("/app/apps");
+  await expect(
+    page.getByRole("heading", { name: /Hosting is not enabled for this deployment/ }),
+  ).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
 test("a signed-in non-operator is told, not bounced to the sign-in form", async ({
   page,
 }) => {

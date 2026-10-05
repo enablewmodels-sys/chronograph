@@ -17,6 +17,7 @@ import {
   readFileSync,
   readdirSync,
   statSync,
+  symlinkSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -1006,6 +1007,77 @@ await check(
     );
   },
 );
+
+await check("a build context cannot escape the manifest directory", () => {
+  // The context is what the runtime streams to the build daemon, so a manifest that names a
+  // host directory outside its own is refused before any container command runs.
+  const argsFor = (verb, manifest, state, env) =>
+    appctl(
+      [
+        verb,
+        "--manifest",
+        manifest,
+        "--driver",
+        "dry-run",
+        "--state-dir",
+        state,
+        "--json",
+      ],
+      env,
+    );
+
+  const above = writeManifest(join(workspace, "escape", "chronograph.app.json"), {
+    build: { context: "../../..", dockerfile: "Dockerfile" },
+  });
+  assertRefused(
+    argsFor("plan", above, join(workspace, "state-escape")),
+    "build-context-outside",
+    "a context above the manifest directory",
+  );
+
+  const absolute = writeManifest(join(workspace, "absolute", "chronograph.app.json"), {
+    build: { context: "/etc", dockerfile: "Dockerfile" },
+  });
+  assertRefused(
+    argsFor("plan", absolute, join(workspace, "state-absolute")),
+    "build-context-outside",
+    "an absolute context outside the manifest",
+  );
+
+  const outside = join(workspace, "outside-source");
+  mkdirSync(outside, { recursive: true });
+  const linkedRoot = join(workspace, "linked");
+  mkdirSync(linkedRoot, { recursive: true });
+  symlinkSync(outside, join(linkedRoot, "source"), "dir");
+  const throughLink = writeManifest(join(linkedRoot, "chronograph.app.json"), {
+    build: { context: "source", dockerfile: "Dockerfile" },
+  });
+  assertRefused(
+    argsFor("plan", throughLink, join(workspace, "state-link")),
+    "build-context-outside",
+    "a context symlinked out of the manifest directory",
+  );
+
+  const beside = writeManifest(join(workspace, "beside", "chronograph.app.json"), {
+    build: { context: ".", dockerfile: "Dockerfile" },
+  });
+  assertOk(
+    argsFor("plan", beside, join(workspace, "state-beside")),
+    "a context beside its manifest",
+  );
+
+  // An operator may allowlist a root, and only then may a manifest point outside itself.
+  const allowlisted = writeManifest(
+    join(workspace, "allowlisted", "chronograph.app.json"),
+    { build: { context: outside, dockerfile: "Dockerfile" } },
+  );
+  assertOk(
+    argsFor("plan", allowlisted, join(workspace, "state-allowlisted"), {
+      CHRONOGRAPH_APP_CONTEXT_ROOTS: outside,
+    }),
+    "a context inside an allowlisted root is accepted",
+  );
+});
 
 await check("every command in the interface is implemented", () => {
   const help = appctl(["--help"]);

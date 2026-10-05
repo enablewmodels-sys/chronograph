@@ -92,6 +92,14 @@ viewer may make, mutations need an admin, destroying needs the owner plus a conf
 the child process is spawned with an argv array, a minimal environment in which a secret reference
 travels by name only, and bounded time and output.
 
+A build context is constrained: it must resolve inside the manifest's own directory, or inside a
+root the operator lists in `CHRONOGRAPH_APP_CONTEXT_ROOTS`, and a symlink out of that root is
+refused. The context is exactly what the runtime streams to the build daemon — off the machine when
+`DOCKER_HOST` is remote — so an unconstrained one would let a manifest bake any host directory into
+an image. Treat manifest secret detection as shape-based too: it refuses values that look like
+credentials, and it is not an exhaustive scan, so a manifest is still worth reading before it is
+deployed.
+
 What is still not here: a multi-tenant scheduler with a queue, horizontal scaling (`replicas > 1`
 is refused rather than silently downgraded), and a filesystem-level volume quota, which needs
 host-specific storage options. `scripts/appctl-test.mjs` covers 34 checks on the dry-run driver;
