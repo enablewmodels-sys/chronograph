@@ -51,9 +51,10 @@ export default function ManagedSecrets() {
         text="Store provider credentials for your trusted applications. Separate reader keys keep secret access distinct from graph access."
       />
       <p className="small muted">
-        Changes require recent verification in{" "}
-        <Link to="/app/security">Account security</Link>. Values are encrypted,
-        never shown in the list, and never included in audit events.
+        Only project owners and administrators can read or change secrets, and every
+        change is recorded in the{" "}
+        <Link to="/app/team">audit trail</Link>. Values are encrypted, never shown in
+        the list, and never included in audit events.
       </p>
       <div className="section-head">
         <button className="primary" onClick={() => setCreating(true)}>

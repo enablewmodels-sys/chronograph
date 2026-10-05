@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "./main";
 import {
   Busy,
@@ -88,8 +87,8 @@ export default function ManagedTeam() {
         ))}
       </div>
       <p className="small muted">
-        Sensitive changes require recent verification in{" "}
-        <Link to="/app/security">Account security</Link>.
+        Only owners and administrators can invite people or change roles, and every
+        change is appended to the audit trail below.
       </p>
       {tab === "team" ? (
         <>

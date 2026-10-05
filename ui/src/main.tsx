@@ -115,6 +115,9 @@ function App() {
   // the account service is not an error, and a project that will not connect is a
   // different failure, so the two must not be shown the same way.
   const [accountError, setAccountError] = useState(false);
+  // A session that ends is not the same thing as a visitor who was never signed in, so the
+  // reason travels to the sign-in form and is shown there.
+  const [expiredSession, setExpiredSession] = useState(false);
   const accountAnswered = useRef(false);
   const refreshManaged = useCallback(async () => {
     setManagedProject("");
@@ -122,6 +125,8 @@ function App() {
     accountAnswered.current = true;
     setAccountError(false);
     setManagedProject(next.project?.id || "");
+    // Signing in again answers the question the explanation was there for.
+    if (next.user) setExpiredSession(false);
     if (
       next.user &&
       !next.user.needsMfa &&
@@ -175,19 +180,20 @@ function App() {
       setManagedProject("");
     }
   };
-  // A session that ends is not the same thing as a visitor who was never signed in.
-  // Landing on the sign-in form with no explanation is what made /admin look broken, so
-  // the reason travels to the form and is shown there.
-  const [expiredSession, setExpiredSession] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     const expire = () => {
       update(null);
       setExpiredSession(true);
-      // Only when leaving a page that needs the session: a second navigation while the
-      // sign-in form is already on screen aborts a load in flight.
-      if (!location.pathname.startsWith("/login"))
-        navigate("/login?expired=1", { replace: true });
+      // Only when leaving a page that needs the session. A second navigation while the
+      // sign-in form is already on screen aborts a load in flight, and the account entry
+      // routes (/activate, /reset-password, …) are mid-flow: bouncing someone off one of
+      // those would discard the link they arrived with.
+      const accountEntry =
+        /^\/(login|signup|activate|reset-password|forgot-password|verify-email|join)\/?$/.test(
+          window.location.pathname,
+        );
+      if (!accountEntry) navigate("/login?expired=1", { replace: true });
     };
     window.addEventListener("session-expired", expire);
     return () => {

@@ -79,15 +79,58 @@ const engine = spawn(BINARY, ["serve"], {
   stdio: ["ignore", "ignore", "inherit"],
 });
 const engineUrl = "http://127.0.0.1:" + ENGINE_PORT;
+/**
+ * A port already in use is the common way this script fails, and the failure it used to
+ * produce was a bare "the engine exited during start-up" with a temporary directory left
+ * behind. Name the likely cause, clean up, and exit.
+ */
+const abort = async (message) => {
+  engine.kill("SIGKILL");
+  if (!keep) await rm(state, { recursive: true, force: true });
+  process.stderr.write(
+    message +
+      "\nAnother local deployment is probably still running: stop it (pkill -f managed-local.mjs) or pass --port.\n",
+  );
+  process.exit(1);
+};
+let ready = false;
 for (let i = 0; i < 200; i++) {
-  if (engine.exitCode !== null) throw new Error("the engine exited during start-up");
-  try {
-    if ((await fetch(engineUrl + "/healthz", { signal: AbortSignal.timeout(250) })).ok) break;
-  } catch {
-    /* not listening yet */
+  if (engine.exitCode !== null)
+    await abort(
+      "The engine exited during start-up, most often because " + engineUrl + " is taken.",
+    );
+  // The engine authorises every request by public origin, so even the readiness probe has
+  // to present the deployment's host rather than the port the engine listens on. fetch()
+  // cannot set Host, and without it this probe answers 403 forever.
+  const status = await new Promise((done) => {
+    const probe = httpRequest(
+      {
+        host: "127.0.0.1",
+        port: ENGINE_PORT,
+        path: "/healthz",
+        method: "GET",
+        headers: { host: "127.0.0.1:" + PORT },
+        timeout: 1000,
+      },
+      (response) => {
+        response.resume();
+        response.on("end", () => done(response.statusCode));
+      },
+    );
+    probe.on("error", () => done(0));
+    probe.on("timeout", () => {
+      probe.destroy();
+      done(0);
+    });
+    probe.end();
+  });
+  if (status === 200) {
+    ready = true;
+    break;
   }
   await new Promise((done) => setTimeout(done, 100));
 }
+if (!ready) await abort("The engine did not become ready.");
 // The engine authorises by public origin, so a direct call has to present the origin the
 // deployment is configured with rather than the port the engine happens to use. fetch()
 // silently drops a Host header (it is a forbidden header name), so this goes through

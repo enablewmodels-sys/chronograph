@@ -10,6 +10,13 @@
   `/login?expired=1`, which says the session expired instead of showing an unexplained form.
   `launch/private/managed/control-plane/identity.mjs` owns the three numbers; the control-plane
   suite asserts both sides of the idle boundary.
+- The rolling session actually reaches the browser. Keeping the session row alive was only half
+  the fix: `session()` discarded the `Set-Cookie` the identity provider issues when it refreshes a
+  session, so the row rolled forward while the browser's cookie kept the expiry it was given at
+  sign-in. Measured on a local deployment with the row staged 28 days out: `/managed/session`
+  returned no `Set-Cookie` before, and `Max-Age=2592000` with the row back at 30 days after.
+  A test that pins the policy literals replaced the boundary-only assertion, which stayed green
+  for any value including the half hour it replaced.
 - The account an operator signs in with is the account that can open the panel. The allowlist held
   two addresses while the browser was signed in as a third, so /admin answered "operator access
   required" for its owner. The deployment's `superadminEmails` now names every address the owner

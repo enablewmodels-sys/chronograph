@@ -68,21 +68,36 @@ const MANAGED: Record<string, unknown> = {
   },
 };
 
-const PAGES = [
-  ["Overview", "/app/"],
-  ["BCI workspace", "/app/bci"],
-  ["Explorer", "/app/explorer"],
-  ["Branches", "/app/branches"],
-  ["Schema & migrations", "/app/schema"],
-  ["Write data", "/app/write"],
-  ["Connectors", "/app/connectors"],
-  ["Connections & keys", "/app/access"],
-  ["Operations", "/app/operations"],
-  ["Team & audit", "/app/team"],
-  ["Secrets", "/app/secrets"],
-  ["Apps", "/app/apps"],
-  ["Account security", "/app/security"],
-] as const;
+// Each page is named together with copy that only that page draws. Without it the suite can
+// pass a page that redirected somewhere else (a read-scope credential sends /app/secrets back
+// to /app) or one whose reads all failed and left a single notice: both mount the shell, draw
+// something, and raise nothing.
+const PAGES: [string, string, string[]][] = [
+  ["Overview", "/app/", ["Every relationship has a timeline"]],
+  ["BCI workspace", "/app/bci", ["NEURAL DATA WORKSPACE", "Follow a signal"]],
+  ["Explorer", "/app/explorer", ["Explore any moment"]],
+  ["Branches", "/app/branches", ["Explore another future"]],
+  [
+    "Schema & migrations",
+    "/app/schema",
+    ["A recording writes numeric relation kinds"],
+  ],
+  ["Write data", "/app/write", ["Insert a relationship", "Writing to main"]],
+  ["Connectors", "/app/connectors", ["Bring your world into the graph"]],
+  ["Connections & keys", "/app/access", ["Project endpoints"]],
+  ["Operations", "/app/operations", ["Storage health"]],
+  ["Team & audit", "/app/team", ["Clear accountability"]],
+  ["Secrets", "/app/secrets", ["Values are encrypted"]],
+  [
+    "Apps",
+    "/app/apps",
+    [
+      "A manifest in this project's manifests directory",
+      "Hosting is not enabled",
+    ],
+  ],
+  ["Account security", "/app/security", ["Your account, protected"]],
+];
 
 async function mockConsole(page: Page) {
   if (ORIGIN) return;
@@ -193,7 +208,7 @@ test("the operator panel renders for the operator account", async ({ page }) => 
 
 // One test per page: a failure names the page, and each page gets its own budget instead
 // of one long walk that can only report the first timeout.
-for (const [name, path] of PAGES) {
+for (const [name, path, markers] of PAGES) {
   test(`${name} renders without an error or a dead end`, async ({ page }) => {
     const errors: string[] = [];
     const console_: string[] = [];
@@ -265,10 +280,15 @@ for (const [name, path] of PAGES) {
     const text = (await page.locator("main").innerText().catch(() => ""))
       .replace(/\s+/g, " ")
       .trim();
-    // Reaching the shell means the route mounted. From there the only remaining
-    // requirement is that it drew real content and raised nothing.
+    // Reaching the shell means the route mounted. From there the requirements are that this
+    // page — not a redirect to another one — drew its own content, and that nothing raised.
     if (rendered && (await shell.isVisible().catch(() => false))) {
       if (!text) failures.push("the page mounted but drew nothing inside <main>.");
+      if (!markers.some((marker) => text.includes(marker)))
+        failures.push(
+          `${path} did not draw its own page: expected one of ${markers.join(" / ")}` +
+            ` | drew: ${text.slice(0, 240)}`,
+        );
       for (const error of errors) failures.push(`raised ${error}`);
     }
     console.log(
