@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Mail delivery is the operator's infrastructure, and invitations now actually go out. The control
+  plane had one hardcoded transport — Resend's API — so a deployment without that vendor's key could
+  not turn on email signup, password recovery or team invitations at all, and the invitation path
+  never sent a message even when mail was configured: the console had to tell the operator to pass
+  the link on by hand. A private `mailFile` now names one of three transports (`resend`, `http` for
+  any relay that accepts the same JSON, or `file` for a spool an MTA or the operator drains), the
+  loader bounds each of them, and an owner's invitation of a brand-new address provisions the
+  account and emails the link. The refusal that said "until email delivery is connected" is now
+  honoured rather than permanent. Delivery is reported, not assumed: a send that fails leaves the
+  invitation working, records `project.invite_undelivered` in the audit trail, and tells the console
+  to show the link with the reason. Proven end to end against a real deployment, where the spool
+  holds the message it claims to have sent.
 - The control-plane suite's only integration tests run again, and they run everywhere. They had
   been reported as "2 skipped" for this whole line of work, and running them showed they would have
   failed if they had run: the engine path was passed as `target/release/chronograph-server`, which

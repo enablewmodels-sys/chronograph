@@ -45,6 +45,9 @@ export default function ManagedTeam() {
       url: string;
       email: string;
       expiresAt: number;
+      /** Whether the control plane emailed it, or the operator has to pass the link on. */
+      delivered?: boolean;
+      delivery?: string;
     } | null>(null);
   const [inviting, setInviting] = useState(false);
   const allowedRoles =
@@ -160,12 +163,19 @@ export default function ManagedTeam() {
                 </button>
               </SubmitForm>
               {invite && (
-                <div className="notice">
-                  <strong>Private invitation for {invite.email}</strong>
+                <div className="notice" role="status">
+                  <strong>
+                    {invite.delivered
+                      ? `Invitation emailed to ${invite.email}`
+                      : `Private invitation for ${invite.email}`}
+                  </strong>
                   <p>
-                    Share this directly with your collaborator. Email delivery
-                    is not connected yet. Expires{" "}
-                    {new Date(invite.expiresAt).toLocaleString()}.
+                    {invite.delivered
+                      ? "They can set a password and join from the link in the email. The same private link is below if it does not arrive."
+                      : invite.delivery === "failed"
+                        ? "The invitation exists, but sending the email failed. Pass this private link on directly."
+                        : "Share this directly with your collaborator. Email delivery is not connected on this deployment."}{" "}
+                    Expires {new Date(invite.expiresAt).toLocaleString()}.
                   </p>
                   <Code text={invite.url} />
                   <button onClick={() => setInvite(null)}>

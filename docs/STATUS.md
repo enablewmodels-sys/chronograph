@@ -17,6 +17,7 @@ setting or credential — nothing half-on, and nothing pretending to be on.
 | Console sign-in, projects, team, secrets, audit | `ui/e2e/managed-auth.spec.ts`; control-plane suite 46 tests / 46 pass / 0 fail with `CHRONOGRAPH_TEST_BINARY` set, which is what runs the two integration tests |
 | Project provisioning, schema CAS, scoped keys, SDK routing, MCP, restart persistence, role boundaries | the control-plane suite's two `real databases:` tests, against `target/release/chronograph-server` |
 | Every console page, and the page it claims to be | `ui/e2e/console-sweep.spec.ts` — 13 console pages plus the operator panel, each asserted against copy only that page draws, so a redirect or a page that rendered one error notice fails |
+| An invitation that is actually delivered | With a transport configured, a project owner can invite a brand-new address: the account is provisioned, the link is emailed, and the console reports which of sent/failed/not-configured happened. Without mail the refusal stands, and it always did say "until email delivery is connected" — a condition the code now honours |
 | The console's own controls | `ui/e2e/console-actions.spec.ts` — 6/6 against a real deployment: an API key created then revoked, a secret stored, a reader key issued, an invitation answered or refused with its reason, a durable branch created, a backup identified by its new ID, and the sign-in form itself |
 | One deployment, one deployment floor | `minimumFreeBytes` (default 5 GiB) is read by the graph-write guard, project provisioning and the operator panel's disk warning, each naming the measurement; the loader pins 64 MiB/1 TiB as the accepted bounds |
 | A refusal says what to do | The gateway masks an unexpected failure but passes through a deliberate one, so "writes are paused because storage is low: 3200 MiB free, below this deployment's 4096 MiB floor" reaches the reader; `test/errors.test.mjs` |
@@ -41,7 +42,7 @@ setting or credential — nothing half-on, and nothing pretending to be on.
 | Operational alerts | `alertWebhook` (https) or `CHRONOGRAPH_ALERT_WEBHOOK` | `scripts/alerts-test.py` — 14 checks; the status file reports `destination: none` today |
 | Billing capacity (subscription → seats, storage, retention) | `CHRONOGRAPH_BILLING_API_KEY`, `CHRONOGRAPH_BILLING_WEBHOOK_SECRET` | `scripts/platform-connectors-test.mjs` |
 | Hostname binding through Cloudflare SaaS | `CHRONOGRAPH_DOMAINS_API_TOKEN`, `CHRONOGRAPH_DOMAINS_ZONE`, then `appctl bind-domain` | `scripts/platform-connectors-test.mjs` (record mode and fail-closed) |
-| Email signup and password recovery | a mail provider in the control-plane configuration (`mail`) | control-plane suite; the console says "not available yet" while it is unset |
+| Email signup, password recovery and team invitations | a private `mailFile` naming the transport: `resend` (apiKey), `http` (any relay that accepts the JSON) or `file` (a spool an MTA or the operator drains) | `test/mail.test.mjs` — 6 tests covering all three transports, the loader's bounds, and that a failed delivery still leaves a working invitation; `console-actions.spec.ts` invites a new person against a real deployment and requires the message in the spool |
 | Google and GitHub sign-in | the OAuth credential files the configuration points at | `ui/e2e/managed-auth.spec.ts` |
 
 ## Not built, and why

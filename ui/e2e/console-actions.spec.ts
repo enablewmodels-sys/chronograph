@@ -8,6 +8,7 @@
  *
  * See ui/e2e/real-deployment.ts for the environment.
  */
+import { readFile } from "node:fs/promises";
 import { test, expect, type Page } from "@playwright/test";
 import {
   NEEDS_DEPLOYMENT,
@@ -92,14 +93,46 @@ test("asking for a collaborator answers, or says exactly what is missing", async
   // The refusal is drawn twice — inside the dialog and again as the page's feedback — so the
   // locator has to pick one rather than tripping over strict mode.
   const refusal = page.getByText(/Ask this collaborator to sign up/).first();
+  const delivered = page.getByText(`Invitation emailed to ${email}`);
   const link = page.getByText(`Private invitation for ${email}`);
-  await expect(refusal.or(link).first()).toBeVisible({ timeout: 20_000 });
+  await expect(refusal.or(delivered).or(link).first()).toBeVisible({ timeout: 20_000 });
   if (await refusal.isVisible()) {
     // Nothing was created, which is the point of refusing: no invitation, no audit event for
     // an account that can never be activated.
     await expect(page.getByText(email)).toHaveCount(0);
-  } else {
-    await expect(link).toBeVisible();
+    return;
+  }
+  // The invitation exists either way, and the private link is always shown so an operator can
+  // deliver it by hand when sending failed.
+  await expect(delivered.or(link).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /set a password|join/i }).or(page.getByText(/\/activate#token=|\/join#token=/)).first()).toBeVisible({
+    timeout: 15_000,
+  });
+  // When the deployment spools its mail, the message must actually be there: a notice that says
+  // "emailed" proves nothing on its own.
+  const spool = process.env.CHRONOGRAPH_SWEEP_MAIL_SPOOL;
+  if (spool && (await delivered.isVisible())) {
+    const written = await expect
+      .poll(
+        async () => {
+          try {
+            return (await readFile(spool, "utf8")).includes(email);
+          } catch {
+            return false;
+          }
+        },
+        { timeout: 15_000 },
+      )
+      .toBe(true);
+    void written;
+    const message = (await readFile(spool, "utf8"))
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line))
+      .filter((entry) => entry.to === email)
+      .at(-1);
+    expect(message, "the spool holds the invitation").toBeTruthy();
+    expect(message.text).toMatch(/activate#token=|join#token=/);
   }
 });
 

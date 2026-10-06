@@ -163,6 +163,12 @@ const op = (path, body) =>
 // --- the control plane's own configuration file, through the real loader -------------------
 const secretFile = join(state, "session.secret");
 await writeFile(secretFile, random(), { mode: 0o600 });
+await mkdir(join(state, "config"), { recursive: true, mode: 0o700 });
+await writeFile(
+  join(state, "config", "mail.json"),
+  JSON.stringify({ transport: "file", from: "ChronoDB <no-reply@chronodb.local>", path: join(state, "mail.jsonl") }),
+  { mode: 0o600 },
+);
 const configPath = join(state, "control.json");
 await writeFile(
   configPath,
@@ -184,6 +190,12 @@ await writeFile(
     // A development volume is legitimately small. The production default of 5 GiB would refuse
     // every write on a nearly full laptop, which is how a working control plane looks broken.
     minimumFreeBytes: 256 * 1024 ** 2,
+    // Mail goes to a spool file rather than to a provider: invitations and password recovery need
+    // delivery to be switched on, and writing the message to a private file is delivery a local
+    // deployment can actually perform and a test can read. The path is printed with the rest.
+    // It is a file the loader reads separately, like the OAuth credentials, because mail
+    // configuration is private: `mail` inline in control.json is ignored by design.
+    mailFile: join(state, "config", "mail.json"),
   }),
   { mode: 0o600 },
 );
@@ -287,6 +299,7 @@ process.stdout.write(
       engine: engineUrl,
       ui: UI,
       state,
+      mailSpool: join(state, "mail.jsonl"),
       seed: seeded,
     },
     null,
