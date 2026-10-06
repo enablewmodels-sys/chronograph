@@ -12,6 +12,11 @@
   absent, because a silent skip is how the only coverage of real project provisioning, schema CAS,
   scoped keys, SDK routing, MCP, restart persistence and role boundaries went unexercised. With
   `CHRONOGRAPH_TEST_BINARY` set: 46 tests, 46 pass, 0 skipped.
+- The deployment probe passes against production. `scripts/production-check.py` had never been run
+  in this work; it reports `ok: true` for liveness, readiness, anonymous API and metrics refused,
+  authenticated API and metrics, durable write policy and writer health on https://chronodb.co. It
+  must be given the public origin — the engine authorises by origin, so a loopback URL fails every
+  check for the wrong reason, which is exactly what it did first.
 - The console suite runs at both viewports and passes at both. The mobile project had never been
   run in this line of work; it failed three tests, and the product was right in all three: below the
   desktop breakpoint the console collapses its sidebar behind "Open navigation", so a locator for the

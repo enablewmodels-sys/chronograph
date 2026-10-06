@@ -27,6 +27,7 @@ setting or credential — nothing half-on, and nothing pretending to be on.
 | Docs, both editions, TLS, asset caching at the edge | every chapter 200 on chronodb.co and the Community site; `cf-cache-status: HIT` |
 | Scheduled backups and per-project backup freshness | `chronograph-managed-backup` exit 0; health report `ok: true` for every project |
 | Host monitor | `chronograph-monitor.timer`; `/var/lib/chronograph-managed/operational-health.json` |
+| The deployment probe | `scripts/production-check.py` against `https://chronodb.co` with an engine token: liveness, readiness, anonymous API and metrics refused, authenticated API and metrics, durable write policy, writer healthy — `ok: true` (it must be given the public origin; the engine authorises by origin, so a loopback URL reports a false red) |
 | Layer 4 runtime (plan, build, deploy, promote, rollback, destroy, bind-domain) | `scripts/appctl-test.mjs` — 35 checks, including a build context that cannot escape its manifest |
 | Layer 4 from the console | `scripts/hosting-test.mjs` — 12 scenarios, 386 checks |
 | Layer 5 connectors (identity verification, billing mapping, domain binding) | `scripts/platform-connectors-test.mjs` — 9 checks with real keys and signatures |
@@ -96,6 +97,11 @@ cd ui && CHRONOGRAPH_SWEEP_ORIGIN=http://127.0.0.1:19090 \
 # engine.json is captured from a real engine, so refresh it when an operation's answer changes.
 node scripts/capture-engine-shapes.mjs
 python scripts/alerts-test.py                    # 14
+
+# Against the live deployment, read-only, with an engine token on the host. Give it the public
+# origin: the engine authorises by origin, so a loopback URL fails every check for the wrong reason.
+sudo -u chronograph python3 scripts/production-check.py \
+  --url https://chronodb.co --token-file /var/lib/chronograph/config/operator.token   # ok: true
 ```
 
 If a row here claims something the commands do not show, the row is wrong and should be
