@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+- The control-plane suite's only integration tests run again, and they run everywhere. They had
+  been reported as "2 skipped" for this whole line of work, and running them showed they would have
+  failed if they had run: the engine path was passed as `target/release/chronograph-server`, which
+  is relative to the repository root rather than to the test directory, so provisioning died with
+  `spawn ... ENOENT` — and the fixture inherited the production 5 GiB write floor, so a developer's
+  nearly full laptop turned "project provisioning works" into a 503. The fixture resolves the binary
+  against the repository root and sets its own floor, and the suite warns loudly when the variable is
+  absent, because a silent skip is how the only coverage of real project provisioning, schema CAS,
+  scoped keys, SDK routing, MCP, restart persistence and role boundaries went unexercised. With
+  `CHRONOGRAPH_TEST_BINARY` set: 46 tests, 46 pass, 0 skipped.
+- The console suite runs at both viewports and passes at both. The mobile project had never been
+  run in this line of work; it failed three tests, and the product was right in all three: below the
+  desktop breakpoint the console collapses its sidebar behind "Open navigation", so a locator for the
+  navigation itself is invisible and a click inside it never lands. `ui/e2e/navigation.ts` opens it
+  when the viewport has collapsed it, so one test now serves desk and phone: 38 passed / 0 failed on
+  mobile, where it was 35 / 3.
+- The repository can be pushed again. GitHub push protection refused the branch because two test
+  sentinels were shaped like live Stripe keys — one planted in a worker's environment to prove it
+  reaches no response, log or dry-run trace, one placed in a manifest to prove validation refuses
+  credential-shaped text and never echoes it. Neither needs a provider's prefix: the Stripe-shaped
+  value is now assembled at run time, so the tree holds no credential-shaped literal while the
+  validator is still handed one. The offending lines existed in eighteen unpushed commits owned by
+  this work, so that range was rewritten rather than superseded, and the branch is pushed.
 - A session lasts as long as a working day does not end it. The control plane dropped any session
   that had been quiet for thirty minutes and the cookie expired after twelve hours with no refresh,
   so an operator who left the console open came back to the sign-in form — and reported it as

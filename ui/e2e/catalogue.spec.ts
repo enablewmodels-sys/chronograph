@@ -7,6 +7,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { openConsolePage } from "./navigation";
 
 const catalogue = async () =>
   JSON.parse(await readFile(resolve("src/brainflow-boards.json"), "utf8")) as {
@@ -31,10 +32,7 @@ test("the console decodes the shipped artifact in this browser", async ({
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await connect(page);
-  await page
-    .getByRole("navigation", { name: "Console navigation" })
-    .getByRole("link", { name: "BCI workspace", exact: true })
-    .click();
+  await openConsolePage(page, "BCI workspace");
   await expect(
     page.getByRole("heading", { name: "Browser decoder check" }),
   ).toBeVisible();
@@ -55,10 +53,7 @@ test("every catalogued board is selectable in the source picker", async ({
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await connect(page);
-  await page
-    .getByRole("navigation", { name: "Console navigation" })
-    .getByRole("link", { name: "BCI workspace", exact: true })
-    .click();
+  await openConsolePage(page, "BCI workspace");
   await expect(page).toHaveURL(/\/app\/bci$/);
 
   // The setup panel is behind the empty-state action on a fresh workspace, and the

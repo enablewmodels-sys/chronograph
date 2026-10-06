@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { consoleNavigation } from "./navigation";
 
 // Reproduce the hosted regression against the Community artifact. The private
 // gateway stamps this metadata; account/provider security has separate tests.
@@ -213,9 +214,10 @@ test("a signed-in account reaches the console without a redirect loop", async ({
     }),
   );
   await page.goto("/app");
-  await expect(
-    page.getByRole("navigation", { name: "Console navigation" }),
-  ).toBeVisible();
+  // The sidebar is collapsed below the desktop breakpoint, so this asserts the console shell
+  // and then the sidebar, opening it if this viewport hides it behind the toggle.
+  await expect(page.locator(".workspace-top")).toBeVisible();
+  await expect(await consoleNavigation(page)).toBeVisible();
   await expect(page).toHaveURL(/\/app$/);
   await expect(page.getByRole("link", { name: "All projects" })).toBeVisible();
   await expect(
