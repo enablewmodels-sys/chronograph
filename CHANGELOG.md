@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+- The website is mobile friendly, and the floor is asserted rather than assumed. Auditing the live
+  pages at 390x844 found the stylesheets making text *smaller* on a phone than on a desktop — 7px
+  timeline ticks, an 8px scene caption, 9px navigation sections, a 10px version badge — inline links
+  16px tall that a thumb cannot reliably hit, a section nav that scrolled sideways instead of folding
+  (its links ran to 869px inside a 390px screen), a price table whose column headers were cut
+  mid-word, and 88px of padding top and bottom on every landing section. `ui/src/mobile.css` now
+  states the floors once — nothing a reader has to read below 12px, prose at 14px, every control and
+  navigation link at least 40px tall, long words unable to push a page sideways, the two landing
+  grids stacking into one readable column, and the price table keeping its row labels sticky while
+  the columns scroll. Links inside a sentence are explicitly exempt: a link mid-paragraph cannot be
+  a 40px target without breaking the paragraph.
+  `ui/e2e/mobile.spec.ts` holds all of it at a phone viewport, on every public page, including that
+  no navigation scrolls sideways — the regression this would otherwise silently return through.
+  Measured on the live site afterwards: 0 horizontal overflow, 0 text beyond the viewport, 0 text
+  under 12px and 0 controls under 40px, on every page (previously 33/33 on the landing page alone).
+
 - Three more things a review found, all of them the difference between what the code said and what
   it did. A retried invitation for a brand-new address was still refused with "this account must
   finish its current setup first" — a step the invitee cannot take, for a person whose only step is

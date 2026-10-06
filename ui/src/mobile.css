@@ -1,0 +1,220 @@
+/*
+ * The mobile floor.
+ *
+ * WHY this file exists as one place: the stylesheets shrink type and stack grids at narrow widths
+ * in 136 separate rules, and several of them were making text *smaller* on a phone than on a
+ * desktop — 7px timeline ticks, 8px labels, 9px navigation sections. Auditing the site at 390x844
+ * found that, plus a section nav that scrolled sideways instead of folding, a price table whose
+ * column headers were cut mid-word, inline links a thumb cannot reliably hit, and ten screens of
+ * padding on the landing page.
+ *
+ * So this is written as floors rather than as more per-breakpoint fiddling: everything a reader has
+ * to read is at least 12px, prose is at least 14px, every control and navigation link is at least
+ * 40px tall, and a long word cannot push a page sideways.
+ *
+ * Two details that matter:
+ *  - It is imported last, after theme.css, and still uses an `html body` prefix, because the
+ *    component stylesheets (landing, pricing, legal, footer, bci, schema) load with their lazy
+ *    chunks and would otherwise win on document order.
+ *  - Inline links inside prose are explicitly exempted from the 40px rule. A link inside a
+ *    sentence cannot be a 40px target without breaking the paragraph; the rule is about controls.
+ */
+@media (max-width: 700px) {
+  /* 1. Nothing a reader has to read is smaller than 12px. */
+  html body small,
+  html body .small,
+  html body .muted,
+  html body figcaption,
+  html body .eyebrow,
+  html body .landing-eyebrow,
+  html body .integration-tag,
+  html body .integration-banner p,
+  html body .integration-banner a,
+  html body .hero-note,
+  html body .world-frame-note,
+  html body .world-frame-time,
+  html body .world-phase,
+  html body .world-candidate,
+  html body .world-expand,
+  html body .example-caption,
+  html body .example-doc-link,
+  html body .history-focus,
+  html body .scene-caption,
+  html body .graph-caption,
+  html body .history-frames figcaption,
+  html body .docs-edition-note,
+  html body .pricing-badge,
+  html body .pricing-partial,
+  html body .site-footer a,
+  html body .site-footer p,
+  html body .footer-bottom,
+  html body .policy-links,
+  html body .policy-links a,
+  html body .account-footer,
+  html body .account-footer a,
+  html body .bci-eyebrow,
+  html body .bci-wave-meta,
+  html body .bci-wave-row > small,
+  html body .bci-wave-row > span,
+  html body .bci-time-labels,
+  html body .bci-event time,
+  html body .bci-chip,
+  html body .bci-muted,
+  html body .schema-property-form .field > span,
+  html body .schema-bytes span,
+  html body .schema-editor-head .eyebrow,
+  html body .schema-checksum,
+  html body .schema-history-item small,
+  html body .time-scrubber label,
+  html body .time-scrubber small,
+  html body .project-row small,
+  html body .button,
+  html body .form-divider span,
+  html body .account-footer a,
+  html body .account-footer span,
+  html body .account-terms,
+  html body .account-terms a,
+  html body .account-page span,
+  html body .account-page a,
+  html body .account-page p,
+  html body .not-found span,
+  html body .not-found a,
+  html body .not-found p,
+  html body .login-page footer,
+  html body .login-page footer span,
+  html body footer a,
+  html body .documentation a,
+  html body .documentation span,
+  html body .sidebar .nav-section,
+  html body .workspace-top .status {
+    /* The declaration is important because these are floors, not preferences: several of these
+       selectors are written with two classes in the component stylesheets that load with their
+       lazy chunks (for example `.memory-hero .hero-note`), so an equal-looking rule here loses on
+       specificity and the phone kept 11px text. A floor has to win by declaration. */
+    font-size: 12px !important;
+  }
+
+  /* 2. Prose is what people actually read on a phone. */
+  html body .prose p,
+  html body .prose li,
+  html body .policy-document p,
+  html body .policy-document li,
+  html body p,
+  html body li,
+  html body dd,
+  html body dt {
+    font-size: 14px !important;
+    line-height: 1.65;
+  }
+  html body .prose pre,
+  html body pre {
+    font-size: 12px !important;
+  }
+  html body code,
+  html body .prose :not(pre) > code {
+    font-size: 12.5px !important;
+  }
+
+  /* 3. Every control and navigation link is at least 40px tall. */
+  html body a,
+  html body .site-footer a,
+  html body .policy-links a,
+  html body .account-footer a,
+  html body .public-nav a,
+  html body .account-top a,
+  html body .forgot-password,
+  html body .demo-link,
+  html body .text-link,
+  html body .integration-banner a,
+  html body .documentation a,
+  html body .information-nav nav a,
+  html body .tabs button,
+  html body button,
+  html body select,
+  html body a.button,
+  html body .button {
+    /* A floor, for the same reason as the type above: component rules set explicit heights that
+       otherwise win, and a 32px control is one a thumb misses. */
+    min-height: 40px !important;
+    display: inline-flex;
+    align-items: center;
+  }
+  /* Links inside a sentence are exempt, and this must come after the block above: a link in the
+     middle of a paragraph cannot be a 40px target without breaking the paragraph. */
+  html body .prose a,
+  html body .policy-document a,
+  html body .information-main article a,
+  html body p a,
+  html body li a,
+  html body td a,
+  html body dd a,
+  html body a.skip {
+    min-height: 0 !important;
+    display: inline !important;
+  }
+
+  /* 4. The information pages' section nav folds instead of scrolling sideways: a reader cannot
+        guess what is in a strip whose end they cannot see. */
+  html body .information-nav nav {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    row-gap: 8px;
+  }
+
+  /* 5. Horizontally scrollable content says that it scrolls, and the price table keeps the row
+        labels in view while it does. */
+  html body .pricing-table-wrap,
+  html body .prose pre,
+  html body .table-scroll,
+  html body .bci-table-wrap {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  html body .pricing-table-wrap {
+    box-shadow: inset -18px 0 18px -18px rgba(0, 0, 0, 0.75);
+  }
+  html body .pricing-table th:first-child,
+  html body .pricing-table td:first-child {
+    position: sticky;
+    left: 0;
+    background: var(--canvas);
+    z-index: 1;
+  }
+
+  /* 6. A long word or a URL must not push the layout sideways. */
+  html body p,
+  html body li,
+  html body h1,
+  html body h2,
+  html body h3,
+  html body td {
+    overflow-wrap: anywhere;
+  }
+
+  /* 7. A phone should not scroll for ten screens of padding. Every landing section carried 88px
+        top and bottom, and the two grids stack into one readable column instead of two narrow
+        ones. */
+  html body .landing-section {
+    padding: 38px 0;
+  }
+  html body .platform-features {
+    grid-template-columns: 1fr;
+    gap: 26px;
+    margin-top: 28px;
+  }
+  html body .start-steps {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin-top: 28px;
+  }
+  html body .final-invitation {
+    padding: 42px 0;
+  }
+  html body .hero {
+    padding-top: 22px;
+    padding-bottom: 22px;
+  }
+  html body .world-timeline {
+    min-height: 300px;
+  }
+}

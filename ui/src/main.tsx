@@ -66,6 +66,9 @@ const JoinProject = lazy(() =>
 );
 import "./managed.css";
 import "./theme.css";
+// Imported last on purpose: the mobile floor has to win over the per-component rules that ship
+// with their lazy chunks. See the header of mobile.css for what it floors and why.
+import "./mobile.css";
 import { PolicyLinks } from "./SiteFooter";
 const LegalPage = lazy(() => import("./LegalPage"));
 import { BranchPicker, WorkspaceProvider } from "./workspace";
