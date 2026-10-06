@@ -30,14 +30,14 @@ setting or credential — nothing half-on, and nothing pretending to be on.
 | Host monitor | `chronograph-monitor.timer`; `/var/lib/chronograph-managed/operational-health.json` |
 | The deployment probe | `scripts/production-check.py` against `https://chronodb.co` with an engine token: liveness, readiness, anonymous API and metrics refused, authenticated API and metrics, durable write policy, writer healthy — `ok: true` (it must be given the public origin; the engine authorises by origin, so a loopback URL reports a false red) |
 | Layer 4 runtime (plan, build, deploy, promote, rollback, destroy, bind-domain) | `scripts/appctl-test.mjs` — 35 checks, including a build context that cannot escape its manifest |
-| Layer 4 from the console | `scripts/hosting-test.mjs` — 12 scenarios, 386 checks |
+| Layer 4 from the console, driven rather than described | `console-actions.spec.ts` plans, deploys, rolls back and destroys an app through the rendered controls against a deployment running the dry-run driver, which records the argv a container runtime would receive; `scripts/hosting-test.mjs` — 12 scenarios, 386 checks at the API level |
 | Layer 5 connectors (identity verification, billing mapping, domain binding) | `scripts/platform-connectors-test.mjs` — 9 checks with real keys and signatures |
 
 ## Deployed, inert until configured
 
 | Capability | Turn it on with | Test that proves it |
 | --- | --- | --- |
-| Console Apps page and `/managed/apps*` routes | `hosting: {enabled, stateRoot, manifestsRoot, runtime}` in the control-plane configuration | `scripts/hosting-test.mjs` (hosting absent ⇒ 404 everywhere) |
+| Console Apps page and `/managed/apps*` routes | `hosting: {enabled, stateRoot, manifestsRoot, runtime}` in the control-plane configuration; `runtime: "dry-run"` runs the whole lifecycle without a container runtime, which is what `scripts/managed-local.mjs` uses | `scripts/hosting-test.mjs` (hosting absent ⇒ 404 everywhere) and the console test above |
 | Provider-token sign-in (`POST /managed/provider-session`) | `identityProvider: {issuer, audience, jwksPath, policy}` | `scripts/provider-identity-test.mjs` — 108 checks |
 | Operational alerts | `alertWebhook` (https) or `CHRONOGRAPH_ALERT_WEBHOOK` | `scripts/alerts-test.py` — 14 checks; the status file reports `destination: none` today |
 | Billing capacity (subscription → seats, storage, retention) | `CHRONOGRAPH_BILLING_API_KEY`, `CHRONOGRAPH_BILLING_WEBHOOK_SECRET` | `scripts/platform-connectors-test.mjs` |

@@ -196,9 +196,43 @@ await writeFile(
     // It is a file the loader reads separately, like the OAuth credentials, because mail
     // configuration is private: `mail` inline in control.json is ignored by design.
     mailFile: join(state, "config", "mail.json"),
+    // Layer 4 on the dry-run driver: the console's Apps page is otherwise a page that says
+    // hosting is not enabled on every deployment, and the only way to exercise deploy, promote,
+    // roll back and destroy through the rendered controls is to run them somewhere. The dry-run
+    // driver records the argv a container runtime would have received and touches nothing.
+    hosting: {
+      enabled: true,
+      stateRoot: join(state, "hosting", "state"),
+      manifestsRoot: join(state, "hosting", "manifests"),
+      runtime: "dry-run",
+    },
   }),
   { mode: 0o600 },
 );
+// A deployable app for the console to drive. The manifest lives in the project's own manifests
+// directory and the build context is the directory beside it, which is what validation requires.
+const appContext = join(state, "hosting", "manifests", PRIMARY, "sample-service");
+await mkdir(appContext, { recursive: true });
+await writeFile(
+  join(appContext, "Dockerfile"),
+  "# A placeholder context: the dry-run driver records the argv and builds nothing.\nFROM scratch\n",
+);
+await writeFile(
+  join(state, "hosting", "manifests", PRIMARY, "sample-service.json"),
+  JSON.stringify(
+    {
+      version: 1,
+      kind: "web",
+      name: "sample-service",
+      build: { context: "sample-service", dockerfile: "Dockerfile" },
+      run: { port: 8080, health: "/healthz", replicas: 1 },
+      env: [{ name: "CHRONOGRAPH_TOKEN", kind: "secret-ref" }],
+    },
+    null,
+    2,
+  ) + "\n",
+);
+
 const config = await loadConfig(configPath);
 const app = await createGateway(config);
 await app.projects.restore();

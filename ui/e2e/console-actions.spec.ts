@@ -68,13 +68,31 @@ test("a secret can be stored and a reader key issued", async ({ page }) => {
   await expect(page.getByRole("cell", { name: secret, exact: true })).toBeVisible({
     timeout: 15_000,
   });
+  // The vault keeps at most twenty reader keys per project, and this suite creates one per run,
+  // so it revokes its own key at the end rather than leaving the deployment to fill up. A run that
+  // meets a full vault makes room first, the way the backup test does.
+  const keyCell = page.getByRole("cell", { name: key, exact: true });
   await page.getByRole("button", { name: "New reader key" }).click();
   await page.getByLabel("Key name").fill(key);
   await page.getByRole("button", { name: "Create reader key" }).click();
+  if (
+    await page
+      .getByText(/Revoke unused secret-reader keys/)
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await page
+      .locator("table tbody tr")
+      .last()
+      .getByRole("button", { name: "Revoke" })
+      .click();
+    await page.getByRole("button", { name: "Create reader key" }).click();
+  }
   await closeDrawer(page);
-  await expect(page.getByRole("cell", { name: key, exact: true })).toBeVisible({
-    timeout: 15_000,
-  });
+  await expect(keyCell).toBeVisible({ timeout: 15_000 });
+  await page.getByRole("row", { name: new RegExp(key) }).getByRole("button", { name: "Revoke" }).click();
+  await expect(keyCell).toHaveCount(0, { timeout: 15_000 });
 });
 
 test("asking for a collaborator answers, or says exactly what is missing", async ({
@@ -136,15 +154,27 @@ test("asking for a collaborator answers, or says exactly what is missing", async
   }
 });
 
-test("a durable branch can be created", async ({ page }) => {
+test("a durable branch can be created and discarded", async ({ page }) => {
   const name = unique("qa-branch");
   await page.goto(ORIGIN + "/app/branches");
   await page.getByRole("button", { name: "Create branch" }).click();
   await page.getByLabel("Branch name").fill(name);
   await page.getByRole("button", { name: "Create durable branch" }).click();
-  await expect(page.getByRole("cell", { name, exact: true })).toBeVisible({
+  const branch = page.getByRole("button", { name, exact: true });
+  await expect(branch).toBeVisible({ timeout: 20_000 });
+  // Discard it again: a suite that leaves a branch behind on every run fills the deployment's
+  // fork budget, and discarding exercises the one branch control the create path does not.
+  await branch.click();
+  await page.getByRole("button", { name: "Discard branch" }).click();
+  await expect(page.getByText("Branch discarded and synchronized.")).toBeVisible({
     timeout: 20_000,
   });
+  // The branch stays in the table as history with its state, which is the point of a lineage
+  // view; what the discard frees is the active fork, not the record of it.
+  await expect(page.getByRole("row", { name: new RegExp(name) })).toContainText(
+    "discarded",
+    { timeout: 20_000 },
+  );
 });
 
 test("a consistent backup can be created", async ({ page }) => {
@@ -185,6 +215,46 @@ test("a consistent backup can be created", async ({ page }) => {
   await expect
     .poll(async () => (await ids()).some((id) => !before.has(id)), { timeout: 20_000 })
     .toBe(true);
+});
+
+/* Layer 4 is the one surface whose console was never driven: without a hosting block every
+   deployment answers "Hosting is not enabled for this deployment", so plan, deploy, roll back and
+   destroy had only ever been exercised at the API level. This walks the rendered controls against a
+   deployment running the dry-run driver, which records the argv a container runtime would receive
+   and touches nothing. */
+test("an app is planned, deployed, rolled back and destroyed from the console", async ({
+  page,
+}) => {
+  await page.goto(ORIGIN + "/app/apps");
+  await expect(page.getByText("Hosting is not enabled")).toHaveCount(0);
+  await expect(page.getByText("sample-service").first()).toBeVisible({ timeout: 20_000 });
+
+  await page.getByRole("button", { name: "Plan", exact: true }).click();
+  await expect(page.getByText("Plan ready. Nothing on the host was touched.")).toBeVisible({
+    timeout: 20_000,
+  });
+
+  await page.getByRole("button", { name: "Deploy", exact: true }).click();
+  await expect(page.getByText("Deploy finished. The ledger records it.")).toBeVisible({
+    timeout: 30_000,
+  });
+  // The ledger shows the first twelve hex characters of the digest the deploy recorded (the full
+  // value is the cell's title), so a placeholder would not produce this.
+  await expect(page.getByText(/^[0-9a-f]{12}…$/).first()).toBeVisible({ timeout: 20_000 });
+
+  await page.getByRole("button", { name: "Roll back", exact: true }).click();
+  // Either outcome is correct and they are not the same thing: with a previous digest recorded the
+  // rollback happens, and on a first deploy appctl refuses rather than inventing a target. Both
+  // must be reported, and this asserts one of the two appeared rather than silence.
+  await expect(
+    page
+      .getByText("Rollback recorded.")
+      .or(page.getByText(/no earlier image digest|will not invent/i))
+      .first(),
+  ).toBeVisible({ timeout: 30_000 });
+
+  await page.getByRole("button", { name: "Destroy", exact: true }).click();
+  await expect(page.getByText("Destroy recorded.")).toBeVisible({ timeout: 30_000 });
 });
 
 /* The suites sign in through the provider's endpoint, which is not the path a person takes. This

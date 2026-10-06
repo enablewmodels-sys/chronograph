@@ -221,7 +221,7 @@ export default function ManagedLogin({
           {signup && emailSent ? (
             <div className="notice" role="status">
               Check your inbox. If this address is eligible, you’ll receive a
-              private link to finish setup. The link expires in one hour.
+              private link to finish setup. The link expires in 24 hours.
             </div>
           ) : signup && config && !config.emailSignup ? (
             <div className="signup-help">
@@ -471,7 +471,7 @@ export function ForgotPassword() {
       <h2>{sent ? "Check your inbox." : "Forgot your password?"}</h2>
       <p>
         {sent
-          ? "If this address is eligible, a reset link will arrive shortly. Check your spam folder too. The link expires in one hour."
+          ? "If this address is eligible, a reset link will arrive shortly. Check your spam folder too. The link expires in 24 hours."
           : "Recover access to your ChronoDB account."}
       </p>
       {config && !config.passwordReset ? (

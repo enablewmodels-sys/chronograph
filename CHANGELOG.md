@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+- Two defects a review found in the invitation path, both worth fixing before calling it done. The
+  console's request bound is eight seconds and the mail transport's was ten, so a slow relay told the
+  operator "the service did not answer in time" while the invitation had in fact been created and
+  emailed; the send is now bounded below the console's patience, and a repeated invitation for
+  somebody already invited re-issues the link instead of answering "this person already belongs to
+  the project". The link in an invitation was a one-hour password-reset token while the invitation it
+  belongs to is meant to be read hours later, and the message stated no expiry at all: the token now
+  lasts a day, the message says so, and the sign-in copy that promised an hour was corrected.
+- The mail spool is written the way a credential is. A fresh file was created 0600 but an existing
+  one kept whatever mode it had, the directory was left alone, and appendFile followed a symlink
+  planted at the path — so an activation link could land in a world-readable file or somewhere else
+  entirely. It now opens with O_NOFOLLOW and corrects both the file and the directory mode. The
+  loader also tightened what it accepts: one real from address rather than "contains an @", a full
+  Resend key rather than its prefix, no headers the platform owns, and a normalised spool path.
+- Layer 4 is driven from its own console, not only from a test of its routes. Every deployment
+  without a hosting block answers "Hosting is not enabled for this deployment", so plan, deploy,
+  roll back and destroy had only ever been exercised at the API level; the local deployment now
+  enables hosting on the dry-run driver (which records the argv a container runtime would receive
+  and touches nothing) and the console suite walks the real controls: a manifest in the project's
+  own directory lists the app, Plan shows the exact build/run/health argv, Deploy records a digest
+  and a healthy probe in the ledger, Roll back either rolls back or refuses with appctl's reason
+  rather than inventing a target, and Destroy stops and removes the container. Two stricter
+  manifest rules are visible from the console as a result: an unknown key is reported on the Apps
+  page and refused by plan and deploy, and the ledger shows the first twelve characters of the
+  digest it recorded.
 - Mail delivery is the operator's infrastructure, and invitations now actually go out. The control
   plane had one hardcoded transport — Resend's API — so a deployment without that vendor's key could
   not turn on email signup, password recovery or team invitations at all, and the invitation path
