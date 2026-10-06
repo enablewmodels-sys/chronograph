@@ -59,6 +59,35 @@ requires configured providers; email registration and recovery additionally
 require configured email delivery. A project API key is for software access,
 not a substitute for signing in to the hosted console.
 
+## Hold the mobile floor
+
+A phone is a width, not a device, and the stylesheets used to make text smaller as the window got
+narrower. The floors now live in one file, `ui/src/mobile.css`, in two queries:
+
+- `max-width: 900px` — type and touch. Nothing a reader reads is under 12px, prose is at least 14px,
+  a disclosure row or a control is at least 40px tall, and a navigation folds instead of scrolling
+  sideways. This reaches to 900px because a 768px tablet in portrait is a touch device too.
+- `max-width: 700px` — layout. Grids stack, section padding shrinks, and the help tooltip becomes a
+  sheet along the bottom edge.
+
+Measure a change with the committed suite, not by eye:
+
+```sh
+cd ui && node node_modules/@playwright/test/cli.js test e2e/mobile.spec.ts       # public pages
+cd ui && node node_modules/@playwright/test/cli.js test e2e/console-mobile.spec.ts  # the console
+```
+
+`ui/e2e/mobile-floor.ts` is the measurement both suites share. It reports sideways scrolling, text
+past the viewport, text under 12px, controls under 40px, a navigation that scrolls instead of
+folding, and a label cut off with an ellipsis. The console suite measures the Community edition on
+the isolated test server and the Managed edition against `scripts/managed-local.mjs`.
+
+Measure the boundary widths, not only 390px. Every defect found so far sat between two breakpoints:
+the information pages' section nav scrolled from 701px to 760px because the component stylesheet
+starts its scroller at 760px while the fold rule stopped at 700px, and the console's two-column grid
+was wider than the window from 901px to about 944px. When you add or move a narrow-width rule in a
+component stylesheet, check the width on both sides of its breakpoint.
+
 ## Hosting the database
 
 The Rust service is a long-running process owning a durable journal and local

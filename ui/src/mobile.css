@@ -322,6 +322,18 @@
   html body .world-timeline {
     min-height: 300px;
   }
+  /* Tab strips fold like the section nav, for the same reason and with the same result when they do
+     not: at 320px the BCI workspace's tabs were 365px in a 288px strip, so "Boards" showed 2px of a
+     63px label, and the landing page's model tabs pushed "BCI" and "Quantum" entirely off the
+     screen. They are not <nav> elements, and an element inside a scroller is exempt from the floor's
+     viewport check, so both layers of the audit had looked past them. */
+  html body .bci-tabs,
+  html body .model-tabs,
+  html body .tabs {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    row-gap: 4px;
+  }
   /* The welcome panel is a row of artwork and text on a desktop. On a phone the artwork is 100%
      wide, so there is no room beside it: stack the two, and drop the 50px gap and the inline
      24px margin that only made sense in a row. */

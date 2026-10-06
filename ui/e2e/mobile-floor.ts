@@ -21,6 +21,7 @@ export interface FloorReport {
   documentOverflow: number;
   overflowing: string[];
   sidewaysNav: string[];
+  hiddenControls: string[];
   smallText: string[];
   smallTargets: string[];
   clippedText: string[];
@@ -93,6 +94,47 @@ export async function floorReport(page: Page): Promise<FloorReport> {
           );
       }
 
+      // A control that a sideways-scrolling strip has hidden. The check above only looks at <nav>,
+      // and the viewport check above that exempts anything inside a scroller, so two tab strips hid
+      // their own labels from both: at 320px the BCI workspace's tabs were 365px in a 288px strip and
+      // showed 2px of the word "Boards", and the landing page's model tabs put "BCI" and "Quantum"
+      // entirely off the screen. Two exemptions keep this honest: a code block that scrolls holds no
+      // controls, and a strip that says it scrolls is allowed to — the price table and the console's
+      // tables carry an inset shadow for exactly that reason, and a table on a phone has to scroll.
+      const hiddenControls: string[] = [];
+      for (const el of Array.from(document.querySelectorAll("body *"))) {
+        const style = getComputedStyle(el);
+        if (style.overflowX !== "auto" && style.overflowX !== "scroll")
+          continue;
+        if (el.scrollWidth <= el.clientWidth + 2) continue;
+        if (style.boxShadow.includes("inset")) continue;
+        const box = el.getBoundingClientRect();
+        const hidden = Array.from(
+          el.querySelectorAll("a, button, select, input, summary"),
+        ).filter((control) => {
+          const rect = control.getBoundingClientRect();
+          if (!rect.width) return false;
+          return rect.left < box.left - 1 || rect.right > box.right + 1;
+        });
+        if (!hidden.length) continue;
+        const names = hidden
+          .map((control) => (control.textContent || "").trim().slice(0, 16))
+          .filter(Boolean)
+          .slice(0, 3);
+        hiddenControls.push(
+          label(el) +
+            " " +
+            el.scrollWidth +
+            ">" +
+            el.clientWidth +
+            " hides " +
+            hidden.length +
+            " [" +
+            names.join(", ") +
+            "]",
+        );
+      }
+
       const smallText: string[] = [];
       for (const el of Array.from(document.querySelectorAll(readable))) {
         if (el.children.length > 0) continue;
@@ -161,6 +203,7 @@ export async function floorReport(page: Page): Promise<FloorReport> {
         documentOverflow: document.documentElement.scrollWidth - viewport,
         overflowing: [...new Set(overflowing)].slice(0, 6),
         sidewaysNav: [...new Set(sidewaysNav)].slice(0, 6),
+        hiddenControls: [...new Set(hiddenControls)].slice(0, 6),
         smallText: [...new Set(smallText)].slice(0, 6),
         smallTargets: [...new Set(smallTargets)].slice(0, 6),
         clippedText: [...new Set(clippedText)].slice(0, 6),

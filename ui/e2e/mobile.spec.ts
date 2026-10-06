@@ -35,6 +35,7 @@ const PAGES = [
   "/login",
   "/signup",
   "/documentation/HOSTED",
+  "/documentation/QUICKSTART",
   "/privacy",
   "/terms",
   "/support",
@@ -63,6 +64,7 @@ async function failuresAt(page: Page, width: number): Promise<string[]> {
       report.documentOverflow > 1 ||
       report.overflowing.length ||
       report.sidewaysNav.length ||
+      report.hiddenControls.length ||
       report.smallText.length ||
       report.smallTargets.length ||
       report.clippedText.length

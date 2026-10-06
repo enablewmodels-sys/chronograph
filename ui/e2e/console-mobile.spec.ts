@@ -70,11 +70,16 @@ const COMMUNITY_ROUTES: Array<[string, string]> = [
   ["/app/operations", "Operations"],
 ];
 
-/** Sign in to the isolated Community console the Playwright config serves. */
+/**
+ * Sign in to the isolated Community console the Playwright config serves.
+ *
+ * The token file path can be overridden. The Playwright config starts that server with
+ * `reuseExistingServer: false`, so two runs on one machine cannot share port 18083: the second one
+ * needs its own server, its own port and its own token file, and this is how it points at it.
+ */
+const CONFIG = process.env.CHRONOGRAPH_E2E_CONFIG || "../.work/e2e-config.json";
 async function connectCommunity(page: Page): Promise<void> {
-  const config = JSON.parse(
-    await readFile(resolve("../.work/e2e-config.json"), "utf8"),
-  ) as {
+  const config = JSON.parse(await readFile(resolve(CONFIG), "utf8")) as {
     token: string;
     url: string;
   };
@@ -118,6 +123,7 @@ async function inspect(
     report.documentOverflow > 1 ||
     report.overflowing.length ||
     report.sidewaysNav.length ||
+    report.hiddenControls.length ||
     report.clippedText.length ||
     (!layoutOnly && (report.smallText.length || report.smallTargets.length))
   )
