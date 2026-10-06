@@ -10,7 +10,7 @@ same engine health, durability and backup interfaces. Their operating duties dif
 
 | Responsibility | Managed project user | Isolated Community operator |
 | --- | --- | --- |
-| Access | Account MFA, project members, expiring application keys | Bootstrap, rotate and revoke workspace keys |
+| Access | Account sessions, project members, expiring application keys | Bootstrap, rotate and revoke workspace keys |
 | Durability | Host enforces fsync; inspect Operations | Set `CHRONOGRAPH_REQUIRE_FSYNC=true` |
 | Monitoring | Inspect project Operations; report service failures | Collect metrics, host capacity, backup age and external probes |
 | Disaster recovery | Hosting operator captures graph and account/vault state | Back up graph, external auth store and deployment configuration |
@@ -136,7 +136,7 @@ format with an older binary. See [upgrade requirements](UPGRADE_0_4.md).
 
 ## Current hosted boundaries
 
-The live host has TLS, MFA for accounts, scoped keys, separate project stores,
+The live host has TLS, account sessions, scoped keys, separate project stores,
 fsync enforcement, health/metrics endpoints and six-hour local backup timers.
 An encrypted recovery copy has been captured outside the instance manually.
 Automated off-host backup, replication and automatic failover are **not

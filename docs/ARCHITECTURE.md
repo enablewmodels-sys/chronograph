@@ -92,11 +92,11 @@ One Community service owns one local journal and its volume. The intended contai
 
 ```mermaid
 flowchart TB
-  HUMAN[Browser: GitHub or invited email + MFA] -->|HTTPS and secure session cookie| TLS[Caddy TLS proxy]
+  HUMAN[Browser: GitHub, Google or invited email] -->|HTTPS and secure session cookie| TLS[Caddy TLS proxy]
   APP[Backend / SDK / AI agent] -->|HTTPS and scoped API key| TLS
   READER[Trusted secret consumer] -->|Separate secret-reader key| TLS
   TLS --> GATE[Private Node control plane: origin, session, role and rate checks]
-  GATE --> ID[(SQLite: users, MFA, sessions, projects, memberships and key routes)]
+  GATE --> ID[(SQLite: users, sessions, projects, memberships and key routes)]
   GATE --> VAULT[(Encrypted project secrets and HMAC audit chain)]
   GATE -->|Current human role becomes a private bridge credential| ROUTE[Project router]
   GATE -->|Machine credential checked by selected engine| ROUTE
@@ -113,7 +113,7 @@ flowchart TB
   LOCAL -->|Operator-created encrypted recovery bundle| OFFHOST[Off-host operator copy]
 ```
 
-Browser sessions require MFA and current project membership. Machine API keys and
+Browser sessions require current project membership. Machine API keys and
 MCP requests bypass browser sessions and retain native read/ingest/admin scopes.
 Secret-reader credentials are separate from graph keys and cannot access MCP.
 New projects start with fsync durability. Schema changes retain the engine's

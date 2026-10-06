@@ -20,8 +20,9 @@ are unchanged.
    **Continue with Google** when configured. Email registration sends a one-use
    verification link before creating an account; it becomes available when the
    operator connects email delivery. Private operator invitations also work.
-2. Set up an authenticator app. Save the one-time recovery codes privately, then
-   verify a code. GitHub and Google login also require this second factor.
+2. You are in. There is no second step: this deployment has no authenticator, so a
+   password or a verified provider account is the whole of sign-in. Treat the account
+   as the credential it is and use a strong, unique password.
 3. Open **Projects**, name your project, and create it. Each project has its own
    Rust process, journal, schema catalog, assets, credentials, and members.
 4. In **Schema & migrations**, choose a connector preset or upload a JSON
@@ -53,12 +54,14 @@ only to that project. Application keys are independent credentials: revoke keys
 that were shared with a departing collaborator. Permissions apply to the whole
 project; there is no row-level or per-relation authorization.
 
-Console sign-in uses HttpOnly cookies, not pasted API keys. Sessions expire after
-12 hours or 30 minutes of inactivity. Key creation/revocation, secret changes,
-team administration and provisioning require authenticator verification within
-five minutes. Reverify in **Account security** when prompted. Changing a password
-revokes all account sessions. Recovery codes are one-use; a lost authenticator
-and lost recovery codes require operator-assisted identity verification.
+Console sign-in uses HttpOnly cookies, not pasted API keys. A session lasts 30 days
+and is refreshed as it is used; it ends after 14 days without a single request, and a
+session that ends says so on the sign-in page rather than appearing as a broken page.
+Key creation/revocation, secret changes, team administration and provisioning are
+authorised by your role in the project and a live session — there is no authenticator
+and therefore no re-verification step. Changing a password revokes every other session.
+Because a stolen cookie is not backed by a second factor, revoke sessions you do not
+recognise in **Account security**.
 
 Project invitations are private, single-use links bound to an existing account.
 Ask collaborators to create their account before inviting them. Share project
@@ -74,22 +77,22 @@ email. An existing, established email account must have independently verified
 its local email before another provider can link to it.
 
 An unclaimed operator invitation is different: a verified provider can claim
-that placeholder account, retain its invited project role, and enroll MFA. The
-claim removes its temporary password, previous sessions and old setup links.
-It does not merge established identities or bypass MFA. Revoked invitations and
-suspended accounts remain blocked.
+that placeholder account and retain its invited project role. The claim removes its
+temporary password, previous sessions and old setup links. It does not merge
+established identities. Revoked invitations and suspended accounts remain blocked.
 
 Use [Forgot password](https://chronodb.co/forgot-password) to request a private,
-one-use email link. Links expire after one hour. Completing a reset revokes all
-account sessions and preserves the authenticator and recovery codes. The request
-response does not reveal whether an email has an account. Requests are limited
+one-use email link. Links expire after 24 hours. Completing a reset revokes all
+account sessions; there is no second factor for it to preserve, because the
+authenticator was removed. The request response does not reveal whether an email
+has an account. Requests are limited
 per address and client IP; a newer reset request invalidates older reset links.
 
 Email registration and recovery require a configured delivery service. When it
 is unavailable, the UI explains the limitation and offers existing provider
 sign-in or an operator-issued recovery link. It never claims to send an email
-without delivery configured. A password reset cannot replace a lost MFA device:
-use a saved recovery code or contact the platform operator for identity checks.
+without delivery configured. With no second factor, the operator-issued recovery link is
+the way back into an account whose password is lost.
 
 ## API keys and endpoints
 
@@ -236,7 +239,7 @@ Google is an optional Managed identity provider. Community/isolated instances
 continue to use scoped API credentials. A Managed host shows **Continue with
 Google** only after its operator configures a Google OAuth web client. No Google
 Drive, Gmail, or other data permissions are requested: only identity, email and
-profile. Each new session still requires ChronoDB MFA.
+profile. Signing in with Google creates a normal session, like any other sign-in.
 
 Google email addresses must be verified. Established accounts with unverified
 local email cannot be linked implicitly; unclaimed operator invitations follow

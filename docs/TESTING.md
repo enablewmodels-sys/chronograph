@@ -175,7 +175,7 @@ Core tests passed (30 tests plus two doctests; one subprocess-only fixture remai
 intentionally ignored). All 22 server tests and strict core/server Clippy passed.
 REST/MCP, schema, all 36 connector presets, process-kill recovery and independent
 backup restoration passed against the candidate native engine. Eight private
-Managed suites cover identity, MFA, vault separation, real project databases,
+Managed suites cover identity, sessions, vault separation, real project databases,
 fsync enforcement, routed metrics, shutdown draining and failed-project recovery.
 Four probe tests cover insecure credential files, redirects, stale backups and
 unhealthy/non-durable responses. These are implementation checks, not certification.

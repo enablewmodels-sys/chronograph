@@ -91,7 +91,7 @@ control plane persists a project-scoped SQLite queue with idempotency keys, two
 pending jobs per project, ten submissions/day, one concurrent job, 60-second leases,
 three attempts and a 15-minute attempt limit. Owners/admins/editors may submit or
 cancel; viewers can inspect their project's results. All requests require the
-existing authenticated project session and MFA policy.
+existing authenticated project session and project role.
 
 The worker gets a job-scoped broker, never a project API key. It materializes only
 the frozen sessions/assets into a bounded input directory. The built-in recipe runs

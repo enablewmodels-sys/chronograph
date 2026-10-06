@@ -13,7 +13,7 @@ restricted. See [licensing](LICENSING.md) for the full boundary.
 | Typed assets, checkpointed ingestion and language SDKs | Included | Same transport over HTTPS |
 | Consistent backup and restore | Local tools | Scheduled graph and encrypted account/configuration snapshots |
 | Infrastructure | Operated by you | Separate databases and project processes on a shared host |
-| Accounts and teams | Workspace-wide token scopes | GitHub, invited email accounts, MFA, project roles and sessions |
+| Accounts and teams | Workspace-wide token scopes | GitHub, Google and invited email accounts, project roles and sessions; no second factor |
 | Provider secrets | Use your own secret store | Encrypted project vault with separate reader keys |
 | Billing | No license fee for permitted use; infrastructure costs apply | Subscription pricing not announced |
 | Reliability | Alpha with documented limits | No service commitment available yet |

@@ -53,7 +53,7 @@ Community test build cannot overwrite the artifact intended for hosting.
 
 The Managed gateway also declares the edition in the HTML it serves. This
 controls the interface only; the server independently enforces account sessions,
-MFA, project membership and API key scopes. Never deploy the static public demo
+project membership and API key scopes. Never deploy the static public demo
 as a replacement for the Managed account service. Google/GitHub account creation
 requires configured providers; email registration and recovery additionally
 require configured email delivery. A project API key is for software access,

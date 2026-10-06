@@ -15,7 +15,7 @@ and [known limits](LIMITATIONS.md) before choosing a workload.
 
 | Concern | Managed | Isolated Community |
 | --- | --- | --- |
-| Console sign-in | GitHub or invited email account, plus MFA | Scoped API key held in browser memory |
+| Console sign-in | GitHub, Google or invited email account | Scoped API key held in browser memory |
 | Applications and agents | Project API key | Workspace API key |
 | REST base | `https://HOST/p/PROJECT_ID` | Your server's HTTPS origin |
 | SDK base | Managed HTTPS origin; key selects project | Your server's HTTPS origin |

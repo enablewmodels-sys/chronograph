@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Three more things a review found, all of them the difference between what the code said and what
+  it did. A retried invitation for a brand-new address was still refused with "this account must
+  finish its current setup first" — a step the invitee cannot take, for a person whose only step is
+  to open the link they never received — so a pending invitation is re-issued instead. A
+  forgot-password link really did die after an hour: the gateway checks the control plane's own
+  invitation row before the provider's, and that row was written at one hour while the message and
+  the provider's row said a day. And the file transport corrected the spool's *directory* mode,
+  which is wrong when an operator points the spool at a shared directory: it now corrects a
+  directory only when this process owns it, and relies on the file's own 0600 for the link. The
+  hosted documentation's "links expire after one hour" and its promise that a reset preserves the
+  authenticator were corrected too — there is no authenticator to preserve.
 - The account lifecycle is exercised through the pages a person uses, with the deployment's own
   mail: sign up on /signup, read the message the control plane actually wrote to its spool, open
   the verification link, set a password, and sign in as the new account. The link exists only in
