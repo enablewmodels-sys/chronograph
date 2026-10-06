@@ -75,6 +75,12 @@ const engine = spawn(BINARY, ["serve"], {
     CHRONOGRAPH_DATA: join(engineRoot, "data"),
     CHRONOGRAPH_BIND: "127.0.0.1:" + ENGINE_PORT,
     CHRONOGRAPH_ORIGIN: "http://127.0.0.1:" + PORT,
+    // The engine serves the shell and its assets, and its own default is ui/dist. Without this
+    // the local deployment was serving the Community build of the console while the host serves
+    // ui/dist-managed (see launch/private/managed/deploy-ui.sh), so a bundle could pass every
+    // local sweep and still be nothing like the one that ships. Per-project engines already get
+    // this from projects.mjs; this is the primary one.
+    CHRONOGRAPH_UI: UI,
   },
   stdio: ["ignore", "ignore", "inherit"],
 });

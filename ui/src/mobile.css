@@ -1,7 +1,7 @@
 /*
  * The mobile floor.
  *
- * WHY this file exists as one place: the stylesheets shrink type and stack grids at narrow widths
+ * WHY this file exists as one place: the stylesheets shrink type and stack layout at narrow widths
  * in 136 separate rules, and several of them were making text *smaller* on a phone than on a
  * desktop — 7px timeline ticks, 8px labels, 9px navigation sections. Auditing the site at 390x844
  * found that, plus a section nav that scrolled sideways instead of folding, a price table whose
@@ -12,6 +12,22 @@
  * to read is at least 12px, prose is at least 14px, every control and navigation link is at least
  * 40px tall, and a long word cannot push a page sideways.
  *
+ * The first pass measured the public pages, and that pass was too kind to itself: it read only
+ * paragraphs, list items and spans of twelve characters or more, so 10px captions, 11px table
+ * headers and the world timeline's 11px tick labels counted as clean. Measuring again with every
+ * text element and a two-character minimum — on the live site at 390px *and* 320px, and then inside
+ * the signed-in console — is what the two blocks below are the result of. The measurement lives in
+ * ui/e2e/mobile-floor.ts and is shared by ui/e2e/mobile.spec.ts (public) and
+ * ui/e2e/console-mobile.spec.ts (both editions of the console), so they hold the same floor.
+ *
+ * WHY there are two queries: the floors are about reading and tapping, and those apply to every
+ * touch device, not only to phones. Measured at 701px — one pixel above the old single query — the
+ * landing page still had 41 leaf texts under 12px and 38 controls under 40px, and the disclosure
+ * rows a reader taps were 22px tall. A 768px iPad in portrait is such a device. So type, touch and
+ * the console's grid fitting apply to 900px, and the *layout* decisions (stacking grids, cutting
+ * section padding, folding navigations, moving the help tooltip) stay at 700px, where the two- and
+ * three-column layouts genuinely stop fitting.
+ *
  * Two details that matter:
  *  - It is imported last, after theme.css, and still uses an `html body` prefix, because the
  *    component stylesheets (landing, pricing, legal, footer, bci, schema) load with their lazy
@@ -19,7 +35,7 @@
  *  - Inline links inside prose are explicitly exempted from the 40px rule. A link inside a
  *    sentence cannot be a 40px target without breaking the paragraph; the rule is about controls.
  */
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   /* 1. Nothing a reader has to read is smaller than 12px. */
   html body small,
   html body .small,
@@ -52,6 +68,7 @@
   html body .policy-links a,
   html body .account-footer,
   html body .account-footer a,
+  html body .account-footer span,
   html body .bci-eyebrow,
   html body .bci-wave-meta,
   html body .bci-wave-row > small,
@@ -70,8 +87,6 @@
   html body .project-row small,
   html body .button,
   html body .form-divider span,
-  html body .account-footer a,
-  html body .account-footer span,
   html body .account-terms,
   html body .account-terms a,
   html body .account-page span,
@@ -86,7 +101,20 @@
   html body .documentation a,
   html body .documentation span,
   html body .sidebar .nav-section,
-  html body .workspace-top .status {
+  html body .workspace-top .status,
+  /* A table header is 11px in the base stylesheet and 12px in the pricing stylesheet, which is how
+     the pricing page's row labels came to be smaller than the cells under them. */
+  html body th,
+  /* A disclosure row is text a reader reads before tapping it, and the documentation sidebar's
+     section names ("Get started", "Build", "Integrations") were 10px on a phone while both layers
+     of the audit looked past them, because neither list mentioned `summary`. */
+  html body summary,
+  /* The BCI page's tab strip and proof-step numbers, and the landing page's integration caption
+     and timeline tick labels: all four were 10-11px on a phone. */
+  html body .bci-tabs button,
+  html body .bci-proof-grid span,
+  html body .integration-banner strong,
+  html body .world-time-labels span {
     /* The declaration is important because these are floors, not preferences: several of these
        selectors are written with two classes in the component stylesheets that load with their
        lazy chunks (for example `.memory-hero .hero-note`), so an equal-looking rule here loses on
@@ -139,11 +167,19 @@
     display: inline-flex;
     align-items: center;
   }
-  /* Links inside a sentence are exempt, and this must come after the block above: a link in the
-     middle of a paragraph cannot be a 40px target without breaking the paragraph. */
-  html body .prose a,
-  html body .policy-document a,
-  html body .information-main article a,
+  /* A disclosure row is a control. It keeps `display: list-item` on purpose: these summaries use
+     the native triangle, and `display: flex` would silently remove it. `align-content` centres
+     the label in the taller row where the browser supports block alignment, and does nothing
+     where it does not. */
+  html body summary {
+    min-height: 40px !important;
+    align-content: center;
+  }
+  /* A link inside a sentence is exempt, and this must come after the block above: it cannot be a
+     40px target without breaking the paragraph. The exemption is written as "a link inside p, li,
+     dd or td" rather than as "a link inside prose", because a contents navigation lives inside the
+     prose *container* — `.policy-document a` — while being a list of controls. That is what the
+     legal pages' own table of contents is: six 17px links a thumb cannot hit. */
   html body p a,
   html body li a,
   html body td a,
@@ -152,16 +188,97 @@
     min-height: 0 !important;
     display: inline !important;
   }
+  /* A call to action is never prose, even when a page nests it in a paragraph or a list item. This
+     comes last so it wins over the exemption above. */
+  html body a.button,
+  html body .button {
+    min-height: 40px !important;
+    display: inline-flex !important;
+  }
 
-  /* 4. The information pages' section nav folds instead of scrolling sideways: a reader cannot
-        guess what is in a strip whose end they cannot see. */
+  /* 4. A long word or a URL must not push the layout sideways. */
+  html body p,
+  html body li,
+  html body h1,
+  html body h2,
+  html body h3,
+  html body td {
+    overflow-wrap: anywhere;
+  }
+
+  /* 5. The console. The public pages were measured first and the console second, and the console is
+        where a phone actually gets used — an operator checking a branch from the train. Four things
+        were wrong:
+
+          - /app/access overflowed the viewport by 79px at 390 and 149px at 320. `.managed-two-column`
+            collapses to one column below 900px, but the track was still 432px wide: `1fr` means
+            `minmax(auto, 1fr)`, and the auto minimum took the width of a `<pre>` config block
+            rather than the panel. `minmax(0, 1fr)` is the fix, and the children need their own
+            `min-width: 0` for the same reason.
+          - Every table header, scope badge and interval note in the console is 10-11px — the same
+            defect the public pages had, in the denser place.
+          - Tables scroll sideways with no sign that they do.
+          - The workspace bar wrapped the account status onto a row of its own, right-aligned under
+            a floating Connect button.
+    */
+  html body .managed-two-column {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  html body .managed-two-column > * {
+    min-width: 0;
+  }
+  /* A flex row whose children cannot shrink is the same defect in another shape: the overview's
+     welcome panel is image + text in a row, and a child with `min-width: auto` keeps the row at
+     its min-content width. Measured in the empty-workspace state, that row was 431px wide in a
+     390px window — 41px of sideways scroll — and 401px at 320. */
+  html body .welcome-panel > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  html body .console span.mono,
+  html body .console .scope-badge,
+  html body .console .interval-note,
+  html body .console .stat-strip span,
+  html body .console .time-preview span,
+  html body .console .table-actions button,
+  html body .console td button {
+    /* `span.mono` rather than `.mono`: the same class carries a 14px paragraph in the welcome
+       panel, and a floor must not shrink anything. */
+    font-size: 12px !important;
+  }
+  html body .console .table-scroll {
+    box-shadow: inset -18px 0 18px -18px rgba(0, 0, 0, 0.75);
+  }
+  /* A range slider and a checkbox are touch targets too, even where a 40px box would look wrong:
+     the slider gets a 40px box, and the checkbox keeps its size with the label around it — the BCI
+     channel picker's rows were 22px tall, which is a coin toss with a thumb — made big enough. */
+  html body input[type="range"] {
+    min-height: 40px;
+  }
+  html body label.check-field,
+  html body label:has(> input[type="checkbox"]),
+  html body label:has(> input[type="radio"]) {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+  }
+  html body input[type="checkbox"],
+  html body input[type="radio"] {
+    min-width: 20px;
+    min-height: 20px;
+  }
+}
+
+@media (max-width: 700px) {
+  /* 6. The information pages' section nav folds instead of scrolling sideways: a reader cannot guess
+        what is in a strip whose end they cannot see. */
   html body .information-nav nav {
     flex-wrap: wrap;
     overflow-x: visible;
     row-gap: 8px;
   }
 
-  /* 5. Horizontally scrollable content says that it scrolls, and the price table keeps the row
+  /* 7. Horizontally scrollable content says that it scrolls, and the price table keeps the row
         labels in view while it does. */
   html body .pricing-table-wrap,
   html body .prose pre,
@@ -181,19 +298,8 @@
     z-index: 1;
   }
 
-  /* 6. A long word or a URL must not push the layout sideways. */
-  html body p,
-  html body li,
-  html body h1,
-  html body h2,
-  html body h3,
-  html body td {
-    overflow-wrap: anywhere;
-  }
-
-  /* 7. A phone should not scroll for ten screens of padding. Every landing section carried 88px
-        top and bottom, and the two grids stack into one readable column instead of two narrow
-        ones. */
+  /* 8. A phone should not scroll for ten screens of padding. Every landing section carried 88px top
+        and bottom, and the two grids stack into one readable column instead of two narrow ones. */
   html body .landing-section {
     padding: 38px 0;
   }
@@ -216,5 +322,58 @@
   }
   html body .world-timeline {
     min-height: 300px;
+  }
+  /* The welcome panel is a row of artwork and text on a desktop. On a phone the artwork is 100%
+     wide, so there is no room beside it: stack the two, and drop the 50px gap and the inline
+     24px margin that only made sense in a row. */
+  html body .welcome-panel {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+    padding: 26px 22px;
+    min-height: 0;
+  }
+  html body .welcome-panel .text-link {
+    margin-left: 0;
+  }
+
+  /* 9. The public nav is a nowrap row of logo + links + a call to action. At 390px that row is 392px
+        wide on the pricing page, so the document scrolled two pixels sideways; at 320px it is 72px
+        over. Letting it wrap costs a second line only on the pages that need one. The call to action
+        keeps to the right of whichever line it lands on. */
+  html body .public-nav {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+  html body .public-nav .button {
+    margin-left: auto;
+  }
+
+  /* 10. The page-help popover is a tooltip anchored `left: -100px` from a button that sits at the
+         right edge of the heading, so on a phone it lands off the left of the screen. Measured:
+         300px wide with its right edge at x=267, which is 33px past the left edge — and a closed
+         <details> paints nothing, so it stays invisible until someone opens it. A tooltip that has
+         to be pulled back inside the viewport is no longer a tooltip, so on a phone it becomes what
+         a phone expects: a sheet along the bottom edge, always fully inside the viewport. */
+  html body .page-help p {
+    position: fixed;
+    left: 14px;
+    right: 14px;
+    top: auto;
+    bottom: 14px;
+    width: auto;
+    max-height: 55dvh;
+    overflow-y: auto;
+  }
+  /* The copy button sits over code that now scrolls under it, so it needs its own background. */
+  html body .copy {
+    background: inherit;
+  }
+  html body .workspace-top {
+    row-gap: 10px;
+  }
+  html body .workspace-top .status {
+    flex-basis: auto;
+    margin-left: 8px;
   }
 }
