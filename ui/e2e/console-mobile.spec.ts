@@ -115,18 +115,24 @@ async function inspect(
     failures.push(path + " " + JSON.stringify(report));
 }
 
+/** Walk the Community console from the sidebar: its token lives in memory, not in a cookie. */
+async function communityFailures(page: Page, width: number): Promise<string[]> {
+  await page.setViewportSize({ width, height: 900 });
+  await connectCommunity(page);
+  const failures: string[] = [];
+  for (const [path, title] of COMMUNITY_ROUTES) {
+    if (path !== "/app") await openConsolePage(page, title);
+    await inspect(page, path, failures);
+  }
+  return failures;
+}
+
 for (const width of [390, 320]) {
   test(`the community console holds the mobile floor at ${width}px`, async ({
     page,
   }) => {
     test.setTimeout(300000);
-    await page.setViewportSize({ width, height: 844 });
-    await connectCommunity(page);
-    const failures: string[] = [];
-    for (const [path, title] of COMMUNITY_ROUTES) {
-      if (path !== "/app") await openConsolePage(page, title);
-      await inspect(page, path, failures);
-    }
+    const failures = await communityFailures(page, width);
     expect(failures, failures.join("\n")).toEqual([]);
   });
 
@@ -142,6 +148,21 @@ for (const width of [390, 320]) {
       await page.goto(ORIGIN + path);
       await inspect(page, path, failures);
     }
+    expect(failures, failures.join("\n")).toEqual([]);
+  });
+}
+
+// Both sides of the console's own breakpoint. `.managed-two-column` is two columns above 900px and
+// one below, and the sidebar collapses somewhere between, so a floor measured on only one side of a
+// breakpoint can be crossed at it — which is exactly what happened to the public section nav between
+// 701px and 760px. The Community console is the edition that is available on every machine, and the
+// stylesheet is shared, so the boundary is measured there.
+for (const width of [900, 901]) {
+  test(`the community console holds the mobile floor at ${width}px`, async ({
+    page,
+  }) => {
+    test.setTimeout(300000);
+    const failures = await communityFailures(page, width);
     expect(failures, failures.join("\n")).toEqual([]);
   });
 }

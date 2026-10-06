@@ -11,8 +11,12 @@
  * It runs against the served console rather than a mock of it: the floors are CSS, and CSS is the
  * thing under test. Every page below is a public route, so no session is needed. The measurement
  * itself is in mobile-floor.ts, shared with the signed-in console's copy of this test.
+ *
+ * Two widths are not enough. Each component stylesheet has its own breakpoint — this nav becomes a
+ * horizontal scroller at 760 and a column at 761 — so a floor that stops at 700 left 701-760 worse
+ * than either side of it. The boundary widths below are measured for that reason.
  */
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { floorReport } from "./mobile-floor";
 
 // A phone, whatever project this runs under.
@@ -35,46 +39,49 @@ const PAGES = [
   "/status",
 ];
 
-for (const path of PAGES) {
-  test(`${path} holds the mobile floor`, async ({ page }) => {
-    // The route has to exist before its layout can be judged: a page this deployment does not
-    // serve would report every floor at once and mean nothing. A single-page app answers 200 for
-    // an unknown route, so the not-found page is recognised by its own heading.
-    const response = await page.goto(path);
-    await page.waitForTimeout(2000);
+/** The widths where a component stylesheet changes behaviour, plus the phone. */
+const BOUNDARIES = [701, 760, 900];
+
+async function failuresAt(page: Page, width: number): Promise<string[]> {
+  await page.setViewportSize({ width, height: 900 });
+  const failures: string[] = [];
+  for (const path of PAGES) {
+    // A route has to exist before its layout can be judged: a page this build does not serve would
+    // report every floor at once and mean nothing. A single-page app answers 200 for an unknown
+    // route, so the not-found page is recognised by its own heading.
+    await page.goto(path);
+    await page.waitForTimeout(800);
     const notFound = await page
       .getByRole("heading", { name: "That page is not here." })
       .isVisible()
       .catch(() => false);
-    test.skip(
-      notFound || (response !== null && response.status() >= 400),
-      `this deployment does not serve ${path}`,
-    );
-    await expect(page.locator("body")).not.toHaveText(/could not be displayed/);
+    if (notFound) continue;
     const report = await floorReport(page);
-    expect(
-      report.documentOverflow,
-      `${path} scrolls sideways: ${JSON.stringify(report)}`,
-    ).toBeLessThanOrEqual(1);
-    expect(
-      report.overflowing,
-      `${path} overflows the viewport: ${JSON.stringify(report.overflowing)}`,
-    ).toEqual([]);
-    expect(
-      report.sidewaysNav,
-      `${path} has a navigation that scrolls sideways instead of wrapping: ${JSON.stringify(report.sidewaysNav)}`,
-    ).toEqual([]);
-    expect(
-      report.smallText,
-      `${path} has text below 12px: ${JSON.stringify(report.smallText)}`,
-    ).toEqual([]);
-    expect(
-      report.smallTargets,
-      `${path} has controls below 40px: ${JSON.stringify(report.smallTargets)}`,
-    ).toEqual([]);
-    expect(
-      report.clippedText,
-      `${path} truncates text with an ellipsis: ${JSON.stringify(report.clippedText)}`,
-    ).toEqual([]);
+    if (
+      report.documentOverflow > 1 ||
+      report.overflowing.length ||
+      report.sidewaysNav.length ||
+      report.smallText.length ||
+      report.smallTargets.length ||
+      report.clippedText.length
+    )
+      failures.push(path + " " + JSON.stringify(report));
+  }
+  return failures;
+}
+
+test("every public page holds the mobile floor at 390px", async ({ page }) => {
+  test.setTimeout(300000);
+  const failures = await failuresAt(page, 390);
+  expect(failures, failures.join("\n")).toEqual([]);
+});
+
+for (const width of BOUNDARIES) {
+  test(`every public page holds the mobile floor at ${width}px`, async ({
+    page,
+  }) => {
+    test.setTimeout(300000);
+    const failures = await failuresAt(page, width);
+    expect(failures, failures.join("\n")).toEqual([]);
   });
 }

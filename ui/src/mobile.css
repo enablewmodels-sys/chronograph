@@ -267,17 +267,22 @@
     min-width: 20px;
     min-height: 20px;
   }
-}
 
-@media (max-width: 700px) {
   /* 6. The information pages' section nav folds instead of scrolling sideways: a reader cannot guess
-        what is in a strip whose end they cannot see. */
+        what is in a strip whose end they cannot see, and three of this nav's ten destinations were
+        invisible past the right edge. This rule belongs at 900, not at 700, because the component
+        stylesheet turns the same nav into `overflow-x: auto` at 760 — so between 701 and 760 the
+        strip scrolled while the fold did not apply, which is worse than either side of the pair.
+        Measured at 701 with the defect present: the nav was sw=849 in cw=661, "Support" was cut
+        mid-label, and "Company" and "Status" were off the strip. */
   html body .information-nav nav {
     flex-wrap: wrap;
     overflow-x: visible;
     row-gap: 8px;
   }
+}
 
+@media (max-width: 700px) {
   /* 7. Horizontally scrollable content says that it scrolls, and the price table keeps the row
         labels in view while it does. */
   html body .pricing-table-wrap,
