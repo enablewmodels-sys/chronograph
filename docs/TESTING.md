@@ -15,6 +15,12 @@ npm --prefix ui run test:e2e -- --headed
 node scripts/service-latency.mjs
 ```
 
+These are default-feature builds, which is what ships. `cargo test --workspace --all-features`
+additionally compiles the optional `lsl` binding, whose build script compiles the bundled liblsl with
+CMake; without CMake installed that crate fails to build and the workspace run stops before a single
+test executes. The optional feature is deliberately off in every build this repository ships, so the
+engine carries no LSL client and the Python SDK is where LSL ingestion lives.
+
 The phase runner saves exact build/test/Clippy/fmt output and exit status.
 Protocol and browser tests create disposable workspaces and private tokens; they
 never use `data/` or modify client-wide MCP configuration. Test servers stop on

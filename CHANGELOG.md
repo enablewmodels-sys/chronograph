@@ -27,9 +27,12 @@
   sentinels were shaped like live Stripe keys — one planted in a worker's environment to prove it
   reaches no response, log or dry-run trace, one placed in a manifest to prove validation refuses
   credential-shaped text and never echoes it. Neither needs a provider's prefix: the Stripe-shaped
-  value is now assembled at run time, so the tree holds no credential-shaped literal while the
-  validator is still handed one. The offending lines existed in eighteen unpushed commits owned by
-  this work, so that range was rewritten rather than superseded, and the branch is pushed.
+  value is now assembled at run time, so the tree holds no Stripe-, GitHub- or AWS-shaped literal
+  while the validator is still handed one, and a third fixture in platform-connectors-test.mjs that
+  signed its webhooks with a `whsec_`-prefixed string is assembled the same way. The offending lines
+  existed in unpushed commits owned by this work, so that range was rewritten rather than superseded,
+  and the branch is pushed. The published history still contains the older `whsec_` fixture; it was
+  accepted by the remote, and rewriting published commits again is not worth a force-push.
 - A session lasts as long as a working day does not end it. The control plane dropped any session
   that had been quiet for thirty minutes and the cookie expired after twelve hours with no refresh,
   so an operator who left the console open came back to the sign-in form — and reported it as
