@@ -273,11 +273,19 @@
   padding: 8px 12px;
   border-color: var(--rule);
 }
+/* WHY minmax(0, 1fr) and not 1fr: 1fr means minmax(auto, 1fr), and that auto minimum is the
+   column's min-content width. One column of this grid holds a <pre> config block, so the track grew
+   to that block's width instead of the panel's share: the Connections page was 79px wider than the
+   window at 390px, and still 39px wider between 901px and roughly 944px. The children carry
+   min-width: 0 for the same reason, and it must be every child, not only the .panel ones. */
 .managed-two-column {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
   margin: 24px 0;
+}
+.managed-two-column > * {
+  min-width: 0;
 }
 .managed-two-column > .panel {
   margin: 0;

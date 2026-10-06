@@ -207,26 +207,20 @@
   }
 
   /* 5. The console. The public pages were measured first and the console second, and the console is
-        where a phone actually gets used — an operator checking a branch from the train. Four things
+        where a phone actually gets used — an operator checking a branch from the train. Three things
         were wrong:
 
-          - /app/access overflowed the viewport by 79px at 390 and 149px at 320. `.managed-two-column`
-            collapses to one column below 900px, but the track was still 432px wide: `1fr` means
-            `minmax(auto, 1fr)`, and the auto minimum took the width of a `<pre>` config block
-            rather than the panel. `minmax(0, 1fr)` is the fix, and the children need their own
-            `min-width: 0` for the same reason.
           - Every table header, scope badge and interval note in the console is 10-11px — the same
             defect the public pages had, in the denser place.
           - Tables scroll sideways with no sign that they do.
           - The workspace bar wrapped the account status onto a row of its own, right-aligned under
             a floating Connect button.
+
+        The fourth, /app/access being wider than the window, is fixed where it was written rather
+        than here: `.managed-two-column` in ui/src/managed.css now uses `minmax(0, 1fr)` and gives
+        every child `min-width: 0`, because the defect reached from 390px up to about 944px and a
+        floor that only covers one range of it would leave the other.
     */
-  html body .managed-two-column {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-  html body .managed-two-column > * {
-    min-width: 0;
-  }
   /* A flex row whose children cannot shrink is the same defect in another shape: the overview's
      welcome panel is image + text in a row, and a child with `min-width: auto` keeps the row at
      its min-content width. Measured in the empty-workspace state, that row was 431px wide in a

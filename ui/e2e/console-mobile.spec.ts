@@ -96,11 +96,20 @@ async function connectCommunity(page: Page): Promise<void> {
   }
 }
 
-/** Cross a floor on one page? Reported with the page path, so a failure names it. */
+/**
+ * Cross a floor on one page? Reported with the page path, so a failure names it.
+ *
+ * `layoutOnly` is for a width just above the floors' 900px range. There the type and touch sizes
+ * are the desktop design on purpose — an 11px table header and a 36px select are what the console
+ * has always looked like at 1536 — so asserting them would be asserting that the desktop is wrong.
+ * What must still hold on both sides of the boundary is the layout: nothing may scroll sideways,
+ * sit past the viewport, or be cut off.
+ */
 async function inspect(
   page: Page,
   path: string,
   failures: string[],
+  layoutOnly = false,
 ): Promise<void> {
   // The console fetches on mount; the numbers arrive a beat after the shell does.
   await page.waitForTimeout(1800);
@@ -108,9 +117,9 @@ async function inspect(
   if (
     report.documentOverflow > 1 ||
     report.overflowing.length ||
-    report.smallText.length ||
-    report.smallTargets.length ||
-    report.clippedText.length
+    report.sidewaysNav.length ||
+    report.clippedText.length ||
+    (!layoutOnly && (report.smallText.length || report.smallTargets.length))
   )
     failures.push(path + " " + JSON.stringify(report));
 }
@@ -122,7 +131,7 @@ async function communityFailures(page: Page, width: number): Promise<string[]> {
   const failures: string[] = [];
   for (const [path, title] of COMMUNITY_ROUTES) {
     if (path !== "/app") await openConsolePage(page, title);
-    await inspect(page, path, failures);
+    await inspect(page, path, failures, width > 900);
   }
   return failures;
 }

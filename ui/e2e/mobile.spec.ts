@@ -12,9 +12,11 @@
  * thing under test. Every page below is a public route, so no session is needed. The measurement
  * itself is in mobile-floor.ts, shared with the signed-in console's copy of this test.
  *
- * Two widths are not enough. Each component stylesheet has its own breakpoint — this nav becomes a
- * horizontal scroller at 760 and a column at 761 — so a floor that stops at 700 left 701-760 worse
- * than either side of it. The boundary widths below are measured for that reason.
+ * One width is not enough. Each component stylesheet has its own breakpoint, and the floors are not
+ * the only rules that move: the information pages' section nav becomes a horizontal scroller at
+ * 760px and a column at 761px, so a floor that stopped at 700px left 701-760 worse than either side
+ * of it — three of that nav's ten destinations were off the strip. The boundary widths below are
+ * measured for that reason.
  */
 import { expect, test, type Page } from "@playwright/test";
 import { floorReport } from "./mobile-floor";
