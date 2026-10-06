@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- The account lifecycle is exercised through the pages a person uses, with the deployment's own
+  mail: sign up on /signup, read the message the control plane actually wrote to its spool, open
+  the verification link, set a password, and sign in as the new account. The link exists only in
+  the spool, so the test cannot pass without delivery, and it corrected two of my own mistakes on
+  the way: it first visited /signup while carrying the suite's session — which the deployment
+  redirects away, correctly — and it treated the gateway's per-IP rate limit as a broken signup
+  rather than waiting it out.
 - Two defects a review found in the invitation path, both worth fixing before calling it done. The
   console's request bound is eight seconds and the mail transport's was ten, so a slow relay told the
   operator "the service did not answer in time" while the invitation had in fact been created and

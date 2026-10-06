@@ -257,6 +257,87 @@ test("an app is planned, deployed, rolled back and destroyed from the console", 
   await expect(page.getByText("Destroy recorded.")).toBeVisible({ timeout: 30_000 });
 });
 
+/* The whole account lifecycle through the rendered pages and the deployment's own mail: sign up,
+   read the message the control plane actually wrote, activate from its link, and sign in as the new
+   account. The activation link only exists in the spool, so this cannot pass without delivery. */
+test("a new account is created, activated from the email, and signed in", async ({
+  page,
+}) => {
+  const spool = process.env.CHRONOGRAPH_SWEEP_MAIL_SPOOL;
+  if (!spool) test.skip(true, "Set CHRONOGRAPH_SWEEP_MAIL_SPOOL to a deployment that spools mail.");
+  const email = unique("qa-signup") + "@example.com";
+  const password = "qa-signup-passphrase-2468";
+
+  // Signing up is for somebody who is not signed in: the deployment redirects a signed-in visitor
+  // away from /signup, which is correct and is why this test drops the suite's session first.
+  await page.context().clearCookies();
+  await page.goto(ORIGIN + "/signup");
+  // The form only renders once /managed/config has answered, and a deployment that has just been
+  // swept answers it slower than a human would notice.
+  await expect(page.getByLabel("Full name")).toBeVisible({ timeout: 45_000 });
+  await page.getByLabel("Full name").fill("QA Signup");
+  await page.getByLabel("Email address").fill(email);
+  // A single IP that has been driving a whole suite can be rate-limited for a minute; that is the
+  // limiter working, so wait it out rather than reporting a broken signup.
+  const notice = page.getByText(/Check your inbox/);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await page.getByRole("button", { name: "Continue with email" }).click();
+    const outcome = await Promise.race([
+      notice
+        .waitFor({ state: "visible", timeout: 25_000 })
+        .then(() => "sent")
+        .catch(() => ""),
+      page
+        .getByText(/too many attempts|rate/i)
+        .first()
+        .waitFor({ state: "visible", timeout: 25_000 })
+        .then(() => "limited")
+        .catch(() => ""),
+    ]);
+    if (outcome === "sent") break;
+    await page.waitForTimeout(30_000);
+  }
+  await expect(notice).toBeVisible({ timeout: 25_000 });
+
+  let link = "";
+  await expect
+    .poll(
+      async () => {
+        try {
+          const lines = (await readFile(spool as string, "utf8"))
+            .trim()
+            .split("\n")
+            .filter(Boolean);
+          const message = lines
+            .map((line) => JSON.parse(line))
+            .filter((entry) => entry.to === email)
+            .at(-1);
+          link = message?.text?.match(/https?:\/\/\S+/)?.[0] ?? "";
+        } catch {
+          link = "";
+        }
+        return link;
+      },
+      { timeout: 20_000 },
+    )
+    .not.toBe("");
+
+  await page.goto(link);
+  await page.getByLabel("New password").fill(password);
+  await page.getByLabel("Confirm password").fill(password);
+  await page.getByRole("button", { name: "Create password" }).click();
+
+  await page.goto(ORIGIN + "/login");
+  await page.getByLabel("Email address").fill(email);
+  await page.getByLabel("Password").fill(password);
+  await page.getByRole("button", { name: "Sign in" }).click();
+  // The sign-in form is gone: the account it was just created for is usable.
+  await expect(page.getByRole("heading", { name: "Sign in to ChronoDB." })).toHaveCount(
+    0,
+    { timeout: 30_000 },
+  );
+});
+
 /* The suites sign in through the provider's endpoint, which is not the path a person takes. This
    one uses the rendered form on a real deployment, because the failure this product actually had
    was a form that accepted a password and then bounced the reader back to itself. */
