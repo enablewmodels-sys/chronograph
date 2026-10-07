@@ -207,6 +207,14 @@ BrainVision derivative creation, forced restart, BrainFlow's synthetic board and
 LSL loopback timestamps. They do not establish physical-board compatibility,
 clinical suitability or real-subject model accuracy.
 
+The Managed deployment's own producer is exercised without hardware too. Run the control plane's
+suite with `cd launch/private/managed/control-plane && node --test test/*.test.mjs`.
+`test/bci-acquisition.test.mjs` drives the module against a stand-in project engine that enforces
+the connector contract's rules — the cursor sequence, the asset shapes, the timestamp arithmetic and
+the immutable-record checks — and asserts what it writes, that the deliberate acquisition pause costs
+a second of samples and leaves a hole in the index, that a refused request writes nothing, and that
+the largest board the catalogue ships still fits inside the asset upload limit.
+
 `PYTHONPATH=sdk/python python3 scripts/bci-soak.py` runs a real one-hour producer at
 64 channels × 1 kHz, simulates a ten-minute transport outage, checks all sample
 indices after draining, measures ingestion and window-read percentiles, then kills
