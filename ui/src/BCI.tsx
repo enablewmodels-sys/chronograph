@@ -44,7 +44,12 @@ import {
   type BrowserDecode,
 } from "./browser-decoder";
 import SiteFooter from "./SiteFooter";
-import { exportDataset, exportRecording, saveFile } from "./bci-export";
+import {
+  exportDataset,
+  exportRecording,
+  saveFile,
+  type ExportedDataset,
+} from "./bci-export";
 import {
   bciRecord,
   bciRecords,
@@ -205,6 +210,46 @@ function TracePanel({
         </>
       )}
     </section>
+  );
+}
+
+/**
+ * What a dataset download actually contains, including what it left out.
+ *
+ * WHY the exclusions are named: the file holds the epochs the baseline worker would train on, so a
+ * reader comparing its trial count with a recording's cue count needs to see the difference rather
+ * than guess at it.
+ */
+function datasetNote(file: ExportedDataset) {
+  const trials = file.sessions.reduce(
+    (total, session) => total + session.trials.length,
+    0,
+  );
+  const excluded = file.sessions.reduce(
+    (total, session) => total + session.excluded_over_span,
+    0,
+  );
+  const dropped = file.sessions.reduce(
+    (total, session) => total + session.dropped_beyond_read_budget,
+    0,
+  );
+  return (
+    "Downloaded " +
+    trials +
+    " trial(s) from " +
+    file.sessions.length +
+    " recording(s)" +
+    (excluded
+      ? ", after excluding " +
+        excluded +
+        " whose window crossed a gap or an artifact"
+      : "") +
+    (dropped
+      ? ". " +
+        dropped +
+        " cue(s) fall past the console's read budget, so the file stops before them; the SDK exporter reads the rest"
+      : "") +
+    "."
   );
 }
 
@@ -1469,6 +1514,10 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
         await new Promise((done) => setTimeout(done, 500));
         listed = await refresh();
       }
+      if (!listed.some((s) => `${s.instance}:${s.session}` === key))
+        setError(
+          "The recording was started, but the engine has not listed it yet. Refresh in a moment to follow it.",
+        );
       setSelection(key);
       setLive(true);
       setTab("Live");
@@ -1575,7 +1624,8 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
     void (async () => {
       for (const row of sessions) {
         if (row.instance !== current.instance) continue;
-        if (layouts[row.session]) continue;
+        const key = row.instance + ":" + row.session;
+        if (layouts[key]) continue;
         try {
           const d = await graph<BciDetail>("bci_session", {
             instance: row.instance,
@@ -1585,9 +1635,9 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
           if (!active || !fields) continue;
           setLayouts((old) => ({
             ...old,
-            [row.session]: {
+            [key]: {
               channels: fields.channels?.length || 0,
-              units: String(fields.units?.[0] || ""),
+              units: (fields.units || []).map(String).join(","),
               reference: String(fields.reference || ""),
               rate: Number(fields.sample_rate_hz || 0),
             },
@@ -1601,9 +1651,12 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
       active = false;
     };
   }, [tab, synthetic, current?.instance, sessions, layouts]);
-  const layoutOf = (session: string) => layouts[session];
+  // Keyed by instance and session: two recordings in one project can carry the same session
+  // number, and a layout attributed to the wrong one would let an impossible selection through.
+  const layoutOf = (instance: string, session: string) =>
+    layouts[instance + ":" + session];
   const chosenLayouts = chosen
-    .map((session) => layoutOf(session))
+    .map((session) => layoutOf(current?.instance || "", session))
     .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
   const layoutsDiffer =
     chosenLayouts.length > 1 &&
@@ -1721,9 +1774,15 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
         .then((d) => {
           if (active) {
             setDetail(d);
-            // Clamped: a recording shorter than the window would otherwise ask the engine for a
-            // window that starts before its own coverage.
-            const newest = Math.max(0, Number(d.last_us) - span * 1e6);
+            // Clamped to this recording's origin, not to zero: a live run is seeded with a few
+            // seconds behind "now", so the first poll of a short recording would otherwise ask for
+            // a window that starts before its first sample and draw a blank lead-in whose axis
+            // labels precede the recording. The engine answers such a window as asked, so the
+            // clamp has to happen here.
+            const newest = Math.max(
+              origin,
+              Number(d.last_us) - span * 1e6,
+            );
             setOffset(Math.max(0, (Number(d.last_us) - origin) / 1e6 - span));
             void loadWindow(newest);
           }
@@ -1790,12 +1849,6 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
       clearInterval(timer);
     };
   }, [tab, synthetic]);
-  // One request id per press, reused only for a double press of the same run: the queue's
-  // idempotency key exists to stop a double submit, not to answer a retry after a failure with
-  // the job that already failed, which is what an id keyed on the specification alone did.
-  const submission = useRef<{ id: string; spec: string; at: number } | null>(
-    null,
-  );
   async function queueJob() {
     if (!current || !jobDataset) return;
     setJobBusy(true);
@@ -1808,17 +1861,14 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
         datasetId: jobDataset,
         components: jobComponents,
       };
-      const spec = JSON.stringify(specification);
-      const withinDoublePress =
-        submission.current?.spec === spec &&
-        Date.now() - (submission.current?.at ?? 0) < 4000;
-      if (!withinDoublePress)
-        submission.current = { id: crypto.randomUUID(), spec, at: Date.now() };
+      // WHY one id per press and no reuse: the queue answers a repeated (project, requestId) with
+      // the row it already holds, whatever its state, so an id kept from a failed press made the
+      // second press return the failure instead of trying again. The button is disabled while this
+      // call is in flight, which is what actually stops a double submit.
       await managedApi("/managed/bci/jobs", {
-        requestId: submission.current!.id,
+        requestId: crypto.randomUUID(),
         specification,
       });
-      submission.current = null;
       setJobs(await managedApi<JobStatus>("/managed/bci/jobs"));
     } catch (e) {
       setError(String(e));
@@ -2028,17 +2078,7 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
         datasetName,
       );
       saveFile(file, `bci-dataset-${r.dst}.json`);
-      const trials = file.sessions.reduce(
-        (total, session) => total + session.trials.length,
-        0,
-      );
-      setExportNote(
-        "Downloaded " +
-          file.sessions.length +
-          " recording(s) and " +
-          trials +
-          " trial(s).",
-      );
+      setExportNote(datasetNote(file));
     } catch (e) {
       setExportError(String(e));
     } finally {
@@ -2433,7 +2473,7 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                       {exportScope === "recording" && exportNote && !exportBusy && (
                         <p className="bci-muted">{exportNote}</p>
                       )}
-                      {exportError && (
+                      {exportScope === "recording" && exportError && (
                         <p role="alert" className="bci-error">
                           {exportError}
                         </p>
@@ -2505,8 +2545,8 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                           {s.metadata.name}{" "}
                           <small>
                             {s.chunks} chunks
-                            {layoutOf(s.session)
-                              ? ` · ${layoutOf(s.session)!.channels} ch · ${layoutOf(s.session)!.rate} Hz · ${layoutOf(s.session)!.units}`
+                            {layoutOf(s.instance, s.session)
+                              ? ` · ${layoutOf(s.instance, s.session)!.channels} ch · ${layoutOf(s.instance, s.session)!.rate} Hz · ${layoutOf(s.instance, s.session)!.units}`
                               : ""}
                           </small>
                         </label>
@@ -2533,7 +2573,7 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                     {exportScope === "dataset" && exportNote && !exportError && (
                       <p className="bci-muted">{exportNote}</p>
                     )}
-                    {exportError && (
+                    {exportScope === "dataset" && exportError && (
                       <p role="alert" className="bci-error">
                         {exportError}
                       </p>
@@ -2558,17 +2598,7 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                                   String(d.record.fields.name || "dataset"),
                                 );
                                 saveFile(file, `dataset-${d.record.dst}.json`);
-                                setExportNote(
-                                  "Downloaded " +
-                                    file.sessions.reduce(
-                                      (total, session) =>
-                                        total + session.trials.length,
-                                      0,
-                                    ) +
-                                    " trial(s) from " +
-                                    file.sessions.length +
-                                    " recording(s).",
-                                );
+                                setExportNote(datasetNote(file));
                               } catch (error) {
                                 setExportError(
                                   error instanceof Error

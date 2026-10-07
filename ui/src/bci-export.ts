@@ -71,7 +71,9 @@ const MAX_CHUNKS = 600;
  * selecting two recordings actually saw. The export therefore paces itself below the limit and
  * waits out a refusal instead of failing, and stops at a budget it can state.
  */
-const REQUEST_INTERVAL_MS = 380;
+// 500 ms is 120 requests a minute: below the console's 180 a minute for project reads with room
+// for the page's own polls, which share the same bucket.
+const REQUEST_INTERVAL_MS = 500;
 const MAX_REQUESTS = 1400;
 const MAX_RETRIES = 8;
 
@@ -327,6 +329,10 @@ export interface ExportedDatasetSession {
   sha256: string;
   events: Record<string, unknown>[];
   trials: ExportedTrial[];
+  /** Cues whose trial the console did not read: this recording is longer than one export. */
+  dropped_beyond_read_budget: number;
+  /** Cues whose window crossed a gap or an artifact, which the baseline worker also excludes. */
+  excluded_over_span: number;
 }
 
 export interface ExportedDataset {
@@ -335,6 +341,8 @@ export interface ExportedDataset {
   name: string;
   manifest: object;
   sessions: ExportedDatasetSession[];
+  /** True when at least one recording is longer than a single console export reads. */
+  truncated: boolean;
   note: string;
 }
 
@@ -366,6 +374,7 @@ export async function exportDataset(
   const start = manifest.preprocessing?.epoch_start_s ?? 0.5;
   const end = manifest.preprocessing?.epoch_end_s ?? 2.5;
   const sessions: ExportedDatasetSession[] = [];
+  let readTruncated = false;
   for (const snapshot of manifest.source_snapshots) {
     const detail = await limited(() =>
       graph<BciDetail>("bci_session", {
@@ -374,6 +383,7 @@ export async function exportDataset(
       }),
     );
     const recording = await exportRecording(instance, snapshot.session, detail);
+    if (recording.truncated) readTruncated = true;
     const stream =
       recording.streams.find((entry) => entry.stream_id === manifest.stream) ??
       recording.streams[0];
@@ -384,20 +394,56 @@ export async function exportDataset(
     const cues = recording.events.filter(
       (event) => event.category === category,
     );
+    // WHY these spans are honoured here as well: the baseline worker drops a trial whose window
+    // crosses a gap or an artifact, and the deliberate pause every recording starts with is one of
+    // them. A file that kept those trials would disagree with the run the same manifest produced.
+    const blocked = [
+      ...recording.gaps,
+      ...recording.events.filter(
+        (event) =>
+          event.category === "artifact" || event.category === "bad_channel",
+      ),
+    ].map((span) => [
+      Number(span.timestamp_us),
+      Number(span.end_us ?? span.timestamp_us),
+    ]);
     const trials: ExportedTrial[] = [];
+    let beyondBudget = 0;
+    let overSpan = 0;
     for (const cue of cues) {
       const onset = Number(cue.timestamp_us);
       const from = onset + start * 1e6;
       const to = onset + end * 1e6;
+      if (blocked.some(([spanFrom, spanTo]) => from < spanTo && to > spanFrom)) {
+        overSpan += 1;
+        continue;
+      }
       const first = stream.timestamps_us.findIndex((time) => time >= from);
-      if (first < 0) continue;
+      // A cue with no sample at or after its window is one the read budget cut off, not a trial
+      // the recording lacks, and it must not vanish from the count without a word.
+      if (first < 0) {
+        beyondBudget += 1;
+        continue;
+      }
       const last = stream.timestamps_us.findIndex((time) => time >= to);
       const stop = last < 0 ? stream.timestamps_us.length : last;
-      if (stop - first < 2) continue;
+      if (stop - first < 2) {
+        beyondBudget += 1;
+        continue;
+      }
+      const samples = stream.samples.map((channel) =>
+        channel.slice(first, stop),
+      );
+      // The recipe refuses a trial holding a sample the engine stored as not-a-number, so the file
+      // must not offer one as if it were usable.
+      if (samples.some((channel) => channel.some((value) => value === null))) {
+        beyondBudget += 1;
+        continue;
+      }
       trials.push({
         label: String(cue.label || ""),
         onset_us: onset,
-        samples: stream.samples.map((channel) => channel.slice(first, stop)),
+        samples,
       });
     }
     sessions.push({
@@ -410,18 +456,27 @@ export async function exportDataset(
       sha256: snapshot.sha256,
       events: recording.events,
       trials,
+      dropped_beyond_read_budget: beyondBudget,
+      excluded_over_span: overSpan,
     });
   }
+  // A recording longer than one export leaves cues the read never reached, and the recording
+  // export says so itself; both mean this file is not the whole dataset.
+  const truncated = sessions.some(
+    (entry) => entry.dropped_beyond_read_budget > 0,
+  );
   return {
     format: "chronograph-bci-dataset-v1",
     exported_at: new Date().toISOString(),
     name,
     manifest,
     sessions,
+    truncated: truncated || readTruncated,
     note:
       "Each trial holds the samples between the manifest's epoch_start_s and epoch_end_s after its " +
-      "cue, in the stream's own units. The manifest's source_snapshots are what make this dataset " +
-      "reproducible: they name the exact record each recording was frozen at.",
+      "cue, in the stream's own units. Trials whose window crosses a gap or an artifact are excluded " +
+      "here, as the baseline worker excludes them. The manifest's source_snapshots are what make " +
+      "this dataset reproducible: they name the exact record each recording was frozen at.",
   };
 }
 

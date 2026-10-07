@@ -9,6 +9,9 @@ import {
 // The catalogue's narrow-screen layout. The table stays the table above 720px; below it the
 // same rows become cards, and nothing here is a second rendering of the catalogue.
 import "./boards.css";
+// A hosted account is never asked to run a command, so the catalogue shows it the geometry it
+// gets from this deployment instead of a shell line it would have to install something to use.
+import { managedSite } from "./site";
 
 type Board = (typeof catalog.boards)[number];
 
@@ -227,14 +230,17 @@ export default function Boards({
             </button>
           )}
           <p className="small muted">
-            This deployment records the board's geometry itself, so nothing has to be
-            installed here. On a machine wired to the device, the same board runs as:
+            {managedSite
+              ? "This deployment records the board's geometry itself: choose this board, review the migration and the workspace writes the recording. Nothing is installed and no command is needed."
+              : "This deployment records the board's geometry itself, so nothing has to be installed here. On a machine wired to the device, the same board runs as:"}
           </p>
           {/* The command is the widest unbreakable line in the panel. It scrolls inside this
               container at narrow widths, so the page never does. */}
-          <div className="board-command-scroll">
-            <pre className="board-command">{command}</pre>
-          </div>
+          {!managedSite && (
+            <div className="board-command-scroll">
+              <pre className="board-command">{command}</pre>
+            </div>
+          )}
         </div>
       )}
 

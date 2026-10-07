@@ -51,8 +51,11 @@
   any, so the download was a recipe a person could not run; freezing a dataset now cuts the epochs the
   manifest names (0.5–2.5 s after each cue, in the stream's own units, not-a-number samples preserved
   as null) and downloads those, and a dataset that already exists downloads the same way. Both exports
-  are bounded — 2,000,000 samples per channel, 48 MiB, 4,000 chunks — and mark themselves `truncated`
-  when they stop rather than quietly returning part of a recording.
+  are bounded — 2,000,000 samples per channel, 48 MiB and 600 chunks — and mark themselves `truncated`
+  when they stop rather than quietly returning part of a recording. A dataset export also applies the
+  exclusions the baseline worker applies (a window crossing a gap or an artifact is dropped, as is a
+  trial holding a sample the engine stored as not-a-number) and counts every cue it could not read, so
+  the file's trial count is one a reader can reconcile with the run.
 - A run or a dataset answers for itself. A "Trace" button walks the chain a record came from — run →
   dataset → the recordings in its frozen `source_snapshots`, with each recording's chunk count and the
   hash it was frozen at — and "Export trace" writes that chain as a file. Nothing traces while nobody
