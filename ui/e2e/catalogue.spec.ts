@@ -1,9 +1,10 @@
 // The catalogue is only useful if every board in it can actually be picked.
 //
-// BrainFlow ships 64 boards and documents 18 vendors; 28 boards carry the placeholder
-// vendor "undocumented". Grouping by the documentation map hid exactly those boards in
-// the source picker — the defect this file pins — so the test walks the real widget in a
-// real console and compares what a person can choose with the catalogue file.
+// BrainFlow ships 64 boards. The catalogue used to place any board the hand-written vendor map
+// omitted under the placeholder vendor "undocumented" — 28 of them — which hid those boards in
+// the source picker, the defect this file pins. Every board now carries the vendor its
+// controller belongs to, so the test walks the real widget in a real console and compares what
+// a person can choose with the catalogue file, and asserts the placeholder group is gone.
 import { test, expect, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";

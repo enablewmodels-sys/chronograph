@@ -67,12 +67,15 @@ for preset in presets(38):     # Muse 2 and its presets, each described separate
 BrainFlow documents these vendor groups. Names are BrainFlow device names; the ID is the
 `BoardIds` member in your installed library.
 
-Vendor labels come from `VENDORS` in `brainflow_catalog.py`, which records the device-to-vendor
-edges BrainFlow names explicitly. A board the installed library defines that this table does not
-name carries `vendor == "undocumented"` and appears in `catalog()["undocumented_boards"]` - today
-29 members, including the Wi-Fi and BLED variants, Ant Neuro EE-211 to EE-225/411/430/511,
-Mentalab Explore Plus, AAVAA, NTL, Synchroni, OB3000/5000 and `NO_BOARD`. Those boards are still
-described correctly; only the vendor label is unset. Add a label here if you need one.
+Vendor labels come from `VENDORS` in `brainflow_catalog.py`. Every member the installed library
+defines now belongs to one: the table names the 18 vendors BrainFlow documents on its Supported
+Boards page, and the members that page never grouped - the Wi-Fi and BLED variants, Ant Neuro
+EE-211 to EE-225/411/430/511, Mentalab Explore Plus, AAVAA, NTL, Synchroni and the OB3000/5000 -
+are placed by the driver's own board factory, which constructs each of them from a controller class
+inside a vendor source directory. A board the table omits would carry `vendor == "undocumented"`
+and appear in `catalog()["undocumented_boards"]`; that set is empty today, and
+`scripts/bci-formats-test.py` fails if a driver upgrade adds a member nobody has attributed. Add a
+label there when it does.
 
 | Vendor | Devices |
 | --- | --- |

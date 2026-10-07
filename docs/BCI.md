@@ -44,6 +44,13 @@ pip install './sdk/python[bci]'
 export CHRONOGRAPH_URL=http://127.0.0.1:8080
 ```
 
+On the Managed deployment nothing has to be installed to get a recording. **Connect
+recording** in the console previews and applies the contract, and the deployment then writes
+a simulated BrainFlow recording into the project itself, in the board's own geometry, with
+cue-locked trials and one deliberate acquisition pause. Everything below — the SDK, the CLI
+and the spool — is what you use to record from your own hardware, to run a decoder, or to
+work against a Community checkout.
+
 For Managed set `CHRONOGRAPH_URL=https://chronodb.co`. Create a scoped project key
 in **Access**. Save it in a private local file (mode 0600) and supply `--token-file`.
 Use an **admin** key to create a binding; use **ingest** for recording and **read**
