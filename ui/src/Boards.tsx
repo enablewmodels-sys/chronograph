@@ -6,6 +6,9 @@ import {
   BCI_VENDORS,
   vendorLabel,
 } from "./bci-vendors";
+// The catalogue's narrow-screen layout. The table stays the table above 720px; below it the
+// same rows become cards, and nothing here is a second rendering of the catalogue.
+import "./boards.css";
 
 type Board = (typeof catalog.boards)[number];
 
@@ -87,7 +90,7 @@ export default function Boards({
     : "";
 
   return (
-    <section className="bci-panel bci-boards">
+    <section className="bci-panel bci-boards board-catalogue">
       <div className="board-summary">
         <div>
           <h2>Device catalogue</h2>
@@ -146,19 +149,22 @@ export default function Boards({
         <tbody>
           {shown.map((entry) => (
             <tr key={entry.name}>
-              <td>{vendorLabel(entry.vendor)}</td>
-              <td>
+              {/* The rows carry the column names as values as well as the header cells above
+                  them: below 720px the table stacks into cards and the header row goes away,
+                  so each cell's own label is what a card shows. One row, read two ways. */}
+              <td data-label="Vendor">{vendorLabel(entry.vendor)}</td>
+              <td className="board-card-head">
                 <strong>{entry.device ?? entry.name}</strong>
                 <span className="small muted">
                   {" "}
                   {entry.name} · #{entry.id}
                 </span>
               </td>
-              <td>{modality(entry)}</td>
-              <td>{entry.rate ? entry.rate + " Hz" : "—"}</td>
-              <td>{entry.channels || "—"}</td>
-              <td>{entry.presets.length}</td>
-              <td>
+              <td data-label="Signal">{modality(entry)}</td>
+              <td data-label="Rate">{entry.rate ? entry.rate + " Hz" : "—"}</td>
+              <td data-label="Channels">{entry.channels || "—"}</td>
+              <td data-label="Presets">{entry.presets.length}</td>
+              <td className="board-card-use">
                 <button
                   className="text-link"
                   onClick={() => {
@@ -173,7 +179,7 @@ export default function Boards({
             </tr>
           ))}
           {!shown.length && (
-            <tr>
+            <tr className="board-empty-row">
               <td colSpan={7} className="small muted">
                 No board matches that search.
               </td>
@@ -202,7 +208,7 @@ export default function Boards({
               </select>
             </label>
           )}
-          <p className="small muted">
+          <p className="small muted board-channels">
             {rows} rows at {chosen?.rate ?? board.rate ?? "unknown"} Hz,{" "}
             {modality(board)}. {board.channel_names.length} channel names:{" "}
             {board.channel_names.length
@@ -224,7 +230,11 @@ export default function Boards({
             This deployment records the board's geometry itself, so nothing has to be
             installed here. On a machine wired to the device, the same board runs as:
           </p>
-          <pre className="board-command">{command}</pre>
+          {/* The command is the widest unbreakable line in the panel. It scrolls inside this
+              container at narrow widths, so the page never does. */}
+          <div className="board-command-scroll">
+            <pre className="board-command">{command}</pre>
+          </div>
         </div>
       )}
 

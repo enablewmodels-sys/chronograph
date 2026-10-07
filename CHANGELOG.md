@@ -2,6 +2,91 @@
 
 ## Unreleased
 
+- The managed deployment now trains the decoder itself. "Queue CPU run" answered a hosted account with
+  `pip install` and a `chronograph-bci train` line, so the one number the workspace exists to produce
+  required a Python environment on somebody else's machine. A new control-plane module
+  (`launch/private/managed/control-plane/bci-training.mjs`) runs the same csp-lda-v1 recipe inside the
+  account service: it reads the frozen dataset record with the project's read credential, re-derives
+  the manifest and refuses a dataset whose frozen snapshots no longer match, pages each recording's
+  assets, band-passes them with two biquads applied forward and backward, cuts the cue-locked epochs
+  the manifest names (dropping windows that cross a gap or an artifact), fits CSP by whitening and a
+  symmetric eigendecomposition, fits a Ledoit-Wolf shrinkage LDA in closed form, splits by recording,
+  and publishes the same `run` record the local CLI publishes — including the `result` field the Runs
+  table reads. Every bound is explicit and checked before the allocation it guards (64 channels, four
+  million decoded values per recording, 4096 trials, 128 MiB read, a ten-minute deadline with a
+  fifteen-second heartbeat inside the queue's lease). Verified on the live deployment: a dataset of
+  three 8-channel recordings produced "CSP + LDA on 2 training recordings and 1 held out: 18
+  evaluation trials, balanced accuracy 100.0%", and the Runs table shows the figure beside the run the
+  deployment published. The local worker remains for anyone who wants it.
+- Two defects the live deployment found in that trainer, both fixed with a test that fails against the
+  old code. Its asset reader compared a hash of the raw bytes against the digest the engine stores,
+  and the engine's digest covers the whole asset frame — its metadata and then its bytes — so every
+  run failed with "A recording asset does not match its recorded digest"; the reader now checks what
+  it can actually prove (one digest across every page, and pages that add up to the tensor the
+  asset's own metadata declares), and the test's stand-in engine computes the frame digest the real
+  engine computes, which is the mistake that hid it. Pressing "Queue CPU run" twice also did nothing
+  the second time: the console reused one idempotency key for as long as the specification was
+  unchanged, so a retry after a failure was answered with the job that had already failed. The key is
+  now per press, reused only inside a double-press window.
+- A recording's layout is visible before it is frozen, and the console stops a selection that cannot
+  train. The Datasets tab listed six recordings under one identical name with no way to tell which
+  could be combined; each row now shows its chunk count, channel count, sample rate and unit, and a
+  selection that mixes layouts is refused with the layouts named rather than by the worker's answer
+  minutes later. The same list is why every recording the deployment writes now carries a name of its
+  own — the board and the local time it was recorded — instead of the six identical rows this started
+  from.
+- Taking a large recording out of a hosted workspace no longer fails on the deployment's own rate
+  limit. Every chunk is two asset reads, so a nine-hundred-chunk recording costs about two thousand
+  requests against the console's 180 a minute for project reads, and the export was refused partway
+  through with "Too many attempts". The browser exporter now paces itself under that limit, waits out
+  a refusal instead of reporting it, and bounds itself to the number of chunks it can finish (600,
+  with the file marked `truncated` and the SDK exporter named for the rest).
+
+- A hosted BCI account is never asked to run a command, and the console now does the work itself. The
+  Sessions tab answered "how do I get my data out" with a `chronograph-bci export` line; it reads the
+  recording out of the engine in the browser instead — the stored samples in each stream's own units
+  with the acquisition time of every sample, annotations and the deliberate gap as separate records —
+  and hands back a file. The SDK exporter is still named for MNE, BIDS and recordings larger than the
+  tab will assemble. The Datasets tab downloaded a manifest that described trials without carrying
+  any, so the download was a recipe a person could not run; freezing a dataset now cuts the epochs the
+  manifest names (0.5–2.5 s after each cue, in the stream's own units, not-a-number samples preserved
+  as null) and downloads those, and a dataset that already exists downloads the same way. Both exports
+  are bounded — 2,000,000 samples per channel, 48 MiB, 4,000 chunks — and mark themselves `truncated`
+  when they stop rather than quietly returning part of a recording.
+- A run or a dataset answers for itself. A "Trace" button walks the chain a record came from — run →
+  dataset → the recordings in its frozen `source_snapshots`, with each recording's chunk count and the
+  hash it was frozen at — and "Export trace" writes that chain as a file. Nothing traces while nobody
+  asks: the chain costs extra reads, and a reader who wants to defend a number presses the button.
+- The picker's own catalogue is now what the producer accepts. `bci-acquisition.mjs` refused any board
+  below 80 Hz, so EmotiBit at 25 Hz and the AAVAA V3 at 50 Hz — both boards the console offers — failed
+  with a rate error after the person had configured them; the floor is 1 Hz. The preset ceiling was 2,
+  which refuses a preset index BrainFlow adds in a later release even though the console prints each
+  board's own preset list; it is 31 now. `test/bci-acquisition.test.mjs` starts a recording on every
+  board in the shipped catalogue at that board's own rate, preset and channel count, each on its own
+  instance, and a preset index above today's catalogue is asserted to start. The accepted preset is
+  echoed with the run and recorded in the session's driver string, so two recordings of one board can
+  be told apart by the layout each one used.
+- "Live recording started" used to be the whole story, and it was not true enough. The workspace asked
+  the deployment for a live recording and then stayed on whichever session was selected, so the panel
+  reported a running recording while the waveform showed the previous one; a new recording now selects
+  itself — waiting briefly for the engine to list it, because a session appears as its first records
+  land — opens the Live view and closes the setup form. Following a live recording also read the offset
+  from before it moved, so the window trailed the newest samples by one span. One status line now says
+  what is drawn and what the recording holds: the window, its points, whether it follows the newest
+  samples, the chunk and record counts, and any sample the engine stored as not-a-number.
+- The BCI workspace asks for less before it records anything. In a hosted workspace the instance name,
+  the clock domain and the original reference moved behind an "Advanced" disclosure: a new user needs
+  the board, its sample rate and its channels, and the other three only matter when a recording is
+  merged with an existing one. The Runs tab no longer prints a `chronograph-bci train` command to a
+  hosted account at all — the deployment trains on its own CPU and the tab queues the run — and its
+  chip reports the deployment's own answer instead of a capability.
+- The device catalogue is usable on a narrow screen, which is the width the console is actually read
+  at. Below 720px the same table rows become cards: each cell carries its own column name, the board
+  leads the card, and the "Use" control spans it, while the long command line scrolls inside its own
+  container instead of pushing the page sideways. Above 720px the table, its header row and its
+  columns are exactly what they were. `ui/src/boards.css` holds the query and it is written against
+  `.bci-boards.board-catalogue`, so it wins over `bci.css` whatever order the two land in.
+
 - The BCI workspace now records for a hosted account instead of asking it to install one. "Connect a
   recording" ended by printing a pip command and a `chronograph-bci` line, so a hosted account had to
   install the SDK and run a producer on its own machine before a single session existed — and a

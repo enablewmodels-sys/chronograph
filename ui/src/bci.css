@@ -806,3 +806,60 @@
   flex-basis: 100%;
 }
 
+
+/* Advanced setup fields stay reachable but out of the first read. A new user needs the
+   board, its sample rate and its channels; the instance name, clock domain and reference
+   only matter when a recording is merged with an existing one. */
+.bci-advanced {
+  margin: 12px 0 4px;
+  border: 1px solid var(--bci-line, #2a2f3a);
+  border-radius: 10px;
+  padding: 0 12px;
+}
+.bci-advanced > summary {
+  cursor: pointer;
+  padding: 10px 0;
+  font-size: 12px !important;
+  color: var(--bci-muted);
+}
+.bci-advanced[open] > summary {
+  border-bottom: 1px solid var(--bci-line, #2a2f3a);
+  margin-bottom: 12px;
+}
+.bci-advanced .bci-fields {
+  padding-bottom: 12px;
+}
+/* The provenance trace is a reading aid, not a dashboard: a numbered chain, the raw
+   document behind a disclosure, and two buttons. */
+.bci-trace-steps {
+  margin: 10px 0 0;
+  padding-left: 22px;
+  font-size: 12px !important;
+  line-height: 1.8;
+}
+.bci-trace-steps li {
+  margin-bottom: 2px;
+}
+.bci-trace-steps strong {
+  color: var(--bci-accent, #7cc7ff);
+  margin-right: 4px;
+}
+.bci-trace-json {
+  margin: 0;
+  font-size: 11px !important;
+  line-height: 1.5;
+  max-height: 320px;
+  overflow: auto;
+}
+.bci-trace details > summary {
+  cursor: pointer;
+  font-size: 12px !important;
+  color: var(--bci-muted);
+  margin-top: 8px;
+}
+
+/* The window's own status line: what is drawn, and whether it follows the recording. */
+.bci-window-status {
+  margin: 0 0 10px;
+  font-size: 11px !important;
+}

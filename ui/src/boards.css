@@ -1,0 +1,169 @@
+/*
+ * The device catalogue when the panel is narrow.
+ *
+ * WHY this file exists: the catalogue is a seven-column table, and this product is read in a
+ * sidebar that is about 520px wide. Measured there, the columns cannot be read together —
+ * vendor, signal, rate, channels and presets are squeezed or cut off, and the table stops
+ * being a comparison and becomes a horizontal scroll with no sign that it scrolls. The panel
+ * is therefore *one* rendering with *one* breakpoint: below 720px the very same rows are
+ * stacked as cards. There is deliberately no second component, because a second component is
+ * where the two surfaces start to disagree about what the catalogue contains, and a
+ * catalogue that disagrees with itself is worse than a narrow one.
+ *
+ * WHY 720px: this is about one table's columns, not about the page's grids, so it is not the
+ * 700px layout query in mobile.css and not the 900px type/touch floor. 720 is where the table
+ * itself runs out: the uppercase header row plus a board name, a device name, a signal name
+ * and six cells no longer fit a line at a readable size. The panel is 520px here, so the card
+ * list is what a person actually sees in the sidebar; a 1440px window never reaches this file.
+ *
+ * WHY the overrides are written as `.bci-boards.board-catalogue`: bci.css is imported by
+ * BCI.tsx after this file's importer, so on an equal-specificity tie bci.css wins. Two classes
+ * beat its `.bci-boards table` outright and the result does not depend on bundle order.
+ *
+ * The floors in mobile.css are kept, not fought: every label is 12px, every sentence is 14px,
+ * the Use control is at least 40px tall, and nothing here scrolls the page sideways.
+ */
+
+/* The command line is the widest unbreakable thing in the panel, so it gets a container that
+   is allowed to scroll. This rule is outside the query on purpose: it costs nothing at any
+   width, and the shell still prints one line because `pre` does not wrap. */
+.board-command-scroll {
+  max-width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  /* 1. The table stops being a table. `display: block` at the three levels is what lets one
+        row be one card; the cells below take their own layout back. `min-width: 0` undoes
+        every width that would otherwise be honoured as a table's. */
+  .bci-boards.board-catalogue table,
+  .bci-boards.board-catalogue thead,
+  .bci-boards.board-catalogue tbody,
+  .bci-boards.board-catalogue tr,
+  .bci-boards.board-catalogue th,
+  .bci-boards.board-catalogue td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+  /* The header row is dropped rather than stacked. Every value in a card carries its own
+     label, so the seven column names would only repeat them, and a reader scrolling a card
+     list should not have to hold seven headings in mind to read one card. */
+  .bci-boards.board-catalogue thead {
+    display: none;
+  }
+  .bci-boards.board-catalogue tbody {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  /* One board, one card. */
+  .bci-boards.board-catalogue tbody tr {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px;
+    border: 1px solid var(--line, #2a3550);
+    border-radius: 10px;
+    background: var(--surface, #0f1524);
+  }
+  /* A labelled row: the label comes from the markup's `data-label`, the value sits beside
+     it. A grid keeps every label in the same column, so two cards can be read down the page
+     rather than re-found in each card. */
+  .bci-boards.board-catalogue tbody td {
+    display: grid;
+    grid-template-columns: minmax(0, 5.5rem) minmax(0, 1fr);
+    gap: 2px 10px;
+    align-items: baseline;
+    padding: 0;
+    border: 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .bci-boards.board-catalogue tbody td::before {
+    content: attr(data-label);
+    color: var(--muted, #8b96ad);
+    /* The 12px floor from mobile.css, declared here so this file is readable on its own. */
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+  /* The board leads the card, so it is not one more labelled row: no label, the device in the
+     reading size, and the catalogue name and id under it. `order` is what moves it to the
+     top — the markup keeps the table's column order, so the two surfaces cannot disagree. */
+  .bci-boards.board-catalogue tbody td.board-card-head {
+    order: -1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line, #2a3550);
+  }
+  .bci-boards.board-catalogue tbody td.board-card-head::before {
+    content: none;
+  }
+  .bci-boards.board-catalogue tbody td.board-card-head strong {
+    font-size: 15px;
+    line-height: 1.35;
+  }
+  /* The use action is the card's control, so it spans the card. Its height is left alone:
+     `.bci-workspace button` already makes it 42px and the 40px floor in mobile.css enforces
+     the minimum, and a rule here would only fight one of the two. */
+  .bci-boards.board-catalogue tbody td.board-card-use {
+    display: block;
+    padding-top: 2px;
+  }
+  .bci-boards.board-catalogue tbody td.board-card-use::before {
+    content: none;
+  }
+  .bci-boards.board-catalogue tbody td.board-card-use button {
+    width: 100%;
+    justify-content: center;
+  }
+  /* No result is one sentence, not a board, so it is not drawn as a card. */
+  .bci-boards.board-catalogue tbody tr.board-empty-row {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .bci-boards.board-catalogue tbody tr.board-empty-row td {
+    display: block;
+  }
+  .bci-boards.board-catalogue tbody tr.board-empty-row td::before {
+    content: none;
+  }
+
+  /* 2. The filters take one column, each control full width, the label above it. bci.css gives
+        both controls a 220px minimum and this panel is about 472px inside its padding, so two
+        of them cannot share a line; a grid states that rather than leaving it to wrapping. */
+  .bci-boards.board-catalogue .board-filters {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    align-items: stretch;
+  }
+  .bci-boards.board-catalogue .board-filters label {
+    width: 100%;
+    min-width: 0;
+  }
+  .bci-boards.board-catalogue .board-filters input,
+  .bci-boards.board-catalogue .board-filters select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* 3. The selected board. A command line has no space to break at, so it scrolls inside its
+        own container instead of pushing the page sideways, and the channel-name preview is
+        prose that wraps. */
+  .board-catalogue .board-command-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .board-catalogue .board-command-scroll .board-command {
+    margin: 0;
+    overflow: visible;
+  }
+  .board-catalogue .board-channels {
+    overflow-wrap: anywhere;
+  }
+}

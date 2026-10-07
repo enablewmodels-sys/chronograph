@@ -217,6 +217,15 @@ Agent access must be scoped to the project and minimum necessary data.
 
 ## Export and data handling
 
+A hosted workspace needs no command line for this. The BCI workspace assembles the stored
+samples in the browser: **Download this recording** on the Sessions tab writes every stream's
+samples in its own units with the acquisition time of each sample, and **Download dataset** on
+the Datasets tab cuts the epochs the frozen manifest names. The console export is bounded —
+2,000,000 samples per channel, 48 MiB and 4,000 chunks — and marks the file `truncated` when it
+stops early. A run or a dataset also answers for itself: **Trace** walks the chain back to the
+frozen recordings and **Export trace** writes that chain as a file. The commands below are for
+larger recordings, MNE/BIDS derivatives and automation.
+
 ```sh
 chronograph-bci export --token-file ./read.token --session 101 \
   --stream eeg --output ./exact-recording

@@ -44,6 +44,7 @@ import {
   type BrowserDecode,
 } from "./browser-decoder";
 import SiteFooter from "./SiteFooter";
+import { exportDataset, exportRecording, saveFile } from "./bci-export";
 import {
   bciRecord,
   bciRecords,
@@ -60,6 +61,152 @@ import {
 import "./bci.css";
 
 const shell = (value: string) => "'" + value.replaceAll("'", "'\\''") + "'";
+
+/**
+ * One recorded provenance chain: a decoder run, the dataset it was frozen against, and the
+ * recordings inside that dataset. The console never builds this on its own. A reader asks for
+ * the trace of one row, reads it, and exports it when the number has to be defended later.
+ */
+interface BciTraceRecording {
+  session: string;
+  through_edge: string | null;
+  sha256: string | null;
+  chunks: number | null;
+  records: number | null;
+  last_us: string | null;
+  in_this_workspace: boolean;
+}
+interface BciTrace {
+  format: string;
+  generated_utc: string;
+  instance: string;
+  workspace_session: string;
+  root: {
+    kind: string;
+    id: string;
+    name: string;
+    recipe: string | null;
+    clock_domain: string | null;
+    recorded_us: string | null;
+  };
+  dataset: {
+    id: string;
+    name: string | null;
+    stream: string | null;
+    epoch_start_s: number | null;
+    epoch_end_s: number | null;
+    present_here: boolean;
+  } | null;
+  recordings: BciTraceRecording[];
+  result: Record<string, unknown> | null;
+  note: string;
+}
+
+function TracePanel({
+  trace,
+  busy,
+  error,
+  onExport,
+  onClose,
+}: {
+  trace: BciTrace | null;
+  busy: boolean;
+  error: string;
+  onExport: () => void;
+  onClose: () => void;
+}) {
+  if (!trace && !busy && !error) return null;
+  return (
+    <section className="bci-panel bci-trace">
+      <div className="bci-section-title">
+        <h2>Provenance trace</h2>
+        <span className="bci-chip">
+          {busy ? "reading" : trace ? trace.root.kind : "no trace"}
+        </span>
+      </div>
+      {error && (
+        <p role="alert" className="bci-error">
+          {error}
+        </p>
+      )}
+      {trace && (
+        <>
+          <p>
+            {trace.root.kind === "run"
+              ? "This run used dataset "
+              : "This dataset froze "}
+            <code>{trace.dataset?.id || "unknown"}</code>
+            {trace.dataset
+              ? " (" + (trace.dataset.name || "unnamed") + ")"
+              : " — that record is not in this recording"}
+            {trace.dataset?.present_here === false
+              ? ", so only the identifier is known here"
+              : ""}
+            .
+          </p>
+          <ol className="bci-trace-steps">
+            {trace.root.kind === "run" && (
+              <li>
+                <strong>Run</strong> {trace.root.name} · recipe{" "}
+                {trace.root.recipe || "—"} · clock{" "}
+                {trace.root.clock_domain || "—"}
+              </li>
+            )}
+            <li>
+              <strong>Dataset</strong>{" "}
+              {trace.dataset
+                ? (trace.dataset.name || trace.dataset.id) +
+                  " · stream " +
+                  (trace.dataset.stream || "—") +
+                  (trace.dataset.epoch_start_s === null
+                    ? ""
+                    : " · epoch " +
+                      trace.dataset.epoch_start_s +
+                      "–" +
+                      trace.dataset.epoch_end_s +
+                      " s")
+                : "not available here"}
+            </li>
+            {trace.recordings.map((entry) => (
+              <li key={entry.session}>
+                <strong>Recording</strong> {entry.session}
+                {entry.chunks === null
+                  ? " · not in this recording"
+                  : " · " +
+                    entry.chunks +
+                    " chunks, " +
+                    entry.records +
+                    " records"}
+                {entry.through_edge ? " · frozen at edge " + entry.through_edge : ""}
+                {entry.sha256 ? " · sha256 " + entry.sha256.slice(0, 16) + "…" : ""}
+              </li>
+            ))}
+          </ol>
+          {trace.result && (
+            <p className="bci-muted">
+              Result: {JSON.stringify(trace.result)}
+            </p>
+          )}
+          <p className="bci-muted">{trace.note}</p>
+          <details>
+            <summary>Raw trace</summary>
+            <div className="bci-table-wrap">
+              <pre className="bci-trace-json">
+                {JSON.stringify(trace, null, 2)}
+              </pre>
+            </div>
+          </details>
+          <div className="bci-actions">
+            <button className="button primary" onClick={onExport}>
+              <Download size={16} /> Export trace
+            </button>
+            <button onClick={onClose}>Close trace</button>
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
 
 interface JobStatus {
   available: boolean;
@@ -603,6 +750,7 @@ function ManagedRecording({
   boardPreset,
   reference,
   onWrote,
+  onStarted,
 }: {
   instance: string;
   clockDomain: string;
@@ -613,6 +761,8 @@ function ManagedRecording({
   boardPreset: number;
   reference: string;
   onWrote: () => void;
+  /** Told the session a live run is writing, so the workspace can show it rather than guess. */
+  onStarted?: (instance: string, session: string) => void;
 }) {
   const action = useAction();
   const [status, setStatus] = useState<AcquisitionStatus | null>(null);
@@ -621,6 +771,31 @@ function ManagedRecording({
   );
   const [failure, setFailure] = useState("");
   const asked = useRef(false);
+  /**
+   * The name a person will read in the recording picker.
+   *
+   * WHY it carries the board and the moment: every recording this deployment writes used to be
+   * called "Simulated recording", so six of them were six identical rows and the picker could not
+   * be used to find anything. The board and the local time are both facts the deployment knows.
+   */
+  const recordingName = () => {
+    const device = boardById(boardId)?.name || "Board " + boardId;
+    const when = new Date();
+    const pad = (value: number) => String(value).padStart(2, "0");
+    return (
+      device +
+      " · " +
+      when.getFullYear() +
+      "-" +
+      pad(when.getMonth() + 1) +
+      "-" +
+      pad(when.getDate()) +
+      " " +
+      pad(when.getHours()) +
+      ":" +
+      pad(when.getMinutes())
+    ).slice(0, 120);
+  };
   const request = () => ({
     instance,
     clockDomain,
@@ -630,6 +805,7 @@ function ManagedRecording({
     preset: boardPreset,
     rate,
     reference,
+    name: recordingName(),
     channels: channels.map((channel) => ({
       name: channel.name,
       unit: channel.unit,
@@ -696,7 +872,9 @@ function ManagedRecording({
           disabled={action.busy}
           onClick={() =>
             void action.run(async () => {
-              await managedApi("/managed/bci/acquisition", {
+              const started = await managedApi<{
+                run?: { session?: string };
+              }>("/managed/bci/acquisition", {
                 action: "start",
                 ...request(),
                 seconds: 5,
@@ -704,6 +882,8 @@ function ManagedRecording({
               });
               await read();
               onWrote();
+              if (started?.run?.session)
+                onStarted?.(instance, String(started.run.session));
             }, "Live recording started.")
           }
         >
@@ -779,10 +959,12 @@ function ManagedRecording({
  */
 function Setup({
   onDone,
+  onStarted,
   initialBoard,
   initialPreset,
 }: {
   onDone: () => void;
+  onStarted?: (instance: string, session: string) => void;
   initialBoard?: number;
   initialPreset?: number;
 }) {
@@ -843,10 +1025,10 @@ function Setup({
       if (
         !/^[A-Za-z][A-Za-z0-9_]{0,47}$/.test(instance) ||
         !Number.isFinite(rate) ||
-        rate < 80 ||
+        rate < 1 ||
         rate > 100000
       )
-        throw Error("Use a valid instance name and sample rate (80–100000 Hz).");
+        throw Error("Use a valid instance name and sample rate (1–100000 Hz).");
       if (!channels.length || channels.length > 512)
         throw Error("Configure between 1 and 512 channels.");
       if (names.some((name) => !name.trim() || name.length > 128))
@@ -1005,45 +1187,10 @@ function Setup({
           </>
         )}
         <label>
-          Instance
-          <input
-            value={instance}
-            disabled={locked}
-            onChange={(e) => setInstance(e.target.value)}
-            pattern="[A-Za-z0-9_]+"
-            maxLength={48}
-          />
-        </label>
-        <label>
-          Clock
-          <select
-            value={clock}
-            disabled={locked}
-            onChange={(e) => setClock(e.target.value)}
-          >
-            {["unix_us", "simulation_us", "lsl_local_us", "device_us"].map(
-              (v) => (
-                <option key={v}>{v}</option>
-              ),
-            )}
-          </select>
-        </label>
-        {source !== "synthetic" && (
-          <label>
-            Original reference
-            <input
-              value={reference}
-              disabled={locked}
-              onChange={(e) => setReference(e.target.value)}
-              maxLength={128}
-            />
-          </label>
-        )}
-        <label>
           Sample rate
           <input
             type="number"
-            min={80}
+            min={1}
             max={100000}
             value={rate}
             disabled={locked}
@@ -1051,6 +1198,48 @@ function Setup({
           />
         </label>
       </div>
+      <details className="bci-advanced">
+        <summary>
+          Advanced · instance name, clock and original reference
+        </summary>
+        <div className="bci-fields">
+          <label>
+            Instance
+            <input
+              value={instance}
+              disabled={locked}
+              onChange={(e) => setInstance(e.target.value)}
+              pattern="[A-Za-z0-9_]+"
+              maxLength={48}
+            />
+          </label>
+          <label>
+            Clock
+            <select
+              value={clock}
+              disabled={locked}
+              onChange={(e) => setClock(e.target.value)}
+            >
+              {["unix_us", "simulation_us", "lsl_local_us", "device_us"].map(
+                (v) => (
+                  <option key={v}>{v}</option>
+                ),
+              )}
+            </select>
+          </label>
+          {source !== "synthetic" && (
+            <label>
+              Original reference
+              <input
+                value={reference}
+                disabled={locked}
+                onChange={(e) => setReference(e.target.value)}
+                maxLength={128}
+              />
+            </label>
+          )}
+        </div>
+      </details>
       <ChannelEditor
         channels={channels}
         onChange={setChannels}
@@ -1095,6 +1284,7 @@ function Setup({
             boardPreset={boardPreset}
             reference={reference}
             onWrote={onDone}
+            onStarted={onStarted}
           />
         ) : (
           <>
@@ -1147,11 +1337,23 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
     [datasets, setDatasets] = useState<BciRow[]>([]),
     [runs, setRuns] = useState<BciRow[]>([]),
     [chosen, setChosen] = useState<string[]>([]),
+    // The stream contract of every recording, so the Datasets tab can say which recordings can be
+    // frozen together. WHY it matters: a run refuses recordings that disagree about channels,
+    // units, reference or rate, and the session list alone does not show any of that.
+    [layouts, setLayouts] = useState<
+      Record<string, { channels: number; units: string; reference: string; rate: number }>
+    >({}),
     [datasetName, setDatasetName] = useState("EEG experiment"),
     [jobs, setJobs] = useState<JobStatus | null>(null),
     [jobDataset, setJobDataset] = useState(""),
     [jobComponents, setJobComponents] = useState(4),
     [jobBusy, setJobBusy] = useState(false),
+    // One note serves two exports, so each one records which flow wrote it and is only shown
+    // where that flow lives.
+    [exportScope, setExportScope] = useState<"recording" | "dataset">("recording"),
+    [trace, setTrace] = useState<BciTrace | null>(null),
+    [traceBusy, setTraceBusy] = useState(false),
+    [traceError, setTraceError] = useState(""),
     // The board a person picked in the catalogue, carried into the setup form so "Use"
     // there configures a recording instead of only highlighting a row.
     [setupBoard, setSetupBoard] = useState<{
@@ -1162,9 +1364,15 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
   const current = sessions.find(
     (s) => `${s.instance}:${s.session}` === selection,
   );
+  // Counted from the queue itself rather than from a status field, so the chip says what the
+  // deployment actually holds whatever the control plane reports alongside it.
+  const queuedJobs =
+    jobs?.jobs.filter((job) => ["queued", "running"].includes(job.state))
+      .length ?? 0;
   const selected = current?.session || "";
-  const refresh = useCallback(async () => {
-    if (synthetic) return;
+  /** Read the session list, and hand it back so a caller can wait for a specific one. */
+  const refresh = useCallback(async (): Promise<BciSession[]> => {
+    if (synthetic) return [];
     setLoading(true);
     try {
       const r = await graph<{ sessions: BciSession[] }>("bci_sessions", {
@@ -1178,8 +1386,10 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
             ? `${r.sessions[0].instance}:${r.sessions[0].session}`
             : "",
       );
+      return r.sessions;
     } catch (e) {
       setError(String(e));
+      return [];
     } finally {
       setLoading(false);
     }
@@ -1198,6 +1408,9 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
    */
   const [producers, setProducers] = useState<AcquisitionStatus["running"]>([]);
   const [producerBusy, setProducerBusy] = useState(false);
+  const [exportBusy, setExportBusy] = useState(false);
+  const [exportNote, setExportNote] = useState("");
+  const [exportError, setExportError] = useState("");
   const producerAction = useAction();
   const loadProducers = useCallback(async () => {
     if (!managedSite || synthetic) return;
@@ -1233,6 +1446,37 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
         setProducerBusy(false);
       }
     }, "Recording stopped.");
+  /**
+   * Show the recording a live run has just started.
+   *
+   * WHY this is not left to the reader: a new session is not "selected" by itself, so the workspace
+   * kept showing the previous recording while the panel reported that a live one had begun, which
+   * reads exactly like a feature that does not work. This selects the new session, opens the Live
+   * view and closes the setup form, so the samples appear where the person is looking.
+   */
+  const focusRun = useCallback(
+    async (instance: string, session: string) => {
+      const key = instance + ":" + session;
+      // The engine lists a session as its first records land, so a recording that has just been
+      // asked for can be missing from the very next read. Wait for it briefly instead of
+      // selecting an identifier the list does not hold yet.
+      let listed = await refresh();
+      for (
+        let attempt = 0;
+        attempt < 6 && !listed.some((s) => `${s.instance}:${s.session}` === key);
+        attempt += 1
+      ) {
+        await new Promise((done) => setTimeout(done, 500));
+        listed = await refresh();
+      }
+      setSelection(key);
+      setLive(true);
+      setTab("Live");
+      setPlaying(false);
+      setSetup(false);
+    },
+    [refresh],
+  );
   const askedForRecording = useRef(false);
   useEffect(() => {
     if (!managedSite || synthetic || setup || loading || sessions.length) return;
@@ -1324,6 +1568,52 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
     setDatasets([]);
     setRuns([]);
   }, [current?.instance]);
+  // Read each recording's stream contract once, when the Datasets tab needs it.
+  useEffect(() => {
+    if (tab !== "Datasets" || synthetic || !current) return;
+    let active = true;
+    void (async () => {
+      for (const row of sessions) {
+        if (row.instance !== current.instance) continue;
+        if (layouts[row.session]) continue;
+        try {
+          const d = await graph<BciDetail>("bci_session", {
+            instance: row.instance,
+            session: row.session,
+          });
+          const fields = d.streams[0]?.fields;
+          if (!active || !fields) continue;
+          setLayouts((old) => ({
+            ...old,
+            [row.session]: {
+              channels: fields.channels?.length || 0,
+              units: String(fields.units?.[0] || ""),
+              reference: String(fields.reference || ""),
+              rate: Number(fields.sample_rate_hz || 0),
+            },
+          }));
+        } catch {
+          // A recording that cannot be read simply shows no layout; the list still works.
+        }
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [tab, synthetic, current?.instance, sessions, layouts]);
+  const layoutOf = (session: string) => layouts[session];
+  const chosenLayouts = chosen
+    .map((session) => layoutOf(session))
+    .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry));
+  const layoutsDiffer =
+    chosenLayouts.length > 1 &&
+    chosenLayouts.some(
+      (entry) =>
+        entry.channels !== chosenLayouts[0].channels ||
+        entry.units !== chosenLayouts[0].units ||
+        entry.reference !== chosenLayouts[0].reference ||
+        entry.rate !== chosenLayouts[0].rate,
+    );
   const streamMeta = detail?.streams.find(
     (s) => s.fields.stream_id === stream,
   )?.fields;
@@ -1353,14 +1643,24 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
       active = false;
     };
   }, [current?.instance, selected, stream, synthetic]);
-  const loadWindow = useCallback(async () => {
+  /**
+   * Show one window of the recording.
+   *
+   * WHY the start can be passed in: the live view asks for the newest seconds, and the offset state
+   * it would otherwise read is the one from before it moved, so following a live recording used to
+   * show the window it had already left behind.
+   */
+  const loadWindow = useCallback(async (explicitStart?: number) => {
     if (!current || !detail) return;
     if (!channelIndices.length) {
       setData(null);
       return;
     }
-    const start = Math.round(origin + offset * 1e6),
-      end = Math.round(start + span * 1e6);
+    const start =
+      explicitStart === undefined
+        ? Math.round(origin + offset * 1e6)
+        : Math.round(explicitStart);
+    const end = Math.round(start + span * 1e6);
     if (synthetic) {
       setData(demoWindow(start, end, channelIndices));
       return;
@@ -1421,8 +1721,11 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
         .then((d) => {
           if (active) {
             setDetail(d);
+            // Clamped: a recording shorter than the window would otherwise ask the engine for a
+            // window that starts before its own coverage.
+            const newest = Math.max(0, Number(d.last_us) - span * 1e6);
             setOffset(Math.max(0, (Number(d.last_us) - origin) / 1e6 - span));
-            void loadWindow();
+            void loadWindow(newest);
           }
         })
         .catch((e) => {
@@ -1487,7 +1790,12 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
       clearInterval(timer);
     };
   }, [tab, synthetic]);
-  const submission = useRef<{ id: string; spec: string } | null>(null);
+  // One request id per press, reused only for a double press of the same run: the queue's
+  // idempotency key exists to stop a double submit, not to answer a retry after a failure with
+  // the job that already failed, which is what an id keyed on the specification alone did.
+  const submission = useRef<{ id: string; spec: string; at: number } | null>(
+    null,
+  );
   async function queueJob() {
     if (!current || !jobDataset) return;
     setJobBusy(true);
@@ -1501,10 +1809,13 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
         components: jobComponents,
       };
       const spec = JSON.stringify(specification);
-      if (submission.current?.spec !== spec)
-        submission.current = { id: crypto.randomUUID(), spec };
+      const withinDoublePress =
+        submission.current?.spec === spec &&
+        Date.now() - (submission.current?.at ?? 0) < 4000;
+      if (!withinDoublePress)
+        submission.current = { id: crypto.randomUUID(), spec, at: Date.now() };
       await managedApi("/managed/bci/jobs", {
-        requestId: submission.current.id,
+        requestId: submission.current!.id,
         specification,
       });
       submission.current = null;
@@ -1521,6 +1832,96 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
       setJobs(await managedApi<JobStatus>("/managed/bci/jobs"));
     } catch (e) {
       setError(String(e));
+    }
+  }
+  /**
+   * Read the provenance chain of one row on demand.
+   *
+   * WHY it is a button and not part of the page: the chain costs extra reads and nobody needs it
+   * to browse. A reader who wants to defend a number asks for its trace and exports it.
+   */
+  async function runTrace(row: BciRow, kind: "run" | "dataset") {
+    if (!current) return;
+    setTraceBusy(true);
+    setTraceError("");
+    try {
+      const record = row.record;
+      const fields = record.fields;
+      const datasetId =
+        kind === "run" ? String(fields.dataset_id || "") : record.dst;
+      const datasetRow = datasets.find((d) => d.record.dst === datasetId);
+      const manifest = (datasetRow?.record.fields.manifest ??
+        (kind === "dataset" ? fields.manifest : undefined)) as
+        | {
+            sessions?: string[];
+            stream?: string;
+            source_snapshots?: {
+              session: string;
+              through_edge: string;
+              sha256: string;
+            }[];
+            preprocessing?: { epoch_start_s?: number; epoch_end_s?: number };
+          }
+        | undefined;
+      const known = new Map(sessions.map((s) => [s.session, s]));
+      const recordings = (manifest?.sessions || []).map((id) => {
+        const snapshot = manifest?.source_snapshots?.find(
+          (s) => s.session === id,
+        );
+        const local = known.get(id);
+        return {
+          session: id,
+          through_edge: snapshot?.through_edge ?? null,
+          sha256: snapshot?.sha256 ?? null,
+          chunks: local?.chunks ?? null,
+          records: local?.records ?? null,
+          last_us: local?.last_us ?? null,
+          in_this_workspace: Boolean(local),
+        };
+      });
+      const next: BciTrace = {
+        format: "chronograph-bci-trace-v1",
+        generated_utc: new Date().toISOString(),
+        instance: current.instance,
+        workspace_session: selected,
+        root: {
+          kind,
+          id: record.dst,
+          name: String(fields.name || record.dst),
+          recipe: fields.recipe ? String(fields.recipe) : null,
+          clock_domain: fields.clock_domain ? String(fields.clock_domain) : null,
+          recorded_us: record.timestamp_us,
+        },
+        dataset: datasetId
+          ? {
+              id: datasetId,
+              name: datasetRow
+                ? String(datasetRow.record.fields.name || "") || null
+                : null,
+              stream: manifest?.stream ?? null,
+              epoch_start_s: manifest?.preprocessing?.epoch_start_s ?? null,
+              epoch_end_s: manifest?.preprocessing?.epoch_end_s ?? null,
+              present_here: Boolean(datasetRow),
+            }
+          : null,
+        recordings,
+        result: (fields.result as Record<string, unknown>) ?? null,
+        note: manifest
+          ? "Chain read from the frozen manifest in this recording. Raw samples are unchanged."
+          : "No manifest is reachable from this row, so the chain stops at the record itself.",
+      };
+      setTrace(next);
+      if (!manifest)
+        setTraceError(
+          kind === "run"
+            ? "The dataset this run names is not in this recording, so only the run itself could be traced."
+            : "This dataset carries no manifest, so no source recordings could be traced.",
+        );
+    } catch (e) {
+      setTrace(null);
+      setTraceError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setTraceBusy(false);
     }
   }
   async function annotate() {
@@ -1545,12 +1946,69 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
       setError(String(e));
     }
   }
+  /** Read this session out of the engine and hand it back as a file. */
+  async function downloadRecording() {
+    if (!current || !detail) return;
+    setExportBusy(true);
+    setExportScope("recording");
+    setExportNote("");
+    setExportError("");
+    try {
+      const exported = await exportRecording(
+        current.instance,
+        selected,
+        detail,
+        (done, total) =>
+          setExportNote(
+            "Reading the samples… " +
+              Math.round((done / Math.max(1, total)) * 100) +
+              "%",
+          ),
+      );
+      saveFile(exported, `chronodb-${current.instance}-${selected}-${stream}.json`);
+      const samples =
+        exported.streams.find((entry) => entry.stream_id === stream)?.samples[0]
+          ?.length || 0;
+      setExportNote(
+        "Downloaded " +
+          samples.toLocaleString() +
+          " samples per channel" +
+          (exported.truncated
+            ? " — this recording is longer than the console reads in one file, so the file starts at its beginning; the SDK exporter reads the rest"
+            : "") +
+          ".",
+      );
+    } catch (error) {
+      setExportError(error instanceof Error ? error.message : String(error));
+      setExportNote("");
+    } finally {
+      setExportBusy(false);
+    }
+  }
+
+  /**
+   * Freeze the selected recordings into a dataset and hand it back as a file.
+   *
+   * WHY the file carries the trials and not only the manifest: the manifest names the recipe and the
+   * records each session was frozen at, which is what makes a run reproducible, but a person who
+   * downloads a dataset wants the data. The epochs are cut here with the manifest's own window, so
+   * the file and any training run that reads the same manifest agree about what a trial is.
+   */
   async function makeDataset() {
     if (!current || !detail) return;
     setLoading(true);
+    setExportScope("dataset");
+    setExportError("");
     try {
       const selection = chosen.length ? chosen : [selected];
-      const result = await graph<{ manifest: object }>("bci_manifest", {
+      const result = await graph<{
+        manifest: {
+          sessions: string[];
+          stream: string;
+          source_snapshots: { session: string; through_edge: string; sha256: string }[];
+          preprocessing?: { epoch_start_s?: number; epoch_end_s?: number };
+        };
+      }>("bci_manifest", {
         instance: current.instance,
         sessions: selection,
         stream,
@@ -1563,9 +2021,26 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
       );
       await publish(current.instance, [r]);
       setDatasets(await bciRecords(current.instance, selected, "dataset"));
-      saveJson(result.manifest, `bci-dataset-${r.dst}.json`);
+      setExportNote("Freezing the trials…");
+      const file = await exportDataset(
+        current.instance,
+        result.manifest,
+        datasetName,
+      );
+      saveFile(file, `bci-dataset-${r.dst}.json`);
+      const trials = file.sessions.reduce(
+        (total, session) => total + session.trials.length,
+        0,
+      );
+      setExportNote(
+        "Downloaded " +
+          file.sessions.length +
+          " recording(s) and " +
+          trials +
+          " trial(s).",
+      );
     } catch (e) {
-      setError(String(e));
+      setExportError(String(e));
     } finally {
       setLoading(false);
     }
@@ -1616,6 +2091,7 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
             initialBoard={setupBoard?.id}
             initialPreset={setupBoard?.preset}
             onDone={() => void refresh()}
+            onStarted={(instance, session) => void focusRun(instance, session)}
           />
         )}
         {managedNote && !setup && (
@@ -1831,6 +2307,18 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                   ))}
                 </div>
               </details>
+              {/* One line that answers "is it recording?": which window is drawn, whether it
+                  follows the newest samples, and how much this recording already holds. */}
+              <p className="bci-muted bci-window-status" role="status">
+                Window {offset}–{offset + span} s · {data?.points ?? 0} points
+                {live ? " · following the newest samples" : ""}
+                {detail
+                  ? ` · this recording holds ${detail.chunks} chunks and ${detail.records} records`
+                  : ""}
+                {data?.nonfinite_values
+                  ? ` · ${data.nonfinite_values} sample(s) stored as not-a-number`
+                  : ""}
+              </p>
               <section className="bci-panel bci-signal-panel">
                 {data ? (
                   <Waveform data={data} />
@@ -1928,11 +2416,34 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                   <p>
                     {tab === "Live"
                       ? "Live updates refresh every two seconds. Predictions and application feedback appear alongside acquisition events; hardware control stays in your application."
-                      : "Raw samples, source timestamps and clock corrections remain available through the SDK. Annotations create new records."}
+                      : "Take the recording out as a file: the samples this stream stores, in its own units, with the acquisition time of every sample. Nothing is filtered or scaled on the way out, and annotations stay as separate records. The SDK exporter adds MNE, NumPy and BIDS for very large recordings."}
                   </p>
-                  <Code
-                    text={`chronograph-bci export --instance ${current?.instance || "bci_research"} \\\n  --url ${managedSite ? "https://chronodb.co" : "http://127.0.0.1:8080"} \\\n  --session ${selected} --stream ${shell(stream)} --output ./recording-export`}
-                  />
+                  {managedSite ? (
+                    <div className="bci-actions">
+                      <button
+                        className="button primary"
+                        disabled={!current || !detail || exportBusy}
+                        onClick={() => void downloadRecording()}
+                      >
+                        <Download size={16} />{" "}
+                        {exportBusy
+                          ? exportNote || "Reading the samples…"
+                          : "Download this recording"}
+                      </button>
+                      {exportScope === "recording" && exportNote && !exportBusy && (
+                        <p className="bci-muted">{exportNote}</p>
+                      )}
+                      {exportError && (
+                        <p role="alert" className="bci-error">
+                          {exportError}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <Code
+                      text={`chronograph-bci export --instance ${current?.instance || "bci_research"} \\\n  --url ${managedSite ? "https://chronodb.co" : "http://127.0.0.1:8080"} \\\n  --session ${selected} --stream ${shell(stream)} --output ./recording-export`}
+                    />
+                  )}
                   <Link to="/documentation/BCI">
                     Export to NumPy, MNE and BIDS <ArrowRight size={14} />
                   </Link>
@@ -1944,9 +2455,9 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
             <section className="bci-panel">
               <h2>Reproducible datasets</h2>
               <p>
-                Freeze source records and hashes before training. Trials
-                crossing marked gaps or artifacts are excluded by the baseline
-                worker.
+                Freeze source records and hashes before training, then
+                download the trials themselves. Trials crossing marked gaps or
+                artifacts are excluded by the baseline worker.
               </p>
               {synthetic ? (
                 <div className="bci-empty">
@@ -1991,17 +2502,43 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                               )
                             }
                           />
-                          {s.metadata.name} <small>{s.chunks} chunks</small>
+                          {s.metadata.name}{" "}
+                          <small>
+                            {s.chunks} chunks
+                            {layoutOf(s.session)
+                              ? ` · ${layoutOf(s.session)!.channels} ch · ${layoutOf(s.session)!.rate} Hz · ${layoutOf(s.session)!.units}`
+                              : ""}
+                          </small>
                         </label>
                       ))}
                   </div>
-                  <button
-                    className="button primary"
-                    disabled={!write || loading || !datasetName.trim()}
-                    onClick={() => void makeDataset()}
-                  >
-                    Save & download manifest <Download size={16} />
-                  </button>
+                  {/* A run refuses recordings that disagree about their layout, so say which
+                      recordings cannot be frozen together before the person presses the button. */}
+                  {layoutsDiffer && (
+                    <p role="alert" className="bci-error">
+                      The recordings you selected do not share one layout. A dataset needs
+                      recordings with the same channels, units, reference and sample rate — this
+                      selection mixes {chosenLayouts.map((e) => `${e.channels} ch/${e.rate} Hz`).join(", ")}.
+                    </p>
+                  )}
+                  <div className="bci-actions">
+                    <button
+                      className="button primary"
+                      disabled={!write || loading || !datasetName.trim() || layoutsDiffer}
+                      onClick={() => void makeDataset()}
+                    >
+                      {loading ? "Freezing the trials…" : "Save & download dataset"}{" "}
+                      <Download size={16} />
+                    </button>
+                    {exportScope === "dataset" && exportNote && !exportError && (
+                      <p className="bci-muted">{exportNote}</p>
+                    )}
+                    {exportError && (
+                      <p role="alert" className="bci-error">
+                        {exportError}
+                      </p>
+                    )}
+                  </div>
                   <div className="bci-recording-list">
                     {datasets.map((d) => (
                       <article key={d.edge}>
@@ -2009,13 +2546,44 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                         <code>{d.record.dst}</code>
                         <button
                           onClick={() =>
-                            saveJson(
-                              d.record.fields.manifest,
-                              `dataset-${d.record.dst}.json`,
-                            )
+                            void (async () => {
+                              setExportError("");
+                              setExportScope("dataset");
+                              setExportNote("Freezing the trials…");
+                              try {
+                                const file = await exportDataset(
+                                  current?.instance || "bci_research",
+                                  d.record.fields
+                                    .manifest as Parameters<typeof exportDataset>[1],
+                                  String(d.record.fields.name || "dataset"),
+                                );
+                                saveFile(file, `dataset-${d.record.dst}.json`);
+                                setExportNote(
+                                  "Downloaded " +
+                                    file.sessions.reduce(
+                                      (total, session) =>
+                                        total + session.trials.length,
+                                      0,
+                                    ) +
+                                    " trial(s) from " +
+                                    file.sessions.length +
+                                    " recording(s).",
+                                );
+                              } catch (error) {
+                                setExportError(
+                                  error instanceof Error
+                                    ? error.message
+                                    : String(error),
+                                );
+                                setExportNote("");
+                              }
+                            })()
                           }
                         >
-                          Download manifest
+                          Download dataset
+                        </button>
+                        <button onClick={() => void runTrace(d, "dataset")}>
+                          Trace
                         </button>
                       </article>
                     ))}
@@ -2033,20 +2601,25 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                       available beside a status that says hosted training is off told the reader
                       two opposite things about the same page. */}
                   <span className="bci-chip">
-                    {jobs?.available
-                      ? "Hosted training enabled"
-                      : managedSite
-                        ? "Run the worker on your own machine"
-                        : "Local workers"}
+                    {managedSite
+                      ? jobs?.available
+                        ? "CPU training included"
+                        : "Hosted training unavailable"
+                      : "Local workers"}
                   </span>
                 </div>
                 <p>
-                  Run a CPU baseline or publish results from your own decoder.
-                  Compare each result against its frozen source dataset.
+                  {managedSite
+                    ? "Queue a CPU baseline run here. This deployment trains on its own CPU and publishes the result against the frozen dataset."
+                    : "Run a CPU baseline or publish results from your own decoder. Compare each result against its frozen source dataset."}
                 </p>
-                <Code
-                  text={`chronograph-bci train --input ./dataset.json --output ./decoder-run \\\n  --instance ${current?.instance || "bci_research"} --components 4 \\\n  --dataset-id DATASET_ID --spool ./bci-recording --partition recording_01 --sync \\\n  --clock-domain ${shell(current?.metadata.clock_domain || "unix_us")} --url ${managedSite ? "https://chronodb.co" : "http://127.0.0.1:8080"}`}
-                />
+                {/* A managed workspace is not asked to install a Python package or run a
+                    command. It gets the queue below instead. */}
+                {!managedSite && (
+                  <Code
+                    text={`chronograph-bci train --input ./dataset.json --output ./decoder-run \\\n  --instance ${current?.instance || "bci_research"} --components 4 \\\n  --dataset-id DATASET_ID --spool ./bci-recording --partition recording_01 --sync \\\n  --clock-domain ${shell(current?.metadata.clock_domain || "unix_us")} --url ${managedSite ? "https://chronodb.co" : "http://127.0.0.1:8080"}`}
+                  />
+                )}
                 <p className="bci-muted">
                   CSP + shrinkage LDA · Independent recording splits · Raw data
                   unchanged
@@ -2087,6 +2660,9 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                               >
                                 Download
                               </button>
+                              <button onClick={() => void runTrace(r, "run")}>
+                                Trace
+                              </button>
                             </td>
                           </tr>
                         ))}
@@ -2099,83 +2675,118 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                   </p>
                 )}
               </section>
-              <section className="bci-panel">
-                <h2>Managed training</h2>
-                <p>
-                  {jobs?.reason ||
-                    "Hosted training is not enabled. Run a worker on your laptop or server and publish its results here."}
-                </p>
-                {jobs?.available ? (
-                  <div className="bci-fields">
-                    <label>
-                      Dataset
-                      <select
-                        value={jobDataset}
-                        onChange={(e) => setJobDataset(e.target.value)}
-                      >
-                        <option value="">Select a saved dataset</option>
-                        {datasets.map((d) => (
-                          <option key={d.record.dst} value={d.record.dst}>
-                            {d.record.fields.name}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label>
-                      CSP components
-                      <select
-                        value={jobComponents}
-                        onChange={(e) =>
-                          setJobComponents(Number(e.target.value))
-                        }
-                      >
-                        {[2, 4, 6, 8].map((n) => (
-                          <option key={n} value={n}>
-                            {n}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <button
-                      className="button primary"
-                      disabled={!write || !jobDataset || jobBusy}
-                      onClick={() => void queueJob()}
-                    >
-                      <Play size={16} /> Queue CPU run
-                    </button>
+              {/* Community deployments keep their own worker, so this panel would only
+                  repeat the command above. Show it where the platform can train for you. */}
+              {managedSite && (
+                <section className="bci-panel">
+                  <div className="bci-section-title">
+                    <h2>CPU training</h2>
+                    {jobs?.available && (
+                      <span className="bci-chip">
+                        {queuedJobs
+                          ? `${queuedJobs} in the queue`
+                          : "Ready"}
+                      </span>
+                    )}
                   </div>
-                ) : (
-                  <button disabled>
-                    <Terminal size={16} /> Separate compute required
-                  </button>
-                )}
-                <div className="bci-recording-list">
-                  {jobs?.jobs.map((j) => (
-                    <article key={j.id}>
-                      <div>
-                        <strong>
-                          {j.specification?.recipe || "CPU run"} · {j.state}
-                        </strong>
-                        <small>{j.id}</small>
-                      </div>
-                      {write && ["queued", "running"].includes(j.state) && (
-                        <button onClick={() => void cancelJob(j.id)}>
-                          Cancel
-                        </button>
-                      )}
-                      {j.result && (
-                        <button
-                          onClick={() => saveJson(j.result, `${j.id}.json`)}
+                  <p>
+                    {jobs?.available
+                      ? "Pick a saved dataset. The run uses this deployment's CPU, one core per queued job, and stops after its time limit."
+                      : jobs?.reason ||
+                        "Hosted training is not enabled in this deployment. Run a worker on your laptop or server and publish its results here."}
+                  </p>
+                  {jobs?.available ? (
+                    <div className="bci-fields">
+                      <label>
+                        Dataset
+                        <select
+                          value={jobDataset}
+                          onChange={(e) => setJobDataset(e.target.value)}
                         >
-                          Download result & model
-                        </button>
-                      )}
-                    </article>
-                  ))}
-                </div>
-              </section>
+                          <option value="">Select a saved dataset</option>
+                          {datasets.map((d) => (
+                            <option key={d.record.dst} value={d.record.dst}>
+                              {d.record.fields.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        CSP components
+                        <select
+                          value={jobComponents}
+                          onChange={(e) =>
+                            setJobComponents(Number(e.target.value))
+                          }
+                        >
+                          {[2, 4, 6, 8].map((n) => (
+                            <option key={n} value={n}>
+                              {n}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <button
+                        className="button primary"
+                        disabled={!write || !jobDataset || jobBusy}
+                        onClick={() => void queueJob()}
+                      >
+                        <Play size={16} /> Queue CPU run
+                      </button>
+                    </div>
+                  ) : (
+                    <button disabled>
+                      <Terminal size={16} /> Separate compute required
+                    </button>
+                  )}
+                  {write && jobs?.available && !datasets.length && (
+                    <p className="bci-note">
+                      Cut a dataset on the Datasets tab first. A run needs epochs
+                      with labels.
+                    </p>
+                  )}
+                  <div className="bci-recording-list">
+                    {jobs?.jobs.map((j) => (
+                      <article key={j.id}>
+                        <div>
+                          <strong>
+                            {j.specification?.recipe || "CPU run"} · {j.state}
+                          </strong>
+                          <small>{j.id}</small>
+                        </div>
+                        {write && ["queued", "running"].includes(j.state) && (
+                          <button onClick={() => void cancelJob(j.id)}>
+                            Cancel
+                          </button>
+                        )}
+                        {j.result && (
+                          <button
+                            onClick={() => saveJson(j.result, `${j.id}.json`)}
+                          >
+                            Download result & model
+                          </button>
+                        )}
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              )}
             </>
           )}
+          {/* One placement, so a trace asked for on the Datasets tab stays readable after a
+              tab change. The chain is a fact about the record, not about the tab. */}
+          <TracePanel
+            trace={trace}
+            busy={traceBusy}
+            error={traceError}
+            onExport={() =>
+              trace && saveJson(trace, `trace-${trace.root.id}.json`)
+            }
+            onClose={() => {
+              setTrace(null);
+              setTraceError("");
+            }}
+          />
         </>
       )}
     </div>
