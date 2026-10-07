@@ -20,10 +20,16 @@ export const connectors = [
       "Open any board the installed BrainFlow driver defines, or any LSL outlet, and keep every original timestamp. Then hand the recording to MNE, train a decoder and branch the result.",
     detail:
       "The console opens no hardware: the agent runs where the device is wired. Only the synthetic board and local files are exercised by the test suite.",
+    // WHY this is folded at build time rather than chosen at render: the two editions are two
+    // builds with different VITE_ flags, so a literal behind that test is dropped from the managed
+    // bundle entirely. A runtime branch would leave an instruction to install a package inside the
+    // artifact this deployment serves, which is the one thing the hosted console must never carry.
     snippet:
-      "pip install './sdk/python[bci]'\n" +
-      "chronograph-bci brainflow --board-id -1 --preset 0 --units uV \\\n" +
-      "  --seconds 60 --spool ./recording --sync",
+      import.meta.env.VITE_MANAGED_SITE === "true"
+        ? ""
+        : "pip install './sdk/python[bci]'\n" +
+          "chronograph-bci brainflow --board-id -1 --preset 0 --units uV \\\n" +
+          "  --seconds 60 --spool ./recording --sync",
     /* WHAT a hosted account is told instead. WHY the SDK line is not shown here: on this
        deployment nothing has to be installed to record, and a connector page that opens with
        "pip install" tells a hosted reader the opposite. The SDK stays available for their own

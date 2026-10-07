@@ -1648,13 +1648,22 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                   .join(" · ")}
               </p>
             </div>
-            <button
-              className="button outline"
-              disabled={producerAction.busy || producerBusy}
-              onClick={() => void stopProducers()}
-            >
-              <Pause size={15} /> Stop recording
-            </button>
+            {/* The banner reports to every member, because a recording being written is
+                something anyone reading the workspace should know. Stopping it is a write, so
+                the control appears only for a member the server would accept it from. */}
+            {write ? (
+              <button
+                className="button outline"
+                disabled={producerAction.busy || producerBusy}
+                onClick={() => void stopProducers()}
+              >
+                <Pause size={15} /> Stop recording
+              </button>
+            ) : (
+              <span className="bci-muted">
+                Ask a member with write access to stop it.
+              </span>
+            )}
             {producerAction.feedback}
           </section>
         )}
