@@ -72,6 +72,10 @@
   the control plane's suite went with them: the diagnostics export was compared against a snapshot
   taken a moment earlier, so the host's uptime could differ by a second and fail a test about the
   export being complete rather than about the clock.
+  A live producer became visible and bounded in the same pass: it writes into the account's project
+  whether or not the tab is open, and its only control was a button inside the setup panel, so the
+  workspace now reports one running — what it is, how long, and a Stop control — refreshed while the
+  page is open, and a live run stops itself after five minutes instead of fifteen.
 
 
 - The website is mobile friendly, and the floor is asserted rather than assumed. Auditing the live
