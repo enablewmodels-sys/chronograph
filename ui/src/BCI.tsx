@@ -8,10 +8,16 @@ import catalog from "./brainflow-boards.json";
 import {
   BCI_BOARD_COUNT,
   BCI_PRESET_COUNT,
+  BCI_UNATTRIBUTED_COUNT,
   BCI_VENDORS,
   BCI_VENDOR_COUNT,
+  boardById,
   boardsOf,
+  channelTypeFor,
+  defaultChannelNames,
   firstBoardOf,
+  numberedChannelNames,
+  presetOf,
   vendorLabel,
 } from "./bci-vendors";
 import { Link } from "react-router-dom";
@@ -232,27 +238,604 @@ function BrowserDecodeCheck() {
   );
 }
 
-function Setup({ onDone }: { onDone: () => void }) {
-  const [source, setSource] = useState("synthetic"),
-    [instance, setInstance] = useState("bci_research"),
-    [clock, setClock] = useState("unix_us"),
-    [channels, setChannels] = useState(
-      "EEG01, EEG02, EEG03, EEG04, EEG05, EEG06, EEG07, EEG08",
-    ),
-    [units, setUnits] = useState("uV"),
-    [vendor, setVendor] = useState(BCI_VENDORS[0] || ""),
-    [board, setBoard] = useState(firstBoardOf(BCI_VENDORS[0] || "")),
-    [boardPreset, setBoardPreset] = useState(0),
-    [reference, setReference] = useState("unspecified"),
-    [rate, setRate] = useState(250),
-    [preview, setPreview] = useState<{
-      source: string;
-      checksum: string;
-      expected_revision: number;
-    } | null>(null),
-    [applied, setApplied] = useState(false),
-    [error, setError] = useState(""),
-    [busy, setBusy] = useState(false);
+/**
+ * One channel's recorded identity.
+ *
+ * The name is what an analyst reads on every waveform and export; the unit and the type
+ * travel with the stream metadata, so a recording that says "uV EEG" is a claim the
+ * engine stores rather than a label this page paints.
+ */
+interface ChannelSetting {
+  name: string;
+  unit: string;
+  type: string;
+}
+
+/** Units a biosignal recording uses. The list is a dropdown so a typo cannot ship. */
+const CHANNEL_UNITS = ["uV", "mV", "V", "raw", "%", "g", "deg/s", "C", "Ohm"];
+/** Channel families the research contract accepts. */
+const CHANNEL_TYPES = [
+  "EEG",
+  "EXG",
+  "EMG",
+  "ECG",
+  "EOG",
+  "EDA",
+  "PPG",
+  "ACC",
+  "GYR",
+  "MAG",
+  "ROT",
+  "TEMP",
+  "IMP",
+  "AIO",
+  "CH",
+];
+
+/**
+ * The channels a person starts from.
+ *
+ * A board arrives with the names its own driver reports - 8 on a Cyton, 16 on a Daisy,
+ * 64 on an ANT Neuro EE 211 - and falls back to a numbered pattern in the board's signal
+ * family when the driver reports none or reports fewer than the geometry declares. That
+ * is why a 16- or 64-channel board no longer arrives with eight names and no way to
+ * change them.
+ */
+function initialChannels(
+  source: string,
+  boardId: number,
+  preset: number,
+  count?: number,
+): ChannelSetting[] {
+  if (source === "synthetic") {
+    const size = count ?? 8;
+    return numberedChannelNames(-1, size, { prefix: "EEG", width: 2 }).map(
+      (name) => ({ name, unit: "uV", type: "EEG" }),
+    );
+  }
+  const board = boardById(boardId);
+  const size = count ?? presetOf(boardId, preset)?.channels ?? board?.channels ?? 8;
+  const reported = defaultChannelNames(boardId, preset).slice(0, size);
+  const names =
+    reported.length === size
+      ? reported
+      : numberedChannelNames(boardId, size);
+  const type = channelTypeFor(board?.modality);
+  return names.map((name) => ({
+    name,
+    unit: board?.modality === "accel" || board?.modality === "gyro" ? "g" : "uV",
+    type: CHANNEL_TYPES.includes(type) ? type : "CH",
+  }));
+}
+
+/** A name every channel can use at once, from a prefix, a start index and a width. */
+function namesFrom(
+  count: number,
+  prefix: string,
+  start: number,
+  width: number,
+  separator: string,
+) {
+  return Array.from(
+    { length: count },
+    (_, index) =>
+      prefix + separator + String(start + index).padStart(width, "0"),
+  );
+}
+
+/**
+ * The channel editor.
+ *
+ * WHY a disclosure with a per-channel table: a 64-channel board needs 64 editable rows,
+ * and a person renaming a montage wants one gesture that renames all of them. Both live
+ * here: a pattern row that rewrites every name, unit and type at once, and the table that
+ * overrides any single channel afterwards. Nothing is inferred from the board once a row
+ * has been edited - what the table shows is exactly what the recording will claim.
+ */
+function ChannelEditor({
+  channels,
+  onChange,
+  disabled,
+}: {
+  channels: ChannelSetting[];
+  onChange: (next: ChannelSetting[]) => void;
+  disabled?: boolean;
+}) {
+  const [prefix, setPrefix] = useState("EEG");
+  const [start, setStart] = useState(1);
+  const [width, setWidth] = useState(2);
+  const [separator, setSeparator] = useState("");
+  const [bulkUnit, setBulkUnit] = useState("uV");
+  const [bulkType, setBulkType] = useState("EEG");
+  const names = channels.map((channel) => channel.name);
+  const duplicates = names.length !== new Set(names).size;
+  const empty = channels.some((channel) => !channel.name.trim());
+  const update = (index: number, patch: Partial<ChannelSetting>) =>
+    onChange(
+      channels.map((channel, at) =>
+        at === index ? { ...channel, ...patch } : channel,
+      ),
+    );
+  return (
+    <details className="bci-channel-editor">
+      <summary>
+        Channels · {channels.length} configured
+        {duplicates
+          ? " · duplicate names"
+          : empty
+            ? " · a name is empty"
+            : ""}
+      </summary>
+      <div className="bci-channel-bulk">
+        <label>
+          Pattern
+          <select
+            value="custom"
+            disabled={disabled}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (value === "custom") return;
+              const preset = {
+                eeg: { prefix: "EEG", start: 1, width: 2, separator: "" },
+                ch: { prefix: "CH", start: 1, width: 2, separator: "" },
+                dash: { prefix: "EEG", start: 1, width: 2, separator: "-" },
+                ten: { prefix: "EEG", start: 10, width: 2, separator: "" },
+              }[value];
+              if (!preset) return;
+              setPrefix(preset.prefix);
+              setStart(preset.start);
+              setWidth(preset.width);
+              setSeparator(preset.separator);
+              onChange(
+                namesFrom(
+                  channels.length,
+                  preset.prefix,
+                  preset.start,
+                  preset.width,
+                  preset.separator,
+                ).map((name, index) => ({ ...channels[index], name })),
+              );
+            }}
+          >
+            <option value="custom">Custom pattern</option>
+            <option value="eeg">EEG01, EEG02, …</option>
+            <option value="ch">CH01, CH02, …</option>
+            <option value="dash">EEG-01, EEG-02, …</option>
+            <option value="ten">EEG10, EEG11, …</option>
+          </select>
+        </label>
+        <label>
+          Prefix
+          <input
+            value={prefix}
+            maxLength={24}
+            disabled={disabled}
+            onChange={(event) => setPrefix(event.target.value)}
+          />
+        </label>
+        <label>
+          Start at
+          <input
+            type="number"
+            min={0}
+            max={9999}
+            value={start}
+            disabled={disabled}
+            onChange={(event) => setStart(Number(event.target.value))}
+          />
+        </label>
+        <label>
+          Digits
+          <select
+            value={width}
+            disabled={disabled}
+            onChange={(event) => setWidth(Number(event.target.value))}
+          >
+            {[1, 2, 3, 4].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Separator
+          <select
+            value={separator}
+            disabled={disabled}
+            onChange={(event) => setSeparator(event.target.value)}
+          >
+            <option value="">none</option>
+            <option value="-">dash</option>
+            <option value="_">underscore</option>
+            <option value=" ">space</option>
+          </select>
+        </label>
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() =>
+            onChange(
+              namesFrom(channels.length, prefix, start, width, separator).map(
+                (name, index) => ({ ...channels[index], name }),
+              ),
+            )
+          }
+        >
+          Name all {channels.length} channels
+        </button>
+        <label>
+          Unit for all
+          <select
+            value={bulkUnit}
+            disabled={disabled}
+            onChange={(event) => {
+              setBulkUnit(event.target.value);
+              onChange(
+                channels.map((channel) => ({
+                  ...channel,
+                  unit: event.target.value,
+                })),
+              );
+            }}
+          >
+            {CHANNEL_UNITS.map((unit) => (
+              <option key={unit}>{unit}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Type for all
+          <select
+            value={bulkType}
+            disabled={disabled}
+            onChange={(event) => {
+              setBulkType(event.target.value);
+              onChange(
+                channels.map((channel) => ({
+                  ...channel,
+                  type: event.target.value,
+                })),
+              );
+            }}
+          >
+            {CHANNEL_TYPES.map((type) => (
+              <option key={type}>{type}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      {duplicates && (
+        <p role="alert" className="bci-error">
+          Two channels share a name. Names identify a channel in every export, so they
+          have to be unique.
+        </p>
+      )}
+      <div className="bci-channel-table">
+        <div className="bci-channel-head">
+          <span>#</span>
+          <span>Name</span>
+          <span>Unit</span>
+          <span>Type</span>
+        </div>
+        {channels.map((channel, index) => (
+          <div className="bci-channel-row" key={index}>
+            <span>{index + 1}</span>
+            <input
+              value={channel.name}
+              maxLength={128}
+              disabled={disabled}
+              aria-label={"Channel " + (index + 1) + " name"}
+              onChange={(event) => update(index, { name: event.target.value })}
+            />
+            <select
+              value={channel.unit}
+              disabled={disabled}
+              aria-label={"Channel " + (index + 1) + " unit"}
+              onChange={(event) => update(index, { unit: event.target.value })}
+            >
+              {CHANNEL_UNITS.map((unit) => (
+                <option key={unit}>{unit}</option>
+              ))}
+            </select>
+            <select
+              value={channel.type}
+              disabled={disabled}
+              aria-label={"Channel " + (index + 1) + " type"}
+              onChange={(event) => update(index, { type: event.target.value })}
+            >
+              {CHANNEL_TYPES.map((type) => (
+                <option key={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+        ))}
+      </div>
+      <p className="bci-muted">
+        These names, units and types are what the recording carries. The waveform and
+        every export read them back.
+      </p>
+    </details>
+  );
+}
+
+/** What the deployment reports about its own managed producer. */
+interface AcquisitionStatus {
+  available: boolean;
+  runtime: string;
+  reason: string;
+  seedSeconds: number;
+  maxSeconds: number;
+  maxLiveSeconds: number;
+  gapAtSeconds: number;
+  running: {
+    id: string;
+    instance: string;
+    session: string;
+    state: string;
+    device: string;
+    clockDomain: string;
+    channels: number;
+    rate: number;
+    seconds: number;
+    writtenSeconds: number;
+    chunks: number;
+    live: boolean;
+    failure: string | null;
+  }[];
+}
+
+/**
+ * The managed producer panel.
+ *
+ * WHY the workspace shows this instead of a pip line: on a hosted deployment the account
+ * has no terminal in the loop, so "install the SDK and run this command" is an unfinished
+ * product. This panel asks the deployment for the recording, reports what it wrote, and
+ * is the only place a hosted account has to look.
+ */
+function ManagedRecording({
+  instance,
+  clockDomain,
+  channels,
+  rate,
+  source,
+  boardId,
+  boardPreset,
+  reference,
+  onWrote,
+}: {
+  instance: string;
+  clockDomain: string;
+  channels: ChannelSetting[];
+  rate: number;
+  source: string;
+  boardId: number;
+  boardPreset: number;
+  reference: string;
+  onWrote: () => void;
+}) {
+  const action = useAction();
+  const [status, setStatus] = useState<AcquisitionStatus | null>(null);
+  const [ready, setReady] = useState<{ created: boolean; sessions: number } | null>(
+    null,
+  );
+  const [failure, setFailure] = useState("");
+  const asked = useRef(false);
+  const request = () => ({
+    instance,
+    clockDomain,
+    stream: "eeg",
+    source,
+    boardId,
+    preset: boardPreset,
+    rate,
+    reference,
+    channels: channels.map((channel) => ({
+      name: channel.name,
+      unit: channel.unit,
+      type: channel.type,
+    })),
+  });
+  const read = useCallback(async () => {
+    setStatus(await managedApi<AcquisitionStatus>("/managed/bci/acquisition"));
+  }, []);
+  useEffect(() => {
+    void read().catch(() => {});
+  }, [read]);
+  // A hosted workspace should not open empty. This asks the deployment for a recording
+  // once, and the deployment answers with the one it already holds rather than a second.
+  useEffect(() => {
+    if (asked.current) return;
+    asked.current = true;
+    void (async () => {
+      try {
+        const result = await managedApi<{ created: boolean; sessions: number }>(
+          "/managed/bci/acquisition",
+          { action: "ensure", ...request() },
+        );
+        setReady(result);
+        await read();
+        if (result.created) onWrote();
+      } catch (error) {
+        setFailure(error instanceof Error ? error.message : String(error));
+      }
+    })();
+  }, []);
+  const runs = status?.running ?? [];
+  return (
+    <div className="bci-managed">
+      <p className="bci-success">
+        <Check size={16} /> Database configured. This deployment records it for you.
+      </p>
+      {failure && (
+        <p role="alert" className="bci-error">
+          {failure}
+        </p>
+      )}
+      {ready && (
+        <p className="bci-muted">
+          {ready.created
+            ? "A simulated BrainFlow recording is being written now."
+            : "This workspace already holds " +
+              ready.sessions +
+              " recording" +
+              (ready.sessions === 1 ? "" : "s") +
+              " for " +
+              instance +
+              "."}
+        </p>
+      )}
+      {!ready && !failure && (
+        <p className="bci-muted" role="status">
+          Preparing a simulated BrainFlow recording…
+        </p>
+      )}
+      <div className="bci-actions">
+        <button
+          className="button"
+          disabled={action.busy}
+          onClick={() =>
+            void action.run(async () => {
+              await managedApi("/managed/bci/acquisition", {
+                action: "start",
+                ...request(),
+                seconds: 5,
+                live: true,
+              });
+              await read();
+              onWrote();
+            }, "Live recording started.")
+          }
+        >
+          <Play size={15} /> Start live recording
+        </button>
+        <button
+          className="button outline"
+          disabled={action.busy || !runs.length}
+          onClick={() =>
+            void action.run(async () => {
+              for (const run of runs) {
+                if (run.state === "running")
+                  await managedApi("/managed/bci/acquisition", {
+                    action: "stop",
+                    id: run.id,
+                  });
+              }
+              await read();
+            }, "Recording stopped.")
+          }
+        >
+          <Pause size={15} /> Stop
+        </button>
+        <button
+          className="ghost"
+          disabled={action.busy}
+          onClick={() => void action.run(read)}
+        >
+          <RefreshCw size={15} /> Refresh
+        </button>
+      </div>
+      {action.feedback}
+      <div className="bci-recording-list">
+        {runs.map((run) => (
+          <article key={run.id}>
+            <div>
+              <strong>
+                Session {run.session} · {run.device}
+              </strong>
+              <small>
+                {run.state} · {run.writtenSeconds.toFixed(1)} s · {run.chunks}{" "}
+                chunks · {run.channels} channels · {run.rate} Hz · {run.clockDomain}
+              </small>
+            </div>
+          </article>
+        ))}
+      </div>
+      {runs.some((run) => run.failure) && (
+        <p role="alert" className="bci-error">
+          {runs.find((run) => run.failure)?.failure}
+        </p>
+      )}
+      <p className="bci-muted">
+        The recording is a BrainFlow synthetic signal at the board's own geometry: alpha,
+        theta and beta rhythms, cue-locked trials, one deliberate acquisition pause at{" "}
+        {status?.gapAtSeconds ?? 13} s and channel noise. No device is opened and no
+        weight is downloaded.
+      </p>
+      <Link to="/documentation/BCI">
+        Recording contract and exports <ArrowRight size={14} />
+      </Link>
+    </div>
+  );
+}
+
+/**
+ * Configure one recording.
+ *
+ * The board decides the geometry and the person decides the identity: a board arrives
+ * with its own channel count, its driver's channel names and its rate, and every one of
+ * those is editable before the migration is reviewed. What is reviewed is what is
+ * recorded.
+ */
+function Setup({
+  onDone,
+  initialBoard,
+  initialPreset,
+}: {
+  onDone: () => void;
+  initialBoard?: number;
+  initialPreset?: number;
+}) {
+  const managed = managedSite;
+  const fallbackVendor = BCI_VENDORS[0] || "";
+  const defaultBoard = initialBoard ?? (managed ? 0 : firstBoardOf(fallbackVendor));
+  const [source, setSource] = useState(managed ? "brainflow" : "synthetic");
+  const [instance, setInstance] = useState("bci_research");
+  const [clock, setClock] = useState("unix_us");
+  const [vendor, setVendor] = useState(
+    boardById(defaultBoard)?.vendor ?? fallbackVendor,
+  );
+  const [board, setBoard] = useState(defaultBoard);
+  const [boardPreset, setBoardPreset] = useState(initialPreset ?? 0);
+  const [reference, setReference] = useState("unspecified");
+  const [rate, setRate] = useState(presetOf(defaultBoard, initialPreset ?? 0)?.rate ?? 250);
+  const [channels, setChannels] = useState<ChannelSetting[]>(() =>
+    initialChannels(managed ? "brainflow" : "synthetic", defaultBoard, initialPreset ?? 0),
+  );
+  const [preview, setPreview] = useState<{
+    source: string;
+    checksum: string;
+    expected_revision: number;
+  } | null>(null);
+  const [applied, setApplied] = useState(false);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  /** Adopt a board, its rate and its channel names in one gesture. */
+  const adopt = (nextBoard: number, nextPreset: number) => {
+    setBoard(nextBoard);
+    setBoardPreset(nextPreset);
+    const chosen = presetOf(nextBoard, nextPreset);
+    if (chosen?.rate) setRate(chosen.rate);
+    setChannels(initialChannels("brainflow", nextBoard, nextPreset));
+  };
+  const adoptSource = (next: string) => {
+    setSource(next);
+    setClock(next === "lsl" ? "lsl_local_us" : "unix_us");
+    if (next === "synthetic") {
+      setRate(250);
+      setChannels(initialChannels("synthetic", -1, 0, 8));
+    } else adopt(board, boardPreset);
+  };
+  const names = channels.map((channel) => channel.name);
+  const unit = channels[0]?.unit || "uV";
+  const command = `chronograph-bci ${source === "file" ? "import" : source} --url ${managed ? "https://chronodb.co" : "http://127.0.0.1:8080"} \\\n  --instance ${instance} --clock-domain ${clock} --spool ./bci-recording \\\n  --partition recording_01 --sync` +
+    (source === "synthetic"
+      ? ` --rate ${rate} --channels ${shell(names.join(","))} --units ${shell(unit)} --seconds 30 --realtime`
+      : source === "brainflow"
+        ? ` --board-id ${board}${boardPreset ? ` --preset ${boardPreset}` : ""} --units ${shell(unit)} --seconds 60`
+        : source === "lsl"
+          ? ` --source-id YOUR_SOURCE_ID --channels ${shell(names.join(","))} --units ${shell(unit)}`
+          : " \\\n  --input ./recording.edf --start-us YOUR_ACQUISITION_START_US");
   async function prepare() {
     setBusy(true);
     setError("");
@@ -263,9 +846,13 @@ function Setup({ onDone }: { onDone: () => void }) {
         rate < 80 ||
         rate > 100000
       )
-        throw Error(
-          "Use a valid instance name and sample rate (80–100000 Hz).",
-        );
+        throw Error("Use a valid instance name and sample rate (80–100000 Hz).");
+      if (!channels.length || channels.length > 512)
+        throw Error("Configure between 1 and 512 channels.");
+      if (names.some((name) => !name.trim() || name.length > 128))
+        throw Error("Every channel needs a name of 1–128 characters.");
+      if (new Set(names).size !== names.length)
+        throw Error("Channel names have to be unique.");
       const schema = await graph<{
         relations: { kind: number }[];
         connectors: { id: string; connector: string; clock_domain: string }[];
@@ -318,17 +905,7 @@ function Setup({ onDone }: { onDone: () => void }) {
       setBusy(false);
     }
   }
-  const base = `chronograph-bci ${source === "file" ? "import" : source} --url ${managedSite ? "https://chronodb.co" : "http://127.0.0.1:8080"} \\\n  --instance ${instance} --clock-domain ${clock} --spool ./bci-recording \\\n  --partition recording_01 --sync`;
-  const command =
-    base +
-    (source === "synthetic" ? "" : ` --reference ${shell(reference)}`) +
-    (source === "lsl"
-      ? ` \\\n  --source-id YOUR_SOURCE_ID --channels ${shell(channels.replaceAll(" ", ""))} --units ${shell(units)}`
-      : source === "brainflow"
-        ? ` \\\n  --board-id ${board}${boardPreset ? ` --preset ${boardPreset}` : ""} --units ${shell(units)} --seconds 60`
-        : source === "file"
-          ? " \\\n  --input ./recording.edf --start-us YOUR_ACQUISITION_START_US"
-          : ` --rate ${rate} --channels ${shell(channels.replaceAll(" ", ""))} --seconds 30 --realtime`);
+  const locked = !!preview || applied;
   return (
     <section className="bci-panel bci-setup">
       <div className="bci-section-title">
@@ -340,18 +917,26 @@ function Setup({ onDone }: { onDone: () => void }) {
           Source
           <select
             value={source}
-            disabled={!!preview || applied}
-            onChange={(e) => {
-              setSource(e.target.value);
-              setClock(e.target.value === "lsl" ? "lsl_local_us" : "unix_us");
-            }}
+            disabled={locked}
+            onChange={(e) => adoptSource(e.target.value)}
           >
-            <option value="synthetic">Synthetic EEG · no hardware</option>
-            <option value="brainflow">
-              BrainFlow · {BCI_BOARD_COUNT} boards, {BCI_VENDOR_COUNT} vendors
-            </option>
-            <option value="lsl">Lab Streaming Layer</option>
-            <option value="file">Recorded EDF / BDF / FIF</option>
+            {managed ? (
+              <>
+                <option value="brainflow">
+                  BrainFlow board · recorded by this deployment
+                </option>
+                <option value="synthetic">Synthetic EEG · no hardware</option>
+              </>
+            ) : (
+              <>
+                <option value="synthetic">Synthetic EEG · no hardware</option>
+                <option value="brainflow">
+                  BrainFlow · {BCI_BOARD_COUNT} boards, {BCI_VENDOR_COUNT} vendors
+                </option>
+                <option value="lsl">Lab Streaming Layer</option>
+                <option value="file">Recorded EDF / BDF / FIF</option>
+              </>
+            )}
           </select>
         </label>
         {source === "brainflow" && (
@@ -360,11 +945,10 @@ function Setup({ onDone }: { onDone: () => void }) {
               Vendor
               <select
                 value={vendor}
-                disabled={!!preview || applied}
+                disabled={locked}
                 onChange={(e) => {
                   setVendor(e.target.value);
-                  setBoard(firstBoardOf(e.target.value));
-                  setBoardPreset(0);
+                  adopt(firstBoardOf(e.target.value), 0);
                 }}
               >
                 {BCI_VENDORS.map((name) => (
@@ -378,11 +962,8 @@ function Setup({ onDone }: { onDone: () => void }) {
               Device
               <select
                 value={board}
-                disabled={!!preview || applied}
-                onChange={(e) => {
-                  setBoard(Number(e.target.value));
-                  setBoardPreset(0);
-                }}
+                disabled={locked}
+                onChange={(e) => adopt(Number(e.target.value), 0)}
               >
                 {boardsOf(vendor).map((b) => (
                   <option key={b.id} value={b.id}>
@@ -398,8 +979,8 @@ function Setup({ onDone }: { onDone: () => void }) {
                 Preset
                 <select
                   value={boardPreset}
-                  disabled={!!preview || applied}
-                  onChange={(e) => setBoardPreset(Number(e.target.value))}
+                  disabled={locked}
+                  onChange={(e) => adopt(board, Number(e.target.value))}
                 >
                   {(
                     catalog.boards.find((b) => b.id === board)?.presets || []
@@ -412,12 +993,14 @@ function Setup({ onDone }: { onDone: () => void }) {
               </label>
             )}
             <p className="bci-note">
-              {BCI_BOARD_COUNT} boards · {BCI_VENDOR_COUNT} documented vendors
-              {" · "}
-              {boardsOf("undocumented").length} undocumented ·{" "}
+              {BCI_BOARD_COUNT} boards · {BCI_VENDOR_COUNT} vendors ·{" "}
               {BCI_PRESET_COUNT} presets from BrainFlow{" "}
-              {catalog.brainflow_version}. The Boards tab lists every channel
-              name.
+              {catalog.brainflow_version}
+              {BCI_UNATTRIBUTED_COUNT
+                ? ` · ${BCI_UNATTRIBUTED_COUNT} without a vendor`
+                : ""}
+              . This board carries {channels.length} channels; the editor below
+              renames them. The Boards tab lists every channel name.
             </p>
           </>
         )}
@@ -425,7 +1008,7 @@ function Setup({ onDone }: { onDone: () => void }) {
           Instance
           <input
             value={instance}
-            disabled={!!preview || applied}
+            disabled={locked}
             onChange={(e) => setInstance(e.target.value)}
             pattern="[A-Za-z0-9_]+"
             maxLength={48}
@@ -435,7 +1018,7 @@ function Setup({ onDone }: { onDone: () => void }) {
           Clock
           <select
             value={clock}
-            disabled={!!preview || applied}
+            disabled={locked}
             onChange={(e) => setClock(e.target.value)}
           >
             {["unix_us", "simulation_us", "lsl_local_us", "device_us"].map(
@@ -450,22 +1033,12 @@ function Setup({ onDone }: { onDone: () => void }) {
             Original reference
             <input
               value={reference}
+              disabled={locked}
               onChange={(e) => setReference(e.target.value)}
               maxLength={128}
             />
           </label>
         )}
-        <label>
-          Channel names
-          <input
-            value={channels}
-            onChange={(e) => setChannels(e.target.value)}
-          />
-        </label>
-        <label>
-          Original units
-          <input value={units} onChange={(e) => setUnits(e.target.value)} />
-        </label>
         <label>
           Sample rate
           <input
@@ -473,10 +1046,16 @@ function Setup({ onDone }: { onDone: () => void }) {
             min={80}
             max={100000}
             value={rate}
+            disabled={locked}
             onChange={(e) => setRate(Number(e.target.value))}
           />
         </label>
       </div>
+      <ChannelEditor
+        channels={channels}
+        onChange={setChannels}
+        disabled={locked}
+      />
       {error && (
         <p role="alert" className="bci-error">
           {error}
@@ -504,26 +1083,40 @@ function Setup({ onDone }: { onDone: () => void }) {
           <button onClick={() => setPreview(null)}>Edit configuration</button>
         </>
       )}
-      {applied && (
-        <>
-          <p className="bci-success">
-            <Check size={16} /> Database configured. Start your local producer.
-          </p>
-          <p>
-            Install <code>pip install './sdk/python[bci,bci-hardware]'</code>{" "}
-            from the Community checkout. Set <code>CHRONOGRAPH_TOKEN</code> to
-            an ingest key in your terminal.
-          </p>
-          <Code text={command} />
-          <Link to="/documentation/BCI">
-            Acquisition instructions and hardware verification{" "}
-            <ArrowRight size={14} />
-          </Link>
-        </>
-      )}
+      {applied &&
+        (managed ? (
+          <ManagedRecording
+            instance={instance}
+            clockDomain={clock}
+            channels={channels}
+            rate={rate}
+            source={source}
+            boardId={board}
+            boardPreset={boardPreset}
+            reference={reference}
+            onWrote={onDone}
+          />
+        ) : (
+          <>
+            <p className="bci-success">
+              <Check size={16} /> Database configured. Start your local producer.
+            </p>
+            <p>
+              Install <code>pip install './sdk/python[bci,bci-hardware]'</code>{" "}
+              from the Community checkout. Set <code>CHRONOGRAPH_TOKEN</code> to
+              an ingest key in your terminal.
+            </p>
+            <Code text={command} />
+            <Link to="/documentation/BCI">
+              Acquisition instructions and hardware verification{" "}
+              <ArrowRight size={14} />
+            </Link>
+          </>
+        ))}
     </section>
   );
 }
+
 export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
   const { connection } = useAuth();
   const synthetic = demo || connection?.edition === "synthetic";
@@ -558,7 +1151,14 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
     [jobs, setJobs] = useState<JobStatus | null>(null),
     [jobDataset, setJobDataset] = useState(""),
     [jobComponents, setJobComponents] = useState(4),
-    [jobBusy, setJobBusy] = useState(false);
+    [jobBusy, setJobBusy] = useState(false),
+    // The board a person picked in the catalogue, carried into the setup form so "Use"
+    // there configures a recording instead of only highlighting a row.
+    [setupBoard, setSetupBoard] = useState<{
+      id: number;
+      preset: number;
+    } | null>(null),
+    [managedNote, setManagedNote] = useState("");
   const current = sessions.find(
     (s) => `${s.instance}:${s.session}` === selection,
   );
@@ -587,6 +1187,68 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+  /**
+   * A hosted workspace should never open empty.
+   *
+   * The account has no terminal, so it cannot start a producer, and an account that has
+   * applied a recording contract and then sees "no recordings" has been handed a dead
+   * end. This asks the deployment for the recording it produces itself, exactly once,
+   * and only when the project holds a contract and no session yet. The deployment answers
+   * with the recording it already holds when one exists, so this is safe to ask again.
+   */
+  const askedForRecording = useRef(false);
+  useEffect(() => {
+    if (!managedSite || synthetic || setup || loading || sessions.length) return;
+    if (askedForRecording.current) return;
+    askedForRecording.current = true;
+    let active = true;
+    void (async () => {
+      try {
+        const schema = await graph<{
+          connectors: { id: string; connector: string; clock_domain: string }[];
+        }>("schema");
+        const binding = schema.connectors.find((c) => c.connector === "bci");
+        if (!binding) {
+          if (active) setManagedNote("");
+          return;
+        }
+        const defaults = initialChannels("brainflow", 0, 0);
+        const result = await managedApi<{ created: boolean; sessions: number }>(
+          "/managed/bci/acquisition",
+          {
+            action: "ensure",
+            instance: binding.id,
+            clockDomain: binding.clock_domain,
+            stream: "eeg",
+            source: "brainflow",
+            boardId: 0,
+            preset: 0,
+            rate: 250,
+            reference: "unspecified",
+            channels: defaults.map((channel) => ({
+              name: channel.name,
+              unit: channel.unit,
+              type: channel.type,
+            })),
+          },
+        );
+        if (!active) return;
+        setManagedNote(
+          result.created
+            ? "A simulated BrainFlow recording was written for this workspace."
+            : "This workspace already holds " + result.sessions + " recording.",
+        );
+        if (result.created) await refresh();
+      } catch (e) {
+        // A missing contract, a project that cannot be reached or a deployment without a
+        // producer all mean the same thing here: offer the manual setup instead.
+        if (active) setManagedNote("");
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [synthetic, setup, loading, sessions.length, refresh]);
   useEffect(() => {
     let active = true;
     if (synthetic) {
@@ -911,7 +1573,19 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
           )}
         </div>
       </header>
-      {setup && <Setup onDone={() => void refresh()} />}
+      {setup && (
+          <Setup
+            key={setupBoard ? "board-" + setupBoard.id + "-" + setupBoard.preset : "default"}
+            initialBoard={setupBoard?.id}
+            initialPreset={setupBoard?.preset}
+            onDone={() => void refresh()}
+          />
+        )}
+        {managedNote && !setup && (
+          <p className="bci-muted" role="status">
+            {managedNote}
+          </p>
+        )}
       <BrowserDecodeCheck />
       <div className="bci-tabs" role="tablist" aria-label="BCI workspace">
         {["Sessions", "Datasets", "Runs", "Live", "Boards"].map((t) => (
@@ -935,19 +1609,26 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
         </p>
       )}
       {tab === "Boards" ? (
-        <Boards />
+        <Boards
+          onUse={(id, preset) => {
+            setSetupBoard({ id, preset });
+            setSetup(true);
+            setTab("Sessions");
+          }}
+        />
       ) : !sessions.length ? (
         <section className="bci-panel bci-empty">
           <Activity size={34} />
           <h2>Your first recording starts here.</h2>
           <p>
-            Configure a source, start the local worker and watch your session
-            arrive.
+            {managedSite
+              ? "This deployment records a BrainFlow board for you, so nothing has to be installed or run on your machine. Pick a board, review its channels, and the recording arrives."
+              : "Configure a source, start the local worker and watch your session arrive."}
           </p>
           <div className="bci-actions">
             {connection?.credential.scope === "admin" && (
               <button className="button primary" onClick={() => setSetup(true)}>
-                Set up a source <ArrowRight size={15} />
+                Set up a recording <ArrowRight size={15} />
               </button>
             )}
             <Link to="/bci">Explore the sample session</Link>

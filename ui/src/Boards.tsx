@@ -1,6 +1,11 @@
 import { useMemo, useState } from "react";
 import catalog from "./brainflow-boards.json";
-import { BCI_VENDORS, vendorLabel } from "./bci-vendors";
+import {
+  BCI_UNATTRIBUTED_COUNT,
+  BCI_VENDOR_COUNT,
+  BCI_VENDORS,
+  vendorLabel,
+} from "./bci-vendors";
 
 type Board = (typeof catalog.boards)[number];
 
@@ -34,8 +39,17 @@ function modality(board: Board) {
  * reports, so the console cannot promise a device the agent cannot open. Only the
  * synthetic board is exercised by the test suite, and a documented vendor whose board
  * is missing from the installed driver is shown as unavailable rather than invented.
+ *
+ * WHY this surface hands the chosen board back to the workspace: browsing a catalogue
+ * that cannot configure anything made "Use" a button that only highlighted its own row.
+ * The board and preset a person picks here become the source the setup form is already
+ * on, so the catalogue is a way into a recording rather than a list beside one.
  */
-export default function Boards() {
+export default function Boards({
+  onUse,
+}: {
+  onUse?: (boardId: number, preset: number) => void;
+}) {
   const [query, setQuery] = useState("");
   const [vendor, setVendor] = useState("all");
   const [selected, setSelected] = useState<number>(-1);
@@ -63,6 +77,7 @@ export default function Boards() {
   const chosen =
     board?.presets.find((entry) => entry.preset === preset) ??
     board?.presets[0];
+  const rows = chosen?.channels ?? board?.channels ?? 0;
   const command = board
     ? "chronograph-bci brainflow --board-id " +
       board.id +
@@ -79,8 +94,11 @@ export default function Boards() {
           <p className="small muted">
             {catalog.counts.describable} of {catalog.counts.boards} board IDs
             described from the installed BrainFlow {catalog.brainflow_version} ·{" "}
-            {vendors.length} documented vendors ·{" "}
+            {BCI_VENDOR_COUNT} vendors ·{" "}
             {catalog.boards.reduce((n, b) => n + b.presets.length, 0)} presets
+            {BCI_UNATTRIBUTED_COUNT
+              ? " · " + BCI_UNATTRIBUTED_COUNT + " without a vendor"
+              : ""}
           </p>
         </div>
         <span className="bci-chip">{catalog.counts.transports} transports</span>
@@ -128,7 +146,7 @@ export default function Boards() {
         <tbody>
           {shown.map((entry) => (
             <tr key={entry.name}>
-              <td>{entry.vendor === "undocumented" ? "—" : entry.vendor}</td>
+              <td>{vendorLabel(entry.vendor)}</td>
               <td>
                 <strong>{entry.device ?? entry.name}</strong>
                 <span className="small muted">
@@ -146,6 +164,7 @@ export default function Boards() {
                   onClick={() => {
                     setSelected(entry.id);
                     setPreset(entry.presets[0]?.preset ?? 0);
+                    onUse?.(entry.id, entry.presets[0]?.preset ?? 0);
                   }}
                 >
                   Use
@@ -166,8 +185,7 @@ export default function Boards() {
       {board && (
         <div className="board-detail">
           <h3>
-            {board.device ?? board.name}{" "}
-            <span className="bci-chip">#{board.id}</span>
+            {board.device ?? board.name} <span className="bci-chip">#{board.id}</span>
           </h3>
           {board.presets.length > 1 && (
             <label>
@@ -178,33 +196,41 @@ export default function Boards() {
               >
                 {board.presets.map((entry) => (
                   <option key={entry.preset} value={entry.preset}>
-                    {entry.name} · {entry.rate ?? "?"} Hz · {entry.channels}{" "}
-                    rows
+                    {entry.name} · {entry.rate ?? "?"} Hz · {entry.channels} rows
                   </option>
                 ))}
               </select>
             </label>
           )}
           <p className="small muted">
-            {chosen?.channels ?? board.channels} rows at{" "}
-            {chosen?.rate ?? board.rate ?? "unknown"} Hz, {modality(board)}.
-            Channel names:{" "}
+            {rows} rows at {chosen?.rate ?? board.rate ?? "unknown"} Hz,{" "}
+            {modality(board)}. {board.channel_names.length} channel names:{" "}
             {board.channel_names.length
               ? board.channel_names.slice(0, 12).join(", ")
               : "derived from the descriptor rows"}
-            {board.channel_names.length > 12 ? "…" : ""}
+            {board.channel_names.length > 12
+              ? "… and " + (board.channel_names.length - 12) + " more"
+              : ""}
           </p>
+          {onUse && (
+            <button
+              className="button primary"
+              onClick={() => onUse(board.id, chosen?.preset ?? 0)}
+            >
+              Configure a recording on this board
+            </button>
+          )}
           <p className="small muted">
-            Run this on the machine wired to the device. The console never opens
-            hardware, and units are never inferred:
+            This deployment records the board's geometry itself, so nothing has to be
+            installed here. On a machine wired to the device, the same board runs as:
           </p>
           <pre className="board-command">{command}</pre>
         </div>
       )}
 
       <p className="small muted">
-        Physical boards are described, not certified: only the synthetic board
-        and local files are exercised by the test suite.{" "}
+        Physical boards are described, not certified: only the synthetic board and local
+        files are exercised by the test suite.{" "}
         {Object.keys(catalog.unavailable_vendors).length > 0 &&
           Object.entries(
             // The generated file holds an empty object when every documented vendor

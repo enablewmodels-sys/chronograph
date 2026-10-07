@@ -699,3 +699,87 @@
   overflow-x: auto;
   font-size: 12.5px;
 }
+
+/* Channel configuration and the managed producer.
+   A 64-channel board needs 64 editable rows and a control that renames all of them at
+   once, so the editor is a disclosure: the pattern row and the table inside it, a
+   bounded scroll for the rows, and a headline that reports the count and any duplicate
+   before the migration is reviewed. */
+.bci-channel-editor {
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: var(--bci-muted);
+}
+.bci-channel-editor > summary {
+  cursor: pointer;
+  padding: 10px 0;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: #a9bbd2;
+}
+.bci-channel-editor .bci-error {
+  margin: 10px 0;
+}
+.bci-channel-bulk {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  align-items: end;
+  padding: 14px 0;
+  border-top: 1px solid var(--line, #2a3550);
+  border-bottom: 1px solid var(--line, #2a3550);
+  margin-bottom: 12px;
+}
+.bci-channel-bulk button {
+  align-self: end;
+}
+.bci-channel-table {
+  max-height: 340px;
+  overflow-y: auto;
+  border: 1px solid var(--line, #2a3550);
+  border-radius: 8px;
+}
+.bci-channel-head,
+.bci-channel-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1.4fr) minmax(0, 0.8fr) minmax(0, 0.8fr);
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+}
+.bci-channel-head {
+  position: sticky;
+  top: 0;
+  background: var(--surface, #0f1524);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8c9fb8;
+  border-bottom: 1px solid var(--line, #2a3550);
+}
+.bci-channel-row {
+  border-bottom: 1px solid #1b2b3d;
+}
+.bci-channel-row:last-child {
+  border-bottom: 0;
+}
+.bci-channel-row > span {
+  font-size: 11px;
+  color: #8c9fb8;
+  text-align: right;
+}
+.bci-channel-row input,
+.bci-channel-row select {
+  width: 100%;
+  min-width: 0;
+}
+.bci-managed {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.bci-managed .bci-actions {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+

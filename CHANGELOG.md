@@ -2,6 +2,59 @@
 
 ## Unreleased
 
+- The BCI workspace now records for a hosted account instead of asking it to install one. "Connect a
+  recording" ended by printing a pip command and a `chronograph-bci` line, so a hosted account had to
+  install the SDK and run a producer on its own machine before a single session existed — and a
+  project that had already applied its recording contract showed "no recordings" with nothing to press.
+  A new control-plane module (`launch/private/managed/control-plane/bci-acquisition.mjs`) produces the
+  recording itself through the same connector contract the local agent writes: session metadata, an
+  immutable stream contract, immutable signal chunks with their timestamps, cue events and one
+  deliberate acquisition pause. The signal follows BrainFlow's own synthetic board — a deterministic
+  mix of alpha, theta and beta rhythms, cue-locked lateralisation and noise, in microvolts, at the
+  board's own geometry — so a Cyton-shaped recording is the default and nothing claims a device was
+  opened. The workspace asks for a recording on load (`ensure`, idempotent, so a project that already
+  holds one is left alone), and `POST /managed/bci/acquisition` starts, stops and reports runs, all
+  bounded in seconds, memory and producers per project. `ui/src/BCI.tsx` finishes the migration with
+  that request rather than a command line.
+- Every board in the shipped BrainFlow catalogue now belongs to a vendor. The generated catalogue
+  grouped a board under the placeholder vendor `undocumented` whenever the hand-written map omitted
+  it, which hid 28 real boards — 14 Ant Neuro, 7 Muse, 5 NeuroMD, 4 OpenBCI, 4 Mentalab, 4 Synchroni,
+  AAVAA, NTL and the OYMotion OB-series — behind one meaningless group in both the source picker and
+  the device catalogue. The map is completed from the driver's own board factory
+  (`src/board_controller/board_controller.cpp`, which names the controller class and therefore the
+  vendor source directory each member is built in), transports are excluded from the undocumented
+  set, and `scripts/bci-formats-test.py` now fails if a driver upgrade adds a member nobody has
+  attributed. The catalogue reports 21 vendors and 0 un-attributed boards.
+- A board carries its geometry into the form, and the channels are editable. A 16- or 64-channel board
+  arrived with eight channel names and no way to change them; the picker now derives the names the
+  driver reports (or a numbered pattern in the board's own signal family when it reports fewer than
+  the geometry declares), and a channel editor renames all of them in one gesture — prefix, start
+  index, digit count, separator — or any single row, with the unit and the channel type chosen from a
+  list rather than typed. What the table shows is exactly what the recording claims. "Use" in the
+  device catalogue now configures a recording on that board instead of only highlighting its row.
+- App hosting is enabled on this deployment, and a project can author its own manifest.
+  `/app/apps` said hosting was not enabled; the hosting block is now present, and because this host
+  runs no container runtime the deployment runs appctl with its `dry-run` driver, which the page says
+  plainly: a deploy is simulated and the recorded argv is exactly what a real deploy would run. The
+  driver's location now resolves in the release layout as well as in a checkout (a configured
+  `hosting.platformRoot` wins, otherwise `<release>/deploy/platform` is found beside the control
+  plane), `deploy-control-plane.sh` ships the driver with the release, and `POST /managed/apps/create`
+  writes a manifest from a closed set of options — never a manifest body — validated by appctl's own
+  loader and renamed into place atomically. A mount with no size, or a size with no mount, is now
+  refused with the missing half named rather than by appctl's complaint about the temporary file it
+  was validating.
+- Two things the operator panel had been reporting, both found by using it. The panel scoped the
+  operator role to three addresses; it now names one, and the allowlist travels with the account
+  roster so it is visible rather than inferred. The panel was also raising a critical "engine
+  unreachable" alert for projects that were serving requests: its readiness probe used `fetch`, which
+  will not set `Host`, so a loopback request arrived as `127.0.0.1:<port>` and every engine answered
+  403. The probe now sends the deployment's own host, the same header the control plane sets when it
+  proxies to a project. Beyond the read-only snapshot the panel can restart one project engine, revoke
+  one account's sessions and set one membership's status — each refusing to target the acting
+  operator, refusing to suspend a project's last active owner, echoing the target's address as its
+  confirmation and writing exactly one audit row — and it lists accounts, live sessions and
+  memberships without returning a session identifier.
+
 - The website is mobile friendly, and the floor is asserted rather than assumed. Auditing the live
   pages at 390x844 found the stylesheets making text *smaller* on a phone than on a desktop — 7px
   timeline ticks, an 8px scene caption, 9px navigation sections, a 10px version badge — inline links

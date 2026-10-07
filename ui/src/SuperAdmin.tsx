@@ -149,6 +149,43 @@ interface ChainCheck {
   brokenAt: number | null;
   checkedAt: number;
 }
+/* The operator rosters. They are separate from the snapshot because they name people and
+   list every grant, which the aggregate sections deliberately do not. The allowlist is
+   shown because "who can open this panel" is answered only by the deployment's own
+   configuration, which the console cannot read from anywhere else. */
+interface OperatorAccount {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  operator: boolean;
+  projects: number | null;
+  sessions: number | null;
+  lastSeenAt: number | null;
+}
+interface OperatorSession {
+  email: string;
+  createdAt: number | null;
+  expiresAt: number | null;
+  ipAddress: string;
+  userAgent: string;
+  assuranceAt?: number | null;
+}
+interface OperatorMembership {
+  projectId: string;
+  projectName: string;
+  userId: string;
+  email: string;
+  role: string;
+  status: string;
+}
+interface OperatorRoster {
+  accounts: OperatorAccount[];
+  sessions: OperatorSession[];
+  memberships: OperatorMembership[];
+  allowlist: string[];
+}
 
 async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(path, {
@@ -178,6 +215,23 @@ async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
       { status: response.status },
     );
   }
+  return payload as T;
+}
+
+async function postJson<T>(path: string, body: unknown): Promise<T> {
+  const response = await fetch(path, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(body),
+  });
+  const payload = (await response.json().catch(() => null)) as {
+    error?: { message?: string };
+  } | null;
+  if (!response.ok)
+    throw new Error(
+      payload?.error?.message || "The operator action could not be completed.",
+    );
   return payload as T;
 }
 
@@ -367,8 +421,36 @@ export default function SuperAdmin() {
   const [signedOut, setSignedOut] = useState(false);
   const [status, setStatus] = useState("Loading the platform overview.");
   const [chain, setChain] = useState<ChainCheck | null>(null);
+  const [roster, setRoster] = useState<OperatorRoster | null>(null);
   const inFlight = useRef<AbortController | null>(null);
   const verify = useAction();
+  const act = useAction();
+
+  /* The rosters load beside the snapshot and never fail the page: an operator who can read
+     the fleet but not the account list is still better served than one shown an error. */
+  const loadRoster = useCallback(async (signal?: AbortSignal) => {
+    const [accounts, sessions, memberships] = await Promise.all([
+      getJson<{ accounts: OperatorAccount[]; allowlist: string[] }>(
+        "/managed/superadmin/accounts",
+        signal,
+      ),
+      getJson<{ sessions: OperatorSession[] }>(
+        "/managed/superadmin/sessions",
+        signal,
+      ),
+      getJson<{ memberships: OperatorMembership[] }>(
+        "/managed/superadmin/memberships",
+        signal,
+      ),
+    ]);
+    if (signal?.aborted) return;
+    setRoster({
+      accounts: accounts.accounts,
+      allowlist: accounts.allowlist,
+      sessions: sessions.sessions,
+      memberships: memberships.memberships,
+    });
+  }, []);
 
   /* A manual refresh, on mount and on request only. No polling, and the request
      is aborted when the page unmounts. */
@@ -393,6 +475,7 @@ export default function SuperAdmin() {
         `Updated ${new Date().toLocaleTimeString()}.` +
           (stamp === UNKNOWN ? "" : ` Probe reported ${stamp}.`),
       );
+      await loadRoster(control.signal).catch(() => {});
     } catch (error) {
       if (control.signal.aborted) return;
       const status = (error as { status?: number }).status;
@@ -416,7 +499,7 @@ export default function SuperAdmin() {
         setLoading(false);
       }
     }
-  }, []);
+  }, [loadRoster]);
 
   useEffect(() => {
     void load();
@@ -484,6 +567,7 @@ export default function SuperAdmin() {
       <p className="superadmin-status" role="status" aria-live="polite">
         {status}
       </p>
+      {act.feedback}
       {failure && !forbidden && !signedOut && (
         <div className="notice error" role="alert">
           <strong>Overview unavailable.</strong> {failure}
@@ -760,6 +844,7 @@ export default function SuperAdmin() {
                       <th scope="col">Disk</th>
                       <th scope="col">Last backup</th>
                       <th scope="col">Engine</th>
+                      <th scope="col">Control</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -798,6 +883,26 @@ export default function SuperAdmin() {
                               {project.engine.reason}
                             </span>
                           )}
+                        </td>
+                        <td>
+                          {/* A project whose engine died and whose backoff has not expired is
+                              the reason this control exists: the runner re-spawns and waits for
+                              its own readiness probe, so one click is the whole remedy. */}
+                          <button
+                            className="outline"
+                            disabled={act.busy}
+                            onClick={() =>
+                              void act.run(async () => {
+                                await postJson(
+                                  "/managed/superadmin/projects/restart",
+                                  { projectId: project.id },
+                                );
+                                await load();
+                              }, "The engine was restarted.")
+                            }
+                          >
+                            Restart engine
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -878,6 +983,224 @@ export default function SuperAdmin() {
             </Body>
           </Panel>
 
+          <Panel
+            title="Operators"
+            hint="Who can open this panel, and every account it belongs to. The allowlist is root-owned configuration: changing it needs host access, not a toggle here."
+          >
+            <Body loading={firstLoad} reason={reasonFor(roster?.accounts)}>
+              {roster && (
+                <>
+                  <p className="superadmin-note">
+                    {roster.allowlist.length
+                      ? `Platform operators: ${roster.allowlist.join(", ")}.`
+                      : "No platform operator is configured, so nobody can open this panel."}
+                  </p>
+                  <div className="superadmin-scroll">
+                    <table className="superadmin-table">
+                      <caption>Accounts</caption>
+                      <thead>
+                        <tr>
+                          <th scope="col">Account</th>
+                          <th scope="col">Operator</th>
+                          <th scope="col">Role</th>
+                          <th scope="col">State</th>
+                          <th scope="col">Projects</th>
+                          <th scope="col">Sessions</th>
+                          <th scope="col">Last seen</th>
+                          <th scope="col">Sign out everywhere</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {roster.accounts.map((account) => (
+                          <tr key={account.id}>
+                            <th scope="row">
+                              <strong>{account.name || account.email || account.id}</strong>
+                              <span>
+                                <code>{account.email || account.id}</code>
+                              </span>
+                            </th>
+                            <td>
+                              <Flag
+                                value={account.operator}
+                                on="operator"
+                                off="—"
+                              />
+                            </td>
+                            <td>{account.role || UNKNOWN}</td>
+                            <td>{account.status || UNKNOWN}</td>
+                            <td>{formatCount(account.projects)}</td>
+                            <td>{formatCount(account.sessions)}</td>
+                            <td>{formatStamp(account.lastSeenAt)}</td>
+                            <td>
+                              <button
+                                className="ghost danger"
+                                disabled={
+                                  act.busy ||
+                                  !account.email ||
+                                  !isNumber(account.sessions) ||
+                                  account.sessions === 0
+                                }
+                                onClick={() => {
+                                  if (
+                                    !window.confirm(
+                                      "Sign " +
+                                        (account.email || account.id) +
+                                        " out of every device? Their sessions are deleted and they must sign in again.",
+                                    )
+                                  )
+                                    return;
+                                  void act.run(async () => {
+                                    await postJson(
+                                      "/managed/superadmin/accounts/revoke-sessions",
+                                      {
+                                        userId: account.id,
+                                        confirm: account.email,
+                                      },
+                                    );
+                                    await load();
+                                  }, "Every session for that account was revoked.");
+                                }}
+                              >
+                                Revoke
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+            </Body>
+          </Panel>
+
+          <Panel
+            title="Active sessions"
+            hint="Every live sign-in on this deployment. Session identifiers are deliberately not shown: this page returns no credentials."
+          >
+            <Body loading={firstLoad} reason={reasonFor(roster?.sessions)}>
+              {roster &&
+                (roster.sessions.length ? (
+                  <div className="superadmin-scroll">
+                    <table className="superadmin-table">
+                      <caption>Live sessions</caption>
+                      <thead>
+                        <tr>
+                          <th scope="col">Account</th>
+                          <th scope="col">Signed in</th>
+                          <th scope="col">Expires</th>
+                          <th scope="col">Address</th>
+                          <th scope="col">Client</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {roster.sessions.map((session, index) => (
+                          <tr key={`${session.email}-${index}`}>
+                            <th scope="row">
+                              <code>{session.email || UNKNOWN}</code>
+                            </th>
+                            <td>{formatStamp(session.createdAt ?? session.assuranceAt ?? null)}</td>
+                            <td>{formatStamp(session.expiresAt)}</td>
+                            <td>{session.ipAddress || "not kept"}</td>
+                            <td className="superadmin-wrap">
+                              <code>{session.userAgent || "not kept"}</code>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="superadmin-note">
+                    No live session was reported.
+                  </p>
+                ))}
+            </Body>
+          </Panel>
+
+          <Panel
+            title="Memberships"
+            hint="Every project grant. Suspending one takes effect on the member's next request; a project's last active owner cannot be suspended."
+          >
+            <Body loading={firstLoad} reason={reasonFor(roster?.memberships)}>
+              {roster &&
+                (roster.memberships.length ? (
+                  <div className="superadmin-scroll">
+                    <table className="superadmin-table">
+                      <caption>Project memberships</caption>
+                      <thead>
+                        <tr>
+                          <th scope="col">Project</th>
+                          <th scope="col">Account</th>
+                          <th scope="col">Role</th>
+                          <th scope="col">State</th>
+                          <th scope="col">Change</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {roster.memberships.map((member) => (
+                          <tr key={`${member.projectId}-${member.userId}`}>
+                            <th scope="row">
+                              <strong>{member.projectName || member.projectId}</strong>
+                              <span>
+                                <code>{member.projectId}</code>
+                              </span>
+                            </th>
+                            <td>
+                              <code>{member.email || member.userId}</code>
+                            </td>
+                            <td>{member.role || UNKNOWN}</td>
+                            <td>{member.status || UNKNOWN}</td>
+                            <td>
+                              <button
+                                className={
+                                  member.status === "active"
+                                    ? "ghost danger"
+                                    : "outline"
+                                }
+                                disabled={act.busy}
+                                onClick={() => {
+                                  const next =
+                                    member.status === "active"
+                                      ? "suspended"
+                                      : "active";
+                                  if (
+                                    next === "suspended" &&
+                                    !window.confirm(
+                                      "Suspend " +
+                                        (member.email || member.userId) +
+                                        " in " +
+                                        (member.projectName || member.projectId) +
+                                        "? They lose access on their next request.",
+                                    )
+                                  )
+                                    return;
+                                  void act.run(async () => {
+                                    await postJson(
+                                      "/managed/superadmin/memberships/update",
+                                      {
+                                        projectId: member.projectId,
+                                        userId: member.userId,
+                                        status: next,
+                                      },
+                                    );
+                                    await load();
+                                  }, "The membership was updated.");
+                                }}
+                              >
+                                {member.status === "active" ? "Suspend" : "Restore"}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="superadmin-note">No membership exists.</p>
+                ))}
+            </Body>
+          </Panel>
           <Panel
             title="Backups"
             hint="Identity archive and per-project backup freshness."

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Rocket } from "lucide-react";
+import { Plus, Rocket } from "lucide-react";
 import { managedApi } from "./managed-api";
 import { Busy, Code, Field, Head, useAction } from "./shared";
 
@@ -62,6 +62,32 @@ interface PlanResult {
   runtime: string;
   steps: PlanStep[];
 }
+interface ManifestRead {
+  name: string;
+  present: boolean;
+  source: string | null;
+  valid: boolean;
+  problem: string | null;
+  text: string | null;
+}
+/**
+ * The create panel's fields, before the request is assembled. Port, health path and
+ * replicas start at what the platform's own example manifest declares, so a form
+ * holding only a name still produces the documented shape.
+ */
+const EMPTY_FORM = {
+  name: "",
+  kind: "container",
+  image: "",
+  port: "8080",
+  healthPath: "/healthz",
+  replicas: "1",
+  sizeGb: "",
+  mount: "",
+  envNames: "",
+  overwrite: false,
+  confirm: "",
+};
 
 /** The deployment has no hosting block: the routes are 404 with this code. */
 const DISABLED_CODE = "HOSTING_DISABLED";
@@ -88,6 +114,7 @@ function when(at: string | null) {
 }
 export default function ManagedApps() {
   const action = useAction();
+  const createAction = useAction();
   const [disabled, setDisabled] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [runtime, setRuntime] = useState("");
@@ -99,6 +126,9 @@ export default function ManagedApps() {
   const [to, setTo] = useState("production");
   const [purge, setPurge] = useState(false);
   const [plan, setPlan] = useState<PlanResult | null>(null);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [manifestRead, setManifestRead] = useState<ManifestRead | null>(null);
+  const [showManifest, setShowManifest] = useState(false);
   const loadDetail = async (name: string) => {
     const result = await managedApi<AppDetail>(
       "/managed/apps/" + encodeURIComponent(name),
@@ -107,8 +137,21 @@ export default function ManagedApps() {
     setDetail(result);
     setFrom(name + "-preview");
     setPlan(null);
+    setShowManifest(false);
+    try {
+      setManifestRead(
+        await managedApi<ManifestRead>(
+          "/managed/apps/manifest?name=" + encodeURIComponent(name),
+        ),
+      );
+    } catch {
+      // The app summary already reports a manifest this console will not read, so
+      // the read-only view is not offered instead of failing the page in front of
+      // the person looking at it.
+      setManifestRead(null);
+    }
   };
-  const load = async () => {
+  const load = async (preferred?: string) => {
     try {
       const result = await managedApi<{ apps: AppSummary[]; runtime: string }>(
         "/managed/apps",
@@ -116,14 +159,16 @@ export default function ManagedApps() {
       setApps(result.apps);
       setRuntime(result.runtime);
       setDisabled(false);
+      const wanted = preferred ?? selected;
       const name =
-        selected && result.apps.some((app) => app.name === selected)
-          ? selected
+        wanted && result.apps.some((app) => app.name === wanted)
+          ? wanted
           : (result.apps[0]?.name ?? "");
       if (name) await loadDetail(name);
       else {
         setSelected("");
         setDetail(null);
+        setManifestRead(null);
       }
     } catch (error) {
       if (isHostingDisabled(error)) {
@@ -136,6 +181,33 @@ export default function ManagedApps() {
     } finally {
       setLoaded(true);
     }
+  };
+  // Every option is sent only when it holds something, so an untouched field leaves
+  // the server's own default in place, and no request can set a manifest field this
+  // panel does not show.
+  const createApp = () => {
+    const name = form.name.trim();
+    const body: Record<string, unknown> = { name, kind: form.kind };
+    if (form.image.trim()) body.image = form.image.trim();
+    if (form.port.trim()) body.port = Number(form.port);
+    if (form.healthPath.trim()) body.healthPath = form.healthPath.trim();
+    if (form.replicas.trim()) body.replicas = Number(form.replicas);
+    if (form.sizeGb.trim()) body.sizeGb = Number(form.sizeGb);
+    if (form.mount.trim()) body.mount = form.mount.trim();
+    const envNames = form.envNames.split(/[\s,]+/).filter(Boolean);
+    if (envNames.length > 0) body.envNames = envNames;
+    if (form.overwrite) {
+      body.overwrite = true;
+      body.confirm = form.confirm.trim();
+    }
+    void createAction.run(async () => {
+      await managedApi<{ app: AppSummary; source: string }>(
+        "/managed/apps/create",
+        body,
+      );
+      setForm(EMPTY_FORM);
+      await load(name);
+    }, "Manifest written. The app is deployable now.");
   };
   useEffect(() => {
     void action.run(load);
@@ -185,9 +257,13 @@ export default function ManagedApps() {
         A manifest in this project's manifests directory is what makes an app
         deployable. Deploying, promoting, rolling back and destroying are
         recorded in the app's ledger and in the workspace audit log.
-        {runtime
-          ? " This deployment runs appctl with the " + runtime + " runtime."
-          : ""}
+        {runtime === "dry-run"
+          ? " No container runtime is installed on this host, so this deployment" +
+            " runs appctl with the dry-run driver: a deploy is simulated, and the" +
+            " recorded argv is exactly what a real deploy would run."
+          : runtime
+            ? " This deployment runs appctl with the " + runtime + " runtime."
+            : ""}
       </p>
       {action.feedback}
       <section className="panel form-panel">
@@ -244,8 +320,8 @@ export default function ManagedApps() {
         </div>
         {loaded && apps.length === 0 && (
           <p className="empty-table">
-            No app is deployed in this project yet. A manifest under the
-            project's manifests directory is what makes one deployable.
+            No app is deployed in this project yet. A manifest in this project's
+            manifests directory is what makes one deployable.
           </p>
         )}
         {!loaded && (
@@ -253,6 +329,170 @@ export default function ManagedApps() {
             Reading this project's apps…
           </p>
         )}
+      </section>
+      <section className="panel form-panel app-create">
+        <div className="section-head">
+          <div>
+            <h2>
+              <Plus size={18} /> Create an app
+            </h2>
+            <p className="small muted">
+              This console writes the manifest for you from the fields below,
+              because it never accepts a manifest body. A manifest is what makes
+              the app deployable; deploying it comes after.
+            </p>
+          </div>
+        </div>
+        {createAction.feedback}
+        <div className="managed-two-column">
+          <Field
+            label="Name"
+            hint="Lowercase letters, digits and dashes, starting with a letter."
+          >
+            <input
+              name="name"
+              value={form.name}
+              maxLength={31}
+              pattern="[a-z][a-z0-9-]{1,30}"
+              placeholder="console-api"
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+          </Field>
+          <Field
+            label="Kind"
+            hint="A container is the general case; a mobile app also needs its store artifacts."
+          >
+            <select
+              name="kind"
+              value={form.kind}
+              onChange={(e) => setForm({ ...form, kind: e.target.value })}
+            >
+              <option value="container">container</option>
+              <option value="web">web</option>
+              <option value="mobile">mobile</option>
+            </select>
+          </Field>
+          <Field
+            label="Image"
+            hint="Optional. A prebuilt reference, such as ghcr.io/acme/app:1.4.0."
+          >
+            <input
+              name="image"
+              value={form.image}
+              onChange={(e) => setForm({ ...form, image: e.target.value })}
+            />
+          </Field>
+          <Field
+            label="Port"
+            hint="The port the app listens on inside its container."
+          >
+            <input
+              name="port"
+              type="number"
+              min={1}
+              max={65535}
+              value={form.port}
+              onChange={(e) => setForm({ ...form, port: e.target.value })}
+            />
+          </Field>
+          <Field
+            label="Health path"
+            hint="An absolute path that answers 2xx when the app is ready."
+          >
+            <input
+              name="healthPath"
+              value={form.healthPath}
+              onChange={(e) => setForm({ ...form, healthPath: e.target.value })}
+            />
+          </Field>
+          <Field
+            label="Replicas"
+            hint="One container per environment; this runtime refuses more."
+          >
+            <input
+              name="replicas"
+              type="number"
+              min={1}
+              max={4}
+              value={form.replicas}
+              onChange={(e) => setForm({ ...form, replicas: e.target.value })}
+            />
+          </Field>
+          <Field
+            label="Persistence size in GB"
+            hint="A database needs durable local storage. Fill this and the mount path together, or leave both empty for a stateless app."
+          >
+            <input
+              name="sizeGb"
+              type="number"
+              min={1}
+              value={form.sizeGb}
+              onChange={(e) => setForm({ ...form, sizeGb: e.target.value })}
+            />
+          </Field>
+          <Field
+            label="Mount"
+            hint="The absolute path inside the container that keeps its data. Required together with the size above."
+          >
+            <input
+              name="mount"
+              value={form.mount}
+              placeholder="/data"
+              onChange={(e) => setForm({ ...form, mount: e.target.value })}
+            />
+          </Field>
+          <Field
+            label="Environment variable names"
+            hint="Names only, separated by commas. This console never accepts a value."
+          >
+            <input
+              name="envNames"
+              value={form.envNames}
+              placeholder="CHRONOGRAPH_URL, LOG_LEVEL"
+              onChange={(e) => setForm({ ...form, envNames: e.target.value })}
+            />
+          </Field>
+        </div>
+        <div className="app-create-write">
+          <label className="check-field">
+            <input
+              type="checkbox"
+              checked={form.overwrite}
+              onChange={(e) =>
+                setForm({ ...form, overwrite: e.target.checked })
+              }
+            />
+            Replace a manifest this project already has
+          </label>
+          {form.overwrite && (
+            <Field
+              label="Confirm"
+              hint="Repeat the app name; that echo is what makes replacing it deliberate."
+            >
+              <input
+                name="confirm"
+                value={form.confirm}
+                onChange={(e) => setForm({ ...form, confirm: e.target.value })}
+              />
+            </Field>
+          )}
+        </div>
+        <div className="table-actions app-actions">
+          <button
+            className="primary"
+            disabled={createAction.busy}
+            onClick={() => createApp()}
+          >
+            <Busy busy={createAction.busy}>Create manifest</Busy>
+          </button>
+          <button
+            className="ghost"
+            disabled={createAction.busy}
+            onClick={() => setForm(EMPTY_FORM)}
+          >
+            Clear
+          </button>
+        </div>
       </section>
       {app && (
         <section className="panel form-panel">
@@ -267,6 +507,30 @@ export default function ManagedApps() {
             </div>
             <span className="scope-badge">{app.health}</span>
           </div>
+          {manifestRead && manifestRead.present && (
+            <p className="small muted app-manifest-source">
+              Manifest source <code>{manifestRead.source}</code>.{" "}
+              {manifestRead.valid
+                ? "appctl accepts it as written."
+                : (manifestRead.problem ?? "appctl refuses it.")}
+            </p>
+          )}
+          {manifestRead && manifestRead.text !== null && (
+            <div className="table-actions app-actions">
+              <button
+                className="outline"
+                disabled={action.busy}
+                onClick={() => setShowManifest(!showManifest)}
+              >
+                {showManifest ? "Hide manifest" : "View manifest"}
+              </button>
+            </div>
+          )}
+          {showManifest && manifestRead?.text && (
+            <div className="app-manifest">
+              <Code text={manifestRead.text} />
+            </div>
+          )}
           <div className="managed-two-column">
             <Field
               label="Environment"

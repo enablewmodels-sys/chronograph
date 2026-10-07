@@ -107,7 +107,9 @@ test("every catalogued board is selectable in the source picker", async ({
   expect(actual).toEqual(expected);
   expect(selectable.size).toBe(catalogueBoards.length);
 
-  // The placeholder group exists and is named for a person, not as "undocumented".
+  // Every board belongs to a vendor, so no board hides behind a placeholder group. The
+  // group a board lands in is what makes it findable: a board in the un-attributed bucket
+  // is a board nobody browsing by maker can reach.
   const labels = [...selectable.values()].join(" | ");
   expect(labels).toContain("AAVAA_V3_BOARD");
   const vendorLabels = await vendorSelect
@@ -116,10 +118,12 @@ test("every catalogued board is selectable in the source picker", async ({
       options.map((option) => (option as HTMLOptionElement).textContent ?? ""),
     );
   expect(
-    vendorLabels.some((label) => label.startsWith("Undocumented (BrainFlow)")),
-  ).toBe(true);
+    vendorLabels.some((label) => label.startsWith("Unattributed (BrainFlow)")),
+  ).toBe(false);
   // Counts describe boards, not the documentation map: this group holds one board.
   const dummy = vendorLabels.find((label) => label.startsWith("Dummy boards"));
   expect(dummy).toContain("1 board");
+  const antNeuro = vendorLabels.find((label) => label.startsWith("Ant Neuro"));
+  expect(antNeuro).toContain("14 boards");
   expect(errors).toEqual([]);
 });

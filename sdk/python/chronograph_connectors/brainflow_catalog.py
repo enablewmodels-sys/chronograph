@@ -24,14 +24,32 @@ the standard library.
 
 import math
 
-# Documented vendor order from BrainFlow's Supported Boards page. The values are
-# BoardIds member names, not numeric ids, so the catalog cannot drift from the
-# installed enum.
+# Every vendor the installed driver ships a board for, keyed by the BoardIds member
+# names it owns, so the catalog cannot drift from the installed enum. A board the
+# driver defines but this table omits reached the console as the placeholder vendor
+# "undocumented", which hid 28 real boards behind one meaningless group.
+#
+# WHY the table is wider than BrainFlow's Supported Boards page: that page documents 18
+# vendors and lists one or two members each, while the library defines 67 members. The
+# authority used below is the driver's own board factory and its vendor source tree -
+# src/board_controller/board_controller.cpp, which names the controller class each
+# BoardIds member is constructed with, inside the vendor directory that class lives in
+# (ant_neuro, aavaa, ntl, synchroni, mentalab, muse, neuromd, openbci, oymotion). The
+# Supported Boards page is a subset of that, and its 5.22.0 revision dropped the Ganglion
+# and BLED sections while the members remained.
+#
+# Two entries deserve naming, because a name is all they have. The OB-series boards
+# (60 OB5000, 63 OB3000) are built by SynchroniBoard in src/board_controller/synchroni,
+# the controller the SYNCHRONI members share, and OYMotion markets an OB3000 of its own:
+# the driver's classification is followed here and the ambiguity is left visible rather
+# than resolved by guessing. NTL owns src/board_controller/ntl and BrainFlow's page names
+# no vendor for it, so the group carries the library's own short name.
 VENDORS = {
     "Dummy boards": ("PLAYBACK_FILE_BOARD", "STREAMING_BOARD", "SYNTHETIC_BOARD"),
     "OpenBCI": (
         "GALEA_BOARD",
         "CYTON_BOARD",
+        "GANGLION_BOARD",
         "GANGLION_NATIVE_BOARD",
         "CYTON_DAISY_BOARD",
         "GANGLION_WIFI_BOARD",
@@ -40,27 +58,69 @@ VENDORS = {
     ),
     "NeuroMD": (
         "BRAINBIT_BOARD",
+        "BRAINBIT_BLED_BOARD",
         "CALLIBRI_EEG_BOARD",
         "CALLIBRI_EMG_BOARD",
         "CALLIBRI_ECG_BOARD",
     ),
     "G.TEC": ("UNICORN_BOARD",),
     "Neurosity": ("NOTION_1_BOARD", "NOTION_2_BOARD", "CROWN_BOARD"),
-    "OYMotion": ("GFORCE_PRO_BOARD", "GFORCE_DUAL_BOARD"),
+    "OYMotion": (
+        "GFORCE_PRO_BOARD",
+        "GFORCE_DUAL_BOARD",
+        "OB3000_24_CHANNELS_BOARD",
+        "OB5000_8_CHANNELS_BOARD",
+    ),
     "FreeEEG": ("FREEEEG32_BOARD", "FREEEEG128_BOARD"),
-    "Muse": ("MUSE_S_BOARD", "MUSE_S_ATHENA_BOARD", "MUSE_2_BOARD", "MUSE_2016_BOARD"),
-    "Ant Neuro": ("ANT_NEURO_EE_410_BOARD",),
+    "Muse": (
+        "MUSE_S_BOARD",
+        "MUSE_S_ATHENA_BOARD",
+        "MUSE_2_BOARD",
+        "MUSE_2016_BOARD",
+        "MUSE_S_BLED_BOARD",
+        "MUSE_2_BLED_BOARD",
+        "MUSE_2016_BLED_BOARD",
+    ),
+    "Ant Neuro": (
+        "ANT_NEURO_EE_410_BOARD",
+        "ANT_NEURO_EE_411_BOARD",
+        "ANT_NEURO_EE_430_BOARD",
+        "ANT_NEURO_EE_511_BOARD",
+        "ANT_NEURO_EE_211_BOARD",
+        "ANT_NEURO_EE_212_BOARD",
+        "ANT_NEURO_EE_213_BOARD",
+        "ANT_NEURO_EE_214_BOARD",
+        "ANT_NEURO_EE_215_BOARD",
+        "ANT_NEURO_EE_221_BOARD",
+        "ANT_NEURO_EE_222_BOARD",
+        "ANT_NEURO_EE_223_BOARD",
+        "ANT_NEURO_EE_224_BOARD",
+        "ANT_NEURO_EE_225_BOARD",
+    ),
     "Enophone": ("ENOPHONE_BOARD",),
     "BrainAlive": ("BRAINALIVE_BOARD",),
-    "Mentalab": ("EXPLORE_4_CHAN_BOARD", "EXPLORE_8_CHAN_BOARD"),
+    "Mentalab": (
+        "EXPLORE_4_CHAN_BOARD",
+        "EXPLORE_8_CHAN_BOARD",
+        "EXPLORE_PLUS_8_CHAN_BOARD",
+        "EXPLORE_PLUS_32_CHAN_BOARD",
+    ),
     "EmotiBit": ("EMOTIBIT_BOARD",),
     "PiEEG": ("PIEEG_BOARD",),
     "NeuroPawn": ("NEUROPAWN_KNIGHT_BOARD", "NEUROPAWN_KNIGHT_BOARD_IMU"),
     "BioListener": ("BIOLISTENER_BOARD",),
     "IronBCI": ("IRONBCI_32_BOARD",),
-    # Documented by BrainFlow. Present in 5.23.0 and absent from 5.22.2, which is why
-    # availability is decided by the installed enum rather than by this table.
+    # Present in 5.23.0 and absent from 5.22.2, which is why availability is decided by
+    # the installed enum rather than by this table.
     "Shimmer": ("SHIMMER3_BOARD",),
+    "AAVAA": ("AAVAA_V3_BOARD",),
+    "NTL": ("NTL_WIFI_BOARD",),
+    "Synchroni": (
+        "SYNCHRONI_UNO_1_CHANNELS_BOARD",
+        "SYNCHRONI_TRIO_3_CHANNELS_BOARD",
+        "SYNCHRONI_OCTO_8_CHANNELS_BOARD",
+        "SYNCHRONI_PENTO_8_CHANNELS_BOARD",
+    ),
 }
 
 # Transports: data movers, not devices. They have no sampling rate of their own.
@@ -315,8 +375,12 @@ def catalog():
         for vendor, members in VENDORS.items()
         if not any(member in _board_ids() for member in members)
     }
+    # Transports are not devices and are reported under their own key, so a transport
+    # that owns no vendor must not also be counted as an undocumented board.
     undocumented = sorted(
-        member for member in _board_ids() if member not in _VENDOR_BY_MEMBER
+        member
+        for member in _board_ids()
+        if member not in _VENDOR_BY_MEMBER and member not in TRANSPORTS
     )
     return {
         "brainflow_version": BoardShim.get_version(),

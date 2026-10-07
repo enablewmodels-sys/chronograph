@@ -552,3 +552,26 @@
 .console .graph-view.tree-layout .graph-tools {
   background: var(--surface);
 }
+/* Layer 4 app hosting, the create panel. The option grid is the shared two-column one, so these
+   rules cover only what is particular to this panel: the confirm echo sits under the overwrite
+   checkbox, a manifest source path can be longer than its column, and one long manifest scrolls
+   inside its own box instead of widening the page it is read on. */
+.app-create-write {
+  display: grid;
+  gap: 15px;
+  margin: 0 0 20px;
+  max-width: 460px;
+}
+.app-create .managed-two-column {
+  margin-bottom: 20px;
+}
+.app-manifest-source {
+  overflow-wrap: anywhere;
+}
+.app-manifest-source code {
+  font-size: 11px;
+}
+.app-manifest .code-wrap pre {
+  max-height: 360px;
+  overflow: auto;
+}

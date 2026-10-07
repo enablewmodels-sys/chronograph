@@ -277,6 +277,16 @@ def check_every_board():
         sorted(SNAPSHOT["undocumented"]) == sorted(live["undocumented_boards"]),
         "the shipped catalogue's undocumented set differs from the driver",
     )
+    # A board the driver defines but the vendor table omits reaches the console as the
+    # placeholder group, which is how 28 real devices were hidden behind one name. The
+    # table now covers every member the driver constructs, so the placeholder is empty
+    # and a driver upgrade that adds a member fails here instead of in the picker.
+    require(
+        not live["undocumented_boards"],
+        "every board this driver defines must belong to a vendor, but "
+        + ", ".join(live["undocumented_boards"])
+        + " have none",
+    )
     line(
         f"snapshot boards={len(shipped)} vendors={len(SNAPSHOT['vendors'])} "
         "presets=" + str(sum(len(board["presets"]) for board in SNAPSHOT["boards"]))
