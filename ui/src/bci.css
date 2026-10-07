@@ -783,3 +783,26 @@
   gap: 10px;
 }
 
+
+/* The managed producer is running. It writes whether or not this page is open, so the notice
+   is a panel with its own stop control rather than a line of muted text. */
+.bci-live-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-color: #2f6f52;
+}
+.bci-live-banner strong {
+  font-size: 13px;
+  color: #8fddbe;
+}
+.bci-live-banner .bci-muted {
+  margin: 4px 0 0;
+}
+.bci-live-banner .bci-feedback,
+.bci-live-banner [role="alert"] {
+  flex-basis: 100%;
+}
+

@@ -1,5 +1,6 @@
 import { Activity, Bot, Boxes, Atom, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { managedSite } from "./site";
 import { Code, Head } from "./shared";
 import ConnectorConsole from "./ConnectorConsole";
 import catalog from "./brainflow-boards.json";
@@ -23,6 +24,15 @@ export const connectors = [
       "pip install './sdk/python[bci]'\n" +
       "chronograph-bci brainflow --board-id -1 --preset 0 --units uV \\\n" +
       "  --seconds 60 --spool ./recording --sync",
+    /* WHAT a hosted account is told instead. WHY the SDK line is not shown here: on this
+       deployment nothing has to be installed to record, and a connector page that opens with
+       "pip install" tells a hosted reader the opposite. The SDK stays available for their own
+       hardware, and the guides say so. */
+    managedDetail:
+      "This deployment records for you: open the BCI workspace, choose a board, and review the " +
+      "migration. The deployment then writes a simulated BrainFlow session into the project at " +
+      "that board's own geometry. Install nothing — the SDK is for your own hardware, for a " +
+      "decoder you run yourself, or for exporting a session.",
     mapping: "BCI workspace → Boards lists every board, preset and channel name",
   },
   {
@@ -87,9 +97,12 @@ export default function Connectors() {
         text="One encoder, one writer, one decoder interface — whatever produced the samples."
       />
       <div className="notice informational">
-        Configure a connector binding in Schema → Migrations, then record with the
-        SDK below. <Link to="/app/bci">Open the BCI workspace</Link> to see the
-        device catalogue, branch a decode and replay a moment.
+        Configure a connector binding in Schema → Migrations.{" "}
+        {managedSite
+          ? "The BCI workspace records a simulated session for you; the other connectors are written from the SDK, and each guide shows how."
+          : "Then record with the SDK below."}{" "}
+        <Link to="/app/bci">Open the BCI workspace</Link> to see the device
+        catalogue, branch a decode and replay a moment.
       </div>
       <ConnectorConsole />
       <div className="connector-workspace">
@@ -104,8 +117,17 @@ export default function Connectors() {
                 <span className="scope-badge">{c.state}</span>
               </div>
               <p>{c.description}</p>
-              <p className="small muted">{c.detail}</p>
-              <Code text={c.snippet} />
+              <p className="small muted">
+                {managedSite && c.managedDetail ? c.managedDetail : c.detail}
+              </p>
+              {managedSite && c.id === "bci" ? (
+                <p className="connector-mapping">
+                  <span>Start here</span>
+                  <Link to="/app/bci">BCI workspace → Connect recording</Link>
+                </p>
+              ) : (
+                <Code text={c.snippet} />
+              )}
               <p className="connector-mapping">
                 <span>Details</span>
                 <code>{c.mapping}</code>

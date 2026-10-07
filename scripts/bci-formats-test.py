@@ -124,7 +124,19 @@ def check_capabilities():
     )
     require(caps["described"] == caps["board_ids"], "every device must be describable")
     require(caps["undescribed"] == [], "no undescribed devices expected")
-    require(caps["vendors"] == 18, "18 documented vendors")
+    # The vendor count is the table's own size, not a number to keep in step by hand: the
+    # catalogue widened from 18 to 21 when the members BrainFlow's Supported Boards page never
+    # grouped were attributed to the controller that builds them, and a hardcoded floor made
+    # that change look like a regression.
+    require(
+        caps["vendors"] == len(catalog.VENDORS),
+        f"the capability report names {caps['vendors']} vendors, the table has {len(catalog.VENDORS)}",
+    )
+    require(
+        caps["vendors"] == len(SNAPSHOT["vendors"]),
+        "the shipped catalogue's vendor groups differ from the table",
+    )
+    require(caps["vendors"] >= 18, "every vendor BrainFlow documents must be named")
     require(caps["transports"] == ["NO_BOARD", "PLAYBACK_FILE_BOARD", "STREAMING_BOARD"], "3 transports")
     return caps
 

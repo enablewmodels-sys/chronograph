@@ -1196,6 +1196,43 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
    * and only when the project holds a contract and no session yet. The deployment answers
    * with the recording it already holds when one exists, so this is safe to ask again.
    */
+  const [producers, setProducers] = useState<AcquisitionStatus["running"]>([]);
+  const [producerBusy, setProducerBusy] = useState(false);
+  const producerAction = useAction();
+  const loadProducers = useCallback(async () => {
+    if (!managedSite || synthetic) return;
+    const status = await managedApi<AcquisitionStatus>("/managed/bci/acquisition");
+    setProducers(status.running.filter((run) => run.state === "running"));
+  }, [synthetic]);
+  useEffect(() => {
+    void loadProducers().catch(() => {});
+  }, [loadProducers]);
+  // A producer writes into this project whether or not this page is open, and one started from
+  // another tab or by another member is just as invisible, so the workspace asks on a slow timer
+  // for as long as it is open rather than only after it has already seen a run.
+  useEffect(() => {
+    if (!managedSite || synthetic) return;
+    const timer = setInterval(() => {
+      if (!document.hidden) void loadProducers().catch(() => {});
+    }, 10000);
+    return () => clearInterval(timer);
+  }, [synthetic, loadProducers]);
+  const stopProducers = () =>
+    producerAction.run(async () => {
+      setProducerBusy(true);
+      try {
+        for (const run of producers) {
+          await managedApi("/managed/bci/acquisition", {
+            action: "stop",
+            id: run.id,
+          });
+        }
+        await loadProducers();
+        await refresh();
+      } finally {
+        setProducerBusy(false);
+      }
+    }, "Recording stopped.");
   const askedForRecording = useRef(false);
   useEffect(() => {
     if (!managedSite || synthetic || setup || loading || sessions.length) return;
@@ -1586,6 +1623,41 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
             {managedNote}
           </p>
         )}
+        {/* A managed producer writes into this project whether or not this page is open, so the
+            workspace says so wherever the reader is, with the way to stop it. */}
+        {producers.length > 0 && (
+          <section className="bci-panel bci-live-banner" role="status">
+            <div>
+              <strong>
+                {producers.length === 1
+                  ? "A recording is being written now."
+                  : producers.length + " recordings are being written now."}
+              </strong>
+              <p className="bci-muted">
+                {producers
+                  .map(
+                    (run) =>
+                      run.device +
+                      " · session " +
+                      run.session +
+                      " · " +
+                      run.writtenSeconds.toFixed(0) +
+                      " s · " +
+                      run.clockDomain,
+                  )
+                  .join(" · ")}
+              </p>
+            </div>
+            <button
+              className="button outline"
+              disabled={producerAction.busy || producerBusy}
+              onClick={() => void stopProducers()}
+            >
+              <Pause size={15} /> Stop recording
+            </button>
+            {producerAction.feedback}
+          </section>
+        )}
       <BrowserDecodeCheck />
       <div className="bci-tabs" role="tablist" aria-label="BCI workspace">
         {["Sessions", "Datasets", "Runs", "Live", "Boards"].map((t) => (
@@ -1948,7 +2020,16 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
               <section className="bci-panel">
                 <div className="bci-section-title">
                   <h2>Decoder experiments</h2>
-                  <span className="bci-chip">Local workers available</span>
+                  {/* The chip describes this deployment, not a capability: claiming workers are
+                      available beside a status that says hosted training is off told the reader
+                      two opposite things about the same page. */}
+                  <span className="bci-chip">
+                    {jobs?.available
+                      ? "Hosted training enabled"
+                      : managedSite
+                        ? "Run the worker on your own machine"
+                        : "Local workers"}
+                  </span>
                 </div>
                 <p>
                   Run a CPU baseline or publish results from your own decoder.

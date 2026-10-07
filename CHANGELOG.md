@@ -54,6 +54,25 @@
   operator, refusing to suspend a project's last active owner, echoing the target's address as its
   confirmation and writing exactly one audit row — and it lists accounts, live sessions and
   memberships without returning a session identifier.
+- Four defects a review found in the work above, all of them real. The managed console still
+  printed `pip install './sdk/python[bci]'` and a `chronograph-bci` command on the Connectors page,
+  which is the one surface that had not been given the hosted answer; it now says what this
+  deployment does and links to the workspace, and the SDK stays described as the thing you use for
+  your own hardware. `scripts/bci-formats-test.py` still demanded exactly 18 vendors after the same
+  change raised the table to 21, so the script the catalogue is checked with failed; it now compares
+  the table against itself and against the shipped groups. Two concurrency defects were in the
+  producer: two readiness asks arriving together each wrote a full recording, because the check and
+  the write were separated by three round trips, and a live run scheduled its next second on a fixed
+  interval, so an engine slower than one second made two chunks claim the same cursor and the run
+  ended with a conflict. Readiness now joins one attempt per project, a tick schedules its successor
+  only once it has finished, and every publish is serialised against the others for its run;
+  `test/bci-acquisition.test.mjs` pins both, and both of its new cases fail against the code as it
+  was. The Runs tab also claimed "Local workers available" directly above a status explaining that
+  hosted training is off; the chip now reports the deployment's own answer. A pre-existing flake in
+  the control plane's suite went with them: the diagnostics export was compared against a snapshot
+  taken a moment earlier, so the host's uptime could differ by a second and fail a test about the
+  export being complete rather than about the clock.
+
 
 - The website is mobile friendly, and the floor is asserted rather than assumed. Auditing the live
   pages at 390x844 found the stylesheets making text *smaller* on a phone than on a desktop — 7px
