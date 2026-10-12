@@ -99,7 +99,7 @@ page = client.call("as_of", {"t": "9007199254740993", "limit": 100})
 ```
 
 ```typescript
-import { Client } from "@chronograph-community/sdk";
+import { Client } from "@chronodb/sdk";
 const client = new Client(process.env.CHRONOGRAPH_URL!, process.env.CHRONOGRAPH_TOKEN!);
 const page = await client.call("as_of", { t: "9007199254740993", limit: 100 });
 ```

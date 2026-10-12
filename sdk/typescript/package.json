@@ -1,5 +1,5 @@
 {
-  "name": "@chronograph-community/sdk",
+  "name": "@chronodb/sdk",
   "version": "0.4.0-alpha.3",
   "type": "module",
   "description": "ChronoDB Community HTTP client and normalized connector transport",

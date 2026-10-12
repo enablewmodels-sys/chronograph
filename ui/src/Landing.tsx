@@ -82,7 +82,7 @@ const snippets: Record<string, string> = {
   Python:
     'from chronograph_connectors import Client\n\nclient = Client(url, token)\nstate = client.call("as_of", {"t": "2000000"})',
   TypeScript:
-    'import { Client } from "@chronograph-community/sdk";\n\nconst client = new Client(url, token);\nconst state = await client.call("as_of", { t: "2000000" });',
+    'import { Client } from "@chronodb/sdk";\n\nconst client = new Client(url, token);\nconst state = await client.call("as_of", { t: "2000000" });',
   HTTP: 'curl "$CHRONOGRAPH_URL/v1/info" \\\n  -H "Authorization: Bearer $CHRONOGRAPH_TOKEN"',
   MCP: '[mcp_servers.chronograph]\nurl = "https://chronodb.co/p/PROJECT_ID/mcp"\nbearer_token_env_var = "CHRONOGRAPH_TOKEN"',
 };

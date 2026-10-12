@@ -3,7 +3,7 @@
 From the repository root, run `npm --prefix sdk/typescript ci` and `npm --prefix sdk/typescript run build`. In your application, use `npm install /absolute/path/to/chronograph/sdk/typescript`. Node 20+; ES modules and TypeScript declarations are included.
 
 ```typescript
-import { Client, ApiError } from "@chronograph-community/sdk";
+import { Client, ApiError } from "@chronodb/sdk";
 const client = new Client(process.env.CHRONOGRAPH_URL!, process.env.CHRONOGRAPH_TOKEN!);
 try {
   const page = await client.call("as_of", { t: "9007199254740993", limit: 100 });
@@ -38,7 +38,7 @@ constructor URL. Record session `101` first using the [acquisition guide](https:
 The following uses the `client` from the connection example above:
 
 ```typescript
-import { BCIClient } from "@chronograph-community/sdk";
+import { BCIClient } from "@chronodb/sdk";
 const bci = new BCIClient(client, "bci_research");
 const window = await bci.window("101", "eeg", 0n, 1000000n, [0, 1]);
 for await (const row of bci.records("101", "signal")) console.log(row);

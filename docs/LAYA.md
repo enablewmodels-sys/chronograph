@@ -103,7 +103,7 @@ record = laya_decision(
 ```
 
 ```typescript
-import { layaDecision } from '@chronograph-community/sdk';
+import { layaDecision } from '@chronodb/sdk';
 const record = await layaDecision(response, {
   request, src: '9007199254740993', dst: '9007199254740994',
   timestampUs: '1700000000000000', mode: 'live',

@@ -40,7 +40,7 @@ same reader as Python, the CLI and Rust instead of reimplementing the arithmetic
 | `/wasm/artifact/weights.bin` | the tensors, addressed by byte range |
 
 ```js
-import { Decoder } from "@chronograph-community/sdk";
+import { Decoder } from "@chronodb/sdk";
 
 const module = await WebAssembly.compile(
   await (await fetch("/wasm/chronograph-decoder.wasm")).arrayBuffer(),

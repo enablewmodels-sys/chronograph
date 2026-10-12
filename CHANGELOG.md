@@ -1,6 +1,14 @@
 # Changelog
 
 ## Unreleased
+- The published TypeScript client is named for the product, not for the engine binary:
+  `@chronodb/sdk` instead of `@chronograph-community/sdk`. The old scope did not exist on
+  npmjs.com — `@chronograph-community` answers "Scope not found" — so nothing could ever have
+  been published under it, while the `chronodb` organization does exist and owns the name. The
+  package.json name, the lockfile, the README, the TypeScript import lines in the SDK, decoders and
+  Laya guides, and the landing-page snippet all use the new name. First published release:
+  0.4.0-alpha.3 on the `next` tag, because a prerelease must not take `latest`.
+
 
 - The managed deployment now trains the decoder itself. "Queue CPU run" answered a hosted account with
   `pip install` and a `chronograph-bci train` line, so the one number the workspace exists to produce

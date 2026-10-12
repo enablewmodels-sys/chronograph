@@ -91,7 +91,7 @@ pip install https://github.com/enablewmodels-sys/chronograph/releases/download/v
 The npm package is ESM-only. Import it by name after installing:
 
 ```js
-import { Client } from "@chronograph-community/sdk";
+import { Client } from "@chronodb/sdk";
 const client = new Client("https://chronodb.co", process.env.CHRONOGRAPH_TOKEN);
 ```
 

@@ -34,7 +34,7 @@ releases API on 2026-10-01):
 | `chronograph_connectors-0.4.0a3.tar.gz` | 46,590 |
 | `SHA256SUMS` | 394 |
 
-The npm asset declares `@chronograph-community/sdk` 0.4.0-alpha.3 and is ESM-only
+The npm asset declares `@chronodb/sdk` 0.4.0-alpha.3 and is ESM-only
 (`"type": "module"`), so import it by name after installing. The wheel declares
 `chronograph-connectors` 0.4.0a3 and requires Python 3.10 or newer; `pip` refuses
 it on 3.9. These are the only anonymous install paths for the clients today.
@@ -89,7 +89,7 @@ own headers.
 | Artifact | Registry | Name | Wiring | Exact blocker |
 | --- | --- | --- | --- | --- |
 | Python client and agent | PyPI | `chronograph-connectors` | `publish.yml`, job `pypi`, environment `pypi` | an OIDC trusted publisher must be created on pypi.org for repository `enablewmodels-sys/chronograph`, workflow `publish.yml`, environment `pypi`. No token is stored. |
-| TypeScript client | npmjs.com | `@chronograph-community/sdk` | `publish.yml`, job `npm`, environment `npm` | an npm trusted publisher for the package, or an `NPM_TOKEN` (the `packages.yml` npmjs step reads `secrets.NODE_AUTH_TOKEN`) |
+| TypeScript client | npmjs.com | `@chronodb/sdk` | `publish.yml`, job `npm`, environment `npm` | an npm trusted publisher for the package, or an `NPM_TOKEN` (the `packages.yml` npmjs step reads `secrets.NODE_AUTH_TOKEN`) |
 | Rust engine | crates.io | `chronograph-db` | `packages.yml`, job `crates` | `CARGO_REGISTRY_TOKEN` repository secret |
 | Dart client | pub.dev | `chronodb` | `packages.yml`, job `dart` | `PUB_TOKEN` repository secret |
 | Java client | Maven Central | `co.chronodb:chronograph-community` | no publish step yet; the existing Maven step deploys to Maven on GitHub Packages | OSSRH/Sonatype credentials (namespace and Portal token) plus a GPG signing key |
@@ -109,7 +109,7 @@ each package needs to pass locally first.
 | Artifact | Registry | Name | Recorded local check | Remaining blocker |
 | --- | --- | --- | --- | --- |
 | Python client and agent | PyPI | `chronograph-connectors` | wheel and sdist build; clean-venv install runs | the trusted publisher above |
-| TypeScript client | npm | `@chronograph-community/sdk` | `npm pack` tarball, 12 files | the npm trusted publisher or token above |
+| TypeScript client | npm | `@chronodb/sdk` | `npm pack` tarball, 12 files | the npm trusted publisher or token above |
 | Dart client | pub.dev | `chronodb` | `dart analyze` clean; `pub publish --dry-run` has no errors | the `PUB_TOKEN` above |
 | Rust engine | crates.io | `chronograph-db` | `cargo package` + `publish --dry-run` succeed and verify | the `CARGO_REGISTRY_TOKEN` above |
 | Java client | Maven Central | `co.chronodb:chronograph-community` | POM validates against the 4.0.0 XSD; sources compile; javadoc builds | Sonatype namespace, GPG key, Portal token; no `mvn` on the build host |
@@ -135,7 +135,7 @@ Each was checked anonymously on 2026-10-01, not assumed:
   not control, so the namespace could never be verified and the upload would be
   rejected. The groupId is `co.chronodb`, the reverse of the project's own domain.
 - **npm `chronodb` is taken** (200) by an unrelated local-first database, so the
-  TypeScript package is scoped as `@chronograph-community/sdk` (404, free).
+  TypeScript package is scoped as `@chronodb/sdk` (404, free).
 - **NuGet already hosts `Chronograph` and `Chronograph.Core`** from another owner
   (both return 200), and reserved prefixes cannot be queried without an account.
   The package id is `ChronoDB.Client` (404, free), which avoids the contested
@@ -212,7 +212,7 @@ npm publish --access public # scoped packages default to private without this fl
 The package carries `repository`, `homepage`, `bugs`, `keywords`, `author` and
 `publishConfig.access = public`. Its `files` list ships only `dist`, the readme and
 the licence files. The tarball attached to `v0.4.0-alpha.3` has 12 entries, and its
-`package.json` declares `@chronograph-community/sdk` 0.4.0-alpha.3. Publishing to
+`package.json` declares `@chronodb/sdk` 0.4.0-alpha.3. Publishing to
 npmjs.com needs the trusted publisher entry or an automation token in
 `NPM_TOKEN`; never commit the token.
 
