@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Run the mandatory Rust phase gate and retain exact command evidence."""
+"""Run the mandatory Rust phase gate and retain exact command evidence.
+
+Every check runs even after one fails. A gate that stopped at its first failure hid the rest of
+the pipeline behind it: when `cargo fmt --check` failed, the CI job never reached the workspace
+tests, the console builds, the browser suite or the container build, and the run looked like a
+single formatting problem. The exit code is still the first failing check's, so a consumer that
+only reads the status behaves as before.
+"""
 import argparse
 import datetime
 import json
@@ -22,6 +29,7 @@ checks = [
 ]
 report = {"phase": args.phase, "started_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
           "platform": platform.platform(), "checks": []}
+failed = []
 for name, cmd in checks:
     print("Running " + " ".join(cmd), flush=True)
     start = datetime.datetime.now(datetime.timezone.utc)
@@ -33,5 +41,10 @@ for name, cmd in checks:
     (out / "results.json").write_text(json.dumps(report, indent=2) + "\n")
     print("\n".join(result.stdout.splitlines()[-10:]), flush=True)
     if result.returncode:
-        sys.exit(result.returncode)
+        failed.append((name, result.returncode))
+if failed:
+    for name, code in failed:
+        print("FAILED " + name + " (exit " + str(code) + ")", flush=True)
+    print("Failures: " + ", ".join(name for name, _ in failed), flush=True)
+    sys.exit(failed[0][1])
 print("All required checks passed; exact output retained in " + str(out.relative_to(root)), flush=True)

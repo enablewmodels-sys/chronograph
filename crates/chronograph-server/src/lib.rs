@@ -328,8 +328,7 @@ async fn boundary(State(s): State<Shared>, req: Request, next: Next) -> Response
     // cacheable. Forcing no-store on them made every navigation re-download the whole
     // console and stopped an edge cache from holding a single byte.
     let request_path = req.uri().path().to_owned();
-    let immutable =
-        request_path.starts_with("/assets/") || request_path.starts_with("/images/");
+    let immutable = request_path.starts_with("/assets/") || request_path.starts_with("/images/");
     let mut r = if origin_ok && host_ok {
         next.run(req).await
     } else {
