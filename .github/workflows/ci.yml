@@ -53,10 +53,13 @@ jobs:
       - run: docker build -t chronograph:ci .
       - run: python3 scripts/container-smoke.py --image chronograph:ci
       - uses: actions/upload-artifact@v4
-        if: success()
+        # Always, not only on success. The report under bench/reports is the only readable
+        # evidence a failed run leaves: the job log needs admin rights, and a run that stops at
+        # the browser suite otherwise says nothing beyond "exit code 1". The paths below carry
+        # no credentials — no browser traces, temporary configs or tokens are uploaded.
+        if: always()
         with:
           name: verification-evidence
-          # Never upload browser traces, temporary configs or raw credentials.
           path: |
             bench/reports/v0.4.0-alpha.3/phase-ci/
             /tmp/chronograph-schema-*.png
