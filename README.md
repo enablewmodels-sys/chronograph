@@ -95,12 +95,20 @@ import { Client } from "@chronodb/sdk";
 const client = new Client("https://chronodb.co", process.env.CHRONOGRAPH_TOKEN);
 ```
 
-No package is on a public registry yet: npmjs.com, PyPI, crates.io, pub.dev, Maven
-Central and nuget.org each still need a credential or an account. **GitHub Packages
-is not a substitute**: it answers 401 to anonymous installs even for public packages
-(verified 2026-10-01 with an unauthenticated request against `npm.pkg.github.com`),
-so the release download above is the only publicly available client install path
-today. [docs/SDK.md](docs/SDK.md) covers every language and
+The TypeScript client is also published on npmjs.com as `@chronodb/sdk`. A
+prerelease must not take the `latest` tag, so it sits on `next`, and a bare install
+still resolves the `0.0.0-stage` placeholder from the first staged publish (verified
+2026-10-15: `npm view @chronodb/sdk version` returns `0.0.0-stage`, `@chronodb/sdk@next`
+returns `0.4.0-alpha.3`). Install the tagged prerelease or the release tarball above:
+
+```sh
+npm install @chronodb/sdk@next
+```
+
+PyPI, crates.io, pub.dev, Maven Central and nuget.org each still need a credential or
+an account. **GitHub Packages is not a substitute**: it answers 401 to anonymous
+installs even for public packages (verified 2026-10-01 with an unauthenticated request
+against `npm.pkg.github.com`). [docs/SDK.md](docs/SDK.md) covers every language and
 [docs/PUBLISHING.md](docs/PUBLISHING.md) tracks what each registry still needs.
 
 ## Run the published container

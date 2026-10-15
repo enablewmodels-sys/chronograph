@@ -2,7 +2,7 @@
 
 The Community repository contains Python, TypeScript/JavaScript, Java, C++, Go, Dart and C# clients. Q# uses a Python host bridge. Rust applications can embed `chronograph-db` directly. All HTTP clients use the same authenticated `/v1` API; the server owns validation, transactions and connector checkpoints.
 
-These are **alpha.3 source packages**, available in the versioned SDK kit and on `main`. They are not published to npm, PyPI, Maven Central, NuGet or pub.dev. The native alpha.2 release downloads predate these clients; use the current SDK kit or checkout for the complete catalog. Existing `/v1` operations remain compatible with alpha.2.
+These are **alpha.3 source packages**, available in the versioned SDK kit and on `main`. The TypeScript client is also published on npmjs.com as `@chronodb/sdk` 0.4.0-alpha.3, which carries the `next` tag rather than `latest` because a prerelease must not take it: install `@chronodb/sdk@next`. A bare `npm install @chronodb/sdk` still resolves the `0.0.0-stage` placeholder on `latest`. PyPI, Maven Central, NuGet and pub.dev hold source packages only. The native alpha.2 release downloads predate these clients; use the current SDK kit or checkout for the complete catalog. Existing `/v1` operations remain compatible with alpha.2.
 
 ## Managed and isolated connections
 

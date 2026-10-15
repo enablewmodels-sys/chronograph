@@ -6,19 +6,28 @@ container image, and what still requires a human account holder.
 
 ## What is publicly installable today
 
-Two paths work anonymously, with no account and no token. Both were verified on
-2026-10-01 with an unauthenticated `curl` and a native pull.
+Three paths work anonymously, with no account and no token: the GitHub release, the
+GHCR image, and — since 2026-10-12 — npmjs.com. The first two were verified on
+2026-10-01 with an unauthenticated `curl` and a native pull; the npm path was verified
+on 2026-10-15 with `npm view`.
 
 | Path | Install | Evidence |
 | --- | --- | --- |
 | GitHub release `v0.4.0-alpha.3` | `npm install <asset URL>`, `pip install <asset URL>` | both asset URLs return HTTP 200 anonymously; the tag carries 8 assets |
 | GHCR `ghcr.io/enablewmodels-sys/chronograph:main` | `docker pull` | GHCR issued an anonymous pull token, length 72, and the OCI index lists `linux/amd64` and `linux/arm64` |
+| npmjs.com `@chronodb/sdk` | `npm install @chronodb/sdk@next` | anonymous `npm view @chronodb/sdk@next version` returns `0.4.0-alpha.3`; the bare name still resolves the `0.0.0-stage` placeholder on `latest` |
 
 ```sh
 npm install https://github.com/enablewmodels-sys/chronograph/releases/download/v0.4.0-alpha.3/chronograph-community-sdk-0.4.0-alpha.3.tgz
 pip install https://github.com/enablewmodels-sys/chronograph/releases/download/v0.4.0-alpha.3/chronograph_connectors-0.4.0a3-py3-none-any.whl
 docker pull ghcr.io/enablewmodels-sys/chronograph:main
 ```
+
+A bare `npm install @chronodb/sdk` is **not** one of these paths. `latest` still points
+at the `0.0.0-stage` placeholder that was published first, so it installs a stub whose
+tarball holds nothing but a `package.json`. Promoting `next` to `latest` needs a
+registry credential, and the token in `~/.npmrc` on this build host answers E401 as of
+2026-10-15, so the fix is a `npm login` or a fresh automation token, not a code change.
 
 The release tag carries exactly these 8 assets (sizes in bytes, from the GitHub
 releases API on 2026-10-01):
@@ -89,17 +98,18 @@ own headers.
 | Artifact | Registry | Name | Wiring | Exact blocker |
 | --- | --- | --- | --- | --- |
 | Python client and agent | PyPI | `chronograph-connectors` | `publish.yml`, job `pypi`, environment `pypi` | an OIDC trusted publisher must be created on pypi.org for repository `enablewmodels-sys/chronograph`, workflow `publish.yml`, environment `pypi`. No token is stored. |
-| TypeScript client | npmjs.com | `@chronodb/sdk` | `publish.yml`, job `npm`, environment `npm` | an npm trusted publisher for the package, or an `NPM_TOKEN` (the `packages.yml` npmjs step reads `secrets.NODE_AUTH_TOKEN`) |
 | Rust engine | crates.io | `chronograph-db` | `packages.yml`, job `crates` | `CARGO_REGISTRY_TOKEN` repository secret |
 | Dart client | pub.dev | `chronodb` | `packages.yml`, job `dart` | `PUB_TOKEN` repository secret |
 | Java client | Maven Central | `co.chronodb:chronograph-community` | no publish step yet; the existing Maven step deploys to Maven on GitHub Packages | OSSRH/Sonatype credentials (namespace and Portal token) plus a GPG signing key |
 | .NET client | NuGet | `ChronoDB.Client` | no publish step yet; the existing NuGet step pushes to NuGet on GitHub Packages | `NUGET_API_KEY`, a nuget.org API key |
 
 No install instruction may name a registry in this table until its blocker is
-cleared and the upload has been confirmed on the registry itself. As of
-2026-10-01 the chosen names are still unpublished: `registry.npmjs.org/chronodb` is
-taken (200) by an unrelated package, `registry.npmjs.org/@chronograph-community%2Fsdk`
-returns 404, and `pypi.org/pypi/chronograph-connectors/json` returns 404.
+cleared and the upload has been confirmed on the registry itself. The TypeScript row
+left this table on 2026-10-12: `registry.npmjs.org/@chronodb%2Fsdk` answers 200 and
+`@chronodb/sdk@next` resolves to `0.4.0-alpha.3` (re-verified 2026-10-15). The names
+that follow are still unpublished: `registry.npmjs.org/chronodb` is taken (200) by an
+unrelated package, and `pypi.org/pypi/chronograph-connectors/json` returns 404 on
+2026-10-15.
 
 ## Local builds and checks, before any upload
 
@@ -109,7 +119,7 @@ each package needs to pass locally first.
 | Artifact | Registry | Name | Recorded local check | Remaining blocker |
 | --- | --- | --- | --- | --- |
 | Python client and agent | PyPI | `chronograph-connectors` | wheel and sdist build; clean-venv install runs | the trusted publisher above |
-| TypeScript client | npm | `@chronodb/sdk` | `npm pack` tarball, 12 files | the npm trusted publisher or token above |
+| TypeScript client | npm | `@chronodb/sdk` | `npm pack` tarball, 12 files | **uploaded 2026-10-12** as `0.4.0-alpha.3` on the `next` tag; what remains is the `latest` dist-tag, and a re-publish needs a version bump because the registry refuses a second upload of an existing version with 409 |
 | Dart client | pub.dev | `chronodb` | `dart analyze` clean; `pub publish --dry-run` has no errors | the `PUB_TOKEN` above |
 | Rust engine | crates.io | `chronograph-db` | `cargo package` + `publish --dry-run` succeed and verify | the `CARGO_REGISTRY_TOKEN` above |
 | Java client | Maven Central | `co.chronodb:chronograph-community` | POM validates against the 4.0.0 XSD; sources compile; javadoc builds | Sonatype namespace, GPG key, Portal token; no `mvn` on the build host |
@@ -212,9 +222,11 @@ npm publish --access public # scoped packages default to private without this fl
 The package carries `repository`, `homepage`, `bugs`, `keywords`, `author` and
 `publishConfig.access = public`. Its `files` list ships only `dist`, the readme and
 the licence files. The tarball attached to `v0.4.0-alpha.3` has 12 entries, and its
-`package.json` declares `@chronodb/sdk` 0.4.0-alpha.3. Publishing to
-npmjs.com needs the trusted publisher entry or an automation token in
-`NPM_TOKEN`; never commit the token.
+`package.json` declares `@chronodb/sdk` 0.4.0-alpha.3. The registry copy was uploaded
+on 2026-10-12 from `sdk/typescript`, and it carries `next` only: `latest` still resolves
+the `0.0.0-stage` placeholder, and the token this host held then answers E401 now, so
+promoting the tag needs a fresh credential (`npm login`, or an automation token written
+to `~/.npmrc`) rather than a code change. Never commit the token.
 
 ## Container image
 

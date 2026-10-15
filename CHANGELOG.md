@@ -1,6 +1,38 @@
 # Changelog
 
 ## Unreleased
+- The console builds again from a clean checkout, which is what every CI job that builds it does.
+  `scripts/build-sdk.mjs` compiled the TypeScript SDK with `sdk/typescript/node_modules/typescript/bin/tsc`
+  and nothing installed that package before the console build, so `npm --prefix ui ci && npm --prefix ui run build`
+  failed in six seconds with `MODULE_NOT_FOUND` — in `Verify`, `SDK conformance`, `SDK portability`,
+  `Community website` and the release candidate. The compiler is now looked for in the SDK's own
+  `node_modules` first and in the console's second, and a checkout with neither is told to run
+  `npm --prefix sdk/typescript ci` or `npm --prefix ui ci` instead of dying at a module path. Rebuilt
+  against a copy of `sdk/typescript` with `node_modules` hidden: `dist/decoder.js` and its declarations
+  come back.
+- `npm --prefix sdk/typescript test` builds the SDK with its own TypeScript, and `sdks.yml` never
+  installed it, so the conformance job could not have reached that step either. The workflow installs
+  the package now, before it builds the console.
+- The Rust phase gate runs every check instead of stopping at the first failure. `scripts/check-phase.py`
+  exited on the failing command, so when `cargo fmt --check` failed the job never reached its own tests,
+  Clippy, the two console builds, the browser suite or the container build, and a one-line formatting
+  diff looked like the whole story. All four checks now run, each keeps its own log, the failing names
+  are printed together, and the exit code is still the first failure's.
+- The formatting gates pass. `cargo fmt --all` restores one wrapped line in
+  `crates/chronograph-server/src/lib.rs`, and Prettier is applied across the 31 files that
+  `npm run format:check` named. Two generated artifacts are excluded through a new
+  `ui/.prettierignore`: `ui/src/brainflow-boards.json` is written compact by
+  `scripts/export-brainflow-catalog.py` and `ui/e2e/fixtures/engine.json` records a live engine's own
+  answers, so formatting either one would make the next regeneration fail the same gate.
+- The npmjs step of `packages.yml` still renamed the package to the scope the product rename
+  replaced. It now sets `@chronodb/sdk`, which is the name the manifest, the lockfile and the release
+  carry.
+- The registry documentation matches the registry. `README.md`, `docs/SDK.md`, `docs/STATUS.md`,
+  `docs/PUBLISHING.md` and `docs/REQUIREMENTS.md` said no package was published anywhere, which stopped
+  being true on 2026-10-12 when `@chronodb/sdk` 0.4.0-alpha.3 was uploaded. They now record what is
+  installable (`npm install @chronodb/sdk@next`), that a bare install still resolves the `0.0.0-stage`
+  placeholder on `latest`, and that promoting that tag needs a fresh registry credential because the
+  token on the build host answers E401.
 - The published TypeScript client is named for the product, not for the engine binary:
   `@chronodb/sdk` instead of `@chronograph-community/sdk`. The old scope did not exist on
   npmjs.com — `@chronograph-community` answers "Scope not found" — so nothing could ever have

@@ -6,7 +6,7 @@ Community **0.4.0-alpha.2** is the first public source-available alpha prepared 
 is the source of truth for published binaries and checksums. It is an alpha with
 documented limitations, not a managed-service launch or a production SLA.
 
-The table below describes the current **alpha.3 development checkout**. Its multi-language SDKs and expanded catalog are distributed as source on `main`; alpha.2 downloads remain unchanged. No alpha.3 binary or package-registry publication is implied.
+The table below describes the current **alpha.3 development checkout**. Its multi-language SDKs and expanded catalog are distributed as source on `main`; alpha.2 downloads remain unchanged. No alpha.3 binary is published, and the only alpha.3 registry entry is the TypeScript client on npmjs.com (`@chronodb/sdk` 0.4.0-alpha.3, `next` tag).
 
 | Area | Delivered | Limit or remaining work |
 | --- | --- | --- |
