@@ -96,6 +96,9 @@ jobs:
   maven:
     if: inputs.target == 'all' || inputs.target == 'maven'
     runs-on: ubuntu-latest
+    env:
+      # secrets cannot be referenced in a step-level if, so surface them here.
+      MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -106,6 +109,12 @@ jobs:
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
           settings-path: ${{ github.workspace }}
+      # Central needs the jar with its sources and javadoc beside it, and nothing built this POM
+      # before this step existed: the conformance job compiles Client.java with javac instead.
+      # It runs on every dispatch, with or without a registry credential, so 'the artifact
+      # builds' is a checked fact rather than a claim.
+      - name: Build the jar, its sources and its javadoc
+        run: mvn -B -f sdk/java/pom.xml verify
       - name: Deploy to GitHub Packages
         run: |
           mvn -B -f sdk/java/pom.xml --settings "${{ github.workspace }}/settings.xml" \
@@ -114,6 +123,31 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
+      # Maven Central needs two things this repository does not hold: a verified namespace
+      # (co.chronodb by DNS, or io.github.enablewmodels-sys from the GitHub account) and a Portal
+      # user token. The GPG key signs the jar, its sources and its javadoc, which is what the
+      # POM's release profile does. Both steps stay inert until the secrets exist.
+      - name: Import the signing key
+        if: env.MAVEN_CENTRAL_TOKEN != ''
+        env:
+          MAVEN_GPG_PRIVATE_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+        run: printf %s "$MAVEN_GPG_PRIVATE_KEY" | gpg --batch --import
+      - name: Deploy to Maven Central
+        if: env.MAVEN_CENTRAL_TOKEN != ''
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/central"
+          {
+            printf %s "<settings><servers><server><id>central</id><username>"
+            printf %s "$MAVEN_CENTRAL_USERNAME"
+            printf %s "</username><password>"
+            printf %s "$MAVEN_CENTRAL_TOKEN"
+            printf %s "</password></server></servers></settings>"
+          } > "$RUNNER_TEMP/central/settings.xml"
+          mvn -B -f sdk/java/pom.xml -Prelease \
+            --settings "$RUNNER_TEMP/central/settings.xml" deploy -DskipTests
 
   dart:
     if: inputs.target == 'all' || inputs.target == 'dart'
@@ -139,10 +173,20 @@ jobs:
   crates:
     if: inputs.target == 'all' || inputs.target == 'crates'
     runs-on: ubuntu-latest
+    env:
+      # secrets cannot be referenced in a step-level if, so surface it here.
+      CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo package -p chronograph-db
+      # Both commands run whether or not a token exists: package proves the crate builds from its
+      # own tarball, and the dry run is the same pre-publish validation without the upload. The
+      # engine ships 16 files and its two examples live outside the crate root, so the published
+      # package omits them by design and cargo says so on every run.
+      - run: cargo package --locked -p chronograph-db
+      - run: cargo publish --dry-run --locked -p chronograph-db
+      # No continue-on-error: an upload that fails must fail the job. crates.io refuses a second
+      # upload of an existing version with 409 by design, so the answer is a version bump.
       - name: Publish to crates.io
-        continue-on-error: true
-        run: cargo publish -p chronograph-db --token "${{ secrets.CARGO_REGISTRY_TOKEN }}"
+        if: env.CARGO_REGISTRY_TOKEN != ''
+        run: cargo publish --locked -p chronograph-db

@@ -100,7 +100,7 @@ own headers.
 | Python client and agent | PyPI | `chronograph-connectors` | `publish.yml`, job `pypi`, environment `pypi` | an OIDC trusted publisher must be created on pypi.org for repository `enablewmodels-sys/chronograph`, workflow `publish.yml`, environment `pypi`. No token is stored. |
 | Rust engine | crates.io | `chronograph-db` | `packages.yml`, job `crates` | `CARGO_REGISTRY_TOKEN` repository secret |
 | Dart client | pub.dev | `chronodb` | `packages.yml`, job `dart` | `PUB_TOKEN` repository secret |
-| Java client | Maven Central | `co.chronodb:chronograph-community` | no publish step yet; the existing Maven step deploys to Maven on GitHub Packages | OSSRH/Sonatype credentials (namespace and Portal token) plus a GPG signing key |
+| Java client | Maven Central | `co.chronodb:chronograph-community` | `packages.yml`, job `maven`: the Central step runs when `MAVEN_CENTRAL_TOKEN` and `MAVEN_GPG_PRIVATE_KEY` exist, and is inert without them | a verified namespace (`co.chronodb` by DNS, or `io.github.enablewmodels-sys` from the GitHub account), a Portal user token, and a GPG signing key |
 | .NET client | NuGet | `ChronoDB.Client` | no publish step yet; the existing NuGet step pushes to NuGet on GitHub Packages | `NUGET_API_KEY`, a nuget.org API key |
 
 No install instruction may name a registry in this table until its blocker is
@@ -121,8 +121,8 @@ each package needs to pass locally first.
 | Python client and agent | PyPI | `chronograph-connectors` | wheel and sdist build; clean-venv install runs | the trusted publisher above |
 | TypeScript client | npm | `@chronodb/sdk` | `npm pack` tarball, 12 files | **uploaded 2026-10-12** as `0.4.0-alpha.3` on the `next` tag; what remains is the `latest` dist-tag, and a re-publish needs a version bump because the registry refuses a second upload of an existing version with 409 |
 | Dart client | pub.dev | `chronodb` | `dart analyze` clean; `pub publish --dry-run` has no errors | the `PUB_TOKEN` above |
-| Rust engine | crates.io | `chronograph-db` | `cargo package` + `publish --dry-run` succeed and verify | the `CARGO_REGISTRY_TOKEN` above |
-| Java client | Maven Central | `co.chronodb:chronograph-community` | POM validates against the 4.0.0 XSD; sources compile; javadoc builds | Sonatype namespace, GPG key, Portal token; no `mvn` on the build host |
+| Rust engine | crates.io | `chronograph-db` | **re-verified 2026-10-15**: `cargo package --locked` and `cargo publish --dry-run --locked` both pass — 16 files, 215.9 KiB, and Cargo compiles the crate from its own tarball before the upload is aborted | the `CARGO_REGISTRY_TOKEN` above; the two examples live outside the crate root, so the published package omits them by design and Cargo says so on every run |
+| Java client | Maven Central | `co.chronodb:chronograph-community` | the POM declares sources, javadoc and GPG signing for the `release` profile and points `distributionManagement` at the Portal; `packages.yml` now runs `mvn verify` on every dispatch, so the jar, its sources and its javadoc are built in CI rather than only described | Sonatype namespace, GPG key, Portal token; no `mvn` on the build host, which is why the build is checked in CI |
 | .NET client | NuGet | `ChronoDB.Client` | manifests are well-formed | nuget.org API key; no `dotnet` on the build host |
 
 The checks in that column were recorded earlier and cannot all be repeated on this
@@ -233,6 +233,12 @@ to `~/.npmrc`) rather than a code change. Never commit the token.
 A `Dockerfile` exists at the repository root and builds a multi-stage image: the
 console is built with Node, the server with Rust, and the runtime stage runs as an
 unprivileged user with `/data` and `/config` as volumes.
+
+The image could not build between 2026-10-05 and 2026-10-15: the console's `prebuild`
+compiles the TypeScript SDK, and the ui stage received neither `sdk/typescript` nor
+`scripts/build-sdk.mjs`, while `.dockerignore` allows paths one by one. The Dockerfile
+copies both and the allowlist permits them. `container.yml` was dispatched against
+`main` on 2026-10-15 to rebuild and republish the tag.
 
 The published image is verified: `ghcr.io/enablewmodels-sys/chronograph:main`
 pulls anonymously and its OCI index lists `linux/amd64` and `linux/arm64`
