@@ -44,7 +44,9 @@ export async function signInOnce(playwright: Playwright): Promise<void> {
   try {
     if (STATE) {
       try {
-        const saved = JSON.parse(readFileSync(STATE, "utf8")) as { cookies: Cookie[] };
+        const saved = JSON.parse(readFileSync(STATE, "utf8")) as {
+          cookies: Cookie[];
+        };
         const check = await context.get("/managed/session", {
           headers: {
             cookie: saved.cookies.map((c) => c.name + "=" + c.value).join("; "),
@@ -70,7 +72,9 @@ export async function signInOnce(playwright: Playwright): Promise<void> {
     cookies = (await context.storageState()).cookies;
     if (!cookies.length) throw new Error("sign-in produced no session cookie");
     if (STATE)
-      writeFileSync(STATE, JSON.stringify({ cookies }, null, 2) + "\n", { mode: 0o600 });
+      writeFileSync(STATE, JSON.stringify({ cookies }, null, 2) + "\n", {
+        mode: 0o600,
+      });
   } finally {
     await context.dispose();
   }

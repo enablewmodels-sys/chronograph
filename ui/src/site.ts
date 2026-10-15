@@ -14,7 +14,9 @@
 const declared = document.querySelector<HTMLMetaElement>(
   'meta[name="chronodb-edition"]',
 )?.content;
-const declaredEdition = ["managed", "community", "public"].includes(declared || "")
+const declaredEdition = ["managed", "community", "public"].includes(
+  declared || "",
+)
   ? (declared as "managed" | "community" | "public")
   : null;
 const compiledEdition: "managed" | "community" | "public" =

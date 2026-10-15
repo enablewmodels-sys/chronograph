@@ -39,7 +39,8 @@ export const connectors = [
       "migration. The deployment then writes a simulated BrainFlow session into the project at " +
       "that board's own geometry. Install nothing — the SDK is for your own hardware, for a " +
       "decoder you run yourself, or for exporting a session.",
-    mapping: "BCI workspace → Boards lists every board, preset and channel name",
+    mapping:
+      "BCI workspace → Boards lists every board, preset and channel name",
   },
   {
     id: "robotics",

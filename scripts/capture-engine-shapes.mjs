@@ -19,7 +19,8 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const argProfile = process.argv.indexOf("--profile");
-const profile = argProfile === -1 ? "target/release" : process.argv[argProfile + 1];
+const profile =
+  argProfile === -1 ? "target/release" : process.argv[argProfile + 1];
 const binary = join(root, profile, "chronograph-server");
 const output = join(root, "ui/e2e/fixtures/engine.json");
 
@@ -42,10 +43,14 @@ const OPS = [
   ["POST", "/v1/sync", {}],
   ["POST", "/v1/load_demo", {}],
   ["POST", "/v1/add_node", { id: "9001", durability: "fsync" }],
-  ["POST", "/v1/add_edges", {
-    durability: "fsync",
-    edges: [{ src: "9001", dst: "9002", kind: 1, valid_from: "10" }],
-  }],
+  [
+    "POST",
+    "/v1/add_edges",
+    {
+      durability: "fsync",
+      edges: [{ src: "9001", dst: "9002", kind: 1, valid_from: "10" }],
+    },
+  ],
   ["POST", "/v1/invalidate_edge", { id: "1", t: "20", durability: "fsync" }],
   ["POST", "/v1/fork", { t: "30", name: "experiment" }],
   ["POST", "/v1/merge", { fork: "1" }],
@@ -73,10 +78,14 @@ const data = join(base, "data");
 await mkdir(data, { recursive: true });
 const auth = join(base, "auth.json");
 const tokenFile = join(base, "admin.token");
-execFileSync(binary, ["admin", "create-token", "shape capture", "admin", "1", tokenFile], {
-  env: { ...process.env, CHRONOGRAPH_AUTH: auth },
-  stdio: ["ignore", "pipe", "pipe"],
-});
+execFileSync(
+  binary,
+  ["admin", "create-token", "shape capture", "admin", "1", tokenFile],
+  {
+    env: { ...process.env, CHRONOGRAPH_AUTH: auth },
+    stdio: ["ignore", "pipe", "pipe"],
+  },
+);
 const token = (await readFile(tokenFile, "utf8")).trim();
 const port = 18711;
 const child = execFileSync; // eslint-disable-line no-unused-expressions
@@ -92,16 +101,19 @@ const server = spawn(binary, ["serve"], {
   stdio: ["ignore", "ignore", "pipe"],
 });
 let log = "";
-server.stderr.on("data", chunk => (log += chunk));
+server.stderr.on("data", (chunk) => (log += chunk));
 const url = `http://127.0.0.1:${port}`;
 for (let i = 0; i < 200; i++) {
   if (server.exitCode !== null) throw new Error(`server exited: ${log}`);
   try {
-    if ((await fetch(`${url}/healthz`, { signal: AbortSignal.timeout(250) })).ok) break;
+    if (
+      (await fetch(`${url}/healthz`, { signal: AbortSignal.timeout(250) })).ok
+    )
+      break;
   } catch {
     /* not up yet */
   }
-  await new Promise(done => setTimeout(done, 100));
+  await new Promise((done) => setTimeout(done, 100));
 }
 
 const call = async (method, path, body) => {
@@ -125,32 +137,39 @@ const call = async (method, path, body) => {
 
 // A little data, so that list shapes are real lists with an entry rather than empty arrays.
 const seed = [];
-seed.push(await call("POST", "/v1/add_edges", {
-  durability: "fsync",
-  edges: [
-    { src: "1", dst: "2", kind: 1, valid_from: "10" },
-    { src: "2", dst: "3", kind: 2, valid_from: "20" },
-  ],
-}));
+seed.push(
+  await call("POST", "/v1/add_edges", {
+    durability: "fsync",
+    edges: [
+      { src: "1", dst: "2", kind: 1, valid_from: "10" },
+      { src: "2", dst: "3", kind: 2, valid_from: "20" },
+    ],
+  }),
+);
 seed.push(await call("POST", "/v1/fork", { t: "30", name: "experiment" }));
 seed.push(await call("POST", "/v1/load_demo", {}));
-seed.push(await call("POST", "/v1/schema_apply", {
-  source: JSON.stringify({
-    version: 3,
-    relations: [
-      {
-        kind: 1,
-        name: "observed_by",
-        source: "signal",
-        target: "decoder",
-        properties: [],
-      },
-    ],
-    settings: { name: "Primary" },
+seed.push(
+  await call("POST", "/v1/schema_apply", {
+    source: JSON.stringify({
+      version: 3,
+      relations: [
+        {
+          kind: 1,
+          name: "observed_by",
+          source: "signal",
+          target: "decoder",
+          properties: [],
+        },
+      ],
+      settings: { name: "Primary" },
+    }),
   }),
-}));
+);
 
-const captured = { generated: { binary: profile, seed: seed.map(s => s.status) }, routes: {} };
+const captured = {
+  generated: { binary: profile, seed: seed.map((s) => s.status) },
+  routes: {},
+};
 for (const [method, path, body] of OPS) {
   captured.routes[`${method} ${path}`] = await call(method, path, body);
 }
@@ -158,5 +177,9 @@ await mkdir(resolve(output, ".."), { recursive: true });
 await writeFile(output, JSON.stringify(captured, null, 2) + "\n");
 server.kill("SIGTERM");
 await rm(base, { recursive: true, force: true });
-const statuses = Object.entries(captured.routes).map(([k, v]) => `${k} ${v.status}`);
-process.stdout.write(JSON.stringify({ output, calls: statuses.length, statuses }) + "\n");
+const statuses = Object.entries(captured.routes).map(
+  ([k, v]) => `${k} ${v.status}`,
+);
+process.stdout.write(
+  JSON.stringify({ output, calls: statuses.length, statuses }) + "\n",
+);

@@ -126,7 +126,12 @@ async function readAsset(asset: string): Promise<Uint8Array> {
         bytes: number;
         data_hex?: string;
         next_offset?: number | null;
-      }>("asset_get", { asset, content: true, offset, limit: ASSET_PAGE_BYTES }),
+      }>("asset_get", {
+        asset,
+        content: true,
+        offset,
+        limit: ASSET_PAGE_BYTES,
+      }),
     );
     const hex = result.data_hex || "";
     const part = hexToBytes(hex);
@@ -414,7 +419,9 @@ export async function exportDataset(
       const onset = Number(cue.timestamp_us);
       const from = onset + start * 1e6;
       const to = onset + end * 1e6;
-      if (blocked.some(([spanFrom, spanTo]) => from < spanTo && to > spanFrom)) {
+      if (
+        blocked.some(([spanFrom, spanTo]) => from < spanTo && to > spanFrom)
+      ) {
         overSpan += 1;
         continue;
       }

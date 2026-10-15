@@ -182,15 +182,17 @@ function TracePanel({
                     " chunks, " +
                     entry.records +
                     " records"}
-                {entry.through_edge ? " · frozen at edge " + entry.through_edge : ""}
-                {entry.sha256 ? " · sha256 " + entry.sha256.slice(0, 16) + "…" : ""}
+                {entry.through_edge
+                  ? " · frozen at edge " + entry.through_edge
+                  : ""}
+                {entry.sha256
+                  ? " · sha256 " + entry.sha256.slice(0, 16) + "…"
+                  : ""}
               </li>
             ))}
           </ol>
           {trace.result && (
-            <p className="bci-muted">
-              Result: {JSON.stringify(trace.result)}
-            </p>
+            <p className="bci-muted">Result: {JSON.stringify(trace.result)}</p>
           )}
           <p className="bci-muted">{trace.note}</p>
           <details>
@@ -410,8 +412,8 @@ function BrowserDecodeCheck() {
           </div>
           {result && (
             <p className="bci-muted">
-              {result.channels.length} channels · {result.windowSamples} samples ·{" "}
-              {result.sampleRateHz} Hz · decoded{" "}
+              {result.channels.length} channels · {result.windowSamples} samples
+              · {result.sampleRateHz} Hz · decoded{" "}
               <strong>{result.token ?? "no token"}</strong>
               {result.abstained ? " (abstained)" : ""} at{" "}
               {(result.probability * 100).toFixed(1)}% for an expected{" "}
@@ -486,16 +488,16 @@ function initialChannels(
     );
   }
   const board = boardById(boardId);
-  const size = count ?? presetOf(boardId, preset)?.channels ?? board?.channels ?? 8;
+  const size =
+    count ?? presetOf(boardId, preset)?.channels ?? board?.channels ?? 8;
   const reported = defaultChannelNames(boardId, preset).slice(0, size);
   const names =
-    reported.length === size
-      ? reported
-      : numberedChannelNames(boardId, size);
+    reported.length === size ? reported : numberedChannelNames(boardId, size);
   const type = channelTypeFor(board?.modality);
   return names.map((name) => ({
     name,
-    unit: board?.modality === "accel" || board?.modality === "gyro" ? "g" : "uV",
+    unit:
+      board?.modality === "accel" || board?.modality === "gyro" ? "g" : "uV",
     type: CHANNEL_TYPES.includes(type) ? type : "CH",
   }));
 }
@@ -552,11 +554,7 @@ function ChannelEditor({
     <details className="bci-channel-editor">
       <summary>
         Channels · {channels.length} configured
-        {duplicates
-          ? " · duplicate names"
-          : empty
-            ? " · a name is empty"
-            : ""}
+        {duplicates ? " · duplicate names" : empty ? " · a name is empty" : ""}
       </summary>
       <div className="bci-channel-bulk">
         <label>
@@ -699,8 +697,8 @@ function ChannelEditor({
       </div>
       {duplicates && (
         <p role="alert" className="bci-error">
-          Two channels share a name. Names identify a channel in every export, so they
-          have to be unique.
+          Two channels share a name. Names identify a channel in every export,
+          so they have to be unique.
         </p>
       )}
       <div className="bci-channel-table">
@@ -744,8 +742,8 @@ function ChannelEditor({
         ))}
       </div>
       <p className="bci-muted">
-        These names, units and types are what the recording carries. The waveform and
-        every export read them back.
+        These names, units and types are what the recording carries. The
+        waveform and every export read them back.
       </p>
     </details>
   );
@@ -811,9 +809,10 @@ function ManagedRecording({
 }) {
   const action = useAction();
   const [status, setStatus] = useState<AcquisitionStatus | null>(null);
-  const [ready, setReady] = useState<{ created: boolean; sessions: number } | null>(
-    null,
-  );
+  const [ready, setReady] = useState<{
+    created: boolean;
+    sessions: number;
+  } | null>(null);
   const [failure, setFailure] = useState("");
   const asked = useRef(false);
   /**
@@ -886,7 +885,8 @@ function ManagedRecording({
   return (
     <div className="bci-managed">
       <p className="bci-success">
-        <Check size={16} /> Database configured. This deployment records it for you.
+        <Check size={16} /> Database configured. This deployment records it for
+        you.
       </p>
       {failure && (
         <p role="alert" className="bci-error">
@@ -970,7 +970,8 @@ function ManagedRecording({
               </strong>
               <small>
                 {run.state} · {run.writtenSeconds.toFixed(1)} s · {run.chunks}{" "}
-                chunks · {run.channels} channels · {run.rate} Hz · {run.clockDomain}
+                chunks · {run.channels} channels · {run.rate} Hz ·{" "}
+                {run.clockDomain}
               </small>
             </div>
           </article>
@@ -982,10 +983,10 @@ function ManagedRecording({
         </p>
       )}
       <p className="bci-muted">
-        The recording is a BrainFlow synthetic signal at the board's own geometry: alpha,
-        theta and beta rhythms, cue-locked trials, one deliberate acquisition pause at{" "}
-        {status?.gapAtSeconds ?? 13} s and channel noise. No device is opened and no
-        weight is downloaded.
+        The recording is a BrainFlow synthetic signal at the board's own
+        geometry: alpha, theta and beta rhythms, cue-locked trials, one
+        deliberate acquisition pause at {status?.gapAtSeconds ?? 13} s and
+        channel noise. No device is opened and no weight is downloaded.
       </p>
       <Link to="/documentation/BCI">
         Recording contract and exports <ArrowRight size={14} />
@@ -1015,7 +1016,8 @@ function Setup({
 }) {
   const managed = managedSite;
   const fallbackVendor = BCI_VENDORS[0] || "";
-  const defaultBoard = initialBoard ?? (managed ? 0 : firstBoardOf(fallbackVendor));
+  const defaultBoard =
+    initialBoard ?? (managed ? 0 : firstBoardOf(fallbackVendor));
   const [source, setSource] = useState(managed ? "brainflow" : "synthetic");
   const [instance, setInstance] = useState("bci_research");
   const [clock, setClock] = useState("unix_us");
@@ -1025,9 +1027,15 @@ function Setup({
   const [board, setBoard] = useState(defaultBoard);
   const [boardPreset, setBoardPreset] = useState(initialPreset ?? 0);
   const [reference, setReference] = useState("unspecified");
-  const [rate, setRate] = useState(presetOf(defaultBoard, initialPreset ?? 0)?.rate ?? 250);
+  const [rate, setRate] = useState(
+    presetOf(defaultBoard, initialPreset ?? 0)?.rate ?? 250,
+  );
   const [channels, setChannels] = useState<ChannelSetting[]>(() =>
-    initialChannels(managed ? "brainflow" : "synthetic", defaultBoard, initialPreset ?? 0),
+    initialChannels(
+      managed ? "brainflow" : "synthetic",
+      defaultBoard,
+      initialPreset ?? 0,
+    ),
   );
   const [preview, setPreview] = useState<{
     source: string;
@@ -1055,7 +1063,8 @@ function Setup({
   };
   const names = channels.map((channel) => channel.name);
   const unit = channels[0]?.unit || "uV";
-  const command = `chronograph-bci ${source === "file" ? "import" : source} --url ${managed ? "https://chronodb.co" : "http://127.0.0.1:8080"} \\\n  --instance ${instance} --clock-domain ${clock} --spool ./bci-recording \\\n  --partition recording_01 --sync` +
+  const command =
+    `chronograph-bci ${source === "file" ? "import" : source} --url ${managed ? "https://chronodb.co" : "http://127.0.0.1:8080"} \\\n  --instance ${instance} --clock-domain ${clock} --spool ./bci-recording \\\n  --partition recording_01 --sync` +
     (source === "synthetic"
       ? ` --rate ${rate} --channels ${shell(names.join(","))} --units ${shell(unit)} --seconds 30 --realtime`
       : source === "brainflow"
@@ -1158,7 +1167,8 @@ function Setup({
               <>
                 <option value="synthetic">Synthetic EEG · no hardware</option>
                 <option value="brainflow">
-                  BrainFlow · {BCI_BOARD_COUNT} boards, {BCI_VENDOR_COUNT} vendors
+                  BrainFlow · {BCI_BOARD_COUNT} boards, {BCI_VENDOR_COUNT}{" "}
+                  vendors
                 </option>
                 <option value="lsl">Lab Streaming Layer</option>
                 <option value="file">Recorded EDF / BDF / FIF</option>
@@ -1334,7 +1344,8 @@ function Setup({
         ) : (
           <>
             <p className="bci-success">
-              <Check size={16} /> Database configured. Start your local producer.
+              <Check size={16} /> Database configured. Start your local
+              producer.
             </p>
             <p>
               Install <code>pip install './sdk/python[bci,bci-hardware]'</code>{" "}
@@ -1386,7 +1397,10 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
     // frozen together. WHY it matters: a run refuses recordings that disagree about channels,
     // units, reference or rate, and the session list alone does not show any of that.
     [layouts, setLayouts] = useState<
-      Record<string, { channels: number; units: string; reference: string; rate: number }>
+      Record<
+        string,
+        { channels: number; units: string; reference: string; rate: number }
+      >
     >({}),
     [datasetName, setDatasetName] = useState("EEG experiment"),
     [jobs, setJobs] = useState<JobStatus | null>(null),
@@ -1395,7 +1409,9 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
     [jobBusy, setJobBusy] = useState(false),
     // One note serves two exports, so each one records which flow wrote it and is only shown
     // where that flow lives.
-    [exportScope, setExportScope] = useState<"recording" | "dataset">("recording"),
+    [exportScope, setExportScope] = useState<"recording" | "dataset">(
+      "recording",
+    ),
     [trace, setTrace] = useState<BciTrace | null>(null),
     [traceBusy, setTraceBusy] = useState(false),
     [traceError, setTraceError] = useState(""),
@@ -1459,7 +1475,9 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
   const producerAction = useAction();
   const loadProducers = useCallback(async () => {
     if (!managedSite || synthetic) return;
-    const status = await managedApi<AcquisitionStatus>("/managed/bci/acquisition");
+    const status = await managedApi<AcquisitionStatus>(
+      "/managed/bci/acquisition",
+    );
     setProducers(status.running.filter((run) => run.state === "running"));
   }, [synthetic]);
   useEffect(() => {
@@ -1508,7 +1526,8 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
       let listed = await refresh();
       for (
         let attempt = 0;
-        attempt < 6 && !listed.some((s) => `${s.instance}:${s.session}` === key);
+        attempt < 6 &&
+        !listed.some((s) => `${s.instance}:${s.session}` === key);
         attempt += 1
       ) {
         await new Promise((done) => setTimeout(done, 500));
@@ -1528,7 +1547,8 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
   );
   const askedForRecording = useRef(false);
   useEffect(() => {
-    if (!managedSite || synthetic || setup || loading || sessions.length) return;
+    if (!managedSite || synthetic || setup || loading || sessions.length)
+      return;
     if (askedForRecording.current) return;
     askedForRecording.current = true;
     let active = true;
@@ -1703,48 +1723,51 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
    * it would otherwise read is the one from before it moved, so following a live recording used to
    * show the window it had already left behind.
    */
-  const loadWindow = useCallback(async (explicitStart?: number) => {
-    if (!current || !detail) return;
-    if (!channelIndices.length) {
-      setData(null);
-      return;
-    }
-    const start =
-      explicitStart === undefined
-        ? Math.round(origin + offset * 1e6)
-        : Math.round(explicitStart);
-    const end = Math.round(start + span * 1e6);
-    if (synthetic) {
-      setData(demoWindow(start, end, channelIndices));
-      return;
-    }
-    try {
-      const r = await graph<BciWindow>("bci_window", {
-        instance: current.instance,
-        session: selected,
-        stream,
-        start: String(start),
-        end: String(end),
-        channels: channelIndices,
-        points: 600,
-      });
-      setData(r);
-      setAnnotations(r.events);
-      setError("");
-    } catch (e) {
-      setError(String(e));
-    }
-  }, [
-    current?.instance,
-    detail,
-    selected,
-    stream,
-    origin,
-    offset,
-    span,
-    channelIndices,
-    synthetic,
-  ]);
+  const loadWindow = useCallback(
+    async (explicitStart?: number) => {
+      if (!current || !detail) return;
+      if (!channelIndices.length) {
+        setData(null);
+        return;
+      }
+      const start =
+        explicitStart === undefined
+          ? Math.round(origin + offset * 1e6)
+          : Math.round(explicitStart);
+      const end = Math.round(start + span * 1e6);
+      if (synthetic) {
+        setData(demoWindow(start, end, channelIndices));
+        return;
+      }
+      try {
+        const r = await graph<BciWindow>("bci_window", {
+          instance: current.instance,
+          session: selected,
+          stream,
+          start: String(start),
+          end: String(end),
+          channels: channelIndices,
+          points: 600,
+        });
+        setData(r);
+        setAnnotations(r.events);
+        setError("");
+      } catch (e) {
+        setError(String(e));
+      }
+    },
+    [
+      current?.instance,
+      detail,
+      selected,
+      stream,
+      origin,
+      offset,
+      span,
+      channelIndices,
+      synthetic,
+    ],
+  );
   useEffect(() => {
     void loadWindow();
   }, [loadWindow]);
@@ -1779,10 +1802,7 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
             // a window that starts before its first sample and draw a blank lead-in whose axis
             // labels precede the recording. The engine answers such a window as asked, so the
             // clamp has to happen here.
-            const newest = Math.max(
-              origin,
-              Number(d.last_us) - span * 1e6,
-            );
+            const newest = Math.max(origin, Number(d.last_us) - span * 1e6);
             setOffset(Math.max(0, (Number(d.last_us) - origin) / 1e6 - span));
             void loadWindow(newest);
           }
@@ -1939,7 +1959,9 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
           id: record.dst,
           name: String(fields.name || record.dst),
           recipe: fields.recipe ? String(fields.recipe) : null,
-          clock_domain: fields.clock_domain ? String(fields.clock_domain) : null,
+          clock_domain: fields.clock_domain
+            ? String(fields.clock_domain)
+            : null,
           recorded_us: record.timestamp_us,
         },
         dataset: datasetId
@@ -2015,7 +2037,10 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
               "%",
           ),
       );
-      saveFile(exported, `chronodb-${current.instance}-${selected}-${stream}.json`);
+      saveFile(
+        exported,
+        `chronodb-${current.instance}-${selected}-${stream}.json`,
+      );
       const samples =
         exported.streams.find((entry) => entry.stream_id === stream)?.samples[0]
           ?.length || 0;
@@ -2055,7 +2080,11 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
         manifest: {
           sessions: string[];
           stream: string;
-          source_snapshots: { session: string; through_edge: string; sha256: string }[];
+          source_snapshots: {
+            session: string;
+            through_edge: string;
+            sha256: string;
+          }[];
           preprocessing?: { epoch_start_s?: number; epoch_end_s?: number };
         };
       }>("bci_manifest", {
@@ -2126,63 +2155,67 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
         </div>
       </header>
       {setup && (
-          <Setup
-            key={setupBoard ? "board-" + setupBoard.id + "-" + setupBoard.preset : "default"}
-            initialBoard={setupBoard?.id}
-            initialPreset={setupBoard?.preset}
-            onDone={() => void refresh()}
-            onStarted={(instance, session) => void focusRun(instance, session)}
-          />
-        )}
-        {managedNote && !setup && (
-          <p className="bci-muted" role="status">
-            {managedNote}
-          </p>
-        )}
-        {/* A managed producer writes into this project whether or not this page is open, so the
+        <Setup
+          key={
+            setupBoard
+              ? "board-" + setupBoard.id + "-" + setupBoard.preset
+              : "default"
+          }
+          initialBoard={setupBoard?.id}
+          initialPreset={setupBoard?.preset}
+          onDone={() => void refresh()}
+          onStarted={(instance, session) => void focusRun(instance, session)}
+        />
+      )}
+      {managedNote && !setup && (
+        <p className="bci-muted" role="status">
+          {managedNote}
+        </p>
+      )}
+      {/* A managed producer writes into this project whether or not this page is open, so the
             workspace says so wherever the reader is, with the way to stop it. */}
-        {producers.length > 0 && (
-          <section className="bci-panel bci-live-banner" role="status">
-            <div>
-              <strong>
-                {producers.length === 1
-                  ? "A recording is being written now."
-                  : producers.length + " recordings are being written now."}
-              </strong>
-              <p className="bci-muted">
-                {producers
-                  .map(
-                    (run) =>
-                      run.device +
-                      " · session " +
-                      run.session +
-                      " · " +
-                      run.writtenSeconds.toFixed(0) +
-                      " s · " +
-                      run.clockDomain,
-                  )
-                  .join(" · ")}
-              </p>
-            </div>
-            {/* The banner reports to every member, because a recording being written is
+      {producers.length > 0 && (
+        <section className="bci-panel bci-live-banner" role="status">
+          <div>
+            <strong>
+              {producers.length === 1
+                ? "A recording is being written now."
+                : producers.length + " recordings are being written now."}
+            </strong>
+            <p className="bci-muted">
+              {producers
+                .map(
+                  (run) =>
+                    run.device +
+                    " · session " +
+                    run.session +
+                    " · " +
+                    run.writtenSeconds.toFixed(0) +
+                    " s · " +
+                    run.clockDomain,
+                )
+                .join(" · ")}
+            </p>
+          </div>
+          {/* The banner reports to every member, because a recording being written is
                 something anyone reading the workspace should know. Stopping it is a write, so
                 the control appears only for a member the server would accept it from. */}
-            {write ? (
-              <button
-                className="button outline"
-                disabled={producerAction.busy || producerBusy}
-                onClick={() => void stopProducers()}
-              >
-                <Pause size={15} /> Stop recording
-              </button>
-            ) : (
-              <span className="bci-muted">
-                Ask a member with write access to stop it.
-              </span>
-            )}
-            {producerAction.feedback}
-          </section>
-        )}
+          {write ? (
+            <button
+              className="button outline"
+              disabled={producerAction.busy || producerBusy}
+              onClick={() => void stopProducers()}
+            >
+              <Pause size={15} /> Stop recording
+            </button>
+          ) : (
+            <span className="bci-muted">
+              Ask a member with write access to stop it.
+            </span>
+          )}
+          {producerAction.feedback}
+        </section>
+      )}
       <BrowserDecodeCheck />
       <div className="bci-tabs" role="tablist" aria-label="BCI workspace">
         {["Sessions", "Datasets", "Runs", "Live", "Boards"].map((t) => (
@@ -2470,9 +2503,11 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                           ? exportNote || "Reading the samples…"
                           : "Download this recording"}
                       </button>
-                      {exportScope === "recording" && exportNote && !exportBusy && (
-                        <p className="bci-muted">{exportNote}</p>
-                      )}
+                      {exportScope === "recording" &&
+                        exportNote &&
+                        !exportBusy && (
+                          <p className="bci-muted">{exportNote}</p>
+                        )}
                       {exportScope === "recording" && exportError && (
                         <p role="alert" className="bci-error">
                           {exportError}
@@ -2495,9 +2530,9 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
             <section className="bci-panel">
               <h2>Reproducible datasets</h2>
               <p>
-                Freeze source records and hashes before training, then
-                download the trials themselves. Trials crossing marked gaps or
-                artifacts are excluded by the baseline worker.
+                Freeze source records and hashes before training, then download
+                the trials themselves. Trials crossing marked gaps or artifacts
+                are excluded by the baseline worker.
               </p>
               {synthetic ? (
                 <div className="bci-empty">
@@ -2556,23 +2591,34 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                       recordings cannot be frozen together before the person presses the button. */}
                   {layoutsDiffer && (
                     <p role="alert" className="bci-error">
-                      The recordings you selected do not share one layout. A dataset needs
-                      recordings with the same channels, units, reference and sample rate — this
-                      selection mixes {chosenLayouts.map((e) => `${e.channels} ch/${e.rate} Hz`).join(", ")}.
+                      The recordings you selected do not share one layout. A
+                      dataset needs recordings with the same channels, units,
+                      reference and sample rate — this selection mixes{" "}
+                      {chosenLayouts
+                        .map((e) => `${e.channels} ch/${e.rate} Hz`)
+                        .join(", ")}
+                      .
                     </p>
                   )}
                   <div className="bci-actions">
                     <button
                       className="button primary"
-                      disabled={!write || loading || !datasetName.trim() || layoutsDiffer}
+                      disabled={
+                        !write ||
+                        loading ||
+                        !datasetName.trim() ||
+                        layoutsDiffer
+                      }
                       onClick={() => void makeDataset()}
                     >
-                      {loading ? "Freezing the trials…" : "Save & download dataset"}{" "}
+                      {loading
+                        ? "Freezing the trials…"
+                        : "Save & download dataset"}{" "}
                       <Download size={16} />
                     </button>
-                    {exportScope === "dataset" && exportNote && !exportError && (
-                      <p className="bci-muted">{exportNote}</p>
-                    )}
+                    {exportScope === "dataset" &&
+                      exportNote &&
+                      !exportError && <p className="bci-muted">{exportNote}</p>}
                     {exportScope === "dataset" && exportError && (
                       <p role="alert" className="bci-error">
                         {exportError}
@@ -2593,8 +2639,9 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                               try {
                                 const file = await exportDataset(
                                   current?.instance || "bci_research",
-                                  d.record.fields
-                                    .manifest as Parameters<typeof exportDataset>[1],
+                                  d.record.fields.manifest as Parameters<
+                                    typeof exportDataset
+                                  >[1],
                                   String(d.record.fields.name || "dataset"),
                                 );
                                 saveFile(file, `dataset-${d.record.dst}.json`);
@@ -2713,9 +2760,7 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                     <h2>CPU training</h2>
                     {jobs?.available && (
                       <span className="bci-chip">
-                        {queuedJobs
-                          ? `${queuedJobs} in the queue`
-                          : "Ready"}
+                        {queuedJobs ? `${queuedJobs} in the queue` : "Ready"}
                       </span>
                     )}
                   </div>
@@ -2771,8 +2816,8 @@ export function BCIWorkspace({ demo = false }: { demo?: boolean }) {
                   )}
                   {write && jobs?.available && !datasets.length && (
                     <p className="bci-note">
-                      Cut a dataset on the Datasets tab first. A run needs epochs
-                      with labels.
+                      Cut a dataset on the Datasets tab first. A run needs
+                      epochs with labels.
                     </p>
                   )}
                   <div className="bci-recording-list">

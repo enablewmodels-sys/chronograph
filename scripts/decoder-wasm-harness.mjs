@@ -6,7 +6,9 @@ import { readFileSync } from "node:fs";
 
 const [, , wasmPath, artifactDir, windowPath] = process.argv;
 if (!wasmPath || !artifactDir || !windowPath) {
-  console.error("usage: node decoder-wasm-harness.mjs MODULE.wasm ARTIFACT_DIR WINDOW.f64");
+  console.error(
+    "usage: node decoder-wasm-harness.mjs MODULE.wasm ARTIFACT_DIR WINDOW.f64",
+  );
   process.exit(2);
 }
 
@@ -24,7 +26,9 @@ function write(bytes) {
 function readResult() {
   const pointer = api.chronograph_result_ptr();
   const length = api.chronograph_result_len();
-  return JSON.parse(new TextDecoder().decode(memory().slice(pointer, pointer + length)));
+  return JSON.parse(
+    new TextDecoder().decode(memory().slice(pointer, pointer + length)),
+  );
 }
 
 const model = write(readFileSync(`${artifactDir}/model.json`));
@@ -38,7 +42,14 @@ if (code !== 0) {
   process.exit(1);
 }
 
-code = api.chronograph_decode(model[0], model[1], weights[0], weights[1], window[0], window[1]);
+code = api.chronograph_decode(
+  model[0],
+  model[1],
+  weights[0],
+  weights[1],
+  window[0],
+  window[1],
+);
 const decoded = readResult();
 if (code !== 0) {
   console.error("decode failed:", JSON.stringify(decoded));

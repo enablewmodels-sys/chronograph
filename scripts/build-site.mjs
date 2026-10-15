@@ -17,7 +17,10 @@ if (!/^\/(?:[a-zA-Z0-9_-]+\/)*$/.test(base))
 // from one kind of command.
 for (const [entry, args] of [
   ["./node_modules/typescript/bin/tsc", ["-b"]],
-  ["./node_modules/vite/bin/vite.js", ["build", "--outDir", "../dist/site", "--emptyOutDir"]],
+  [
+    "./node_modules/vite/bin/vite.js",
+    ["build", "--outDir", "../dist/site", "--emptyOutDir"],
+  ],
 ])
   execFileSync(process.execPath, [entry, ...args], {
     cwd: path.join(root, "ui"),

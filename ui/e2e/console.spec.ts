@@ -385,7 +385,9 @@ test("landing artwork, documentation and connector navigation render at this vie
     page.getByRole("slider", { name: "World timeline" }),
   ).toBeVisible();
   for (const name of ["Replay", "Branch", "Connect"]) {
-    await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name, exact: true }),
+    ).toBeVisible();
   }
   await page.screenshot({
     path: `/tmp/chronograph-navy-${testInfo.project.name}-${testInfo.repeatEachIndex}.png`,

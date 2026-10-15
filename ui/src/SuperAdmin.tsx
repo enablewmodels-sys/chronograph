@@ -1014,7 +1014,9 @@ export default function SuperAdmin() {
                         {roster.accounts.map((account) => (
                           <tr key={account.id}>
                             <th scope="row">
-                              <strong>{account.name || account.email || account.id}</strong>
+                              <strong>
+                                {account.name || account.email || account.id}
+                              </strong>
                               <span>
                                 <code>{account.email || account.id}</code>
                               </span>
@@ -1099,7 +1101,13 @@ export default function SuperAdmin() {
                             <th scope="row">
                               <code>{session.email || UNKNOWN}</code>
                             </th>
-                            <td>{formatStamp(session.createdAt ?? session.assuranceAt ?? null)}</td>
+                            <td>
+                              {formatStamp(
+                                session.createdAt ??
+                                  session.assuranceAt ??
+                                  null,
+                              )}
+                            </td>
                             <td>{formatStamp(session.expiresAt)}</td>
                             <td>{session.ipAddress || "not kept"}</td>
                             <td className="superadmin-wrap">
@@ -1141,7 +1149,9 @@ export default function SuperAdmin() {
                         {roster.memberships.map((member) => (
                           <tr key={`${member.projectId}-${member.userId}`}>
                             <th scope="row">
-                              <strong>{member.projectName || member.projectId}</strong>
+                              <strong>
+                                {member.projectName || member.projectId}
+                              </strong>
                               <span>
                                 <code>{member.projectId}</code>
                               </span>
@@ -1170,7 +1180,8 @@ export default function SuperAdmin() {
                                       "Suspend " +
                                         (member.email || member.userId) +
                                         " in " +
-                                        (member.projectName || member.projectId) +
+                                        (member.projectName ||
+                                          member.projectId) +
                                         "? They lose access on their next request.",
                                     )
                                   )
@@ -1188,7 +1199,9 @@ export default function SuperAdmin() {
                                   }, "The membership was updated.");
                                 }}
                               >
-                                {member.status === "active" ? "Suspend" : "Restore"}
+                                {member.status === "active"
+                                  ? "Suspend"
+                                  : "Restore"}
                               </button>
                             </td>
                           </tr>

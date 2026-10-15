@@ -240,12 +240,16 @@ test("an unreachable account service says so instead of showing the sign-in form
   await page.route("**/managed/session", (route) =>
     route.fulfill({
       status: 500,
-      json: { error: { code: "INTERNAL", message: "Account service unavailable." } },
+      json: {
+        error: { code: "INTERNAL", message: "Account service unavailable." },
+      },
     }),
   );
   await page.goto("/app");
   await expect(
-    page.getByRole("heading", { name: "The account service is not answering." }),
+    page.getByRole("heading", {
+      name: "The account service is not answering.",
+    }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
   await expect(page.getByLabel("Password", { exact: true })).toHaveCount(0);
@@ -309,7 +313,9 @@ test("the Apps page reports missing hosting instead of an error", async ({
   );
   await page.goto("/app/apps");
   await expect(
-    page.getByRole("heading", { name: /Hosting is not enabled for this deployment/ }),
+    page.getByRole("heading", {
+      name: /Hosting is not enabled for this deployment/,
+    }),
   ).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
   expect(errors).toEqual([]);

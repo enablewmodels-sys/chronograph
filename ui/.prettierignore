@@ -1,0 +1,6 @@
+# Generated artifacts. Their producers own these bytes, so the formatter must not touch them:
+# scripts/export-brainflow-catalog.py writes compact JSON on purpose, and
+# scripts/capture-engine-shapes.mjs records a live engine's own answers. Formatting either one
+# here would make the next regeneration fail `npm run format:check`.
+src/brainflow-boards.json
+e2e/fixtures/engine.json

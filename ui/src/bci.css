@@ -783,7 +783,6 @@
   gap: 10px;
 }
 
-
 /* The managed producer is running. It writes whether or not this page is open, so the notice
    is a panel with its own stop control rather than a line of muted text. */
 .bci-live-banner {
@@ -805,7 +804,6 @@
 .bci-live-banner [role="alert"] {
   flex-basis: 100%;
 }
-
 
 /* Advanced setup fields stay reachable but out of the first read. A new user needs the
    board, its sample rate and its channels; the instance name, clock domain and reference

@@ -72,9 +72,12 @@ export async function managedApi<T>(path: string, body?: unknown): Promise<T> {
   }
   const value = await response.json().catch(() => null);
   if (value === null) {
-    throw Object.assign(new Error("The service returned an unreadable answer."), {
-      code: "BAD_RESPONSE",
-    });
+    throw Object.assign(
+      new Error("The service returned an unreadable answer."),
+      {
+        code: "BAD_RESPONSE",
+      },
+    );
   }
   if (!response.ok) {
     // A 401 here is the control plane saying this browser is no longer signed in. The

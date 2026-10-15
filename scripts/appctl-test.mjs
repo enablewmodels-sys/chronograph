@@ -984,7 +984,10 @@ await check(
       join(workspace, "leaky", "chronograph.app.json"),
     );
     const raw = JSON.parse(readFileSync(file, "utf8"));
-    raw.boundary = "uses " + ["sk", "live", "0123456789abcdef0123456789abcdef"].join("_") + " for billing";
+    raw.boundary =
+      "uses " +
+      ["sk", "live", "0123456789abcdef0123456789abcdef"].join("_") +
+      " for billing";
     writeFileSync(file, JSON.stringify(raw, null, 2) + "\n");
     const result = appctl([
       "plan",
@@ -1026,18 +1029,24 @@ await check("a build context cannot escape the manifest directory", () => {
       env,
     );
 
-  const above = writeManifest(join(workspace, "escape", "chronograph.app.json"), {
-    build: { context: "../../..", dockerfile: "Dockerfile" },
-  });
+  const above = writeManifest(
+    join(workspace, "escape", "chronograph.app.json"),
+    {
+      build: { context: "../../..", dockerfile: "Dockerfile" },
+    },
+  );
   assertRefused(
     argsFor("plan", above, join(workspace, "state-escape")),
     "build-context-outside",
     "a context above the manifest directory",
   );
 
-  const absolute = writeManifest(join(workspace, "absolute", "chronograph.app.json"), {
-    build: { context: "/etc", dockerfile: "Dockerfile" },
-  });
+  const absolute = writeManifest(
+    join(workspace, "absolute", "chronograph.app.json"),
+    {
+      build: { context: "/etc", dockerfile: "Dockerfile" },
+    },
+  );
   assertRefused(
     argsFor("plan", absolute, join(workspace, "state-absolute")),
     "build-context-outside",
@@ -1058,9 +1067,12 @@ await check("a build context cannot escape the manifest directory", () => {
     "a context symlinked out of the manifest directory",
   );
 
-  const beside = writeManifest(join(workspace, "beside", "chronograph.app.json"), {
-    build: { context: ".", dockerfile: "Dockerfile" },
-  });
+  const beside = writeManifest(
+    join(workspace, "beside", "chronograph.app.json"),
+    {
+      build: { context: ".", dockerfile: "Dockerfile" },
+    },
+  );
   assertOk(
     argsFor("plan", beside, join(workspace, "state-beside")),
     "a context beside its manifest",

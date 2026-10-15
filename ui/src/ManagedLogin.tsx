@@ -251,7 +251,10 @@ export default function ManagedLogin({
                   }
                   // The deployment ships no authenticator, so a sign-in either has a
                   // session or it failed; there is no code prompt to hand off to.
-                  await managedApi("/api/auth/sign-in/email", { email, password });
+                  await managedApi("/api/auth/sign-in/email", {
+                    email,
+                    password,
+                  });
                   setPassword("");
                   await refresh();
                 })

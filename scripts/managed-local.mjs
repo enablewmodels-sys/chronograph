@@ -35,11 +35,16 @@ const flag = (name, fallback) => {
 const PORT = Number(flag("port", "19090"));
 const ENGINE_PORT = PORT + 1;
 const UI = resolve(root, flag("ui", "ui/dist-managed"));
-const BINARY = resolve(root, flag("binary", "target/release/chronograph-server"));
+const BINARY = resolve(
+  root,
+  flag("binary", "target/release/chronograph-server"),
+);
 const OWNER = (flag("email", "operator@chronodb.local") || "").toLowerCase();
 const PRIMARY = "primary";
 
-const state = flag("data", "") ? resolve(flag("data")) : await mkdtemp(join(tmpdir(), "chronodb-local-"));
+const state = flag("data", "")
+  ? resolve(flag("data"))
+  : await mkdtemp(join(tmpdir(), "chronodb-local-"));
 const keep = Boolean(flag("data", ""));
 await mkdir(join(state, "engine", "config"), { recursive: true });
 
@@ -60,8 +65,20 @@ for (const scope of ["admin", "ingest", "read"]) {
   await new Promise((done, fail) =>
     execFile(
       BINARY,
-      ["admin", "create-token", "Local " + scope + " bridge", scope, "365", file],
-      { env: { ...process.env, CHRONOGRAPH_AUTH: join(engineRoot, "config", "auth.json") } },
+      [
+        "admin",
+        "create-token",
+        "Local " + scope + " bridge",
+        scope,
+        "365",
+        file,
+      ],
+      {
+        env: {
+          ...process.env,
+          CHRONOGRAPH_AUTH: join(engineRoot, "config", "auth.json"),
+        },
+      },
       (error) => (error ? fail(error) : done()),
     ),
   );
@@ -103,7 +120,9 @@ let ready = false;
 for (let i = 0; i < 200; i++) {
   if (engine.exitCode !== null)
     await abort(
-      "The engine exited during start-up, most often because " + engineUrl + " is taken.",
+      "The engine exited during start-up, most often because " +
+        engineUrl +
+        " is taken.",
     );
   // The engine authorises every request by public origin, so even the readiness probe has
   // to present the deployment's host rather than the port the engine listens on. fetch()
@@ -172,7 +191,11 @@ await writeFile(secretFile, random(), { mode: 0o600 });
 await mkdir(join(state, "config"), { recursive: true, mode: 0o700 });
 await writeFile(
   join(state, "config", "mail.json"),
-  JSON.stringify({ transport: "file", from: "ChronoDB <no-reply@chronodb.local>", path: join(state, "mail.jsonl") }),
+  JSON.stringify({
+    transport: "file",
+    from: "ChronoDB <no-reply@chronodb.local>",
+    path: join(state, "mail.jsonl"),
+  }),
   { mode: 0o600 },
 );
 const configPath = join(state, "control.json");
@@ -217,7 +240,13 @@ await writeFile(
 );
 // A deployable app for the console to drive. The manifest lives in the project's own manifests
 // directory and the build context is the directory beside it, which is what validation requires.
-const appContext = join(state, "hosting", "manifests", PRIMARY, "sample-service");
+const appContext = join(
+  state,
+  "hosting",
+  "manifests",
+  PRIMARY,
+  "sample-service",
+);
 await mkdir(appContext, { recursive: true });
 await writeFile(
   join(appContext, "Dockerfile"),
@@ -285,7 +314,9 @@ const invite = await app.issueInvite({
   projectId: PRIMARY,
   reset: Boolean(existing),
 });
-const token = new URLSearchParams(new URL(invite.url).hash.slice(1)).get("token");
+const token = new URLSearchParams(new URL(invite.url).hash.slice(1)).get(
+  "token",
+);
 const call = (path, body) =>
   fetch("http://127.0.0.1:" + PORT + path, {
     method: "POST",
@@ -298,8 +329,12 @@ const call = (path, body) =>
     },
     body: JSON.stringify(body),
   });
-const reset = await call("/api/auth/reset-password", { token, newPassword: password });
-if (reset.status !== 200) throw new Error("could not set the local password: " + (await reset.text()));
+const reset = await call("/api/auth/reset-password", {
+  token,
+  newPassword: password,
+});
+if (reset.status !== 200)
+  throw new Error("could not set the local password: " + (await reset.text()));
 const passwordFile = join(state, "owner-password");
 await writeFile(passwordFile, password + "\n", { mode: 0o600 });
 
@@ -308,14 +343,17 @@ await writeFile(passwordFile, password + "\n", { mode: 0o600 });
 // point of the seed is data the console can draw, not a load test.
 const seeded = [];
 for (const [name, body] of [
-  ["add_edges", {
-    durability: "fsync",
-    edges: [
-      { src: "1", dst: "2", kind: 1, valid_from: "10" },
-      { src: "2", dst: "3", kind: 2, valid_from: "20" },
-      { src: "3", dst: "4", kind: 3, valid_from: "30" },
-    ],
-  }],
+  [
+    "add_edges",
+    {
+      durability: "fsync",
+      edges: [
+        { src: "1", dst: "2", kind: 1, valid_from: "10" },
+        { src: "2", dst: "3", kind: 2, valid_from: "20" },
+        { src: "3", dst: "4", kind: 3, valid_from: "30" },
+      ],
+    },
+  ],
   ["add_node", { id: "5", durability: "fsync" }],
   ["fork", { t: "40", name: "experiment" }],
   ["load_demo", {}],

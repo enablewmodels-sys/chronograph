@@ -38,7 +38,9 @@ const signedIn = {
     freshUntil: 0,
   },
   project: { id: "primary", name: "Primary", state: "running", role: "owner" },
-  projects: [{ id: "primary", name: "Primary", state: "running", role: "owner" }],
+  projects: [
+    { id: "primary", name: "Primary", state: "running", role: "owner" },
+  ],
   superadmin: true,
 };
 
@@ -177,11 +179,15 @@ test("the browser decoder decodes the artifact this deployment serves", async ({
    was fine: the account was signed out twenty minutes earlier, so /admin answered with the
    sign-in form and read as a broken panel. Against a real deployment this asserts the panel
    itself renders, which the mocked superadmin suite cannot say. */
-test("the operator panel renders for the operator account", async ({ page }) => {
+test("the operator panel renders for the operator account", async ({
+  page,
+}) => {
   test.skip(!configured, NEEDS_DEPLOYMENT);
   await applySession(page);
   await page.goto(ORIGIN + "/admin");
-  await expect(page.getByRole("heading", { name: "Platform status" })).toBeVisible({
+  await expect(
+    page.getByRole("heading", { name: "Platform status" }),
+  ).toBeVisible({
     timeout: 20_000,
   });
   await expect(page.locator(".superadmin-denied")).toHaveCount(0);
@@ -210,13 +216,11 @@ for (const [name, path, markers] of PAGES) {
     // the assertion at the end fails the test with the message the page itself produced.
     const failures: string[] = [];
     const shell = page.locator(".workspace-top");
-    const boundaryCard = page
-      .locator('[role="alert"]')
-      .filter({
-        has: page.getByRole("heading", {
-          name: "This page could not be displayed.",
-        }),
-      });
+    const boundaryCard = page.locator('[role="alert"]').filter({
+      has: page.getByRole("heading", {
+        name: "This page could not be displayed.",
+      }),
+    });
     // Wait for whichever happens: the console shell paints (the route mounted) or the
     // boundary paints (the route mounted and threw). Anything else after this window is
     // genuinely blank, and only then is the page at fault.
@@ -240,7 +244,12 @@ for (const [name, path, markers] of PAGES) {
       }
     }
     if (!rendered) {
-      const body = (await page.locator("body").innerText().catch(() => ""))
+      const body = (
+        await page
+          .locator("body")
+          .innerText()
+          .catch(() => "")
+      )
         .replace(/\s+/g, " ")
         .slice(0, 200);
       const state = await page
@@ -258,13 +267,19 @@ for (const [name, path, markers] of PAGES) {
           ` | console: ${console_.join("; ").slice(0, 400)}`,
       );
     }
-    const text = (await page.locator("main").innerText().catch(() => ""))
+    const text = (
+      await page
+        .locator("main")
+        .innerText()
+        .catch(() => "")
+    )
       .replace(/\s+/g, " ")
       .trim();
     // Reaching the shell means the route mounted. From there the requirements are that this
     // page — not a redirect to another one — drew its own content, and that nothing raised.
     if (rendered && (await shell.isVisible().catch(() => false))) {
-      if (!text) failures.push("the page mounted but drew nothing inside <main>.");
+      if (!text)
+        failures.push("the page mounted but drew nothing inside <main>.");
       if (!markers.some((marker) => text.includes(marker)))
         failures.push(
           `${path} did not draw its own page: expected one of ${markers.join(" / ")}` +

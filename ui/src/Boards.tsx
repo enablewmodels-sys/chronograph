@@ -194,7 +194,8 @@ export default function Boards({
       {board && (
         <div className="board-detail">
           <h3>
-            {board.device ?? board.name} <span className="bci-chip">#{board.id}</span>
+            {board.device ?? board.name}{" "}
+            <span className="bci-chip">#{board.id}</span>
           </h3>
           {board.presets.length > 1 && (
             <label>
@@ -205,7 +206,8 @@ export default function Boards({
               >
                 {board.presets.map((entry) => (
                   <option key={entry.preset} value={entry.preset}>
-                    {entry.name} · {entry.rate ?? "?"} Hz · {entry.channels} rows
+                    {entry.name} · {entry.rate ?? "?"} Hz · {entry.channels}{" "}
+                    rows
                   </option>
                 ))}
               </select>
@@ -245,8 +247,8 @@ export default function Boards({
       )}
 
       <p className="small muted">
-        Physical boards are described, not certified: only the synthetic board and local
-        files are exercised by the test suite.{" "}
+        Physical boards are described, not certified: only the synthetic board
+        and local files are exercised by the test suite.{" "}
         {Object.keys(catalog.unavailable_vendors).length > 0 &&
           Object.entries(
             // The generated file holds an empty object when every documented vendor

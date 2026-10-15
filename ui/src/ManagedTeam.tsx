@@ -90,8 +90,8 @@ export default function ManagedTeam() {
         ))}
       </div>
       <p className="small muted">
-        Only owners and administrators can invite people or change roles, and every
-        change is appended to the audit trail below.
+        Only owners and administrators can invite people or change roles, and
+        every change is appended to the audit trail below.
       </p>
       {tab === "team" ? (
         <>
@@ -222,9 +222,7 @@ export default function ManagedTeam() {
                           )}
                         </select>
                       </td>
-                      <td>
-                        {m.hasPassword ? "Password" : "Provider sign-in"}
-                      </td>
+                      <td>{m.hasPassword ? "Password" : "Provider sign-in"}</td>
                       <td>{m.status}</td>
                       <td>
                         <div className="table-actions">

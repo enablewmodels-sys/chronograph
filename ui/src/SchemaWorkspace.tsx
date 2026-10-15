@@ -280,19 +280,19 @@ export default function Schema() {
               <section className="panel schema-start">
                 <h2>Name what your data means.</h2>
                 <p>
-                  A recording writes numeric relation kinds. Naming them here is what
-                  turns those numbers into readable history: a kind becomes a named
-                  relation with typed properties, so a query answers with
-                  channels, cue and probability instead of raw bytes.
+                  A recording writes numeric relation kinds. Naming them here is
+                  what turns those numbers into readable history: a kind becomes
+                  a named relation with typed properties, so a query answers
+                  with channels, cue and probability instead of raw bytes.
                 </p>
                 <ol className="schema-start-steps">
                   <li>
-                    Define a relation here, or apply a connector preset such as the
-                    BCI research contract.
+                    Define a relation here, or apply a connector preset such as
+                    the BCI research contract.
                   </li>
                   <li>
-                    Record with the SDK on the machine wired to the device. Nothing on
-                    this page touches hardware.
+                    Record with the SDK on the machine wired to the device.
+                    Nothing on this page touches hardware.
                   </li>
                   <li>
                     Read it back in the BCI workspace as a moment, a branch or a

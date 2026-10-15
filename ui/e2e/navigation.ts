@@ -11,7 +11,9 @@ import { expect, type Page } from "@playwright/test";
 
 /** The console sidebar, opening it first when the viewport has collapsed it. */
 export async function consoleNavigation(page: Page) {
-  const navigation = page.getByRole("navigation", { name: "Console navigation" });
+  const navigation = page.getByRole("navigation", {
+    name: "Console navigation",
+  });
   if (await navigation.isVisible().catch(() => false)) return navigation;
   const toggle = page.getByRole("button", { name: "Open navigation" });
   if (await toggle.isVisible().catch(() => false)) {

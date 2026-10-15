@@ -35,7 +35,10 @@ test.beforeEach(async ({ page }) => {
 
 /** The drawer in this console labels its close control "Close <title>". */
 async function closeDrawer(page: Page) {
-  await page.getByRole("button", { name: /^Close / }).first().click();
+  await page
+    .getByRole("button", { name: /^Close / })
+    .first()
+    .click();
 }
 
 const unique = (prefix: string) => prefix + "-" + Date.now().toString(36);
@@ -43,16 +46,23 @@ const unique = (prefix: string) => prefix + "-" + Date.now().toString(36);
 test("an API key can be created and revoked", async ({ page }) => {
   const name = unique("qa-key");
   await page.goto(ORIGIN + "/app/access");
-  await expect(page.getByRole("heading", { name: "Project endpoints" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Project endpoints" }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "New API key" }).click();
   await page.getByLabel("Token name").fill(name);
   await page.getByRole("button", { name: "Create token" }).click();
   // The value is shown once and never again, which is the whole contract of this control.
-  await expect(page.getByText("Copy your token now")).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText("Copy your token now")).toBeVisible({
+    timeout: 15_000,
+  });
   await closeDrawer(page);
   const cell = page.getByRole("cell", { name, exact: true });
   await expect(cell).toBeVisible({ timeout: 15_000 });
-  await page.getByRole("row", { name: new RegExp(name) }).getByRole("button", { name: "Revoke" }).click();
+  await page
+    .getByRole("row", { name: new RegExp(name) })
+    .getByRole("button", { name: "Revoke" })
+    .click();
   await expect(cell).toHaveCount(0, { timeout: 15_000 });
 });
 
@@ -65,7 +75,9 @@ test("a secret can be stored and a reader key issued", async ({ page }) => {
   await page.getByLabel("Secret value").fill("value-for-the-test");
   await page.getByRole("button", { name: "Save secret" }).click();
   await closeDrawer(page);
-  await expect(page.getByRole("cell", { name: secret, exact: true })).toBeVisible({
+  await expect(
+    page.getByRole("cell", { name: secret, exact: true }),
+  ).toBeVisible({
     timeout: 15_000,
   });
   // The vault keeps at most twenty reader keys per project, and this suite creates one per run,
@@ -91,7 +103,10 @@ test("a secret can be stored and a reader key issued", async ({ page }) => {
   }
   await closeDrawer(page);
   await expect(keyCell).toBeVisible({ timeout: 15_000 });
-  await page.getByRole("row", { name: new RegExp(key) }).getByRole("button", { name: "Revoke" }).click();
+  await page
+    .getByRole("row", { name: new RegExp(key) })
+    .getByRole("button", { name: "Revoke" })
+    .click();
   await expect(keyCell).toHaveCount(0, { timeout: 15_000 });
 });
 
@@ -113,7 +128,9 @@ test("asking for a collaborator answers, or says exactly what is missing", async
   const refusal = page.getByText(/Ask this collaborator to sign up/).first();
   const delivered = page.getByText(`Invitation emailed to ${email}`);
   const link = page.getByText(`Private invitation for ${email}`);
-  await expect(refusal.or(delivered).or(link).first()).toBeVisible({ timeout: 20_000 });
+  await expect(refusal.or(delivered).or(link).first()).toBeVisible({
+    timeout: 20_000,
+  });
   if (await refusal.isVisible()) {
     // Nothing was created, which is the point of refusing: no invitation, no audit event for
     // an account that can never be activated.
@@ -123,7 +140,12 @@ test("asking for a collaborator answers, or says exactly what is missing", async
   // The invitation exists either way, and the private link is always shown so an operator can
   // deliver it by hand when sending failed.
   await expect(delivered.or(link).first()).toBeVisible();
-  await expect(page.getByRole("link", { name: /set a password|join/i }).or(page.getByText(/\/activate#token=|\/join#token=/)).first()).toBeVisible({
+  await expect(
+    page
+      .getByRole("link", { name: /set a password|join/i })
+      .or(page.getByText(/\/activate#token=|\/join#token=/))
+      .first(),
+  ).toBeVisible({
     timeout: 15_000,
   });
   // When the deployment spools its mail, the message must actually be there: a notice that says
@@ -166,7 +188,9 @@ test("a durable branch can be created and discarded", async ({ page }) => {
   // fork budget, and discarding exercises the one branch control the create path does not.
   await branch.click();
   await page.getByRole("button", { name: "Discard branch" }).click();
-  await expect(page.getByText("Branch discarded and synchronized.")).toBeVisible({
+  await expect(
+    page.getByText("Branch discarded and synchronized."),
+  ).toBeVisible({
     timeout: 20_000,
   });
   // The branch stays in the table as history with its state, which is the point of a lineage
@@ -181,11 +205,16 @@ test("a consistent backup can be created", async ({ page }) => {
   await page.goto(ORIGIN + "/app/operations");
   // Wait for the page to have read the engine before reading the table: an empty read here once
   // skipped the room-making below and left the test asserting a success the cap forbade.
-  await expect(page.getByRole("button", { name: "Create backup" })).toBeVisible({
-    timeout: 20_000,
-  });
+  await expect(page.getByRole("button", { name: "Create backup" })).toBeVisible(
+    {
+      timeout: 20_000,
+    },
+  );
   await expect(
-    page.locator("table tbody tr").first().or(page.getByText("No local backups yet.")),
+    page
+      .locator("table tbody tr")
+      .first()
+      .or(page.getByText("No local backups yet.")),
   ).toBeVisible({ timeout: 20_000 });
   // Identify the backups by their IDs rather than counting rows: a count that grew would also be
   // satisfied by an unrelated row appearing, and this test's claim is that a *new* backup exists.
@@ -203,9 +232,9 @@ test("a consistent backup can be created", async ({ page }) => {
       .last()
       .getByRole("button", { name: "Delete" })
       .click();
-    await expect.poll(async () => (await ids()).length, { timeout: 20_000 }).toBeLessThan(
-      before.size,
-    );
+    await expect
+      .poll(async () => (await ids()).length, { timeout: 20_000 })
+      .toBeLessThan(before.size);
     before = new Set(await ids());
   }
   await page.getByRole("button", { name: "Create backup" }).click();
@@ -213,7 +242,9 @@ test("a consistent backup can be created", async ({ page }) => {
     timeout: 20_000,
   });
   await expect
-    .poll(async () => (await ids()).some((id) => !before.has(id)), { timeout: 20_000 })
+    .poll(async () => (await ids()).some((id) => !before.has(id)), {
+      timeout: 20_000,
+    })
     .toBe(true);
 });
 
@@ -227,20 +258,28 @@ test("an app is planned, deployed, rolled back and destroyed from the console", 
 }) => {
   await page.goto(ORIGIN + "/app/apps");
   await expect(page.getByText("Hosting is not enabled")).toHaveCount(0);
-  await expect(page.getByText("sample-service").first()).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText("sample-service").first()).toBeVisible({
+    timeout: 20_000,
+  });
 
   await page.getByRole("button", { name: "Plan", exact: true }).click();
-  await expect(page.getByText("Plan ready. Nothing on the host was touched.")).toBeVisible({
+  await expect(
+    page.getByText("Plan ready. Nothing on the host was touched."),
+  ).toBeVisible({
     timeout: 20_000,
   });
 
   await page.getByRole("button", { name: "Deploy", exact: true }).click();
-  await expect(page.getByText("Deploy finished. The ledger records it.")).toBeVisible({
+  await expect(
+    page.getByText("Deploy finished. The ledger records it."),
+  ).toBeVisible({
     timeout: 30_000,
   });
   // The ledger shows the first twelve hex characters of the digest the deploy recorded (the full
   // value is the cell's title), so a placeholder would not produce this.
-  await expect(page.getByText(/^[0-9a-f]{12}…$/).first()).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText(/^[0-9a-f]{12}…$/).first()).toBeVisible({
+    timeout: 20_000,
+  });
 
   await page.getByRole("button", { name: "Roll back", exact: true }).click();
   // Either outcome is correct and they are not the same thing: with a previous digest recorded the
@@ -254,7 +293,9 @@ test("an app is planned, deployed, rolled back and destroyed from the console", 
   ).toBeVisible({ timeout: 30_000 });
 
   await page.getByRole("button", { name: "Destroy", exact: true }).click();
-  await expect(page.getByText("Destroy recorded.")).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByText("Destroy recorded.")).toBeVisible({
+    timeout: 30_000,
+  });
 });
 
 /* The whole account lifecycle through the rendered pages and the deployment's own mail: sign up,
@@ -264,7 +305,11 @@ test("a new account is created, activated from the email, and signed in", async 
   page,
 }) => {
   const spool = process.env.CHRONOGRAPH_SWEEP_MAIL_SPOOL;
-  if (!spool) test.skip(true, "Set CHRONOGRAPH_SWEEP_MAIL_SPOOL to a deployment that spools mail.");
+  if (!spool)
+    test.skip(
+      true,
+      "Set CHRONOGRAPH_SWEEP_MAIL_SPOOL to a deployment that spools mail.",
+    );
   const email = unique("qa-signup") + "@example.com";
   const password = "qa-signup-passphrase-2468";
 
@@ -332,29 +377,36 @@ test("a new account is created, activated from the email, and signed in", async 
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
   // The sign-in form is gone: the account it was just created for is usable.
-  await expect(page.getByRole("heading", { name: "Sign in to ChronoDB." })).toHaveCount(
-    0,
-    { timeout: 30_000 },
-  );
+  await expect(
+    page.getByRole("heading", { name: "Sign in to ChronoDB." }),
+  ).toHaveCount(0, { timeout: 30_000 });
 });
 
 /* The suites sign in through the provider's endpoint, which is not the path a person takes. This
    one uses the rendered form on a real deployment, because the failure this product actually had
    was a form that accepted a password and then bounced the reader back to itself. */
-test("the sign-in form itself works against this deployment", async ({ browser }) => {
+test("the sign-in form itself works against this deployment", async ({
+  browser,
+}) => {
   // A context with no session, or the form would never render.
   const context = await browser.newContext();
   try {
     const page = await context.newPage();
     await page.goto(ORIGIN + "/login");
-    await page.getByLabel("Email address").fill(process.env.CHRONOGRAPH_SWEEP_EMAIL || "");
-    await page.getByLabel("Password").fill(process.env.CHRONOGRAPH_SWEEP_PASSWORD || "");
+    await page
+      .getByLabel("Email address")
+      .fill(process.env.CHRONOGRAPH_SWEEP_EMAIL || "");
+    await page
+      .getByLabel("Password")
+      .fill(process.env.CHRONOGRAPH_SWEEP_PASSWORD || "");
     await page.getByRole("button", { name: "Sign in" }).click();
     // The signed-in shell, not the form again: a bounce is the defect this test exists for.
-    await expect(page.locator(".workspace-top")).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByRole("heading", { name: "Sign in to ChronoDB." })).toHaveCount(
-      0,
-    );
+    await expect(page.locator(".workspace-top")).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(
+      page.getByRole("heading", { name: "Sign in to ChronoDB." }),
+    ).toHaveCount(0);
   } finally {
     await context.close();
   }

@@ -222,176 +222,186 @@ function App() {
             </p>
           }
         >
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/bci" element={<BCIPage />} />
-          <Route
-            path="/login"
-            element={
-              managedSite ? (
-                loadingAccount ? (
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/bci" element={<BCIPage />} />
+            <Route
+              path="/login"
+              element={
+                managedSite ? (
+                  loadingAccount ? (
+                    <p className="loading" role="status">
+                      Checking your account…
+                    </p>
+                  ) : (
+                    <ManagedLogin session={managed} refresh={refreshManaged} />
+                  )
+                ) : connection ? (
+                  <Navigate to="/app" replace />
+                ) : publicSite ? (
+                  <Navigate to="/" replace />
+                ) : (
+                  <Login />
+                )
+              }
+            />
+            <Route path="/documentation/*" element={<Documentation />} />
+            <Route path="/pricing" element={<Pricing />} />
+            {/* Operator-only, and not a public surface: the panel is not mounted at all
+              without an account session that the control plane marks as superadmin.
+              The server still authorises every request, so this is a second gate. */}
+            <Route
+              path="/admin"
+              element={
+                !managedSite ? (
+                  <Navigate to="/" replace />
+                ) : loadingAccount ? (
                   <p className="loading" role="status">
                     Checking your account…
                   </p>
+                ) : accountError ? (
+                  <AccountUnavailable retry={retryAccount} />
+                ) : managed?.superadmin ? (
+                  <SuperAdmin />
+                ) : managed?.user ? (
+                  // Signed in, but not the operator. Saying so is kinder than a silent
+                  // bounce to the sign-in form, which reads as a broken session.
+                  <div className="standalone-security">
+                    <Logo />
+                    <Link to="/projects">Back to projects</Link>
+                    <h2>Operator access required.</h2>
+                    <p>
+                      This panel belongs to the platform operator account. You
+                      are currently signed in as{" "}
+                      {managed?.user?.email || "an unknown account"}. Your own
+                      projects are unaffected.
+                    </p>
+                  </div>
                 ) : (
-                  <ManagedLogin session={managed} refresh={refreshManaged} />
+                  <Navigate
+                    to={expiredSession ? "/login?expired=1" : "/login"}
+                    replace
+                  />
                 )
-              ) : connection ? (
-                <Navigate to="/app" replace />
-              ) : publicSite ? (
-                <Navigate to="/" replace />
-              ) : (
-                <Login />
-              )
-            }
-          />
-          <Route path="/documentation/*" element={<Documentation />} />
-          <Route path="/pricing" element={<Pricing />} />
-          {/* Operator-only, and not a public surface: the panel is not mounted at all
-              without an account session that the control plane marks as superadmin.
-              The server still authorises every request, so this is a second gate. */}
-          <Route
-            path="/admin"
-            element={
-              !managedSite ? (
-                <Navigate to="/" replace />
-              ) : loadingAccount ? (
-                <p className="loading" role="status">
-                  Checking your account…
-                </p>
-              ) : accountError ? (
-                <AccountUnavailable retry={retryAccount} />
-              ) : managed?.superadmin ? (
-                <SuperAdmin />
-              ) : managed?.user ? (
-                // Signed in, but not the operator. Saying so is kinder than a silent
-                // bounce to the sign-in form, which reads as a broken session.
-                <div className="standalone-security">
-                  <Logo />
-                  <Link to="/projects">Back to projects</Link>
-                  <h2>Operator access required.</h2>
-                  <p>
-                    This panel belongs to the platform operator account. You are currently
-                      signed in as {managed?.user?.email || "an unknown account"}. Your
-                    own projects are unaffected.
-                  </p>
-                </div>
-              ) : (
-                <Navigate to={expiredSession ? "/login?expired=1" : "/login"} replace />
-              )
-            }
-          />
-          {[
-            "privacy",
-            "terms",
-            "data-protection",
-            "security",
-            "subprocessors",
-            "cookies",
-            "acceptable-use",
-            "legal",
-            "support",
-            "status",
-          ].map((path) => (
-            <Route key={path} path={`/${path}`} element={<LegalPage />} />
-          ))}
-          {managedSite && (
-            <>
-              <Route path="/activate" element={<ActivateAccount />} />
-              <Route path="/reset-password" element={<ActivateAccount />} />
-              <Route path="/verify-email" element={<ActivateAccount />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route
-                path="/signup"
-                element={
-                  loadingAccount ? (
-                    <p className="loading">Checking your account…</p>
-                  ) : (
-                    <ManagedLogin
-                      key="signup"
-                      session={managed}
-                      refresh={refreshManaged}
-                    />
-                  )
-                }
-              />
-              <Route
-                path="/join"
-                element={<JoinProject refresh={refreshManaged} />}
-              />
-              <Route
-                path="/projects"
-                element={
-                  loadingAccount ? (
-                    <p className="loading">Loading projects…</p>
-                  ) : accountError ? (
-                    <AccountUnavailable retry={retryAccount} />
-                  ) : managed?.user &&
-                    !managed.user.needsMfa &&
-                    !managed.user.needsActivation ? (
-                    <ManagedProjects
-                      session={managed}
-                      refresh={refreshManaged}
-                    />
-                  ) : (
-                    <Navigate to={expiredSession ? "/login?expired=1" : "/login"} replace />
-                  )
-                }
-              />
-              <Route
-                path="/account/security"
-                element={
-                  managed?.user && !managed.user.needsMfa ? (
-                    <div className="standalone-security">
-                      <Logo />
-                      <Link to="/projects">Back to projects</Link>
-                      <ManagedSecurity />
-                    </div>
-                  ) : (
-                    <Navigate to={expiredSession ? "/login?expired=1" : "/login"} replace />
-                  )
-                }
-              />
-            </>
-          )}
-          <Route
-            path="/app/*"
-            element={
-              loadingAccount ? (
-                <p className="loading" role="status">
-                  Loading workspace…
-                </p>
-              ) : accountError ? (
-                <AccountUnavailable retry={retryAccount} />
-              ) : connection ? (
-                <Console key={connection.project?.id || "community"} />
-              ) : (
-                <Navigate
-                  to={
-                    managed?.user &&
-                    !managed.user.needsMfa &&
-                    !managed.user.needsActivation
-                      ? "/projects"
-                      : expiredSession
-                        ? "/login?expired=1"
-                        : "/login"
+              }
+            />
+            {[
+              "privacy",
+              "terms",
+              "data-protection",
+              "security",
+              "subprocessors",
+              "cookies",
+              "acceptable-use",
+              "legal",
+              "support",
+              "status",
+            ].map((path) => (
+              <Route key={path} path={`/${path}`} element={<LegalPage />} />
+            ))}
+            {managedSite && (
+              <>
+                <Route path="/activate" element={<ActivateAccount />} />
+                <Route path="/reset-password" element={<ActivateAccount />} />
+                <Route path="/verify-email" element={<ActivateAccount />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route
+                  path="/signup"
+                  element={
+                    loadingAccount ? (
+                      <p className="loading">Checking your account…</p>
+                    ) : (
+                      <ManagedLogin
+                        key="signup"
+                        session={managed}
+                        refresh={refreshManaged}
+                      />
+                    )
                   }
-                  replace
                 />
-              )
-            }
-          />
-          <Route
-            path="*"
-            element={
-              <div className="not-found">
-                <Logo />
-                <h1>That page is not here.</h1>
-                <Link to="/">Return home</Link>
-              </div>
-            }
-          />
-        </Routes>
+                <Route
+                  path="/join"
+                  element={<JoinProject refresh={refreshManaged} />}
+                />
+                <Route
+                  path="/projects"
+                  element={
+                    loadingAccount ? (
+                      <p className="loading">Loading projects…</p>
+                    ) : accountError ? (
+                      <AccountUnavailable retry={retryAccount} />
+                    ) : managed?.user &&
+                      !managed.user.needsMfa &&
+                      !managed.user.needsActivation ? (
+                      <ManagedProjects
+                        session={managed}
+                        refresh={refreshManaged}
+                      />
+                    ) : (
+                      <Navigate
+                        to={expiredSession ? "/login?expired=1" : "/login"}
+                        replace
+                      />
+                    )
+                  }
+                />
+                <Route
+                  path="/account/security"
+                  element={
+                    managed?.user && !managed.user.needsMfa ? (
+                      <div className="standalone-security">
+                        <Logo />
+                        <Link to="/projects">Back to projects</Link>
+                        <ManagedSecurity />
+                      </div>
+                    ) : (
+                      <Navigate
+                        to={expiredSession ? "/login?expired=1" : "/login"}
+                        replace
+                      />
+                    )
+                  }
+                />
+              </>
+            )}
+            <Route
+              path="/app/*"
+              element={
+                loadingAccount ? (
+                  <p className="loading" role="status">
+                    Loading workspace…
+                  </p>
+                ) : accountError ? (
+                  <AccountUnavailable retry={retryAccount} />
+                ) : connection ? (
+                  <Console key={connection.project?.id || "community"} />
+                ) : (
+                  <Navigate
+                    to={
+                      managed?.user &&
+                      !managed.user.needsMfa &&
+                      !managed.user.needsActivation
+                        ? "/projects"
+                        : expiredSession
+                          ? "/login?expired=1"
+                          : "/login"
+                    }
+                    replace
+                  />
+                )
+              }
+            />
+            <Route
+              path="*"
+              element={
+                <div className="not-found">
+                  <Logo />
+                  <h1>That page is not here.</h1>
+                  <Link to="/">Return home</Link>
+                </div>
+              }
+            />
+          </Routes>
         </Suspense>
       </PageBoundary>
     </AuthContext.Provider>
