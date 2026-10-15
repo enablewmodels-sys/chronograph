@@ -94,7 +94,7 @@ pub struct Token {
 /// One decoded window.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Decoded {
-    /// Space-joined tokens; an abstained slot is the literal <abstain>.
+    /// Space-joined tokens; an abstained slot is the literal `<abstain>`.
     pub text: Option<String>,
     /// Selected class for a classification artifact.
     pub label: Option<String>,
