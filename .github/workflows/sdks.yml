@@ -38,6 +38,7 @@ jobs:
       - run: sudo apt-get install -y ./.work/sdk-tools/liblsl.deb
       - run: python3 -m pip install -r scripts/sdk/requirements.txt
       - run: cargo build --locked -p chronograph-server --bins --example export_openapi
+      - run: npm --prefix sdk/typescript ci --ignore-scripts
       - run: npm --prefix ui ci && npm --prefix ui run build
       - run: python3 scripts/sdk/verify-contract.py
       - run: scripts/sdk/build.sh
