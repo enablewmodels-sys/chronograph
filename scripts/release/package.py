@@ -15,6 +15,7 @@ import tarfile
 import tempfile
 import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import patterns
 from inventory import generate
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -25,7 +26,7 @@ TREES = ['crates', 'examples', 'scripts', '.github', 'deploy', 'third_party', 's
 UI_TOP = ['package.json', 'package-lock.json', 'index.html', 'tsconfig.json', 'vite.config.ts', 'playwright.config.ts']
 FORBIDDEN = {'node_modules', 'target', 'data', 'config', 'community-data', '.work', 'private', '__pycache__', 'secrets', '.git', 'build', 'chronograph_connectors.egg-info'}
 FIXTURES = {'crates/chronograph-core/tests/fixtures/v1.cgraph'}
-SECRET = re.compile(rb'cg_[a-f0-9]{16}_[a-f0-9]{64}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----')
+SECRET = patterns.SECRET
 
 
 def digest(path):

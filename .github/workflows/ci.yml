@@ -11,6 +11,9 @@ jobs:
       CHRONOGRAPH_REPORT_PHASE: phase-ci
     steps:
       - uses: actions/checkout@v4
+      # A credential-shaped string must never reach this tree, and this is the cheapest place to
+      # refuse one: it needs no toolchain and it names the file it found.
+      - run: python3 scripts/release/check-secrets.py
       - uses: dtolnay/rust-toolchain@1.93.0
         with:
           components: rustfmt, clippy
@@ -52,6 +55,11 @@ jobs:
       - run: node scripts/service-latency.mjs
       - run: docker build -t chronograph:ci .
       - run: python3 scripts/container-smoke.py --image chronograph:ci
+      # The evidence below is uploaded on every run, failure included, so it is checked for
+      # credential-shaped bytes first: an artifact is downloadable and this is the last gate
+      # before it leaves the runner.
+      - run: python3 scripts/release/check-secrets.py bench/reports/v0.4.0-alpha.3/phase-ci
+        if: always()
       - uses: actions/upload-artifact@v4
         # Always, not only on success. The report under bench/reports is the only readable
         # evidence a failed run leaves: the job log needs admin rights, and a run that stops at
