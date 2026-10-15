@@ -10,6 +10,16 @@
 !crates/**
 !examples/
 !examples/**
+!sdk/
+!sdk/typescript/
+!sdk/typescript/package.json
+!sdk/typescript/package-lock.json
+!sdk/typescript/tsconfig.json
+!sdk/typescript/README.md
+!sdk/typescript/LICENSE
+!sdk/typescript/NOTICE
+!sdk/typescript/src/
+!sdk/typescript/src/**
 !ui/
 !ui/package.json
 !ui/package-lock.json
@@ -23,6 +33,7 @@
 !third_party/
 !third_party/**
 !scripts/
+!scripts/build-sdk.mjs
 !scripts/release/
 !scripts/release/inventory.py
 !docs/

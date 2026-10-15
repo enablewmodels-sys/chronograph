@@ -3,6 +3,12 @@ FROM node:22-bookworm-slim AS ui
 WORKDIR /build/ui
 COPY ui/package.json ui/package-lock.json ./
 RUN npm ci
+# The console imports the compiled SDK (ui/src/browser-decoder.ts imports
+# sdk/typescript/dist/decoder.js) and ui's prebuild compiles it, so the SDK sources and the
+# build script have to be in the image before ui is built. Without them the prebuild dies on
+# a missing module path and the image never builds.
+COPY sdk/typescript/ /build/sdk/typescript/
+COPY scripts/build-sdk.mjs /build/scripts/build-sdk.mjs
 COPY ui/ ./
 RUN npm run build
 
