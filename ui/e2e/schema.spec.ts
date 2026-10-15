@@ -525,6 +525,11 @@ test("BCI workspace navigation and reviewed recording migration", async ({
   await page
     .getByRole("button", { name: "Connect recording", exact: true })
     .click();
+  // The instance name sits behind the form's own "Advanced" disclosure, which stays closed
+  // until a person opens it: the form asks for the board, the rate and the channels first.
+  await page
+    .locator("summary", { hasText: "Advanced · instance name" })
+    .click();
   const instance = `bci_${info.project.name.startsWith("mobile") ? "m" : "d"}_${info.repeatEachIndex}`;
   await page.getByLabel("Instance", { exact: true }).fill(instance);
   await page

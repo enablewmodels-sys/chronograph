@@ -114,7 +114,23 @@
   html body .bci-tabs button,
   html body .bci-proof-grid span,
   html body .integration-banner strong,
-  html body .world-time-labels span {
+  html body .world-time-labels span,
+  /* The schema workspace and the connector console, measured by the console floor at 390,
+     320 and 900px: a 10px count badge in the tab strip, an 11px "Edit definition" ghost
+     button, a 10px relation footer, 11px property types, and the 11px primary and outline
+     buttons on the connectors page. */
+  html body .schema-tabs button span,
+  html body .schema-relation .eyebrow,
+  html body .schema-relation .ghost,
+  html body .schema-relation footer,
+  html body .schema-property-list code,
+  html body .schema-property-list small,
+  html body .schema-actions label,
+  html body .schema-actions button,
+  html body .schema-diff h4,
+  html body .schema-history-item strong,
+  html body .schema-history-number,
+  html body .schema-toggle small {
     /* The declaration is important because these are floors, not preferences: several of these
        selectors are written with two classes in the component stylesheets that load with their
        lazy chunks (for example `.memory-hero .hero-note`), so an equal-looking rule here loses on

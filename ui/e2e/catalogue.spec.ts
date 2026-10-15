@@ -57,10 +57,15 @@ test("every catalogued board is selectable in the source picker", async ({
   await openConsolePage(page, "BCI workspace");
   await expect(page).toHaveURL(/\/app\/bci$/);
 
-  // The setup panel is behind the empty-state action on a fresh workspace, and the
-  // page renders asynchronously, so wait for whichever of the two arrives.
+  // The setup panel is behind the workspace's own action on a fresh workspace, and the
+  // page renders asynchronously, so wait for whichever of the two arrives. The action is
+  // named "Connect recording" and the panel it opens is headed "Connect a recording", so
+  // the two locators stay distinct.
   const heading = page.getByRole("heading", { name: "Connect a recording" });
-  const setup = page.getByRole("button", { name: /Set up a source/ });
+  const setup = page.getByRole("button", {
+    name: "Connect recording",
+    exact: true,
+  });
   await expect(setup.or(heading).first()).toBeVisible();
   if (!(await heading.isVisible())) await setup.click();
   await expect(heading).toBeVisible();
