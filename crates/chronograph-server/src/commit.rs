@@ -66,12 +66,12 @@ impl GroupCommit {
                     .unwrap_or_else(PoisonError::into_inner);
                 // A round that failed after this waiter arrived must be reported, not retried
                 // silently: the persistent outcome of its own bytes is unknown.
-                if state.generation > seen && state.synced_mark < mark {
-                    if let Some(error) = &state.error {
-                        let error = error.clone();
-                        drop(state);
-                        return Err(ApiError::internal(error));
-                    }
+                if state.generation > seen
+                    && state.synced_mark < mark
+                    && let Some(error) = state.error.clone()
+                {
+                    drop(state);
+                    return Err(ApiError::internal(error));
                 }
                 drop(state);
                 continue;
@@ -210,9 +210,9 @@ mod tests {
             })
         };
         std::thread::sleep(Duration::from_millis(5));
+        // This waiter never leads: the leader's failure has to reach it.
         let follower = {
             let commit = commit.clone();
-            let syncs = syncs.clone();
             std::thread::spawn(move || commit.commit(5, false, || Ok(5)))
         };
 
