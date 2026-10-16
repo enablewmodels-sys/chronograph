@@ -1263,7 +1263,9 @@ fn check_scan_column(g: &Graph, label: &str) {
             "{label}: entry {i} disagrees with its version"
         );
     }
-    for t in [-1i64, 0, 500, 999, 1_000, 1_999, 2_000, 2_999, 3_000, 4_000, 4_500, 9_999] {
+    for t in [
+        -1i64, 0, 500, 999, 1_000, 1_999, 2_000, 2_999, 3_000, 4_000, 4_500, 9_999,
+    ] {
         let by_column: Vec<_> = g.as_of(t).edges().map(|e| e.id).collect();
         let by_versions: Vec<_> = g
             .index

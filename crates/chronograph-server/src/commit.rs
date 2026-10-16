@@ -186,7 +186,11 @@ mod tests {
 
         assert!(leader.join().unwrap().is_ok());
         assert!(later.join().unwrap().is_ok());
-        assert_eq!(syncs.load(Ordering::SeqCst), 2, "the second mark needs its own sync");
+        assert_eq!(
+            syncs.load(Ordering::SeqCst),
+            2,
+            "the second mark needs its own sync"
+        );
     }
 
     /// A sync that fails is reported to every waiter of that round, never swallowed.
@@ -213,8 +217,15 @@ mod tests {
         };
 
         assert!(leader.join().unwrap().is_err());
-        assert!(follower.join().unwrap().is_err(), "the follower must not report success");
-        assert_eq!(syncs.load(Ordering::SeqCst), 1, "a failure is not retried inside the round");
+        assert!(
+            follower.join().unwrap().is_err(),
+            "the follower must not report success"
+        );
+        assert_eq!(
+            syncs.load(Ordering::SeqCst),
+            1,
+            "a failure is not retried inside the round"
+        );
     }
 
     /// A mark that is already durable costs nothing.
@@ -222,14 +233,22 @@ mod tests {
     fn a_covered_mark_returns_without_syncing() {
         let commit = GroupCommit::default();
         let syncs = AtomicUsize::new(0);
-        assert!(commit.commit(10, false, || {
-            syncs.fetch_add(1, Ordering::SeqCst);
-            Ok(10)
-        }).is_ok());
-        assert!(commit.commit(5, false, || {
-            syncs.fetch_add(1, Ordering::SeqCst);
-            Ok(5)
-        }).is_ok());
+        assert!(
+            commit
+                .commit(10, false, || {
+                    syncs.fetch_add(1, Ordering::SeqCst);
+                    Ok(10)
+                })
+                .is_ok()
+        );
+        assert!(
+            commit
+                .commit(5, false, || {
+                    syncs.fetch_add(1, Ordering::SeqCst);
+                    Ok(5)
+                })
+                .is_ok()
+        );
         assert_eq!(syncs.load(Ordering::SeqCst), 1);
     }
 }

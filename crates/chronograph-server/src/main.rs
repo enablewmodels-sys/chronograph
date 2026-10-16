@@ -162,7 +162,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Reported rather than acted on: the completion backend is implemented and type-checked for
     // Linux, and switching the serving path to it needs a Linux run that can measure it.
     match chronograph_uring::available() {
-        true => eprintln!("io_uring is available on this kernel (the portable listener is serving)"),
+        true => {
+            eprintln!("io_uring is available on this kernel (the portable listener is serving)")
+        }
         false => eprintln!(
             "io_uring is unavailable: {}",
             chronograph_uring::unavailable_reason().unwrap_or_else(|| "refused".into())

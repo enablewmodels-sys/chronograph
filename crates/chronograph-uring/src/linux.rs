@@ -8,7 +8,7 @@ use io_uring::types::BufRingEntry;
 use io_uring::{IoUring, opcode, types};
 use tokio::sync::watch;
 
-pub use crate::{PROVIDED_BUFFERS, PROVIDED_BUFFER_SIZE};
+pub use crate::{PROVIDED_BUFFER_SIZE, PROVIDED_BUFFERS};
 
 /// The accept operation is the one submission that is not tied to a connection.
 const ACCEPT_TOKEN: u64 = u64::MAX;
@@ -68,7 +68,11 @@ impl ProvidedBuffers {
         }
         // Publishing the tail is what tells the kernel these are available.
         unsafe { std::ptr::write_volatile(BufRingEntry::tail(ring.as_ptr()) as *mut u16, entries) };
-        Ok(Self { ring, entries, data })
+        Ok(Self {
+            ring,
+            entries,
+            data,
+        })
     }
 
     fn register(&self, submitter: &io_uring::Submitter) -> io::Result<()> {
@@ -88,7 +92,9 @@ impl ProvidedBuffers {
         unsafe {
             let entry = &mut *self.ring.as_ptr().add(id as usize);
             entry.set_bid(id);
-            entry.set_addr(self.data.as_ptr() as u64 + (id as usize * PROVIDED_BUFFER_SIZE as usize) as u64);
+            entry.set_addr(
+                self.data.as_ptr() as u64 + (id as usize * PROVIDED_BUFFER_SIZE as usize) as u64,
+            );
             entry.set_len(PROVIDED_BUFFER_SIZE);
             let tail = BufRingEntry::tail(self.ring.as_ptr()) as *mut u16;
             let used = std::ptr::read_volatile(tail);
@@ -148,7 +154,9 @@ pub fn serve<H: Handler>(
                 continue;
             }
             if let Some(id) = buffer_id(flags) {
-                if let Some(response) = handler.on_bytes(connection, buffers.slice(id, result as u32)) {
+                if let Some(response) =
+                    handler.on_bytes(connection, buffers.slice(id, result as u32))
+                {
                     let _ = write_all(connection, &response);
                 }
                 buffers.recycle(id);
@@ -189,8 +197,13 @@ fn submit_receive(ring: &mut IoUring, connection: RawFd, group: u16) -> io::Resu
 /// Write the whole response, so a short write cannot truncate a body.
 fn write_all(connection: RawFd, mut bytes: &[u8]) -> io::Result<()> {
     while !bytes.is_empty() {
-        let written =
-            unsafe { libc::write(connection, bytes.as_ptr() as *const libc::c_void, bytes.len()) };
+        let written = unsafe {
+            libc::write(
+                connection,
+                bytes.as_ptr() as *const libc::c_void,
+                bytes.len(),
+            )
+        };
         if written < 0 {
             return Err(io::Error::last_os_error());
         }
