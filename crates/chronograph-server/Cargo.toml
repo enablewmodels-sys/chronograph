@@ -30,6 +30,8 @@ reqwest = { version = "0.13", default-features = false, features = ["rustls"] }
 tokio-util = { version = "0.7", features = ["io"] }
 # One listening socket per acceptor, so the kernel spreads connections before any task runs.
 socket2 = "0.6"
+# Completion-based I/O for the listener: the probe is wired in, the serving path is not.
+chronograph-uring = { path = "../chronograph-uring" }
 
 [dev-dependencies]
 tempfile = "3"

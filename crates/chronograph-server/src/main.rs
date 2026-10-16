@@ -159,6 +159,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     let count = listeners.len();
     eprintln!("ChronoDB listening on {addr} with {count} acceptor(s); public origin {origin}");
+    // Reported rather than acted on: the completion backend is implemented and type-checked for
+    // Linux, and switching the serving path to it needs a Linux run that can measure it.
+    match chronograph_uring::available() {
+        true => eprintln!("io_uring is available on this kernel (the portable listener is serving)"),
+        false => eprintln!(
+            "io_uring is unavailable: {}",
+            chronograph_uring::unavailable_reason().unwrap_or_else(|| "refused".into())
+        ),
+    }
     // One shutdown signal for every acceptor, so Ctrl+C drains all of them and then syncs.
     let (stop, signal) = tokio::sync::watch::channel(false);
     let mut servers = Vec::with_capacity(count);

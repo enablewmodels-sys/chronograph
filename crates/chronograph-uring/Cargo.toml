@@ -1,0 +1,19 @@
+[package]
+name = "chronograph-uring"
+description = "Multishot accept and provided-buffer receive for the ChronoDB listener"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+repository.workspace = true
+publish = false
+
+# Pure Rust and thin bindings only. The crate is deliberately free of the server's C dependencies
+# so it can be type-checked for Linux from a machine that has no Linux C toolchain.
+[dependencies]
+# Only the shutdown signal; the crate stays free of the server's runtime and C dependencies.
+tokio = { version = "1", default-features = false, features = ["sync"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+io-uring = "0.7"
+libc = "0.2"

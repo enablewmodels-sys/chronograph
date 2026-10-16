@@ -637,6 +637,7 @@ dependencies = [
  "axum",
  "chronograph-connector-common",
  "chronograph-db",
+ "chronograph-uring",
  "rand 0.9.5",
  "reqwest",
  "rmcp",
@@ -652,6 +653,15 @@ dependencies = [
  "tower",
  "tower-http",
  "url",
+]
+
+[[package]]
+name = "chronograph-uring"
+version = "0.4.0-alpha.3"
+dependencies = [
+ "io-uring",
+ "libc",
+ "tokio",
 ]
 
 [[package]]
@@ -1519,6 +1529,17 @@ dependencies = [
  "hashbrown 0.17.1",
  "serde",
  "serde_core",
+]
+
+[[package]]
+name = "io-uring"
+version = "0.7.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed3bd0ecfbb87805f538bb7b32e5239ca0763890c623e349860ecba69469f2bb"
+dependencies = [
+ "bitflags",
+ "cfg-if",
+ "libc",
 ]
 
 [[package]]
@@ -2868,7 +2889,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "once_cell",
  "rustix",
  "windows-sys 0.61.2",
