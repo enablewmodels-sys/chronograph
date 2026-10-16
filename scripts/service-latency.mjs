@@ -143,6 +143,19 @@ try {
     });
     assert.equal(r.ids.length, 1);
   });
+  // Eight writers asking for durability at once. One fsync can cover all eight, so the
+  // aggregate is what says whether the durability path batches; the single-writer case above
+  // only measures one fsync.
+  await measure("HTTP durable insert, 8 concurrent", 400, 8, async () => {
+    const id = unique++;
+    const r = await http("add_edges", {
+      durability: "fsync",
+      edges: [
+        { src: String(2000000 + id), dst: "3", kind: 1, valid_from: "9000000" },
+      ],
+    });
+    assert.equal(r.ids.length, 1);
+  });
   const source = JSON.stringify({
     version: 1,
     id: "latency_schema",

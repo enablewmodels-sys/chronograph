@@ -1,6 +1,7 @@
 pub mod auth;
 pub mod backup;
 mod bci;
+mod commit;
 mod connectors;
 pub mod contract;
 pub mod import;
@@ -36,6 +37,13 @@ use tower_http::{
     limit::RequestBodyLimitLayer,
     services::{ServeDir, ServeFile},
 };
+
+/// Operations that may hold an engine lock at once; the rest wait for a permit.
+const WORKERS: usize = 8;
+/// Requests admitted but not yet holding a worker permit. This is the queue a reader sees.
+const QUEUE: usize = 40;
+/// Password and token hashing is deliberately the narrowest pool: Argon2id is memory-hard.
+const AUTH_WORKERS: usize = 2;
 
 pub type Shared = Arc<AppState>;
 pub type AppResult<T> = Result<T, ApiError>;
@@ -150,6 +158,8 @@ impl IntoResponse for ApiError {
 }
 pub struct AppState {
     graph: RwLock<Graph>,
+    /// One sync may serve every durable writer that is already waiting for one.
+    commit: commit::GroupCommit,
     bci: Mutex<bci::Index>,
     schema: RwLock<schema::Catalog>,
     auth: Mutex<auth::Auth>,
@@ -215,6 +225,7 @@ impl AppState {
         let authority = url[url::Position::BeforeHost..url::Position::AfterPort].to_owned();
         Ok(Arc::new(Self {
             graph: RwLock::new(graph),
+            commit: commit::GroupCommit::default(),
             bci: Mutex::new(bci::Index::default()),
             schema: RwLock::new(schema),
             auth: Mutex::new(auth),
@@ -222,9 +233,9 @@ impl AppState {
             origin: url.origin().ascii_serialization(),
             authority,
             secure: url.scheme() == "https",
-            jobs: Arc::new(Semaphore::new(8)),
-            admission: Arc::new(Semaphore::new(40)),
-            auth_jobs: Arc::new(Semaphore::new(2)),
+            jobs: Arc::new(Semaphore::new(WORKERS)),
+            admission: Arc::new(Semaphore::new(QUEUE)),
+            auth_jobs: Arc::new(Semaphore::new(AUTH_WORKERS)),
             started: Instant::now(),
             require_fsync,
             requests_total: AtomicU64::new(0),
@@ -234,6 +245,23 @@ impl AppState {
     pub fn sync(&self) -> AppResult<()> {
         self.graph.write().map_err(ApiError::internal)?.sync()?;
         Ok(())
+    }
+    /// Confirm that everything written up to `mark` is on the filesystem.
+    ///
+    /// Coalesces concurrent requests: the caller that arrives first syncs once for everyone whose
+    /// mark that sync covers. `contended` is true while other writers are queued, and only then
+    /// does the leader wait briefly to gather them.
+    pub fn commit_durable(&self, mark: u64, contended: bool) -> AppResult<()> {
+        self.commit.commit(mark, contended, || {
+            let mut graph = self.graph.write().map_err(ApiError::internal)?;
+            let covered = graph.durable_mark();
+            graph.sync()?;
+            Ok(covered)
+        })
+    }
+    /// Whether a writer is waiting for a worker permit, which means a sync has someone to share.
+    pub fn writers_queued(&self) -> bool {
+        self.jobs.available_permits() < WORKERS
     }
     pub async fn admit(&self) -> AppResult<WorkPermit> {
         let admission = self
@@ -442,7 +470,7 @@ async fn info(
         settings.default_durability.clone()
     };
     Ok(Json(
-        json!({"version":env!("CARGO_PKG_VERSION"),"edition":"community","credential":{"id":p.id,"scope":p.scope},"mcp_url":format!("{}/mcp",s.origin),"uptime_seconds":s.started.elapsed().as_secs(),"limits":{"body_bytes":4194304,"batch_edges":10000,"query_results":1000,"workers":8,"queue":32},"default_durability":effective,"require_fsync":s.require_fsync,"configured_default_durability":settings.default_durability,"workspace_name":settings.name}),
+        json!({"version":env!("CARGO_PKG_VERSION"),"edition":"community","credential":{"id":p.id,"scope":p.scope},"mcp_url":format!("{}/mcp",s.origin),"uptime_seconds":s.started.elapsed().as_secs(),"limits":{"body_bytes":4194304,"batch_edges":10000,"query_results":1000,"workers":WORKERS,"queue":QUEUE},"default_durability":effective,"require_fsync":s.require_fsync,"configured_default_durability":settings.default_durability,"workspace_name":settings.name}),
     ))
 }
 async fn ready(State(s): State<Shared>) -> AppResult<Json<Value>> {

@@ -1,6 +1,39 @@
 use chronograph_server::{AppState, router};
 use std::{net::SocketAddr, path::PathBuf};
 
+/// One listening socket per acceptor.
+///
+/// A single listener leaves every connection to one accept queue and one task, so a burst is
+/// serialised before any handler runs. `SO_REUSEPORT` lets the kernel hash an incoming
+/// connection straight to a worker's own queue, which is why the count follows the machine.
+/// Unsupported platforms, and a kernel that refuses the option, keep the single-listener path.
+fn acceptors() -> usize {
+    std::thread::available_parallelism()
+        .map(|n| n.get().clamp(1, 8))
+        .unwrap_or(1)
+}
+
+fn listeners(addr: SocketAddr, count: usize) -> std::io::Result<Vec<tokio::net::TcpListener>> {
+    let mut bound = Vec::with_capacity(count);
+    for _ in 0..count {
+        let domain = if addr.is_ipv4() {
+            socket2::Domain::IPV4
+        } else {
+            socket2::Domain::IPV6
+        };
+        let socket =
+            socket2::Socket::new(domain, socket2::Type::STREAM, Some(socket2::Protocol::TCP))?;
+        socket.set_reuse_address(true)?;
+        #[cfg(unix)]
+        socket.set_reuse_port(true)?;
+        socket.set_nonblocking(true)?;
+        socket.bind(&addr.into())?;
+        socket.listen(1024)?;
+        bound.push(tokio::net::TcpListener::from_std(socket.into())?);
+    }
+    Ok(bound)
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
@@ -115,11 +148,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr: SocketAddr = std::env::var("CHRONOGRAPH_BIND")
         .unwrap_or_else(|_| "127.0.0.1:8080".into())
         .parse()?;
-    let listener = tokio::net::TcpListener::bind(addr).await?;
-    eprintln!("ChronoDB listening on {addr}; public origin {origin}");
-    axum::serve(listener, router(state.clone(), ui, docs))
-        .with_graceful_shutdown(shutdown())
-        .await?;
+    let app = router(state.clone(), ui, docs);
+    let wanted = acceptors();
+    let listeners = match listeners(addr, wanted) {
+        Ok(listeners) => listeners,
+        Err(error) => {
+            eprintln!("Reusing one listening socket instead of {wanted}: {error}");
+            vec![tokio::net::TcpListener::bind(addr).await?]
+        }
+    };
+    let count = listeners.len();
+    eprintln!("ChronoDB listening on {addr} with {count} acceptor(s); public origin {origin}");
+    // One shutdown signal for every acceptor, so Ctrl+C drains all of them and then syncs.
+    let (stop, signal) = tokio::sync::watch::channel(false);
+    let mut servers = Vec::with_capacity(count);
+    for listener in listeners {
+        let app = app.clone();
+        let mut signal = signal.clone();
+        servers.push(tokio::spawn(async move {
+            let _ = axum::serve(listener, app)
+                .with_graceful_shutdown(async move {
+                    let _ = signal.wait_for(|stop| *stop).await;
+                })
+                .await;
+        }));
+    }
+    shutdown().await;
+    let _ = stop.send(true);
+    for server in servers {
+        let _ = server.await;
+    }
     state.sync()?;
     eprintln!("Shutdown complete; log synchronized.");
     Ok(())

@@ -373,15 +373,25 @@ pub async fn execute(state: Shared, op: String, mut args: Value) -> AppResult<Va
                 }
                 _ => unreachable!(),
             };
-            if durability == "fsync" {
-                g.sync()?;
-            }
+            // The mark is taken while the write lock is held, so "a sync covered my mark" means
+            // "my bytes are durable". The sync itself happens after the lock is released: holding
+            // it across an fsync serialised every writer behind one flush.
+            let durable_mark = if durability == "fsync" {
+                Some(g.durable_mark())
+            } else {
+                None
+            };
             result["revision"] = json!(g.revision().to_string());
             result["durability"] = if matches!(op.as_str(), "sync" | "backup") {
                 json!("fsync")
             } else {
                 durability
             };
+            drop(g);
+            if let Some(mark) = durable_mark {
+                let contended = state.writers_queued();
+                state.commit_durable(mark, contended)?;
+            }
             result
         } else {
             let g = state.graph.read().map_err(ApiError::internal)?;
