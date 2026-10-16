@@ -17,10 +17,42 @@ pub(crate) struct Adjacency {
     pub timelines: FxHashMap<Relation, BTreeMap<(i64, EdgeId), EdgeRef>>,
 }
 
+/// What a valid-time filter needs, and nothing else: 16 bytes per version.
+///
+/// Every `as_of` and every `between` scans the retained versions. Scanning this column instead
+/// of the 64-byte `Edge` moves 160 MB for ten million versions rather than 640 MB, and the
+/// matching versions are then read out of `edges`. Position is the index: the column and
+/// `edges` are appended together and never reordered, so `scan[i]` always describes
+/// `edges[i]`.
+#[derive(Clone, Copy)]
+pub(crate) struct ScanInterval {
+    pub valid_from: i64,
+    pub valid_to: i64,
+}
+
+impl ScanInterval {
+    /// Active at `t`; at `i64::MAX` no version is active.
+    #[inline]
+    pub fn covers(&self, t: i64) -> bool {
+        self.valid_from <= t && t < self.valid_to
+    }
+
+    /// Nonempty overlap with the nonempty window `[start, end)`.
+    #[inline]
+    pub fn overlaps(&self, start: i64, end: i64) -> bool {
+        start < end
+            && self.valid_from < self.valid_to
+            && self.valid_from < end
+            && self.valid_to > start
+    }
+}
+
 #[derive(Default)]
 pub(crate) struct Index {
     pub nodes: FxHashMap<NodeId, Adjacency>,
     pub edges: Vec<Edge>,
+    /// The intervals of `edges`, in the same order. Derived state, rebuilt by replay.
+    pub scan: Vec<ScanInterval>,
     // The frame offset is sufficient to locate an edge; a batch shares one frame.
     pub offsets: Vec<u64>,
     pub revision: u64,
@@ -154,8 +186,14 @@ impl Index {
         let edge = insert.edge;
         if let Some(id) = insert.predecessor {
             self.edges[id.0 as usize].valid_to = edge.valid_from;
+            // The scan column holds the same interval, so it has to move with it.
+            self.scan[id.0 as usize].valid_to = edge.valid_from;
         }
         self.edges.push(edge);
+        self.scan.push(ScanInterval {
+            valid_from: edge.valid_from,
+            valid_to: edge.valid_to,
+        });
         self.offsets.push(offset);
         let reference = EdgeRef { id: edge.id };
         let node = self.nodes.entry(edge.src).or_default();
@@ -169,6 +207,7 @@ impl Index {
 
     pub fn invalidate(&mut self, id: EdgeId, t: i64, _maintain_order: bool) {
         self.edges[id.0 as usize].valid_to = t;
+        self.scan[id.0 as usize].valid_to = t;
     }
 
     pub fn finish(&mut self) {}

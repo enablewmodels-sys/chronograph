@@ -318,11 +318,15 @@ impl Graph {
     /// Iterate nonempty edge versions overlapping `[start, end)` in insertion order.
     /// Empty or reversed windows return no results. This is an O(E) history scan.
     pub fn between(&self, start: i64, end: i64) -> impl Iterator<Item = Edge> + '_ {
-        self.index
-            .edges
+        // Filter on the 16-byte interval column, then read the versions that matched. The
+        // insertion order of `edges` is what the caller sees, and the column shares it.
+        let index = &self.index;
+        index
+            .scan
             .iter()
-            .filter(move |edge| edge.overlaps(start, end))
-            .copied()
+            .enumerate()
+            .filter(move |(_, interval)| interval.overlaps(start, end))
+            .map(move |(i, _)| index.edges[i])
     }
 
     /// Active outgoing edges, descending by `(valid_from, EdgeId)`.
@@ -413,6 +417,15 @@ impl Graph {
         }
     }
 
+    /// Byte position of the journal: a monotonic mark for durability waiters.
+    ///
+    /// A writer takes this while it holds the write lock, and a sync publishes the mark it saw
+    /// before flushing. "The sync covered my mark" is therefore exactly "my bytes are durable",
+    /// which is what lets one sync serve every writer that is already waiting for one.
+    pub fn durable_mark(&self) -> u64 {
+        self.journal.offset
+    }
+
     /// Flush accepted writes and synchronize the log to the filesystem.
     /// On error the writer is disabled, since the persistent outcome may be ambiguous.
     pub fn sync(&mut self) -> Result<()> {
@@ -485,12 +498,13 @@ impl<'a> GraphView<'a> {
     /// Whole-graph traversal avoids random adjacency gathers; per-node queries use the temporal index.
     pub fn edges(&self) -> impl Iterator<Item = Edge> + 'a {
         let t = self.t;
-        self.graph
-            .index
-            .edges
+        let index = &self.graph.index;
+        index
+            .scan
             .iter()
-            .filter(move |edge| edge.is_valid_at(t))
-            .copied()
+            .enumerate()
+            .filter(move |(_, interval)| interval.covers(t))
+            .map(move |(i, _)| index.edges[i])
     }
 
     /// Active outgoing edge handles for one node at the view's timestamp.

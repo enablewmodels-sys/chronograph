@@ -1243,3 +1243,84 @@ fn one_frame_commits_several_branches_and_rejects_atomically() {
     assert_eq!(g.fork_history(a).unwrap().count(), 2);
     assert_eq!(g.fork_history(b).unwrap().count(), 2);
 }
+
+/// The derived scan column agrees with the versions it describes, after every kind of mutation.
+///
+/// `as_of` and `between` filter on `Index::scan` and then read `Index::edges`, so a column that
+/// drifted — a shortened predecessor, an invalidation, a branch merge, or a partial replay —
+/// would answer a temporal query with the wrong rows. This compares the two scans entry by entry
+/// and then compares the answers themselves.
+fn check_scan_column(g: &Graph, label: &str) {
+    assert_eq!(
+        g.index.scan.len(),
+        g.index.edges.len(),
+        "{label}: the column and the versions must stay the same length"
+    );
+    for i in 0..g.index.edges.len() {
+        assert_eq!(
+            (g.index.scan[i].valid_from, g.index.scan[i].valid_to),
+            (g.index.edges[i].valid_from, g.index.edges[i].valid_to),
+            "{label}: entry {i} disagrees with its version"
+        );
+    }
+    for t in [-1i64, 0, 500, 999, 1_000, 1_999, 2_000, 2_999, 3_000, 4_000, 4_500, 9_999] {
+        let by_column: Vec<_> = g.as_of(t).edges().map(|e| e.id).collect();
+        let by_versions: Vec<_> = g
+            .index
+            .edges
+            .iter()
+            .filter(|e| e.is_valid_at(t))
+            .map(|e| e.id)
+            .collect();
+        assert_eq!(by_column, by_versions, "{label}: as_of({t}) disagrees");
+    }
+    for (start, end) in [
+        (0i64, 1i64),
+        (0, 10_000),
+        (2_000, 3_500),
+        (500, 500),
+        (9_000, 1_000),
+        (1_000, 1_001),
+    ] {
+        let by_column: Vec<_> = g.between(start, end).map(|e| e.id).collect();
+        let by_versions: Vec<_> = g
+            .index
+            .edges
+            .iter()
+            .filter(|e| e.overlaps(start, end))
+            .map(|e| e.id)
+            .collect();
+        assert_eq!(
+            by_column, by_versions,
+            "{label}: between({start},{end}) disagrees"
+        );
+    }
+}
+
+#[test]
+fn the_scan_column_survives_writes_invalidations_merges_and_replay() {
+    let f = TestFile::new();
+    let mut g = Graph::open(&f.0).unwrap();
+    add(&mut g, input(1, 2, 1_000));
+    add(&mut g, input(1, 2, 3_000));
+    add(&mut g, input(1, 3, 2_000));
+    add(&mut g, input(4, 5, 5_000));
+    // A late correction shortens the active predecessor in place.
+    add(&mut g, input(1, 2, 2_000));
+    // An invalidation shortens an end and keeps the superseded history. It has to land inside
+    // the version's own interval: the engine refuses a timestamp before its start.
+    g.invalidate_edge(EdgeId(0), 1_500).unwrap();
+    let fork = g.fork(4_000).unwrap();
+    // A relationship the parent has no future version of: a touched future blocks the merge
+    // by design, and this test is about the column, not about that rule.
+    g.add_edges_to_fork(fork, &[input(6, 7, 4_500)]).unwrap();
+
+    check_scan_column(&g, "after writes, a correction and an invalidation");
+    g.merge(fork).unwrap();
+    check_scan_column(&g, "after a merge");
+    g.sync().unwrap();
+    drop(g);
+    // Replay rebuilds the column from the journal, which is where a drift would hide longest.
+    let g = Graph::open(&f.0).unwrap();
+    check_scan_column(&g, "after replay");
+}
