@@ -17,7 +17,7 @@ final interval is compared with an independent generated reference.
 | Ordered single insertion + final sync | 547,251 versions/s | ≥500k/s — PASS |
 | Shuffled batches + final sync | 941,933 versions/s | Reported separately |
 | Shuffled singles + final sync | 559,132 versions/s | Reported separately |
-| Full as-of p50 / p99 | 19.053 / 19.805 ms | p50 <10 ms — MISSED |
+| Full as-of p50 / p99 | 19.053 / 19.805 ms (15.693 / 17.393 ms after the October scan column) | p50 <10 ms — MISSED |
 | Full 36-second between p50 / p99 | 22.812 / 23.782 ms | No stated target |
 | LatestFirst returned sampling | 27.69M edges/s | ≥5M/s — PASS |
 | Uniform returned sampling | 24.74M edges/s | ≥5M/s — PASS |

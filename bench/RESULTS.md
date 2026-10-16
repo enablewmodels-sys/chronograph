@@ -45,6 +45,47 @@ The misses remain visible in product copy and release status. A repeat on a
 controlled machine/power configuration and a matched baseline is still needed
 to attribute the difference. Do not claim the candidate meets every speed target.
 
+## Re-run after the scan column, 15–16 October 2026
+
+Same machine, same power state (Apple M5, 16 GiB, AC Low Power Mode **enabled**), same
+seed and generator, Rust 1.93.0 release with thin LTO. The dataset was regenerated into
+`bench/data/scan-ab.cgraph` because the September file is a format-2 journal and the
+current build requires an explicit migration to open it.
+
+| Measurement | September | Re-run | Note |
+|---|---:|---:|---|
+| Ordered batch insert including final sync | 1,104,833/s | **1,225,786/s** | the write path gains a 16-byte scan column per version |
+| Full as-of p50 (200 queries, 10M versions) | 19.053 ms | **15.693 ms** | filters on 16 bytes per version instead of 64 |
+| Full as-of p99 | 19.805 ms | 17.393 ms | |
+| Between full traversal p50 | 22.812 ms | 17.862 ms | |
+| Arrow export, 949,342 rows | 31.187 ms | 31.973 ms | unchanged within noise |
+| Reopen, 10M versions | 12.114 s | 13.423 s | a different dataset file; not a like-for-like pair |
+
+Both targets are still missed: the batch insert needs 2M/s and the as-of needs under
+10 ms. The remaining cost of the as-of walk is that the filter now reads 16 bytes per
+version but each match is still copied as a full 64-byte `Edge`, so a consumer that only
+needs identifiers pays for a payload it never reads. A scan that yields references rather
+than values is the next change to measure; it is not claimed here.
+
+## Durable writes under concurrency, 15 October 2026
+
+`scripts/service-latency.mjs` on the same machine, 100,000-version workspace, release
+binary. The eight-writer case is new with this run, so its "before" is the same case
+measured against the previous build on the same machine.
+
+| Case | Before | After |
+|---|---:|---:|
+| Durable single insert, 1 writer | 4.26 ms p50, 228/s | 3.93 ms p50, 262/s |
+| Durable insert, 8 writers | 31.96 ms p50, 253/s | 6.42 ms p50, 1230/s |
+| Schema catalog read | 0.21 ms p50 | 0.197 ms p50, 4459/s |
+| Typed as-of first page, 1000 rows, 1 writer | 4.98 ms p50 | 5.30 ms p50 |
+| HTTP as-of first page, 8 clients | not measured | 7.66 ms p50, 982/s |
+
+Before, eight concurrent durable writers returned 253 requests a second — the same as one
+writer, because each waited for its own fsync while holding the write lock. One sync now
+covers every writer whose bytes it flushed, which is a 4.9× aggregate improvement and a
+5.0× lower p50 at that concurrency.
+
 Whole-run peak resident memory from macOS `/usr/bin/time -l`: ordered batch
 3,491,495,936 bytes; ordered single 4,037,935,104; shuffled batch 3,641,016,320;
 shuffled single 3,915,841,536. These peaks include generator, validation, replay

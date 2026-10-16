@@ -224,9 +224,10 @@ warm caches, AC Low Power Mode enabled; 100k nodes / 10M versions:
 
 | Workload | Measured | Target / result |
 |---|---:|---|
-| Ordered batch insertion + final sync | 1.105M versions/s | ≥2M — missed |
+| Ordered batch insertion + final sync | 1.226M versions/s | ≥2M — missed |
 | Ordered single insertion + final sync | 547k versions/s | ≥500k — passed |
-| Fully consumed as-of p50 / p99 | 19.053 / 19.805 ms | p50 <10 ms — missed |
+| Fully consumed as-of p50 / p99 | 15.693 / 17.393 ms | p50 <10 ms — missed |
+| Durable insert, 8 concurrent writers | 1,230 requests/s | new; 253/s before |
 | LatestFirst / Uniform sampling | 27.69M / 24.74M returned edges/s | ≥5M — passed |
 
 The earlier checkpoint was faster; its power state was not recorded. A controlled
