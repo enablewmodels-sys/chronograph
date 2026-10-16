@@ -4,6 +4,7 @@ mod bci;
 mod commit;
 mod connectors;
 pub mod contract;
+pub mod http;
 pub mod import;
 mod mcp;
 mod operations;

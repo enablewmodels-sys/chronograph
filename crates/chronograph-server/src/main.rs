@@ -158,7 +158,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
     let count = listeners.len();
-    eprintln!("ChronoDB listening on {addr} with {count} acceptor(s); public origin {origin}");
+    // The hand-written connection layer is opt-in. Its parser answers identically to hyper for
+    // the same bytes (crates/chronograph-server/src/http.rs holds that test), but its response
+    // path collects a whole body into one buffer, so a large Arrow export or backup download
+    // would be bounded by that buffer where hyper streams it. It stays a switch until that half
+    // is streamed too.
+    let own_http = std::env::var("CHRONOGRAPH_HTTP")
+        .map(|value| value == "own")
+        .unwrap_or(false);
+    eprintln!(
+        "ChronoDB listening on {addr} with {count} acceptor(s); public origin {origin}; connection layer {}",
+        if own_http { "own" } else { "hyper" }
+    );
     // Reported rather than acted on: the completion backend is implemented and type-checked for
     // Linux, and switching the serving path to it needs a Linux run that can measure it.
     match chronograph_uring::available() {
@@ -176,13 +187,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     for listener in listeners {
         let app = app.clone();
         let mut signal = signal.clone();
-        servers.push(tokio::spawn(async move {
-            let _ = axum::serve(listener, app)
-                .with_graceful_shutdown(async move {
-                    let _ = signal.wait_for(|stop| *stop).await;
-                })
-                .await;
-        }));
+        if own_http {
+            servers.push(tokio::spawn(async move {
+                loop {
+                    tokio::select! {
+                        accepted = listener.accept() => {
+                            let Ok((io, _)) = accepted else { break };
+                            let app = app.clone();
+                            tokio::spawn(async move {
+                                let _ = chronograph_server::http::serve_connection(app, io).await;
+                            });
+                        }
+                        _ = signal.wait_for(|stop| *stop) => break,
+                    }
+                }
+            }));
+        } else {
+            servers.push(tokio::spawn(async move {
+                let _ = axum::serve(listener, app)
+                    .with_graceful_shutdown(async move {
+                        let _ = signal.wait_for(|stop| *stop).await;
+                    })
+                    .await;
+            }));
+        }
     }
     shutdown().await;
     let _ = stop.send(true);

@@ -32,8 +32,8 @@ tokio-util = { version = "0.7", features = ["io"] }
 socket2 = "0.6"
 # Completion-based I/O for the listener: the probe is wired in, the serving path is not.
 chronograph-uring = { path = "../chronograph-uring" }
+# The hand-written connection layer dispatches into the same router through this.
+tower = { version = "0.5", features = ["util"] }
 
 [dev-dependencies]
 tempfile = "3"
-
-tower = { version = "0.5", features = ["util"] }
